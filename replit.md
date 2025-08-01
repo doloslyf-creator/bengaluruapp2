@@ -2,11 +2,25 @@
 
 ## Overview
 
-This is a full-stack property management application built with Express.js backend and React frontend. The system is designed to manage real estate properties with comprehensive CRUD operations, search functionality, and detailed property information tracking. It focuses on Indian real estate market features including RERA compliance, zoning information, and regional categorization.
+This is a comprehensive full-stack property management and customer discovery platform built with Express.js backend and React frontend. The system combines admin property management with a sophisticated customer-facing property finder that enables property search, booking site visits, and consultation requests. It focuses on Indian real estate market features including RERA compliance, zoning information, and regional categorization with real-time integration between admin panel data and customer experience.
+
+## Recent Changes (August 2025)
+
+**Customer Property Finder System (Completed)**
+- Built complete 4-page customer journey: Find Property → Property Results → Book Visit → Consultation
+- Implemented advanced property matching algorithm with weighted scoring (type 30%, zone 25%, budget 25%, tags 15%, BHK 5%)
+- Added localStorage caching system for search preferences that persist across navigation
+- Enhanced property results with multiple sorting options (Best Match, Price Low/High, Name A-Z)
+- Created advanced filtering panel with budget slider, zone selection, property type, and feature filters
+- Integrated real admin panel data extraction for zones, property types, and tags (no hardcoded options)
+- Fixed property selection dropdowns to dynamically populate from actual database properties
+- Implemented comprehensive booking system for site visits and consultations with confirmation workflows
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Project approach: User appreciates comprehensive solutions that integrate real data with sophisticated customer experience.
+Focus areas: Customer-facing features, real data integration, and seamless user workflows.
 
 ## Authentication
 
@@ -47,11 +61,15 @@ Preferred communication style: Simple, everyday language.
 
 ### Key Features
 - **Property Management**: Full CRUD operations with detailed property specifications
+- **Customer Property Discovery**: Advanced property finder with intelligent matching and filtering
 - **Indian Market Focus**: RERA compliance tracking, zone-based categorization, and regional pricing
 - **Media Support**: Image and video upload capabilities for property listings
 - **Advanced Search**: Text search across property names, developers, and locations
-- **Filtering System**: Multi-criteria filtering by type, status, zone, and price range
+- **Intelligent Filtering**: Dynamic multi-criteria filtering by type, status, zone, price range, and features
+- **Booking System**: Site visit and consultation booking with confirmation workflows
 - **Dashboard Analytics**: Property statistics and summary information
+- **Persistent Preferences**: Customer search preferences cached across sessions
+- **Real-time Data Integration**: Customer dropdowns populated from actual admin panel data
 
 ## External Dependencies
 
