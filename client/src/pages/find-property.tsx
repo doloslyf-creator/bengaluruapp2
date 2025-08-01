@@ -48,22 +48,44 @@ export default function FindProperty() {
   const [preferences, setPreferences] = useState<PropertyPreferences>(getCachedPreferences());
 
   // Fetch properties to extract real options
-  const { data: properties = [] } = useQuery<Property[]>({
+  const { data: properties = [], isLoading: propertiesLoading } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
   // Extract real options from admin panel data
-  const zones = Array.from(new Set(properties.map(p => p.zone))).sort();
-  const propertyTypes = Array.from(new Set(properties.map(p => p.type))).map(type => ({
+  const zones = Array.from(new Set(properties.map(p => p.zone).filter(Boolean))).sort();
+  const propertyTypes = Array.from(new Set(properties.map(p => p.type).filter(Boolean))).map(type => ({
     value: type,
     label: type.charAt(0).toUpperCase() + type.slice(1)
   }));
   
-  const allTags = Array.from(new Set(properties.flatMap(p => p.tags || []))).sort();
+  const allTags = Array.from(new Set(properties.flatMap(p => p.tags || []))).filter(Boolean).sort();
   const tags = allTags.map(tag => ({
     value: tag,
     label: tag.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())
   }));
+
+  // Add some fallback options if no data is loaded yet
+  const fallbackZones = ["north", "south", "east", "west", "central"];
+  const fallbackPropertyTypes = [
+    { value: "apartment", label: "Apartment" },
+    { value: "villa", label: "Villa" },
+    { value: "plot", label: "Plot" },
+    { value: "commercial", label: "Commercial" }
+  ];
+  
+  const displayZones = zones.length > 0 ? zones : (propertiesLoading ? [] : fallbackZones);
+  const displayPropertyTypes = propertyTypes.length > 0 ? propertyTypes : (propertiesLoading ? [] : fallbackPropertyTypes);
+
+  // Debug logging
+  console.log('Properties loaded:', properties.length);
+  console.log('Raw properties:', properties);
+  console.log('Zones extracted:', zones);
+  console.log('Property types extracted:', propertyTypes);
+  console.log('Tags extracted:', tags);
+  console.log('Display zones:', displayZones);
+  console.log('Display property types:', displayPropertyTypes);
 
   // Static options that don't come from properties
   const bhkOptions = ["1BHK", "2BHK", "3BHK", "4BHK", "5BHK+"];
@@ -179,12 +201,14 @@ export default function FindProperty() {
                     <SelectValue placeholder="Select property type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {propertyTypes.length > 0 ? propertyTypes.map(type => (
+                    {displayPropertyTypes.length > 0 ? displayPropertyTypes.map(type => (
                       <SelectItem key={type.value} value={type.value}>
                         {type.label}
                       </SelectItem>
                     )) : (
-                      <SelectItem value="loading" disabled>Loading property types...</SelectItem>
+                      <SelectItem value="" disabled>
+                        {propertiesLoading ? "Loading property types..." : `No property types found (${properties.length} properties loaded)`}
+                      </SelectItem>
                     )}
                   </SelectContent>
                 </Select>
@@ -212,12 +236,14 @@ export default function FindProperty() {
                     <SelectValue placeholder="Select zone" />
                   </SelectTrigger>
                   <SelectContent>
-                    {zones.length > 0 ? zones.map(zone => (
+                    {displayZones.length > 0 ? displayZones.map(zone => (
                       <SelectItem key={zone} value={zone}>
                         {zone.charAt(0).toUpperCase() + zone.slice(1)} Bengaluru
                       </SelectItem>
                     )) : (
-                      <SelectItem value="loading" disabled>Loading zones...</SelectItem>
+                      <SelectItem value="" disabled>
+                        {propertiesLoading ? "Loading zones..." : `No zones found (${properties.length} properties loaded)`}
+                      </SelectItem>
                     )}
                   </SelectContent>
                 </Select>
@@ -280,7 +306,7 @@ export default function FindProperty() {
                   Special Features
                 </label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {tags.map(tag => (
+                  {tags.length > 0 ? tags.map(tag => (
                     <div key={tag.value} className="flex items-center space-x-2">
                       <Checkbox 
                         id={tag.value}
@@ -291,7 +317,11 @@ export default function FindProperty() {
                         {tag.label}
                       </label>
                     </div>
-                  ))}
+                  )) : (
+                    <div className="col-span-full text-sm text-gray-500">
+                      {properties.length === 0 ? "Loading features..." : "No features available from your properties"}
+                    </div>
+                  )}
                 </div>
               </div>
 
