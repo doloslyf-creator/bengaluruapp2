@@ -125,31 +125,42 @@ export default function FindProperty() {
     <TooltipProvider>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
         {/* Header */}
-        <header className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <header className="bg-white/95 backdrop-blur-lg shadow-lg border-b border-slate-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Home className="h-8 w-8 text-primary" />
-                <h1 className="text-2xl font-bold text-gray-900">PropertyFinder</h1>
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg">
+                  <Home className="h-8 w-8 text-white" />
+                </div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-slate-800 bg-clip-text text-transparent">PropertyFinder</h1>
               </div>
-              <div className="text-sm text-gray-600">
-                Step {currentStep} of 3
+              <div className="flex items-center space-x-3">
+                <Badge className="bg-blue-50 text-blue-700 border-blue-200 font-semibold px-3 py-1">
+                  Step {currentStep} of 3
+                </Badge>
+                <Button
+                  variant="outline"
+                  onClick={() => navigate('/')}
+                  className="text-slate-600 hover:text-blue-600 border-slate-200 hover:border-blue-200 transition-all duration-200"
+                >
+                  ← Back to Home
+                </Button>
               </div>
             </div>
           </div>
         </header>
 
         {/* Progress Bar */}
-        <div className="bg-white border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-            <div className="flex items-center space-x-4">
-              <div className="flex-1 bg-gray-200 rounded-full h-2">
+        <div className="bg-white/80 backdrop-blur-sm border-b border-slate-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center space-x-6">
+              <div className="flex-1 bg-slate-200 rounded-full h-3 shadow-inner">
                 <div 
-                  className="bg-primary h-2 rounded-full transition-all duration-300"
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500 shadow-sm"
                   style={{ width: `${(currentStep / 3) * 100}%` }}
                 />
               </div>
-              <span className="text-sm font-medium text-gray-600">
+              <span className="text-sm font-semibold text-slate-600 whitespace-nowrap">
                 Find Your Dream Property
               </span>
             </div>
@@ -158,20 +169,22 @@ export default function FindProperty() {
 
         {/* Main Content */}
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          <div className="text-center mb-10">
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-blue-600 bg-clip-text text-transparent mb-4">
               Tell us what you're looking for
             </h2>
-            <p className="text-lg text-gray-600">
-              Help us find the perfect property that matches your preferences
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+              Help us find the perfect property that matches your preferences and lifestyle
             </p>
           </div>
 
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Search className="h-5 w-5 text-primary" />
-                <span>Property Preferences</span>
+          <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-slate-50 border-b border-slate-100">
+              <CardTitle className="flex items-center space-x-3 text-xl">
+                <div className="p-2 bg-blue-500 rounded-lg">
+                  <Search className="h-5 w-5 text-white" />
+                </div>
+                <span className="bg-gradient-to-r from-blue-600 to-slate-700 bg-clip-text text-transparent font-bold">Property Preferences</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-8">
@@ -276,22 +289,33 @@ export default function FindProperty() {
               </div>
 
               {/* BHK Configuration */}
-              <div className="space-y-3">
-                <label className="text-sm font-medium text-gray-700">
-                  BHK Configuration
+              <div className="space-y-4">
+                <label className="text-sm font-semibold text-slate-700 flex items-center space-x-3">
+                  <div className="p-1 bg-blue-100 rounded-md">
+                    <Home className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <span>BHK Configuration</span>
                 </label>
                 <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
                   {bhkOptions.map(bhk => (
-                    <div key={bhk} className="flex items-center space-x-2">
-                      <Checkbox 
-                        id={bhk}
+                    <label
+                      key={bhk}
+                      className={`
+                        flex items-center justify-center p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:scale-105
+                        ${preferences.bhkType.includes(bhk) 
+                          ? 'bg-gradient-to-r from-blue-500 to-blue-600 border-blue-500 text-white shadow-lg shadow-blue-200' 
+                          : 'bg-white border-slate-200 hover:border-blue-300 hover:shadow-md'
+                        }
+                      `}
+                    >
+                      <input
+                        type="checkbox"
+                        className="sr-only"
                         checked={preferences.bhkType.includes(bhk)}
-                        onCheckedChange={() => handleArrayToggle('bhkType', bhk)}
+                        onChange={() => handleArrayToggle('bhkType', bhk)}
                       />
-                      <label htmlFor={bhk} className="text-sm text-gray-700 cursor-pointer">
-                        {bhk}
-                      </label>
-                    </div>
+                      <span className="text-sm font-semibold">{bhk}</span>
+                    </label>
                   ))}
                 </div>
               </div>
@@ -345,17 +369,21 @@ export default function FindProperty() {
           </Card>
 
           {/* Action Buttons */}
-          <div className="flex justify-between mt-8">
-            <Button variant="outline" onClick={() => navigate('/')}>
+          <div className="flex justify-between items-center mt-10">
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/')}
+              className="border-slate-200 text-slate-600 hover:border-blue-200 hover:text-blue-600 transition-all duration-200"
+            >
               Back to Home
             </Button>
             <Button 
               onClick={handleNext}
-              className="flex items-center space-x-2"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center space-x-3"
               disabled={!preferences.propertyType || !preferences.zone}
             >
-              <span>Find Matching Properties</span>
-              <ChevronRight className="h-4 w-4" />
+              <span className="font-semibold">Find Matching Properties</span>
+              <ChevronRight className="h-5 w-5" />
             </Button>
           </div>
         </main>

@@ -242,23 +242,28 @@ export default function PropertyResults() {
     <TooltipProvider>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
-        <header className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <header className="bg-white/95 backdrop-blur-lg shadow-lg border-b border-slate-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Button 
                   variant="ghost" 
                   onClick={() => navigate('/find-property')}
-                  className="flex items-center space-x-2"
+                  className="flex items-center space-x-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>Back</span>
                 </Button>
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Property Results</h1>
-                  <p className="text-sm text-gray-600">
-                    Found {matchingProperties.length} properties matching your preferences
-                  </p>
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg">
+                    <MapPin className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-slate-800 bg-clip-text text-transparent">Property Results</h1>
+                    <p className="text-sm text-slate-600">
+                      Found {matchingProperties.length} properties matching your preferences
+                    </p>
+                  </div>
                 </div>
               </div>
               

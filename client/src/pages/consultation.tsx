@@ -115,13 +115,13 @@ export default function Consultation() {
 
   if (consultationComplete) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <Card className="max-w-md w-full mx-4">
-          <CardHeader className="text-center">
-            <div className="mx-auto mb-4 w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-              <CheckCircle className="h-8 w-8 text-blue-600" />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <Card className="max-w-md w-full mx-4 shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
+          <CardHeader className="text-center bg-gradient-to-r from-blue-50 to-slate-50 border-b border-slate-100">
+            <div className="mx-auto mb-4 w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center shadow-lg">
+              <CheckCircle className="h-10 w-10 text-blue-600" />
             </div>
-            <CardTitle className="text-2xl text-blue-800">Consultation Requested!</CardTitle>
+            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-slate-800 bg-clip-text text-transparent">Consultation Requested!</CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -167,22 +167,27 @@ export default function Consultation() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <header className="bg-white/95 backdrop-blur-lg shadow-lg border-b border-slate-200">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center space-x-4">
             <Button 
               variant="ghost" 
               onClick={() => navigate('/find-property/results')}
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
             >
               <ArrowLeft className="h-4 w-4" />
               <span>Back</span>
             </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Expert Consultation</h1>
-              <p className="text-sm text-gray-600">Get personalized property advice from our experts</p>
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg">
+                <MessageCircle className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-slate-800 bg-clip-text text-transparent">Expert Consultation</h1>
+                <p className="text-sm text-slate-600">Get personalized property advice from our experts</p>
+              </div>
             </div>
           </div>
         </div>
