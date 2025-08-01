@@ -206,7 +206,7 @@ export default function FindProperty() {
                         {type.label}
                       </SelectItem>
                     )) : (
-                      <SelectItem value="" disabled>
+                      <SelectItem value="loading" disabled>
                         {propertiesLoading ? "Loading property types..." : `No property types found (${properties.length} properties loaded)`}
                       </SelectItem>
                     )}
@@ -241,7 +241,7 @@ export default function FindProperty() {
                         {zone.charAt(0).toUpperCase() + zone.slice(1)} Bengaluru
                       </SelectItem>
                     )) : (
-                      <SelectItem value="" disabled>
+                      <SelectItem value="loading" disabled>
                         {propertiesLoading ? "Loading zones..." : `No zones found (${properties.length} properties loaded)`}
                       </SelectItem>
                     )}

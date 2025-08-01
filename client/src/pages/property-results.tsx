@@ -486,9 +486,11 @@ function PropertyFilters({ preferences, onUpdatePreferences, properties }: Prope
   const bhkOptions = ["1BHK", "2BHK", "3BHK", "4BHK", "5BHK+"];
 
   const handlePreferenceChange = (key: keyof PropertyPreferences, value: any) => {
+    // Convert "any" back to empty string for internal use
+    const processedValue = value === "any" ? "" : value;
     const newPreferences = {
       ...preferences,
-      [key]: value
+      [key]: processedValue
     };
     onUpdatePreferences(newPreferences);
   };
@@ -510,10 +512,10 @@ function PropertyFilters({ preferences, onUpdatePreferences, properties }: Prope
   };
 
   const clearAllFilters = () => {
-    const clearedPreferences = {
+    const clearedPreferences: PropertyPreferences = {
       propertyType: "",
       zone: "",
-      budgetRange: [50, 500] as [number, number],
+      budgetRange: [50, 500],
       bhkType: [],
       amenities: [],
       tags: []
@@ -534,14 +536,14 @@ function PropertyFilters({ preferences, onUpdatePreferences, properties }: Prope
       <div className="space-y-3">
         <label className="text-sm font-medium text-gray-700">Property Type</label>
         <Select 
-          value={preferences.propertyType} 
+          value={preferences.propertyType || "any"} 
           onValueChange={(value) => handlePreferenceChange('propertyType', value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Any type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Any Type</SelectItem>
+            <SelectItem value="any">Any Type</SelectItem>
             {propertyTypes.map(type => (
               <SelectItem key={type.value} value={type.value}>
                 {type.label}
@@ -555,14 +557,14 @@ function PropertyFilters({ preferences, onUpdatePreferences, properties }: Prope
       <div className="space-y-3">
         <label className="text-sm font-medium text-gray-700">Zone</label>
         <Select 
-          value={preferences.zone} 
+          value={preferences.zone || "any"} 
           onValueChange={(value) => handlePreferenceChange('zone', value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Any zone" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Any Zone</SelectItem>
+            <SelectItem value="any">Any Zone</SelectItem>
             {zones.map(zone => (
               <SelectItem key={zone} value={zone}>
                 {zone.charAt(0).toUpperCase() + zone.slice(1)} Bengaluru
