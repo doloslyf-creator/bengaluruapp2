@@ -383,6 +383,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         leadType: "warm",
         priority: "medium",
         leadScore: 60,
+        status: "new",
       });
 
       // Add initial activity
@@ -446,6 +447,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         leadType: "hot",
         priority: "high",
         leadScore: 75,
+        status: "new",
       });
 
       // Add initial activity
@@ -494,6 +496,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Lead Management API Routes
   
+  // Get lead statistics (must be first to avoid route conflicts)
+  app.get("/api/leads/stats", async (req, res) => {
+    try {
+      const stats = await storage.getLeadStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching lead stats:", error);
+      res.status(500).json({ error: "Failed to fetch lead statistics" });
+    }
+  });
+
   // Get all leads with filtering
   app.get("/api/leads", async (req, res) => {
     try {
@@ -666,17 +679,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching lead notes:", error);
       res.status(500).json({ error: "Failed to fetch lead notes" });
-    }
-  });
-
-  // Get lead statistics
-  app.get("/api/leads/stats", async (req, res) => {
-    try {
-      const stats = await storage.getLeadStats();
-      res.json(stats);
-    } catch (error) {
-      console.error("Error fetching lead stats:", error);
-      res.status(500).json({ error: "Failed to fetch lead statistics" });
     }
   });
 

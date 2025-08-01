@@ -42,10 +42,10 @@ const leadTypeColors = {
 export default function LeadsPage() {
   const [selectedLead, setSelectedLead] = useState<LeadWithDetails | null>(null);
   const [filters, setFilters] = useState({
-    status: "",
-    leadType: "",
-    priority: "",
-    source: ""
+    status: "all",
+    leadType: "all",
+    priority: "all",
+    source: "all"
   });
   const [searchTerm, setSearchTerm] = useState("");
   
@@ -59,7 +59,7 @@ export default function LeadsPage() {
     queryFn: () => {
       const queryParams = new URLSearchParams();
       Object.entries(filters).forEach(([key, value]) => {
-        if (value) queryParams.append(key, value);
+        if (value && value !== "all") queryParams.append(key, value);
       });
       return apiRequest(`/api/leads?${queryParams}`);
     }
@@ -263,7 +263,7 @@ export default function LeadsPage() {
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Statuses</SelectItem>
+                <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="new">New</SelectItem>
                 <SelectItem value="contacted">Contacted</SelectItem>
                 <SelectItem value="qualified">Qualified</SelectItem>
@@ -277,7 +277,7 @@ export default function LeadsPage() {
                 <SelectValue placeholder="Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Types</SelectItem>
+                <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value="hot">Hot</SelectItem>
                 <SelectItem value="warm">Warm</SelectItem>
                 <SelectItem value="cold">Cold</SelectItem>
@@ -289,7 +289,7 @@ export default function LeadsPage() {
                 <SelectValue placeholder="Priority" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Priorities</SelectItem>
+                <SelectItem value="all">All Priorities</SelectItem>
                 <SelectItem value="high">High</SelectItem>
                 <SelectItem value="medium">Medium</SelectItem>
                 <SelectItem value="low">Low</SelectItem>
@@ -301,7 +301,7 @@ export default function LeadsPage() {
                 <SelectValue placeholder="Source" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Sources</SelectItem>
+                <SelectItem value="all">All Sources</SelectItem>
                 <SelectItem value="site-visit">Site Visit</SelectItem>
                 <SelectItem value="consultation">Consultation</SelectItem>
                 <SelectItem value="property-inquiry">Property Inquiry</SelectItem>

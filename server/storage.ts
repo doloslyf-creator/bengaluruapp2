@@ -600,6 +600,7 @@ export class MemStorage implements IStorage {
       communicationPreference: lead.communicationPreference || "phone",
       expectedCloseDate: lead.expectedCloseDate || null,
       dealValue: lead.dealValue || null,
+      status: lead.status || "new",
       createdAt: new Date(),
       updatedAt: new Date(),
     };
