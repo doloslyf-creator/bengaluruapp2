@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -53,6 +53,10 @@ export default function AdminLogin() {
       await sendOtp(data.phoneNumber);
       setPhoneNumber(data.phoneNumber);
       setStep("otp");
+      // Clear OTP field after step change
+      setTimeout(() => {
+        otpForm.reset({ otp: "" });
+      }, 100);
       toast({
         title: "OTP Sent",
         description: "OTP has been generated. Check server console in development mode.",
@@ -65,6 +69,13 @@ export default function AdminLogin() {
       });
     }
   };
+
+  // Clear OTP field when step changes to otp
+  useEffect(() => {
+    if (step === "otp") {
+      otpForm.reset({ otp: "" });
+    }
+  }, [step, otpForm]);
 
   const onOtpSubmit = async (data: OtpForm) => {
     try {
@@ -145,10 +156,11 @@ export default function AdminLogin() {
                         <div className="flex justify-center">
                           <InputOTP
                             maxLength={6}
-                            value={field.value}
+                            value={field.value || ""}
                             onChange={field.onChange}
                             className="gap-3"
                             autoFocus
+                            pattern={'^\\d+$'}
                           >
                             <InputOTPGroup className="gap-3">
                               <InputOTPSlot 
@@ -199,7 +211,7 @@ export default function AdminLogin() {
                   className="w-full"
                   onClick={() => {
                     setStep("phone");
-                    otpForm.reset();
+                    otpForm.reset({ otp: "" }); // Explicitly clear OTP field
                   }}
                 >
                   Change phone number
