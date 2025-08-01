@@ -147,38 +147,31 @@ export default function LeadsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-8">
-              <h1 className="text-2xl font-bold text-gray-900">Lead Management</h1>
-              <nav className="flex space-x-6">
-                <Link href="/admin" className="text-gray-600 hover:text-gray-900">
-                  Properties
-                </Link>
-                <Link href="/leads" className="text-blue-600 font-medium">
-                  Leads
-                </Link>
-                <Link href="/bookings" className="text-gray-600 hover:text-gray-900">
-                  Bookings
-                </Link>
-                <Link href="/property-config" className="text-gray-600 hover:text-gray-900">
-                  Configurations
-                </Link>
-              </nav>
+          <div className="flex justify-between items-center py-6">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Lead Management</h1>
+              <p className="text-gray-600">Track and manage customer leads</p>
             </div>
-            <Button
-              onClick={logout}
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <LogOut className="h-4 w-4" />
-              Logout
-            </Button>
+            
+            <div className="flex items-center gap-4">
+              <nav className="flex space-x-8">
+                <Link href="/" className="text-gray-600 hover:text-gray-900">Dashboard</Link>
+                <Link href="/analytics" className="text-gray-600 hover:text-gray-900">Analytics</Link>
+                <Link href="/leads" className="text-violet-600 font-medium">Leads</Link>
+                <Link href="/bookings" className="text-gray-600 hover:text-gray-900">Bookings</Link>
+                <Link href="/property-config" className="text-gray-600 hover:text-gray-900">Configuration</Link>
+              </nav>
+              
+              <Button variant="ghost" onClick={logout}>
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
-      </header>
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards */}
