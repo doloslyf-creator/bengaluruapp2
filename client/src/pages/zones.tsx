@@ -6,14 +6,18 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { type Property } from "@shared/schema";
+import { type Property, type PropertyConfiguration } from "@shared/schema";
 
 export default function Zones() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedZone, setSelectedZone] = useState("all");
 
-  const { data: properties = [], isLoading } = useQuery<Property[]>({
+  const { data: properties = [], isLoading: propertiesLoading } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
+  });
+
+  const { data: allConfigurations = [], isLoading: configurationsLoading } = useQuery<PropertyConfiguration[]>({
+    queryKey: ["/api/all-configurations"],
   });
 
   // Group properties by zone
@@ -50,10 +54,19 @@ export default function Zones() {
     return acc;
   }, {} as Record<string, any>);
 
-  // Calculate average prices
+  // Calculate average prices from configurations
   Object.values(zoneData).forEach((zone: any) => {
-    const totalPrice = zone.properties.reduce((sum: number, prop: Property) => sum + prop.price, 0);
-    zone.avgPrice = Math.round(totalPrice / zone.totalProjects / 10) / 10;
+    const zoneConfigs = allConfigurations.filter(config => {
+      const property = properties.find(p => p.id === config.propertyId);
+      return property && property.zone === zone.zone;
+    });
+    
+    if (zoneConfigs.length > 0) {
+      const totalPrice = zoneConfigs.reduce((sum: number, config: PropertyConfiguration) => sum + config.price, 0);
+      zone.avgPrice = Math.round(totalPrice / zoneConfigs.length * 10) / 10;
+    } else {
+      zone.avgPrice = 0;
+    }
   });
 
   const zones = Object.values(zoneData).filter((zone: any) =>
@@ -81,6 +94,32 @@ export default function Zones() {
     };
     return descriptions[zone] || "Residential development zone in Bengaluru.";
   };
+
+  if (propertiesLoading || configurationsLoading) {
+    return (
+      <div className="flex h-screen bg-background">
+        <Sidebar />
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <header className="bg-white border-b border-border px-6 py-4">
+            <h2 className="text-2xl font-semibold text-gray-900">Zones</h2>
+            <p className="text-sm text-gray-600 mt-1">Loading zone data...</p>
+          </header>
+          <main className="flex-1 overflow-y-auto p-6">
+            <div className="animate-pulse space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="bg-white p-6 rounded-lg border border-border">
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-8 bg-gray-200 rounded"></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-background">

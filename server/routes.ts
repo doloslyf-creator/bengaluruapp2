@@ -143,6 +143,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all configurations across all properties
+  app.get("/api/all-configurations", async (req, res) => {
+    try {
+      const properties = await storage.getAllProperties();
+      const allConfigurations: any[] = [];
+      for (const property of properties) {
+        const configurations = await storage.getPropertyConfigurations(property.id);
+        allConfigurations.push(...configurations);
+      }
+      res.json(allConfigurations);
+    } catch (error) {
+      console.error("Error fetching all configurations:", error);
+      res.status(500).json({ error: "Failed to fetch all configurations" });
+    }
+  });
+
   // Property Configuration Routes
   app.get("/api/property-configurations/:propertyId", async (req, res) => {
     try {

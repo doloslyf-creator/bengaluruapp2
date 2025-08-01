@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { BarChart3, TrendingUp, MapPin, Building, IndianRupee, Users } from "lucide-react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Card } from "@/components/ui/card";
-import { type Property, type PropertyStats } from "@shared/schema";
+import { type Property, type PropertyStats, type PropertyConfiguration } from "@shared/schema";
 
 export default function Analytics() {
   const { data: properties = [], isLoading: propertiesLoading } = useQuery<Property[]>({
@@ -11,6 +11,23 @@ export default function Analytics() {
 
   const { data: stats, isLoading: statsLoading } = useQuery<PropertyStats>({
     queryKey: ["/api/properties/stats"],
+  });
+
+  // Get all configurations for price analysis
+  const { data: allConfigurations = [], isLoading: configurationsLoading } = useQuery<PropertyConfiguration[]>({
+    queryKey: ["/api/all-configurations"],
+    queryFn: async () => {
+      const configs: PropertyConfiguration[] = [];
+      for (const property of properties) {
+        const response = await fetch(`/api/property-configurations/${property.id}`);
+        if (response.ok) {
+          const propertyConfigs = await response.json();
+          configs.push(...propertyConfigs);
+        }
+      }
+      return configs;
+    },
+    enabled: properties.length > 0,
   });
 
   // Calculate zone distribution
@@ -31,17 +48,17 @@ export default function Analytics() {
     return acc;
   }, {} as Record<string, number>);
 
-  // Calculate price ranges
-  const priceRanges = properties.reduce((acc, property) => {
-    if (property.price < 50) acc["Under ₹50L"] = (acc["Under ₹50L"] || 0) + 1;
-    else if (property.price < 100) acc["₹50L - ₹1Cr"] = (acc["₹50L - ₹1Cr"] || 0) + 1;
-    else if (property.price < 200) acc["₹1Cr - ₹2Cr"] = (acc["₹1Cr - ₹2Cr"] || 0) + 1;
-    else if (property.price < 500) acc["₹2Cr - ₹5Cr"] = (acc["₹2Cr - ₹5Cr"] || 0) + 1;
+  // Calculate price ranges from configurations
+  const priceRanges = allConfigurations.reduce((acc, config) => {
+    if (config.price < 50) acc["Under ₹50L"] = (acc["Under ₹50L"] || 0) + 1;
+    else if (config.price < 100) acc["₹50L - ₹1Cr"] = (acc["₹50L - ₹1Cr"] || 0) + 1;
+    else if (config.price < 200) acc["₹1Cr - ₹2Cr"] = (acc["₹1Cr - ₹2Cr"] || 0) + 1;
+    else if (config.price < 500) acc["₹2Cr - ₹5Cr"] = (acc["₹2Cr - ₹5Cr"] || 0) + 1;
     else acc["Above ₹5Cr"] = (acc["Above ₹5Cr"] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
-  if (propertiesLoading || statsLoading) {
+  if (propertiesLoading || statsLoading || configurationsLoading) {
     return (
       <div className="flex h-screen bg-background">
         <Sidebar />
