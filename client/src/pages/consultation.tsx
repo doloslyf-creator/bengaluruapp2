@@ -225,13 +225,15 @@ export default function Consultation() {
 
           {/* Consultation Form */}
           <div className={property?.id ? "lg:col-span-2" : "lg:col-span-3"}>
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <MessageCircle className="h-5 w-5 text-primary" />
-                  <span>Request Expert Consultation</span>
+            <Card className="border-0 shadow-xl bg-white/95 backdrop-blur-sm">
+              <CardHeader className="bg-gradient-to-r from-blue-50/80 to-slate-50/80 border-b border-slate-100">
+                <CardTitle className="flex items-center space-x-3">
+                  <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg">
+                    <MessageCircle className="h-5 w-5 text-white" />
+                  </div>
+                  <span className="font-bold bg-gradient-to-r from-blue-600 to-slate-700 bg-clip-text text-transparent">Request Expert Consultation</span>
                 </CardTitle>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-slate-600 mt-2">
                   Fill out the form below and our property experts will contact you with personalized advice.
                 </p>
               </CardHeader>
@@ -239,8 +241,8 @@ export default function Consultation() {
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
                     {/* Personal Information */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-medium text-gray-900">Personal Information</h3>
+                    <div className="space-y-4 p-4 bg-gradient-to-r from-blue-50/50 to-slate-50/50 rounded-lg border border-blue-100">
+                      <h3 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-slate-700 bg-clip-text text-transparent">Personal Information</h3>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
@@ -297,8 +299,8 @@ export default function Consultation() {
                     </div>
 
                     {/* Consultation Type */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-medium text-gray-900">Consultation Details</h3>
+                    <div className="space-y-4 p-4 bg-gradient-to-r from-blue-50/50 to-slate-50/50 rounded-lg border border-blue-100">
+                      <h3 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-slate-700 bg-clip-text text-transparent">Consultation Details</h3>
                       
                       <FormField
                         control={form.control}
@@ -431,21 +433,22 @@ export default function Consultation() {
                       )}
                     />
 
-                    <div className="flex justify-end space-x-4">
+                    <div className="flex justify-end space-x-4 pt-6 border-t border-slate-100">
                       <Button
                         type="button"
                         variant="outline"
                         onClick={() => navigate('/find-property/results')}
+                        className="border-slate-200 text-slate-600 hover:border-blue-300 hover:text-blue-600 transition-all duration-200"
                       >
                         Cancel
                       </Button>
                       <Button 
                         type="submit" 
                         disabled={consultationMutation.isPending}
-                        className="flex items-center space-x-2"
+                        className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 hover:scale-105 transition-all duration-200 shadow-lg px-8"
                       >
                         <MessageCircle className="h-4 w-4" />
-                        <span>{consultationMutation.isPending ? "Submitting..." : "Request Consultation"}</span>
+                        <span className="font-medium">{consultationMutation.isPending ? "Submitting..." : "Request Consultation"}</span>
                       </Button>
                     </div>
                   </form>

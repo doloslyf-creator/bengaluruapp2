@@ -380,30 +380,31 @@ export default function PropertyResults() {
                 const matchInfo = getMatchLabel(property.matchScore);
                 
                 return (
-                  <Card key={property.id} className="hover:shadow-lg transition-shadow">
-                    <CardHeader className="pb-3">
+                  <Card key={property.id} className="group hover:shadow-2xl transition-all duration-300 border-0 bg-white/95 backdrop-blur-sm hover:scale-[1.02] transform">
+                    <CardHeader className="pb-3 bg-gradient-to-r from-blue-50/50 to-slate-50/50 border-b border-slate-100">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <CardTitle className="text-lg">{property.name}</CardTitle>
-                          <p className="text-sm text-gray-600 flex items-center mt-1">
-                            <MapPin className="h-3 w-3 mr-1" />
+                          <CardTitle className="text-lg font-bold bg-gradient-to-r from-blue-600 to-slate-800 bg-clip-text text-transparent group-hover:from-blue-700 group-hover:to-slate-900 transition-all duration-300">{property.name}</CardTitle>
+                          <p className="text-sm text-slate-600 flex items-center mt-1">
+                            <MapPin className="h-3 w-3 mr-1 text-blue-500" />
                             {property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)}
                           </p>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Badge className={matchInfo.color}>
+                          <Badge className={`${matchInfo.color} shadow-sm`}>
                             {matchInfo.label}
                           </Badge>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => toggleFavorite(property.id)}
+                            className="hover:bg-blue-50 hover:scale-110 transition-all duration-200"
                           >
                             <Heart 
-                              className={`h-4 w-4 ${
+                              className={`h-4 w-4 transition-colors duration-200 ${
                                 favorites.has(property.id) 
                                   ? 'fill-red-500 text-red-500' 
-                                  : 'text-gray-400'
+                                  : 'text-slate-400 hover:text-red-400'
                               }`} 
                             />
                           </Button>
@@ -414,28 +415,28 @@ export default function PropertyResults() {
                     <CardContent className="pt-0">
                       <div className="space-y-4">
                         {/* Property Image Placeholder */}
-                        <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center">
-                          <div className="text-gray-400 text-center">
-                            <div className="text-2xl mb-1">🏢</div>
-                            <p className="text-xs">Property Image</p>
+                        <div className="aspect-video bg-gradient-to-br from-blue-100 to-slate-200 rounded-xl flex items-center justify-center shadow-inner group-hover:shadow-lg transition-all duration-300">
+                          <div className="text-slate-500 text-center">
+                            <div className="text-3xl mb-2 group-hover:scale-110 transition-transform duration-300">🏢</div>
+                            <p className="text-xs font-medium">Property Gallery</p>
                           </div>
                         </div>
 
                         {/* Price and Configuration */}
-                        <div className="space-y-2">
-                          <div className="text-lg font-semibold text-primary">
+                        <div className="space-y-3 p-3 bg-gradient-to-r from-blue-50 to-slate-50 rounded-lg border border-blue-100">
+                          <div className="text-xl font-bold bg-gradient-to-r from-blue-600 to-slate-700 bg-clip-text text-transparent">
                             {getPriceRange(property.configurations)}
                           </div>
                           
                           {property.configurations.length > 0 && (
                             <div className="flex flex-wrap gap-1">
                               {property.configurations.slice(0, 3).map((config, index) => (
-                                <Badge key={index} variant="outline" className="text-xs">
+                                <Badge key={index} variant="outline" className="text-xs border-blue-200 text-blue-700 hover:bg-blue-50 transition-colors">
                                   {config.configuration}
                                 </Badge>
                               ))}
                               {property.configurations.length > 3 && (
-                                <Badge variant="outline" className="text-xs">
+                                <Badge variant="outline" className="text-xs border-blue-200 text-blue-700">
                                   +{property.configurations.length - 3} more
                                 </Badge>
                               )}
@@ -469,23 +470,23 @@ export default function PropertyResults() {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex space-x-2 pt-2">
+                        <div className="flex space-x-3 pt-2">
                           <Button 
                             variant="outline" 
                             size="sm"
                             onClick={() => handleBookVisit(property)}
-                            className="flex-1 flex items-center justify-center space-x-1"
+                            className="flex-1 flex items-center justify-center space-x-2 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 hover:scale-105 transition-all duration-200 shadow-sm"
                           >
-                            <Calendar className="h-3 w-3" />
-                            <span>Book Visit</span>
+                            <Calendar className="h-4 w-4" />
+                            <span className="font-medium">Book Visit</span>
                           </Button>
                           <Button 
                             size="sm"
                             onClick={() => handleConsult(property)}
-                            className="flex-1 flex items-center justify-center space-x-1"
+                            className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 hover:scale-105 transition-all duration-200 shadow-lg"
                           >
-                            <Phone className="h-3 w-3" />
-                            <span>Consult</span>
+                            <Phone className="h-4 w-4" />
+                            <span className="font-medium">Consult</span>
                           </Button>
                         </div>
                       </div>

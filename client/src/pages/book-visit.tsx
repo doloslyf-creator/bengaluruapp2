@@ -220,35 +220,37 @@ export default function BookVisit() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Property Details */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-8">
-              <CardHeader>
-                <CardTitle className="text-lg">Property Details</CardTitle>
+            <Card className="sticky top-8 border-0 shadow-xl bg-white/95 backdrop-blur-sm">
+              <CardHeader className="bg-gradient-to-r from-blue-50/80 to-slate-50/80 border-b border-slate-100">
+                <CardTitle className="text-lg font-bold bg-gradient-to-r from-blue-600 to-slate-700 bg-clip-text text-transparent">Property Details</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center">
-                  <div className="text-gray-400 text-center">
-                    <div className="text-2xl mb-1">🏢</div>
-                    <p className="text-xs">Property Image</p>
+              <CardContent className="space-y-4 p-6">
+                <div className="aspect-video bg-gradient-to-br from-blue-100 to-slate-200 rounded-xl flex items-center justify-center shadow-inner">
+                  <div className="text-slate-500 text-center">
+                    <div className="text-3xl mb-2">🏢</div>
+                    <p className="text-sm font-medium">Property Gallery</p>
                   </div>
                 </div>
                 
-                <div>
-                  <h3 className="font-semibold text-gray-900">{property.name}</h3>
-                  <p className="text-sm text-gray-600 flex items-center mt-1">
-                    <MapPin className="h-3 w-3 mr-1" />
+                <div className="p-4 bg-gradient-to-r from-blue-50 to-slate-50 rounded-lg border border-blue-100">
+                  <h3 className="font-bold text-lg bg-gradient-to-r from-blue-600 to-slate-800 bg-clip-text text-transparent">{property.name}</h3>
+                  <p className="text-sm text-slate-600 flex items-center mt-2">
+                    <MapPin className="h-4 w-4 mr-2 text-blue-500" />
                     {property.area}, {property.zone?.charAt(0).toUpperCase() + property.zone?.slice(1)} Bengaluru
                   </p>
                 </div>
 
-                <div className="space-y-2">
-                  <Badge className="bg-green-100 text-green-800">
+                <div className="space-y-3">
+                  <Badge className="bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border border-green-200 px-3 py-1">
                     {property.status?.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                   </Badge>
-                  {property.tags?.slice(0, 3).map((tag: string) => (
-                    <Badge key={tag} variant="outline" className="text-xs mr-1 mb-1">
-                      {tag.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
-                    </Badge>
-                  ))}
+                  <div className="flex flex-wrap gap-2">
+                    {property.tags?.slice(0, 3).map((tag: string) => (
+                      <Badge key={tag} variant="outline" className="text-xs border-blue-200 text-blue-700 hover:bg-blue-50 transition-colors">
+                        {tag.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -256,11 +258,13 @@ export default function BookVisit() {
 
           {/* Booking Form */}
           <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
+            <Card className="border-0 shadow-xl bg-white/95 backdrop-blur-sm">
+              <CardHeader className="bg-gradient-to-r from-blue-50/80 to-slate-50/80 border-b border-slate-100">
                 <CardTitle className="flex items-center space-x-2">
-                  <Calendar className="h-5 w-5 text-primary" />
-                  <span>Schedule Your Visit</span>
+                  <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg">
+                    <Calendar className="h-5 w-5 text-white" />
+                  </div>
+                  <span className="font-bold bg-gradient-to-r from-blue-600 to-slate-700 bg-clip-text text-transparent">Schedule Your Visit</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -446,21 +450,22 @@ export default function BookVisit() {
                       )}
                     />
 
-                    <div className="flex justify-end space-x-4">
+                    <div className="flex justify-end space-x-4 pt-6 border-t border-slate-100">
                       <Button
                         type="button"
                         variant="outline"
                         onClick={() => navigate('/find-property/results')}
+                        className="border-slate-200 text-slate-600 hover:border-blue-300 hover:text-blue-600 transition-all duration-200"
                       >
                         Cancel
                       </Button>
                       <Button 
                         type="submit" 
                         disabled={bookingMutation.isPending}
-                        className="flex items-center space-x-2"
+                        className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 hover:scale-105 transition-all duration-200 shadow-lg px-8"
                       >
                         <Calendar className="h-4 w-4" />
-                        <span>{bookingMutation.isPending ? "Booking..." : "Confirm Booking"}</span>
+                        <span className="font-medium">{bookingMutation.isPending ? "Booking..." : "Confirm Booking"}</span>
                       </Button>
                     </div>
                   </form>
