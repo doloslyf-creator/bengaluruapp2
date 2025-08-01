@@ -11,13 +11,19 @@ import AdminAnalytics from "@/pages/admin/analytics";
 import AdminZones from "@/pages/admin/zones";
 import AdminDevelopers from "@/pages/admin/developers";
 import PropertyEdit from "@/pages/property-edit";
+import FindProperty from "@/pages/find-property";
+import PropertyResults from "@/pages/property-results";
+import BookVisit from "@/pages/book-visit";
+import Consultation from "@/pages/consultation";
+import CustomerHome from "@/pages/customer-home";
 import Home from "@/pages/home";
 import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home} />
+      <Route path="/" component={CustomerHome} />
+      <Route path="/admin" component={Home} />
       <Route path="/admin-panel/login" component={AdminLogin} />
       <Route path="/admin-panel">
         <ProtectedRoute>
@@ -44,6 +50,13 @@ function Router() {
           <PropertyEdit />
         </ProtectedRoute>
       </Route>
+      
+      {/* Customer-facing routes */}
+      <Route path="/find-property" component={FindProperty} />
+      <Route path="/find-property/results" component={PropertyResults} />
+      <Route path="/book-visit" component={BookVisit} />
+      <Route path="/consultation" component={Consultation} />
+      
       <Route component={NotFound} />
     </Switch>
   );

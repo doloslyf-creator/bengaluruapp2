@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertPropertySchema, insertPropertyConfigurationSchema } from "@shared/schema";
+import { insertPropertySchema, insertPropertyConfigurationSchema, insertBookingSchema } from "@shared/schema";
 import { z } from "zod";
 
 // In-memory session storage for demo (use Redis/database in production)
@@ -346,6 +346,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting property configuration:", error);
       res.status(500).json({ error: "Failed to delete property configuration" });
+    }
+  });
+
+  // Customer-facing booking routes
+  app.post("/api/bookings", async (req, res) => {
+    try {
+      const bookingData = {
+        ...req.body,
+        bookingId: `BK${Date.now()}${Math.floor(Math.random() * 1000)}`,
+        bookingType: "site-visit"
+      };
+      
+      const validatedData = insertBookingSchema.parse(bookingData);
+      
+      // In a real app, you'd save this to database
+      // For now, we'll just return success with the booking ID
+      console.log("📅 New booking request:", validatedData);
+      
+      res.status(201).json({ 
+        success: true,
+        bookingId: validatedData.bookingId,
+        message: "Booking confirmed successfully" 
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid booking data", details: error.errors });
+      }
+      console.error("Error creating booking:", error);
+      res.status(500).json({ error: "Failed to create booking" });
+    }
+  });
+
+  app.post("/api/consultations", async (req, res) => {
+    try {
+      const consultationData = {
+        ...req.body,
+        bookingId: `CR${Date.now()}${Math.floor(Math.random() * 1000)}`,
+        bookingType: "consultation"
+      };
+      
+      const validatedData = insertBookingSchema.parse(consultationData);
+      
+      // In a real app, you'd save this to database
+      console.log("💬 New consultation request:", validatedData);
+      
+      res.status(201).json({ 
+        success: true,
+        consultationId: validatedData.bookingId,
+        message: "Consultation request submitted successfully" 
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid consultation data", details: error.errors });
+      }
+      console.error("Error creating consultation:", error);
+      res.status(500).json({ error: "Failed to create consultation request" });
+    }
+  });
+
+  // Get all property configurations endpoint for property matching
+  app.get("/api/property-configurations/all", async (req, res) => {
+    try {
+      const properties = await storage.getAllProperties();
+      const allConfigurations: any[] = [];
+      for (const property of properties) {
+        const configurations = await storage.getPropertyConfigurations(property.id);
+        allConfigurations.push(...configurations);
+      }
+      res.json(allConfigurations);
+    } catch (error) {
+      console.error("Error fetching all configurations:", error);
+      res.status(500).json({ error: "Failed to fetch all configurations" });
     }
   });
 

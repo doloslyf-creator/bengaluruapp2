@@ -77,6 +77,48 @@ export interface PropertyWithConfigurations extends Property {
   configurations: PropertyConfiguration[];
 }
 
+// Bookings table for site visits and consultations
+export const bookings = pgTable("bookings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  bookingId: varchar("booking_id").notNull().unique(), // User-facing booking ID
+  propertyId: varchar("property_id").references(() => properties.id),
+  propertyName: text("property_name").notNull(),
+  bookingType: varchar("booking_type", { enum: ["site-visit", "consultation"] }).notNull(),
+  
+  // Customer details
+  name: text("name").notNull(),
+  phone: text("phone").notNull(),
+  email: text("email").notNull(),
+  
+  // Visit specific details
+  preferredDate: text("preferred_date"),
+  preferredTime: text("preferred_time"),
+  visitType: varchar("visit_type", { enum: ["site-visit", "virtual-tour"] }),
+  numberOfVisitors: text("number_of_visitors"),
+  
+  // Consultation specific details
+  consultationType: varchar("consultation_type", { enum: ["financing", "legal", "property-advice", "investment"] }),
+  preferredContactTime: text("preferred_contact_time"),
+  urgency: varchar("urgency", { enum: ["immediate", "within-24hrs", "within-week", "flexible"] }),
+  
+  // Common fields
+  questions: text("questions"),
+  specialRequests: text("special_requests"),
+  status: varchar("status", { enum: ["pending", "confirmed", "completed", "cancelled"] }).notNull(),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertBookingSchema = createInsertSchema(bookings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertBooking = z.infer<typeof insertBookingSchema>;
+export type Booking = typeof bookings.$inferSelect;
+
 // Property statistics type
 export type PropertyStats = {
   totalProperties: number;
