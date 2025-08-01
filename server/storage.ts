@@ -155,6 +155,14 @@ export class MemStorage implements IStorage {
       const fullProperty: Property = {
         ...property,
         id,
+        possessionDate: property.possessionDate || null,
+        reraNumber: property.reraNumber || null,
+        reraApproved: property.reraApproved ?? false,
+        infrastructureVerdict: property.infrastructureVerdict || null,
+        zoningInfo: property.zoningInfo || null,
+        tags: (property.tags as string[]) || [],
+        images: (property.images as string[]) || [],
+        videos: (property.videos as string[]) || [],
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -297,6 +305,9 @@ export class MemStorage implements IStorage {
       const fullConfig: PropertyConfiguration = {
         ...config,
         id,
+        plotSize: config.plotSize || null,
+        totalUnits: config.totalUnits || null,
+        availableUnits: config.availableUnits || null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -317,6 +328,14 @@ export class MemStorage implements IStorage {
     const property: Property = {
       ...insertProperty,
       id,
+      possessionDate: insertProperty.possessionDate || null,
+      reraNumber: insertProperty.reraNumber || null,
+      reraApproved: insertProperty.reraApproved ?? false,
+      infrastructureVerdict: insertProperty.infrastructureVerdict || null,
+      zoningInfo: insertProperty.zoningInfo || null,
+      tags: (insertProperty.tags as string[]) || [],
+      images: (insertProperty.images as string[]) || [],
+      videos: (insertProperty.videos as string[]) || [],
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -344,7 +363,9 @@ export class MemStorage implements IStorage {
     const updated: Property = {
       ...existing,
       ...updates,
-      tags: Array.isArray(updates.tags) ? updates.tags : existing.tags,
+      tags: Array.isArray(updates.tags) ? updates.tags as string[] : existing.tags,
+      images: Array.isArray(updates.images) ? updates.images as string[] : existing.images,
+      videos: Array.isArray(updates.videos) ? updates.videos as string[] : existing.videos,
       updatedAt: new Date(),
     };
     this.properties.set(id, updated);
@@ -373,6 +394,9 @@ export class MemStorage implements IStorage {
     const fullConfig: PropertyConfiguration = {
       ...config,
       id,
+      plotSize: config.plotSize || null,
+      totalUnits: config.totalUnits || null,
+      availableUnits: config.availableUnits || null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -416,15 +440,29 @@ export class MemStorage implements IStorage {
     minPrice?: number;
     maxPrice?: number;
   }): Promise<Property[]> {
-    return Array.from(this.properties.values()).filter((property) => {
+    const properties = Array.from(this.properties.values()).filter((property) => {
       if (filters.type && property.type !== filters.type) return false;
       if (filters.status && property.status !== filters.status) return false;
       if (filters.zone && property.zone !== filters.zone) return false;
       if (filters.reraApproved !== undefined && property.reraApproved !== filters.reraApproved) return false;
-      if (filters.minPrice && property.price < filters.minPrice) return false;
-      if (filters.maxPrice && property.price > filters.maxPrice) return false;
       return true;
     });
+
+    // If price filters are specified, filter by property configurations
+    if (filters.minPrice || filters.maxPrice) {
+      const configurations = Array.from(this.propertyConfigurations.values());
+      const filteredPropertyIds = configurations
+        .filter(config => {
+          if (filters.minPrice && config.price < filters.minPrice) return false;
+          if (filters.maxPrice && config.price > filters.maxPrice) return false;
+          return true;
+        })
+        .map(config => config.propertyId);
+      
+      return properties.filter(property => filteredPropertyIds.includes(property.id));
+    }
+
+    return properties;
   }
 
   async getPropertyStats(): Promise<PropertyStats> {
