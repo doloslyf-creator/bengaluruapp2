@@ -240,27 +240,27 @@ export default function PropertyResults() {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         {/* Header */}
-        <header className="bg-white/95 backdrop-blur-lg shadow-lg border-b border-slate-200">
+        <header className="bg-card shadow-sm border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Button 
                   variant="ghost" 
                   onClick={() => navigate('/find-property')}
-                  className="flex items-center space-x-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
+                  className="flex items-center space-x-2"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>Back</span>
                 </Button>
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg">
-                    <MapPin className="h-6 w-6 text-white" />
+                  <div className="p-2 bg-primary rounded-xl">
+                    <MapPin className="h-6 w-6 text-primary-foreground" />
                   </div>
                   <div>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-slate-800 bg-clip-text text-transparent">Property Results</h1>
-                    <p className="text-sm text-slate-600">
+                    <h1 className="text-3xl font-bold">Property Results</h1>
+                    <p className="text-sm text-muted-foreground">
                       Found {matchingProperties.length} properties matching your preferences
                     </p>
                   </div>
@@ -299,7 +299,7 @@ export default function PropertyResults() {
                   </SheetContent>
                 </Sheet>
 
-                <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                <div className="flex items-center bg-muted rounded-lg p-1">
                   <Button
                     variant={viewMode === 'grid' ? 'default' : 'ghost'}
                     size="sm"
@@ -321,11 +321,11 @@ export default function PropertyResults() {
         </header>
 
         {/* Filters Summary */}
-        <div className="bg-white border-b">
+        <div className="bg-card border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-sm text-gray-600">Active filters:</span>
+                <span className="text-sm text-muted-foreground">Active filters:</span>
                 {preferences.propertyType && <Badge variant="secondary">{preferences.propertyType}</Badge>}
                 {preferences.zone && <Badge variant="secondary">{preferences.zone} Bengaluru</Badge>}
                 <Badge variant="secondary">
@@ -361,9 +361,9 @@ export default function PropertyResults() {
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {matchingProperties.length === 0 ? (
             <div className="text-center py-12">
-              <div className="text-gray-400 text-6xl mb-4">🏠</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No matching properties found</h3>
-              <p className="text-gray-600 mb-6">
+              <div className="text-muted-foreground text-6xl mb-4">🏠</div>
+              <h3 className="text-xl font-semibold mb-2">No matching properties found</h3>
+              <p className="text-muted-foreground mb-6">
                 Try adjusting your filters or budget range to see more options
               </p>
               <Button onClick={() => navigate('/find-property')}>
@@ -380,31 +380,30 @@ export default function PropertyResults() {
                 const matchInfo = getMatchLabel(property.matchScore);
                 
                 return (
-                  <Card key={property.id} className="group hover:shadow-2xl transition-all duration-300 border-0 bg-white/95 backdrop-blur-sm hover:scale-[1.02] transform">
-                    <CardHeader className="pb-3 bg-gradient-to-r from-blue-50/50 to-slate-50/50 border-b border-slate-100">
+                  <Card key={property.id} className="group hover:shadow-lg transition-all duration-300">
+                    <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1 cursor-pointer" onClick={() => navigate(`/property/${property.id}`)}>
-                          <CardTitle className="text-lg font-bold bg-gradient-to-r from-blue-600 to-slate-800 bg-clip-text text-transparent group-hover:from-blue-700 group-hover:to-slate-900 transition-all duration-300 hover:underline">{property.name}</CardTitle>
-                          <p className="text-sm text-slate-600 flex items-center mt-1">
-                            <MapPin className="h-3 w-3 mr-1 text-blue-500" />
+                          <CardTitle className="text-lg font-bold hover:underline">{property.name}</CardTitle>
+                          <p className="text-sm text-muted-foreground flex items-center mt-1">
+                            <MapPin className="h-3 w-3 mr-1" />
                             {property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)}
                           </p>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Badge className={`${matchInfo.color} shadow-sm`}>
+                          <Badge variant="secondary">
                             {matchInfo.label}
                           </Badge>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => toggleFavorite(property.id)}
-                            className="hover:bg-blue-50 hover:scale-110 transition-all duration-200"
                           >
                             <Heart 
-                              className={`h-4 w-4 transition-colors duration-200 ${
+                              className={`h-4 w-4 ${
                                 favorites.has(property.id) 
                                   ? 'fill-red-500 text-red-500' 
-                                  : 'text-slate-400 hover:text-red-400'
+                                  : 'text-muted-foreground hover:text-red-400'
                               }`} 
                             />
                           </Button>
@@ -416,30 +415,30 @@ export default function PropertyResults() {
                       <div className="space-y-4">
                         {/* Property Image Placeholder */}
                         <div 
-                          className="aspect-video bg-gradient-to-br from-blue-100 to-slate-200 rounded-xl flex items-center justify-center shadow-inner group-hover:shadow-lg transition-all duration-300 cursor-pointer hover:scale-105"
+                          className="aspect-video bg-muted rounded-xl flex items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors"
                           onClick={() => navigate(`/property/${property.id}`)}
                         >
-                          <div className="text-slate-500 text-center">
-                            <div className="text-3xl mb-2 group-hover:scale-110 transition-transform duration-300">🏢</div>
+                          <div className="text-muted-foreground text-center">
+                            <div className="text-3xl mb-2">🏢</div>
                             <p className="text-xs font-medium">Property Gallery</p>
                           </div>
                         </div>
 
                         {/* Price and Configuration */}
-                        <div className="space-y-3 p-3 bg-gradient-to-r from-blue-50 to-slate-50 rounded-lg border border-blue-100">
-                          <div className="text-xl font-bold bg-gradient-to-r from-blue-600 to-slate-700 bg-clip-text text-transparent">
+                        <div className="space-y-3 p-3 bg-muted/50 rounded-lg">
+                          <div className="text-xl font-bold">
                             {getPriceRange(property.configurations)}
                           </div>
                           
                           {property.configurations.length > 0 && (
                             <div className="flex flex-wrap gap-1">
                               {property.configurations.slice(0, 3).map((config, index) => (
-                                <Badge key={index} variant="outline" className="text-xs border-blue-200 text-blue-700 hover:bg-blue-50 transition-colors">
+                                <Badge key={index} variant="outline" className="text-xs">
                                   {config.configuration}
                                 </Badge>
                               ))}
                               {property.configurations.length > 3 && (
-                                <Badge variant="outline" className="text-xs border-blue-200 text-blue-700">
+                                <Badge variant="outline" className="text-xs">
                                   +{property.configurations.length - 3} more
                                 </Badge>
                               )}
