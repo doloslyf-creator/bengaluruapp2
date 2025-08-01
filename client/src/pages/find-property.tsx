@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Search, MapPin, Home, IndianRupee, Filter, ChevronRight } from "lucide-react";
+import { Search, MapPin, Home, IndianRupee, Filter, ChevronRight, Sparkles, Target, Zap, Heart } from "lucide-react";
+import { motion } from "framer-motion";
 import { type Property } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { OnboardingTooltip } from "@/components/onboarding/onboarding-tooltip";
+import { BorderBeam } from "@/components/magicui/border-beam";
+import GradualSpacing from "@/components/magicui/gradual-spacing";
+import ShineBorder from "@/components/magicui/shine-border";
 
 interface PropertyPreferences {
   propertyType: string;
@@ -124,70 +128,165 @@ export default function FindProperty() {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="bg-card shadow-sm border-b sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+        {/* Animated Header */}
+        <motion.header 
+          initial={{ y: -100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          className="relative bg-card/80 backdrop-blur-xl shadow-xl border-b sticky top-0 z-50"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="p-2 bg-primary rounded-xl">
-                  <Home className="h-8 w-8 text-primary-foreground" />
+              <motion.div 
+                initial={{ x: -50, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.2, duration: 0.6 }}
+                className="flex items-center space-x-4"
+              >
+                <div className="relative">
+                  <div className="p-3 bg-gradient-to-r from-primary to-primary/80 rounded-2xl shadow-lg">
+                    <Sparkles className="h-10 w-10 text-primary-foreground" />
+                  </div>
+                  <BorderBeam size={50} duration={12} delay={0} />
                 </div>
-                <h1 className="text-3xl font-bold">PropertyFinder</h1>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Badge variant="secondary">
-                  Step {currentStep} of 3
+                <div>
+                  <GradualSpacing 
+                    text="Find My Property"
+                    className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent"
+                    duration={0.3}
+                    delayMultiple={0.08}
+                  />
+                  <p className="text-muted-foreground mt-1">Discover your dream home with AI-powered matching</p>
+                </div>
+              </motion.div>
+              <motion.div 
+                initial={{ x: 50, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+                className="flex items-center space-x-4"
+              >
+                <Badge variant="secondary" className="px-4 py-2 text-sm font-semibold">
+                  <Target className="h-4 w-4 mr-2" />
+                  Smart Search
                 </Badge>
                 <Button
                   variant="outline"
                   onClick={() => navigate('/')}
+                  className="px-6 py-2 hover:scale-105 transition-transform"
                 >
                   ← Back to Home
                 </Button>
-              </div>
+              </motion.div>
             </div>
           </div>
-        </header>
+        </motion.header>
 
-        {/* Progress Bar */}
-        <div className="bg-muted/50 border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex items-center space-x-6">
-              <div className="flex-1 bg-muted rounded-full h-3">
-                <div 
-                  className="bg-primary h-3 rounded-full transition-all duration-500"
-                  style={{ width: `${(currentStep / 3) * 100}%` }}
-                />
+        {/* Animated Progress Section */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.8 }}
+          className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-b"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="flex items-center space-x-8">
+              <div className="flex-1 relative">
+                <div className="bg-muted rounded-full h-4 overflow-hidden">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${(currentStep / 3) * 100}%` }}
+                    transition={{ delay: 1, duration: 1, ease: "easeOut" }}
+                    className="bg-gradient-to-r from-primary to-primary/80 h-4 rounded-full shadow-lg"
+                  />
+                </div>
+                <div className="absolute top-6 left-0 flex justify-between w-full">
+                  {["Property Type", "Location & Budget", "Perfect Match"].map((step, index) => (
+                    <motion.div
+                      key={step}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 1.2 + index * 0.2, duration: 0.5 }}
+                      className={`text-sm font-medium ${
+                        index < currentStep ? 'text-primary' : 'text-muted-foreground'
+                      }`}
+                    >
+                      {step}
+                    </motion.div>
+                  ))}
+                </div>
               </div>
-              <span className="text-sm font-semibold text-muted-foreground whitespace-nowrap">
-                Find Your Dream Property
-              </span>
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 1.5, duration: 0.5 }}
+                className="flex items-center space-x-2"
+              >
+                <Zap className="h-5 w-5 text-primary" />
+                <span className="text-lg font-bold text-primary">AI-Powered Search</span>
+              </motion.div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Main Content */}
-        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center mb-10">
-            <h2 className="text-4xl font-bold mb-4">
-              Tell us what you're looking for
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Help us find the perfect property that matches your preferences and lifestyle
+        <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <div className="relative inline-block">
+              <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+                Tell us what you're looking for
+              </h2>
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: "100%" }}
+                transition={{ delay: 1.5, duration: 1 }}
+                className="h-1 bg-gradient-to-r from-primary/20 via-primary to-primary/20 rounded-full mx-auto"
+              />
+            </div>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mt-6">
+              Help us find the perfect property that matches your preferences and lifestyle. 
+              Our AI will analyze thousands of properties to bring you the best matches.
             </p>
-          </div>
+          </motion.div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-3 text-xl">
-                <div className="p-2 bg-primary rounded-lg">
-                  <Search className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <span>Property Preferences</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-8">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1, duration: 0.8 }}
+          >
+            <ShineBorder
+              className="relative bg-gradient-to-br from-card to-card/80 backdrop-blur-sm border-0 shadow-2xl"
+              color={["#a855f7", "#3b82f6", "#06b6d4"]}
+              borderRadius={20}
+              borderWidth={2}
+              duration={12}
+            >
+              <Card className="border-0 shadow-none bg-transparent">
+                <CardHeader className="pb-8">
+                  <CardTitle className="flex items-center space-x-4 text-2xl">
+                    <motion.div 
+                      initial={{ rotate: 0 }}
+                      animate={{ rotate: 360 }}
+                      transition={{ delay: 1.5, duration: 1 }}
+                      className="p-3 bg-gradient-to-r from-primary to-primary/80 rounded-2xl shadow-lg"
+                    >
+                      <Search className="h-6 w-6 text-primary-foreground" />
+                    </motion.div>
+                    <span className="bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+                      Property Preferences
+                    </span>
+                    <Badge variant="secondary" className="ml-auto">
+                      <Heart className="h-4 w-4 mr-1" />
+                      AI-Powered
+                    </Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-10">
               {/* Property Type */}
               <div className="space-y-3">
                 <label className="text-sm font-medium flex items-center space-x-2">
@@ -393,33 +492,43 @@ export default function FindProperty() {
                   ))}
                 </div>
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Action Buttons */}
-          <div className="flex justify-between items-center mt-10">
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/')}
-            >
-              Back to Home
-            </Button>
-            <OnboardingTooltip
-              stepId="find-button"
-              title="Find Your Properties!"
-              description="Click here to search for properties matching your preferences. We'll show you the best matches first."
-              position="top"
-            >
-              <Button 
-                onClick={handleNext}
-                size="lg"
-                disabled={!preferences.propertyType || !preferences.zone}
-              >
-                <span>Find Matching Properties</span>
-                <ChevronRight className="h-5 w-5 ml-2" />
-              </Button>
-            </OnboardingTooltip>
-          </div>
+                  {/* Find Properties Button */}
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 2, duration: 0.6 }}
+                    className="pt-8 border-t"
+                  >
+                    <OnboardingTooltip
+                      stepId="find-button"
+                      title="Find Your Perfect Properties"
+                      description="Ready to discover your dream property? Click here to see properties that match your preferences!"
+                      position="top"
+                    >
+                      <Button 
+                        onClick={handleNext}
+                        size="lg"
+                        className="w-full relative overflow-hidden group bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                        disabled={!preferences.propertyType || !preferences.zone}
+                      >
+                        <motion.div
+                          initial={{ x: -100 }}
+                          animate={{ x: 0 }}
+                          transition={{ delay: 2.2, duration: 0.5 }}
+                          className="flex items-center"
+                        >
+                          <Search className="mr-2 h-5 w-5" />
+                          Find My Dream Properties
+                          <ChevronRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                        </motion.div>
+                      </Button>
+                    </OnboardingTooltip>
+                  </motion.div>
+                </CardContent>
+              </Card>
+            </ShineBorder>
+          </motion.div>
         </main>
       </div>
     </TooltipProvider>
