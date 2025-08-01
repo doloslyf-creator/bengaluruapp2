@@ -564,22 +564,30 @@ function PropertyFilters({ preferences, onUpdatePreferences, properties }: Prope
   };
 
   return (
-    <div className="space-y-6 py-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">Filters</h3>
-        <Button variant="ghost" size="sm" onClick={clearAllFilters}>
+    <div className="space-y-6 p-6 bg-white/95 backdrop-blur-sm rounded-xl border-0 shadow-xl">
+      <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+        <h3 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-slate-700 bg-clip-text text-transparent">Filters</h3>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={clearAllFilters}
+          className="text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
+        >
           Clear All
         </Button>
       </div>
 
       {/* Property Type */}
-      <div className="space-y-3">
-        <label className="text-sm font-medium text-gray-700">Property Type</label>
+      <div className="space-y-3 p-4 bg-gradient-to-r from-blue-50/50 to-slate-50/50 rounded-lg border border-blue-100">
+        <label className="text-sm font-semibold text-slate-700 flex items-center space-x-2">
+          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+          <span>Property Type</span>
+        </label>
         <Select 
           value={preferences.propertyType || "any"} 
           onValueChange={(value) => handlePreferenceChange('propertyType', value)}
         >
-          <SelectTrigger>
+          <SelectTrigger className="border-blue-200 hover:border-blue-300 focus:border-blue-400 transition-colors">
             <SelectValue placeholder="Any type" />
           </SelectTrigger>
           <SelectContent>
@@ -594,13 +602,16 @@ function PropertyFilters({ preferences, onUpdatePreferences, properties }: Prope
       </div>
 
       {/* Zone */}
-      <div className="space-y-3">
-        <label className="text-sm font-medium text-gray-700">Zone</label>
+      <div className="space-y-3 p-4 bg-gradient-to-r from-blue-50/50 to-slate-50/50 rounded-lg border border-blue-100">
+        <label className="text-sm font-semibold text-slate-700 flex items-center space-x-2">
+          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+          <span>Zone</span>
+        </label>
         <Select 
           value={preferences.zone || "any"} 
           onValueChange={(value) => handlePreferenceChange('zone', value)}
         >
-          <SelectTrigger>
+          <SelectTrigger className="border-blue-200 hover:border-blue-300 focus:border-blue-400 transition-colors">
             <SelectValue placeholder="Any zone" />
           </SelectTrigger>
           <SelectContent>
@@ -615,9 +626,12 @@ function PropertyFilters({ preferences, onUpdatePreferences, properties }: Prope
       </div>
 
       {/* Budget Range */}
-      <div className="space-y-4">
-        <label className="text-sm font-medium text-gray-700">Budget Range</label>
-        <div className="px-2">
+      <div className="space-y-4 p-4 bg-gradient-to-r from-blue-50/50 to-slate-50/50 rounded-lg border border-blue-100">
+        <label className="text-sm font-semibold text-slate-700 flex items-center space-x-2">
+          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+          <span>Budget Range</span>
+        </label>
+        <div className="px-3">
           <Slider
             value={preferences.budgetRange}
             onValueChange={(value) => handlePreferenceChange('budgetRange', value as [number, number])}
@@ -626,7 +640,7 @@ function PropertyFilters({ preferences, onUpdatePreferences, properties }: Prope
             step={10}
             className="w-full"
           />
-          <div className="flex justify-between text-sm text-gray-600 mt-2">
+          <div className="flex justify-between text-sm font-medium text-blue-600 mt-3">
             <span>{formatBudget(preferences.budgetRange[0])}</span>
             <span>{formatBudget(preferences.budgetRange[1])}</span>
           </div>
@@ -634,17 +648,21 @@ function PropertyFilters({ preferences, onUpdatePreferences, properties }: Prope
       </div>
 
       {/* BHK Configuration */}
-      <div className="space-y-3">
-        <label className="text-sm font-medium text-gray-700">BHK Type</label>
+      <div className="space-y-3 p-4 bg-gradient-to-r from-blue-50/50 to-slate-50/50 rounded-lg border border-blue-100">
+        <label className="text-sm font-semibold text-slate-700 flex items-center space-x-2">
+          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+          <span>BHK Type</span>
+        </label>
         <div className="grid grid-cols-2 gap-3">
           {bhkOptions.map(bhk => (
-            <div key={bhk} className="flex items-center space-x-2">
+            <div key={bhk} className="flex items-center space-x-3 p-2 rounded-md hover:bg-blue-50 transition-colors">
               <Checkbox 
                 id={`filter-${bhk}`}
                 checked={preferences.bhkType.includes(bhk)}
                 onCheckedChange={() => handleArrayToggle('bhkType', bhk)}
+                className="data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
               />
-              <label htmlFor={`filter-${bhk}`} className="text-sm text-gray-700 cursor-pointer">
+              <label htmlFor={`filter-${bhk}`} className="text-sm text-slate-700 cursor-pointer font-medium">
                 {bhk}
               </label>
             </div>
@@ -653,17 +671,21 @@ function PropertyFilters({ preferences, onUpdatePreferences, properties }: Prope
       </div>
 
       {/* Tags */}
-      <div className="space-y-3">
-        <label className="text-sm font-medium text-gray-700">Features</label>
-        <div className="grid grid-cols-1 gap-3 max-h-48 overflow-y-auto">
+      <div className="space-y-3 p-4 bg-gradient-to-r from-blue-50/50 to-slate-50/50 rounded-lg border border-blue-100">
+        <label className="text-sm font-semibold text-slate-700 flex items-center space-x-2">
+          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+          <span>Features</span>
+        </label>
+        <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
           {tags.slice(0, 10).map(tag => (
-            <div key={tag.value} className="flex items-center space-x-2">
+            <div key={tag.value} className="flex items-center space-x-3 p-2 rounded-md hover:bg-blue-50 transition-colors">
               <Checkbox 
                 id={`filter-${tag.value}`}
                 checked={preferences.tags.includes(tag.value)}
                 onCheckedChange={() => handleArrayToggle('tags', tag.value)}
+                className="data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
               />
-              <label htmlFor={`filter-${tag.value}`} className="text-sm text-gray-700 cursor-pointer">
+              <label htmlFor={`filter-${tag.value}`} className="text-sm text-slate-700 cursor-pointer font-medium">
                 {tag.label}
               </label>
             </div>
