@@ -240,10 +240,10 @@ export default function PropertyResults() {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gray-50">
         {/* Header */}
-        <header className="bg-card shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <header className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Button 
@@ -254,16 +254,11 @@ export default function PropertyResults() {
                   <ArrowLeft className="h-4 w-4" />
                   <span>Back</span>
                 </Button>
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-primary rounded-xl">
-                    <MapPin className="h-6 w-6 text-primary-foreground" />
-                  </div>
-                  <div>
-                    <h1 className="text-3xl font-bold">Property Results</h1>
-                    <p className="text-sm text-muted-foreground">
-                      Found {matchingProperties.length} properties matching your preferences
-                    </p>
-                  </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">Property Results</h1>
+                  <p className="text-sm text-gray-600">
+                    Found {matchingProperties.length} properties matching your preferences
+                  </p>
                 </div>
               </div>
               
@@ -299,7 +294,7 @@ export default function PropertyResults() {
                   </SheetContent>
                 </Sheet>
 
-                <div className="flex items-center bg-muted rounded-lg p-1">
+                <div className="flex items-center bg-gray-100 rounded-lg p-1">
                   <Button
                     variant={viewMode === 'grid' ? 'default' : 'ghost'}
                     size="sm"
@@ -321,11 +316,11 @@ export default function PropertyResults() {
         </header>
 
         {/* Filters Summary */}
-        <div className="bg-card border-b">
+        <div className="bg-white border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-sm text-muted-foreground">Active filters:</span>
+                <span className="text-sm text-gray-600">Active filters:</span>
                 {preferences.propertyType && <Badge variant="secondary">{preferences.propertyType}</Badge>}
                 {preferences.zone && <Badge variant="secondary">{preferences.zone} Bengaluru</Badge>}
                 <Badge variant="secondary">
@@ -361,9 +356,9 @@ export default function PropertyResults() {
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {matchingProperties.length === 0 ? (
             <div className="text-center py-12">
-              <div className="text-muted-foreground text-6xl mb-4">🏠</div>
-              <h3 className="text-xl font-semibold mb-2">No matching properties found</h3>
-              <p className="text-muted-foreground mb-6">
+              <div className="text-gray-400 text-6xl mb-4">🏠</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No matching properties found</h3>
+              <p className="text-gray-600 mb-6">
                 Try adjusting your filters or budget range to see more options
               </p>
               <Button onClick={() => navigate('/find-property')}>
@@ -380,18 +375,18 @@ export default function PropertyResults() {
                 const matchInfo = getMatchLabel(property.matchScore);
                 
                 return (
-                  <Card key={property.id} className="group hover:shadow-lg transition-all duration-300">
+                  <Card key={property.id} className="hover:shadow-lg transition-shadow">
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
-                        <div className="flex-1 cursor-pointer" onClick={() => navigate(`/property/${property.id}`)}>
-                          <CardTitle className="text-lg font-bold hover:underline">{property.name}</CardTitle>
-                          <p className="text-sm text-muted-foreground flex items-center mt-1">
+                        <div className="flex-1">
+                          <CardTitle className="text-lg">{property.name}</CardTitle>
+                          <p className="text-sm text-gray-600 flex items-center mt-1">
                             <MapPin className="h-3 w-3 mr-1" />
                             {property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)}
                           </p>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <Badge variant="secondary">
+                          <Badge className={matchInfo.color}>
                             {matchInfo.label}
                           </Badge>
                           <Button
@@ -403,7 +398,7 @@ export default function PropertyResults() {
                               className={`h-4 w-4 ${
                                 favorites.has(property.id) 
                                   ? 'fill-red-500 text-red-500' 
-                                  : 'text-muted-foreground hover:text-red-400'
+                                  : 'text-gray-400'
                               }`} 
                             />
                           </Button>
@@ -414,19 +409,16 @@ export default function PropertyResults() {
                     <CardContent className="pt-0">
                       <div className="space-y-4">
                         {/* Property Image Placeholder */}
-                        <div 
-                          className="aspect-video bg-muted rounded-xl flex items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors"
-                          onClick={() => navigate(`/property/${property.id}`)}
-                        >
-                          <div className="text-muted-foreground text-center">
-                            <div className="text-3xl mb-2">🏢</div>
-                            <p className="text-xs font-medium">Property Gallery</p>
+                        <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center">
+                          <div className="text-gray-400 text-center">
+                            <div className="text-2xl mb-1">🏢</div>
+                            <p className="text-xs">Property Image</p>
                           </div>
                         </div>
 
                         {/* Price and Configuration */}
-                        <div className="space-y-3 p-3 bg-muted/50 rounded-lg">
-                          <div className="text-xl font-bold">
+                        <div className="space-y-2">
+                          <div className="text-lg font-semibold text-primary">
                             {getPriceRange(property.configurations)}
                           </div>
                           
@@ -472,23 +464,23 @@ export default function PropertyResults() {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex space-x-3 pt-2">
+                        <div className="flex space-x-2 pt-2">
                           <Button 
                             variant="outline" 
                             size="sm"
                             onClick={() => handleBookVisit(property)}
-                            className="flex-1 flex items-center justify-center space-x-2 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 hover:scale-105 transition-all duration-200 shadow-sm"
+                            className="flex-1 flex items-center justify-center space-x-1"
                           >
-                            <Calendar className="h-4 w-4" />
-                            <span className="font-medium">Book Visit</span>
+                            <Calendar className="h-3 w-3" />
+                            <span>Book Visit</span>
                           </Button>
                           <Button 
                             size="sm"
                             onClick={() => handleConsult(property)}
-                            className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 hover:scale-105 transition-all duration-200 shadow-lg"
+                            className="flex-1 flex items-center justify-center space-x-1"
                           >
-                            <Phone className="h-4 w-4" />
-                            <span className="font-medium">Consult</span>
+                            <Phone className="h-3 w-3" />
+                            <span>Consult</span>
                           </Button>
                         </div>
                       </div>
@@ -566,30 +558,22 @@ function PropertyFilters({ preferences, onUpdatePreferences, properties }: Prope
   };
 
   return (
-    <div className="space-y-6 p-6 bg-white/95 backdrop-blur-sm rounded-xl border-0 shadow-xl">
-      <div className="flex justify-between items-center pb-4 border-b border-slate-100">
-        <h3 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-slate-700 bg-clip-text text-transparent">Filters</h3>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={clearAllFilters}
-          className="text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
-        >
+    <div className="space-y-6 py-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-medium">Filters</h3>
+        <Button variant="ghost" size="sm" onClick={clearAllFilters}>
           Clear All
         </Button>
       </div>
 
       {/* Property Type */}
-      <div className="space-y-3 p-4 bg-gradient-to-r from-blue-50/50 to-slate-50/50 rounded-lg border border-blue-100">
-        <label className="text-sm font-semibold text-slate-700 flex items-center space-x-2">
-          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-          <span>Property Type</span>
-        </label>
+      <div className="space-y-3">
+        <label className="text-sm font-medium text-gray-700">Property Type</label>
         <Select 
           value={preferences.propertyType || "any"} 
           onValueChange={(value) => handlePreferenceChange('propertyType', value)}
         >
-          <SelectTrigger className="border-blue-200 hover:border-blue-300 focus:border-blue-400 transition-colors">
+          <SelectTrigger>
             <SelectValue placeholder="Any type" />
           </SelectTrigger>
           <SelectContent>
@@ -604,16 +588,13 @@ function PropertyFilters({ preferences, onUpdatePreferences, properties }: Prope
       </div>
 
       {/* Zone */}
-      <div className="space-y-3 p-4 bg-gradient-to-r from-blue-50/50 to-slate-50/50 rounded-lg border border-blue-100">
-        <label className="text-sm font-semibold text-slate-700 flex items-center space-x-2">
-          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-          <span>Zone</span>
-        </label>
+      <div className="space-y-3">
+        <label className="text-sm font-medium text-gray-700">Zone</label>
         <Select 
           value={preferences.zone || "any"} 
           onValueChange={(value) => handlePreferenceChange('zone', value)}
         >
-          <SelectTrigger className="border-blue-200 hover:border-blue-300 focus:border-blue-400 transition-colors">
+          <SelectTrigger>
             <SelectValue placeholder="Any zone" />
           </SelectTrigger>
           <SelectContent>
@@ -628,12 +609,9 @@ function PropertyFilters({ preferences, onUpdatePreferences, properties }: Prope
       </div>
 
       {/* Budget Range */}
-      <div className="space-y-4 p-4 bg-gradient-to-r from-blue-50/50 to-slate-50/50 rounded-lg border border-blue-100">
-        <label className="text-sm font-semibold text-slate-700 flex items-center space-x-2">
-          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-          <span>Budget Range</span>
-        </label>
-        <div className="px-3">
+      <div className="space-y-4">
+        <label className="text-sm font-medium text-gray-700">Budget Range</label>
+        <div className="px-2">
           <Slider
             value={preferences.budgetRange}
             onValueChange={(value) => handlePreferenceChange('budgetRange', value as [number, number])}
@@ -642,7 +620,7 @@ function PropertyFilters({ preferences, onUpdatePreferences, properties }: Prope
             step={10}
             className="w-full"
           />
-          <div className="flex justify-between text-sm font-medium text-blue-600 mt-3">
+          <div className="flex justify-between text-sm text-gray-600 mt-2">
             <span>{formatBudget(preferences.budgetRange[0])}</span>
             <span>{formatBudget(preferences.budgetRange[1])}</span>
           </div>
@@ -650,21 +628,17 @@ function PropertyFilters({ preferences, onUpdatePreferences, properties }: Prope
       </div>
 
       {/* BHK Configuration */}
-      <div className="space-y-3 p-4 bg-gradient-to-r from-blue-50/50 to-slate-50/50 rounded-lg border border-blue-100">
-        <label className="text-sm font-semibold text-slate-700 flex items-center space-x-2">
-          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-          <span>BHK Type</span>
-        </label>
+      <div className="space-y-3">
+        <label className="text-sm font-medium text-gray-700">BHK Type</label>
         <div className="grid grid-cols-2 gap-3">
           {bhkOptions.map(bhk => (
-            <div key={bhk} className="flex items-center space-x-3 p-2 rounded-md hover:bg-blue-50 transition-colors">
+            <div key={bhk} className="flex items-center space-x-2">
               <Checkbox 
                 id={`filter-${bhk}`}
                 checked={preferences.bhkType.includes(bhk)}
                 onCheckedChange={() => handleArrayToggle('bhkType', bhk)}
-                className="data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
               />
-              <label htmlFor={`filter-${bhk}`} className="text-sm text-slate-700 cursor-pointer font-medium">
+              <label htmlFor={`filter-${bhk}`} className="text-sm text-gray-700 cursor-pointer">
                 {bhk}
               </label>
             </div>
@@ -673,21 +647,17 @@ function PropertyFilters({ preferences, onUpdatePreferences, properties }: Prope
       </div>
 
       {/* Tags */}
-      <div className="space-y-3 p-4 bg-gradient-to-r from-blue-50/50 to-slate-50/50 rounded-lg border border-blue-100">
-        <label className="text-sm font-semibold text-slate-700 flex items-center space-x-2">
-          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-          <span>Features</span>
-        </label>
-        <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
+      <div className="space-y-3">
+        <label className="text-sm font-medium text-gray-700">Features</label>
+        <div className="grid grid-cols-1 gap-3 max-h-48 overflow-y-auto">
           {tags.slice(0, 10).map(tag => (
-            <div key={tag.value} className="flex items-center space-x-3 p-2 rounded-md hover:bg-blue-50 transition-colors">
+            <div key={tag.value} className="flex items-center space-x-2">
               <Checkbox 
                 id={`filter-${tag.value}`}
                 checked={preferences.tags.includes(tag.value)}
                 onCheckedChange={() => handleArrayToggle('tags', tag.value)}
-                className="data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
               />
-              <label htmlFor={`filter-${tag.value}`} className="text-sm text-slate-700 cursor-pointer font-medium">
+              <label htmlFor={`filter-${tag.value}`} className="text-sm text-gray-700 cursor-pointer">
                 {tag.label}
               </label>
             </div>

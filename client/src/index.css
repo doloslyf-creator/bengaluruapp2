@@ -2,23 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Onboarding highlight effect */
-@keyframes onboarding-pulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
-  }
-  50% {
-    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
-  }
-}
-
-.onboarding-highlight {
-  border-radius: 8px;
-  animation: onboarding-pulse 2s infinite;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.8);
-  background-color: rgba(59, 130, 246, 0.05);
-}
-
 :root {
   --background: hsl(0, 0%, 100%);
   --foreground: hsl(20, 14.3%, 4.1%);
@@ -74,57 +57,5 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
-  }
-}
-
-/* Marquee animations */
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(calc(-100% - var(--gap)));
-  }
-}
-
-@keyframes marquee-vertical {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(calc(-100% - var(--gap)));
-  }
-}
-
-.animate-marquee {
-  animation: marquee var(--duration) linear infinite;
-}
-
-.animate-marquee-vertical {
-  animation: marquee-vertical var(--duration) linear infinite;
-}
-
-/* Border beam animation */
-@keyframes border-beam {
-  100% {
-    offset-distance: 100%;
-  }
-}
-
-.animate-border-beam {
-  offset-path: rect(0 auto auto 0 round calc(var(--size) / 2));
-  animation: border-beam calc(var(--duration) * 1s) infinite linear;
-}
-
-/* Shine animation */
-@keyframes shine {
-  0% {
-    background-position: 0% 0%;
-  }
-  50% {
-    background-position: 100% 100%;
-  }
-  to {
-    background-position: 0% 0%;
   }
 }

@@ -155,77 +155,53 @@ export default function LeadsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="relative overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-indigo-500/10"></div>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-semibold text-gray-700 tracking-wide">Total Leads</CardTitle>
-              <div className="p-2 bg-blue-500 rounded-lg shadow-md">
-                <Users className="h-4 w-4 text-white" />
-              </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Leads</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="text-3xl font-bold text-gray-900 mb-1">{stats?.totalLeads || 0}</div>
-              <p className="text-xs text-gray-600 font-medium">
+            <CardContent>
+              <div className="text-2xl font-bold">{stats?.totalLeads || 0}</div>
+              <p className="text-xs text-muted-foreground">
                 Active leads in pipeline
               </p>
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden bg-gradient-to-br from-red-50 to-pink-100 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-pink-500/10"></div>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-semibold text-gray-700 tracking-wide">Hot Leads</CardTitle>
-              <div className="p-2 bg-gradient-to-r from-red-500 to-pink-500 rounded-lg shadow-md animate-pulse">
-                <TrendingUp className="h-4 w-4 text-white" />
-              </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Hot Leads</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="text-3xl font-bold text-gray-900 mb-1">{stats?.hotLeads || 0}</div>
-              <p className="text-xs text-gray-600 font-medium">
+            <CardContent>
+              <div className="text-2xl font-bold">{stats?.hotLeads || 0}</div>
+              <p className="text-xs text-muted-foreground">
                 High priority prospects
               </p>
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden bg-gradient-to-br from-emerald-50 to-green-100 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-green-500/10"></div>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-semibold text-gray-700 tracking-wide">Avg Lead Score</CardTitle>
-              <div className="p-2 bg-gradient-to-r from-emerald-500 to-green-500 rounded-lg shadow-md">
-                <Target className="h-4 w-4 text-white" />
-              </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Avg Lead Score</CardTitle>
+              <Target className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="text-3xl font-bold text-gray-900 mb-1">{stats?.avgLeadScore || 0}</div>
-              <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                <div 
-                  className="bg-gradient-to-r from-emerald-500 to-green-500 h-2 rounded-full transition-all duration-500" 
-                  style={{width: `${Math.min((stats?.avgLeadScore || 0) / 100 * 100, 100)}%`}}
-                ></div>
-              </div>
-              <p className="text-xs text-gray-600 font-medium">
+            <CardContent>
+              <div className="text-2xl font-bold">{stats?.avgLeadScore || 0}</div>
+              <p className="text-xs text-muted-foreground">
                 Quality indicator
               </p>
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden bg-gradient-to-br from-purple-50 to-violet-100 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-violet-500/10"></div>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-semibold text-gray-700 tracking-wide">Conversion Rate</CardTitle>
-              <div className="p-2 bg-gradient-to-r from-purple-500 to-violet-500 rounded-lg shadow-md">
-                <Award className="h-4 w-4 text-white" />
-              </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
+              <Award className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent className="relative z-10">
-              <div className="text-3xl font-bold text-gray-900 mb-1">{stats?.conversionRate || 0}%</div>
-              <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                <div 
-                  className="bg-gradient-to-r from-purple-500 to-violet-500 h-2 rounded-full transition-all duration-500" 
-                  style={{width: `${Math.min((stats?.conversionRate || 0), 100)}%`}}
-                ></div>
-              </div>
-              <p className="text-xs text-gray-600 font-medium">
+            <CardContent>
+              <div className="text-2xl font-bold">{stats?.conversionRate || 0}%</div>
+              <p className="text-xs text-muted-foreground">
                 Success rate
               </p>
             </CardContent>
@@ -233,33 +209,24 @@ export default function LeadsPage() {
         </div>
 
         {/* Filters and Search */}
-        <Card className="mb-8 border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-          <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50 border-b border-gray-100">
-            <CardTitle className="flex items-center gap-3 text-gray-800">
-              <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg shadow-md">
-                <Filter className="h-5 w-5 text-white" />
-              </div>
-              <span className="text-lg font-semibold tracking-wide">Filters & Search</span>
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Filters & Search
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-6">
+          <CardContent>
             <div className="flex flex-wrap gap-4 items-center">
-              <div className="relative max-w-sm">
-                <Input
-                  placeholder="Search leads..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 border-2 border-gray-200 focus:border-blue-500 transition-colors duration-200 shadow-sm"
-                />
-                <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                  <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-              </div>
+              <Input
+                placeholder="Search leads..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="max-w-sm"
+              />
               
               <Select value={filters.status} onValueChange={(value) => setFilters(prev => ({ ...prev, status: value }))}>
-                <SelectTrigger className="w-40 border-2 border-gray-200 hover:border-blue-400 transition-colors duration-200 shadow-sm">
+                <SelectTrigger className="w-40">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -312,19 +279,14 @@ export default function LeadsPage() {
         </Card>
 
         {/* Leads List */}
-        <Card className="border-0 shadow-xl bg-white/95 backdrop-blur-sm">
-          <CardHeader className="bg-gradient-to-r from-gray-50 to-indigo-50 border-b border-gray-100">
-            <CardTitle className="flex items-center gap-3 text-xl font-bold text-gray-800">
-              <div className="p-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg shadow-md">
-                <Users className="h-5 w-5 text-white" />
-              </div>
-              Leads ({filteredLeads.length})
-            </CardTitle>
-            <CardDescription className="text-gray-600 font-medium">
-              Manage and track your sales leads with advanced analytics
+        <Card>
+          <CardHeader>
+            <CardTitle>Leads ({filteredLeads.length})</CardTitle>
+            <CardDescription>
+              Manage and track your sales leads
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent>
             {leadsLoading ? (
               <div className="text-center py-8">Loading leads...</div>
             ) : filteredLeads.length === 0 ? (
@@ -336,14 +298,13 @@ export default function LeadsPage() {
                 {filteredLeads.map((lead: Lead) => (
                   <div
                     key={lead.id}
-                    className="group relative border-0 rounded-xl p-6 bg-gradient-to-r from-white to-gray-50 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer hover:scale-[1.02] hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50"
+                    className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
                     onClick={() => setSelectedLead(lead)}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-indigo-500/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div className="flex items-center justify-between relative z-10">
+                    <div className="flex items-center justify-between">
                       <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-3">
-                          <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-700 transition-colors duration-200">{lead.customerName}</h3>
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="font-semibold">{lead.customerName}</h3>
                           <Badge className={leadTypeColors[lead.leadType as keyof typeof leadTypeColors]}>
                             {lead.leadType}
                           </Badge>
@@ -354,42 +315,31 @@ export default function LeadsPage() {
                             {lead.status}
                           </Badge>
                         </div>
-                        <div className="text-sm text-gray-700 space-y-2">
-                          <div className="grid grid-cols-2 gap-4">
-                            <span className="flex items-center gap-2 bg-blue-50 px-3 py-2 rounded-lg">
-                              <Phone className="h-4 w-4 text-blue-600" />
-                              <span className="font-medium">{lead.phone}</span>
+                        <div className="text-sm text-gray-600 space-y-1">
+                          <div className="flex items-center gap-4">
+                            <span className="flex items-center gap-1">
+                              <Phone className="h-4 w-4" />
+                              {lead.phone}
                             </span>
-                            <span className="flex items-center gap-2 bg-green-50 px-3 py-2 rounded-lg">
-                              <Mail className="h-4 w-4 text-green-600" />
-                              <span className="font-medium">{lead.email}</span>
+                            <span className="flex items-center gap-1">
+                              <Mail className="h-4 w-4" />
+                              {lead.email}
                             </span>
-                          </div>
-                          <div className="flex items-center gap-2 bg-purple-50 px-3 py-2 rounded-lg">
-                            <MapPin className="h-4 w-4 text-purple-600" />
-                            <span className="font-medium">{lead.propertyName}</span>
-                          </div>
-                          <div className="inline-flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full text-xs">
-                            <span className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></span>
-                            <span className="font-semibold text-gray-700">Source: {lead.source}</span>
+                            <span className="flex items-center gap-1">
+                              <MapPin className="h-4 w-4" />
+                              {lead.propertyName}
+                            </span>
+                            <span>Source: {lead.source}</span>
                           </div>
                         </div>
                       </div>
-                      <div className="text-right space-y-3">
-                        <div className="text-center">
-                          <div className="relative inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full shadow-lg">
-                            <div className="text-2xl font-bold text-white">{lead.leadScore}</div>
-                            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
-                              <svg className="w-3 h-3 text-yellow-800" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                              </svg>
-                            </div>
-                          </div>
-                          <div className="text-xs text-gray-500 font-medium mt-1">Lead Score</div>
-                        </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-blue-600">{lead.leadScore}</div>
+                        <div className="text-sm text-gray-500">Lead Score</div>
                         <Button
                           size="sm"
-                          className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-lg transition-all duration-200 hover:scale-105"
+                          variant="outline"
+                          className="mt-2"
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedLead(lead);

@@ -77,16 +77,16 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+    <div className="flex h-screen bg-background">
       <Sidebar />
       
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 px-6 py-4 shadow-sm">
+        <header className="bg-white border-b border-border px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Property Management</h2>
-              <p className="text-sm text-gray-600 mt-2 font-medium">Manage residential properties across Bengaluru</p>
+              <h2 className="text-2xl font-semibold text-gray-900">Property Management</h2>
+              <p className="text-sm text-gray-600 mt-1">Manage residential properties across Bengaluru</p>
             </div>
             <div className="flex items-center space-x-4">
               <div className="relative">
@@ -94,14 +94,14 @@ export default function Dashboard() {
                 <Input
                   type="text"
                   placeholder="Search properties..."
-                  className="w-80 pl-10 pr-4 py-2 border-2 border-gray-200 focus:border-blue-500 transition-colors duration-200 shadow-sm"
+                  className="w-80 pl-10 pr-4 py-2"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
               <Button
                 onClick={() => setShowAddDialog(true)}
-                className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-lg transition-all duration-200 hover:scale-105"
+                className="bg-primary text-white hover:bg-primary/90"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Property

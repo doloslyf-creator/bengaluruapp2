@@ -46,30 +46,26 @@ export default function AdminAnalytics() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+      <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">Analytics Dashboard</h1>
-              <p className="text-gray-600 font-medium mt-2">Property insights and market analysis</p>
+              <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
+              <p className="text-gray-600">Property insights and market analysis</p>
             </div>
             
             <div className="flex items-center gap-4">
               <nav className="flex space-x-8">
-                <Link href="/admin-panel" className="text-gray-600 hover:text-purple-600 hover:bg-purple-50 px-3 py-2 rounded-lg transition-all duration-200">Dashboard</Link>
-                <Link href="/admin-panel/analytics" className="text-purple-600 font-semibold bg-purple-50 px-3 py-2 rounded-lg">Analytics</Link>
-                <Link href="/admin-panel/leads" className="text-gray-600 hover:text-purple-600 hover:bg-purple-50 px-3 py-2 rounded-lg transition-all duration-200">Leads</Link>
-                <Link href="/admin-panel/developers" className="text-gray-600 hover:text-purple-600 hover:bg-purple-50 px-3 py-2 rounded-lg transition-all duration-200">Developers</Link>
-                <Link href="/admin-panel/zones" className="text-gray-600 hover:text-purple-600 hover:bg-purple-50 px-3 py-2 rounded-lg transition-all duration-200">Zones</Link>
+                <Link href="/admin-panel" className="text-gray-600 hover:text-gray-900">Dashboard</Link>
+                <Link href="/admin-panel/analytics" className="text-violet-600 font-medium">Analytics</Link>
+                <Link href="/admin-panel/leads" className="text-gray-600 hover:text-gray-900">Leads</Link>
+                <Link href="/admin-panel/developers" className="text-gray-600 hover:text-gray-900">Developers</Link>
+                <Link href="/admin-panel/zones" className="text-gray-600 hover:text-gray-900">Zones</Link>
               </nav>
               
-              <Button 
-                variant="ghost" 
-                onClick={handleLogout}
-                className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white shadow-lg transition-all duration-200 hover:scale-105"
-              >
+              <Button variant="ghost" onClick={handleLogout}>
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
               </Button>
@@ -129,25 +125,22 @@ export default function AdminAnalytics() {
         {/* Distribution Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Property Type Distribution */}
-          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-bold text-gray-800">Property Types</CardTitle>
-              <CardDescription className="text-gray-600 font-medium">Distribution by property type</CardDescription>
+          <Card>
+            <CardHeader>
+              <CardTitle>Property Types</CardTitle>
+              <CardDescription>Distribution by property type</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {Object.entries(propertyTypeDistribution).map(([type, count], index) => {
-                  const colors = ['bg-purple-500', 'bg-blue-500', 'bg-green-500', 'bg-orange-500', 'bg-pink-500'];
-                  return (
-                    <div key={type} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-3 h-3 rounded-full ${colors[index % colors.length]} shadow-sm`}></div>
-                        <span className="text-sm font-semibold capitalize text-gray-700">{type}</span>
-                      </div>
-                      <span className="text-sm font-bold text-gray-900 bg-gray-100 px-2 py-1 rounded-full">{count}</span>
+                {Object.entries(propertyTypeDistribution).map(([type, count]) => (
+                  <div key={type} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-violet-500"></div>
+                      <span className="text-sm font-medium capitalize">{type}</span>
                     </div>
-                  );
-                })}
+                    <span className="text-sm text-gray-600">{count}</span>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>

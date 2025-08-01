@@ -64,14 +64,13 @@ export function PropertyCard({ property, onClick, onDelete }: PropertyCardProps)
 
   return (
     <div
-      className="bg-white/95 backdrop-blur-sm rounded-xl border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer overflow-hidden"
+      className="bg-white rounded-lg border border-border hover:shadow-lg transition-shadow cursor-pointer"
       onClick={onClick}
     >
-      <div className="aspect-video bg-gradient-to-br from-blue-100 via-purple-50 to-indigo-100 rounded-t-xl flex items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10"></div>
-        <div className="text-gray-600 text-center relative z-10">
-          <div className="text-4xl mb-2 filter drop-shadow-sm">🏢</div>
-          <p className="text-sm font-semibold">Property Image</p>
+      <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-t-lg flex items-center justify-center">
+        <div className="text-gray-400 text-center">
+          <div className="text-2xl mb-2">🏢</div>
+          <p className="text-sm">Property Image</p>
         </div>
       </div>
       

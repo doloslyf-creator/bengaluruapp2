@@ -124,13 +124,13 @@ export default function BookVisit() {
 
   if (bookingComplete) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-        <Card className="max-w-md w-full mx-4 shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
-          <CardHeader className="text-center bg-gradient-to-r from-blue-50 to-slate-50 border-b border-slate-100">
-            <div className="mx-auto mb-4 w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center shadow-lg">
-              <CheckCircle className="h-10 w-10 text-blue-600" />
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center">
+        <Card className="max-w-md w-full mx-4">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-4 w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+              <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
-            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-slate-800 bg-clip-text text-transparent">Booking Confirmed!</CardTitle>
+            <CardTitle className="text-2xl text-green-800">Booking Confirmed!</CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
@@ -190,27 +190,22 @@ export default function BookVisit() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white/95 backdrop-blur-lg shadow-lg border-b border-slate-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center space-x-4">
             <Button 
               variant="ghost" 
               onClick={() => navigate('/find-property/results')}
-              className="flex items-center space-x-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
+              className="flex items-center space-x-2"
             >
               <ArrowLeft className="h-4 w-4" />
               <span>Back to Results</span>
             </Button>
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg">
-                <Calendar className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-slate-800 bg-clip-text text-transparent">Book Site Visit</h1>
-                <p className="text-sm text-slate-600">Schedule your property visit with our expert</p>
-              </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Book Site Visit</h1>
+              <p className="text-sm text-gray-600">Schedule your property visit</p>
             </div>
           </div>
         </div>
@@ -220,37 +215,35 @@ export default function BookVisit() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Property Details */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-8 border-0 shadow-xl bg-white/95 backdrop-blur-sm">
-              <CardHeader className="bg-gradient-to-r from-blue-50/80 to-slate-50/80 border-b border-slate-100">
-                <CardTitle className="text-lg font-bold bg-gradient-to-r from-blue-600 to-slate-700 bg-clip-text text-transparent">Property Details</CardTitle>
+            <Card className="sticky top-8">
+              <CardHeader>
+                <CardTitle className="text-lg">Property Details</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4 p-6">
-                <div className="aspect-video bg-gradient-to-br from-blue-100 to-slate-200 rounded-xl flex items-center justify-center shadow-inner">
-                  <div className="text-slate-500 text-center">
-                    <div className="text-3xl mb-2">🏢</div>
-                    <p className="text-sm font-medium">Property Gallery</p>
+              <CardContent className="space-y-4">
+                <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center">
+                  <div className="text-gray-400 text-center">
+                    <div className="text-2xl mb-1">🏢</div>
+                    <p className="text-xs">Property Image</p>
                   </div>
                 </div>
                 
-                <div className="p-4 bg-gradient-to-r from-blue-50 to-slate-50 rounded-lg border border-blue-100">
-                  <h3 className="font-bold text-lg bg-gradient-to-r from-blue-600 to-slate-800 bg-clip-text text-transparent">{property.name}</h3>
-                  <p className="text-sm text-slate-600 flex items-center mt-2">
-                    <MapPin className="h-4 w-4 mr-2 text-blue-500" />
+                <div>
+                  <h3 className="font-semibold text-gray-900">{property.name}</h3>
+                  <p className="text-sm text-gray-600 flex items-center mt-1">
+                    <MapPin className="h-3 w-3 mr-1" />
                     {property.area}, {property.zone?.charAt(0).toUpperCase() + property.zone?.slice(1)} Bengaluru
                   </p>
                 </div>
 
-                <div className="space-y-3">
-                  <Badge className="bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border border-green-200 px-3 py-1">
+                <div className="space-y-2">
+                  <Badge className="bg-green-100 text-green-800">
                     {property.status?.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                   </Badge>
-                  <div className="flex flex-wrap gap-2">
-                    {property.tags?.slice(0, 3).map((tag: string) => (
-                      <Badge key={tag} variant="outline" className="text-xs border-blue-200 text-blue-700 hover:bg-blue-50 transition-colors">
-                        {tag.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
-                      </Badge>
-                    ))}
-                  </div>
+                  {property.tags?.slice(0, 3).map((tag: string) => (
+                    <Badge key={tag} variant="outline" className="text-xs mr-1 mb-1">
+                      {tag.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                    </Badge>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -258,13 +251,11 @@ export default function BookVisit() {
 
           {/* Booking Form */}
           <div className="lg:col-span-2">
-            <Card className="border-0 shadow-xl bg-white/95 backdrop-blur-sm">
-              <CardHeader className="bg-gradient-to-r from-blue-50/80 to-slate-50/80 border-b border-slate-100">
+            <Card>
+              <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg">
-                    <Calendar className="h-5 w-5 text-white" />
-                  </div>
-                  <span className="font-bold bg-gradient-to-r from-blue-600 to-slate-700 bg-clip-text text-transparent">Schedule Your Visit</span>
+                  <Calendar className="h-5 w-5 text-primary" />
+                  <span>Schedule Your Visit</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -450,22 +441,21 @@ export default function BookVisit() {
                       )}
                     />
 
-                    <div className="flex justify-end space-x-4 pt-6 border-t border-slate-100">
+                    <div className="flex justify-end space-x-4">
                       <Button
                         type="button"
                         variant="outline"
                         onClick={() => navigate('/find-property/results')}
-                        className="border-slate-200 text-slate-600 hover:border-blue-300 hover:text-blue-600 transition-all duration-200"
                       >
                         Cancel
                       </Button>
                       <Button 
                         type="submit" 
                         disabled={bookingMutation.isPending}
-                        className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 hover:scale-105 transition-all duration-200 shadow-lg px-8"
+                        className="flex items-center space-x-2"
                       >
                         <Calendar className="h-4 w-4" />
-                        <span className="font-medium">{bookingMutation.isPending ? "Booking..." : "Confirm Booking"}</span>
+                        <span>{bookingMutation.isPending ? "Booking..." : "Confirm Booking"}</span>
                       </Button>
                     </div>
                   </form>
