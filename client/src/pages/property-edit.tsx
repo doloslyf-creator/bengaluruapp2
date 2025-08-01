@@ -45,6 +45,7 @@ export default function PropertyEdit() {
     defaultValues: {
       configurations: [
         {
+          propertyId: "",
           configuration: "",
           pricePerSqft: "0",
           builtUpArea: 0,
@@ -94,6 +95,7 @@ export default function PropertyEdit() {
           availableUnits: config.availableUnits || 0,
           price: config.price,
         })) : [{
+          propertyId: id || "",
           configuration: "",
           pricePerSqft: "0",
           builtUpArea: 0,
@@ -156,6 +158,7 @@ export default function PropertyEdit() {
 
   const addConfiguration = () => {
     append({
+      propertyId: id || "",
       configuration: "",
       pricePerSqft: "0",
       builtUpArea: 0,
@@ -487,7 +490,8 @@ export default function PropertyEdit() {
                                   {...field} 
                                   type="number"
                                   placeholder="0 (optional for apartments)"
-                                  onChange={(e) => field.onChange(Number(e.target.value))}
+                                  value={field.value || 0}
+                                  onChange={(e) => field.onChange(Number(e.target.value) || 0)}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -530,7 +534,8 @@ export default function PropertyEdit() {
                                   {...field} 
                                   type="number"
                                   placeholder="0"
-                                  onChange={(e) => field.onChange(Number(e.target.value))}
+                                  value={field.value || 0}
+                                  onChange={(e) => field.onChange(Number(e.target.value) || 0)}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -549,7 +554,8 @@ export default function PropertyEdit() {
                                   {...field} 
                                   type="number"
                                   placeholder="0"
-                                  onChange={(e) => field.onChange(Number(e.target.value))}
+                                  value={field.value || 0}
+                                  onChange={(e) => field.onChange(Number(e.target.value) || 0)}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -592,7 +598,7 @@ export default function PropertyEdit() {
                       <FormItem>
                         <FormLabel>RERA Number</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="Enter RERA registration number" />
+                          <Input {...field} value={field.value || ""} placeholder="Enter RERA registration number" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -606,7 +612,7 @@ export default function PropertyEdit() {
                       <FormItem>
                         <FormLabel>Possession Date</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="YYYY-MM format" />
+                          <Input {...field} value={field.value || ""} placeholder="YYYY-MM format" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -622,7 +628,7 @@ export default function PropertyEdit() {
                       <FormItem>
                         <FormLabel>Infrastructure Verdict</FormLabel>
                         <FormControl>
-                          <Textarea {...field} placeholder="Infrastructure assessment and connectivity details" />
+                          <Textarea {...field} value={field.value || ""} placeholder="Infrastructure assessment and connectivity details" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -638,7 +644,7 @@ export default function PropertyEdit() {
                       <FormItem>
                         <FormLabel>Zoning Information</FormLabel>
                         <FormControl>
-                          <Textarea {...field} placeholder="Zoning classification and regulatory details" />
+                          <Textarea {...field} value={field.value || ""} placeholder="Zoning classification and regulatory details" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
