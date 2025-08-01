@@ -50,10 +50,10 @@ export default function Analytics() {
 
   // Calculate price ranges from configurations
   const priceRanges = allConfigurations.reduce((acc, config) => {
-    if (config.price < 50) acc["Under ₹50L"] = (acc["Under ₹50L"] || 0) + 1;
-    else if (config.price < 100) acc["₹50L - ₹1Cr"] = (acc["₹50L - ₹1Cr"] || 0) + 1;
+    if (config.price < 100) acc["Under ₹1Cr"] = (acc["Under ₹1Cr"] || 0) + 1;
     else if (config.price < 200) acc["₹1Cr - ₹2Cr"] = (acc["₹1Cr - ₹2Cr"] || 0) + 1;
-    else if (config.price < 500) acc["₹2Cr - ₹5Cr"] = (acc["₹2Cr - ₹5Cr"] || 0) + 1;
+    else if (config.price < 300) acc["₹2Cr - ₹3Cr"] = (acc["₹2Cr - ₹3Cr"] || 0) + 1;
+    else if (config.price < 500) acc["₹3Cr - ₹5Cr"] = (acc["₹3Cr - ₹5Cr"] || 0) + 1;
     else acc["Above ₹5Cr"] = (acc["Above ₹5Cr"] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);

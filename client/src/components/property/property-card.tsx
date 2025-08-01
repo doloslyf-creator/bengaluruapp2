@@ -1,8 +1,10 @@
-import { Calendar, MapPin, Edit, Trash2 } from "lucide-react";
+import { Calendar, MapPin, Edit, Trash2, IndianRupee } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { type Property } from "@shared/schema";
+import { useQuery } from "@tanstack/react-query";
+import { formatPriceDisplay } from "@/lib/utils";
+import { type Property, type PropertyConfiguration } from "@shared/schema";
 
 interface PropertyCardProps {
   property: Property;
@@ -29,19 +31,35 @@ const tagColors = {
 };
 
 export function PropertyCard({ property, onClick }: PropertyCardProps) {
-  const formatPrice = (price: number) => {
-    if (price >= 100) {
-      return `₹${(price / 100).toFixed(1)} Cr`;
-    }
-    return `₹${price} L`;
-  };
+  // Fetch configurations for this property to show pricing
+  const { data: configurations = [] } = useQuery<PropertyConfiguration[]>({
+    queryKey: ["/api/property-configurations", property.id],
+    queryFn: async () => {
+      const response = await fetch(`/api/property-configurations/${property.id}`);
+      if (response.ok) {
+        return response.json();
+      }
+      return [];
+    },
+  });
 
   const formatArea = (area: number | null, type: string) => {
     if (!area) return null;
     return `${area.toLocaleString()} sq ft`;
   };
 
-  // Remove display area since it's now in configurations
+  // Get price range from configurations
+  const getPriceRange = () => {
+    if (configurations.length === 0) return "Price on request";
+    const prices = configurations.map(c => c.price);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    
+    if (minPrice === maxPrice) {
+      return formatPriceDisplay(minPrice);
+    }
+    return `${formatPriceDisplay(minPrice)} - ${formatPriceDisplay(maxPrice)}`;
+  };
 
   return (
     <div
@@ -100,6 +118,17 @@ export function PropertyCard({ property, onClick }: PropertyCardProps) {
               {property.possessionDate === "immediate" ? "Ready" : property.possessionDate}
             </span>
           </div>
+        </div>
+        
+        {/* Price Range Display */}
+        <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center">
+            <IndianRupee className="h-4 w-4 text-primary mr-2" />
+            <span className="text-sm text-gray-600">Price Range:</span>
+          </div>
+          <span className="font-semibold text-primary">
+            {getPriceRange()}
+          </span>
         </div>
         
         <div className="flex items-center justify-between pt-4 border-t border-border">

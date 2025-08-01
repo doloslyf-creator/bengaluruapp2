@@ -44,8 +44,8 @@ export function StatsCards({ stats }: StatsCardsProps) {
       iconColor: "text-blue-600",
     },
     {
-      title: "Avg. Price (₹Cr)",
-      value: stats.avgPrice ? stats.avgPrice.toString() : "0",
+      title: "Avg. Price",
+      value: stats.avgPrice ? `₹${(stats.avgPrice / 100).toFixed(1)} Cr` : "₹0 Cr",
       icon: IndianRupee,
       bgColor: "bg-yellow-100",
       iconColor: "text-yellow-600",

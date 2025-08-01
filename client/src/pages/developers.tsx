@@ -70,10 +70,7 @@ export default function Developers() {
   );
 
   const formatPrice = (price: number) => {
-    if (price >= 100) {
-      return `₹${(price / 100).toFixed(1)} Cr`;
-    }
-    return `₹${price} L`;
+    return `₹${(price / 100).toFixed(1)} Cr`;
   };
 
   if (propertiesLoading || configurationsLoading) {

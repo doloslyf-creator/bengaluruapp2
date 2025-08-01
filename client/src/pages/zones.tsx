@@ -78,10 +78,7 @@ export default function Zones() {
   );
 
   const formatPrice = (price: number) => {
-    if (price >= 100) {
-      return `₹${(price / 100).toFixed(1)} Cr`;
-    }
-    return `₹${price} L`;
+    return `₹${(price / 100).toFixed(1)} Cr`;
   };
 
   const getZoneDescription = (zone: string) => {
