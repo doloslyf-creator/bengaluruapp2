@@ -78,14 +78,10 @@ export default function FindProperty() {
   const displayZones = zones.length > 0 ? zones : (propertiesLoading ? [] : fallbackZones);
   const displayPropertyTypes = propertyTypes.length > 0 ? propertyTypes : (propertiesLoading ? [] : fallbackPropertyTypes);
 
-  // Debug logging
-  console.log('Properties loaded:', properties.length);
-  console.log('Raw properties:', properties);
-  console.log('Zones extracted:', zones);
-  console.log('Property types extracted:', propertyTypes);
-  console.log('Tags extracted:', tags);
-  console.log('Display zones:', displayZones);
-  console.log('Display property types:', displayPropertyTypes);
+  // Debug logging (can be removed in production)
+  if (properties.length > 0) {
+    console.log(`Properties loaded: ${properties.length}, Zones: [${zones.join(', ')}], Types: [${propertyTypes.map(t => t.value).join(', ')}]`);
+  }
 
   // Static options that don't come from properties
   const bhkOptions = ["1BHK", "2BHK", "3BHK", "4BHK", "5BHK+"];

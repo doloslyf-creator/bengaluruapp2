@@ -79,10 +79,11 @@ export default function PropertyResults() {
   const [matchingProperties, setMatchingProperties] = useState<PropertyWithConfigurations[]>([]);
 
   useEffect(() => {
-    if (allProperties.length && allConfigurations.length) {
+    if (allProperties.length > 0) {
       const filtered = filterAndScoreProperties();
       const sorted = sortProperties(filtered);
       setMatchingProperties(sorted);
+      console.log('Filtered properties result:', sorted.length);
     }
   }, [allProperties, allConfigurations, preferences, sortBy]);
 
@@ -93,46 +94,69 @@ export default function PropertyResults() {
   };
 
   const filterAndScoreProperties = (): PropertyWithConfigurations[] => {
+    console.log('Filtering properties:', allProperties.length, 'configurations:', allConfigurations.length);
+    console.log('Preferences:', preferences);
+    
     return allProperties
       .map(property => {
         const propertyConfigs = allConfigurations.filter(config => config.propertyId === property.id);
         
         let score = 0;
         
-        // Property type match (30 points)
-        if (property.type === preferences.propertyType) score += 30;
-        
-        // Zone match (25 points)
-        if (property.zone === preferences.zone) score += 25;
-        
-        // Budget range match (25 points)
-        const prices = propertyConfigs.map(c => c.price);
-        const minPrice = Math.min(...prices) / 10000000; // Convert to crores
-        const maxPrice = Math.max(...prices) / 10000000;
-        const budgetMin = preferences.budgetRange[0] / 100; // Convert from lakhs to crores
-        const budgetMax = preferences.budgetRange[1] / 100;
-        
-        if (minPrice <= budgetMax && maxPrice >= budgetMin) {
-          score += 25;
+        // Property type match (30 points) - if no preference set, give partial score
+        if (!preferences.propertyType || preferences.propertyType === property.type) {
+          score += preferences.propertyType ? 30 : 15;
         }
         
-        // Tags match (15 points)
-        const matchingTags = property.tags.filter(tag => preferences.tags.includes(tag));
-        score += (matchingTags.length / Math.max(preferences.tags.length, 1)) * 15;
+        // Zone match (25 points) - if no preference set, give partial score
+        if (!preferences.zone || preferences.zone === property.zone) {
+          score += preferences.zone ? 25 : 12;
+        }
         
-        // BHK match (5 points)
-        const hasMatchingBHK = propertyConfigs.some(config => 
-          preferences.bhkType.some(bhk => config.configuration.includes(bhk))
-        );
-        if (hasMatchingBHK) score += 5;
+        // Budget range match (25 points) - if no configurations, give default score
+        if (propertyConfigs.length === 0) {
+          score += 20; // Default score when no price data available
+        } else {
+          const prices = propertyConfigs.map(c => c.price);
+          const minPrice = Math.min(...prices) / 10000000; // Convert to crores
+          const maxPrice = Math.max(...prices) / 10000000;
+          const budgetMin = preferences.budgetRange[0] / 100; // Convert from lakhs to crores
+          const budgetMax = preferences.budgetRange[1] / 100;
+          
+          if (minPrice <= budgetMax && maxPrice >= budgetMin) {
+            score += 25;
+          }
+        }
+        
+        // Tags match (15 points) - if no preferences, give default score
+        if (preferences.tags.length === 0) {
+          score += 10; // Default score when no tag preferences
+        } else {
+          const matchingTags = property.tags.filter(tag => preferences.tags.includes(tag));
+          score += (matchingTags.length / preferences.tags.length) * 15;
+        }
+        
+        // BHK match (5 points) - if no configurations or preferences, give default score
+        if (preferences.bhkType.length === 0) {
+          score += 3; // Default score when no BHK preferences
+        } else if (propertyConfigs.length === 0) {
+          score += 2; // Partial score when no configuration data
+        } else {
+          const hasMatchingBHK = propertyConfigs.some(config => 
+            preferences.bhkType.some(bhk => config.configuration.includes(bhk))
+          );
+          if (hasMatchingBHK) score += 5;
+        }
 
-        return {
+        const finalProperty = {
           ...property,
           configurations: propertyConfigs,
           matchScore: Math.round(score)
         };
+        
+        return finalProperty;
       })
-      .filter(property => property.matchScore > 20) // Only show properties with decent match
+      .filter(property => property.matchScore > 10) // Lower threshold to show more results
       .sort((a, b) => b.matchScore - a.matchScore);
   };
 
@@ -140,10 +164,20 @@ export default function PropertyResults() {
     return [...properties].sort((a, b) => {
       switch (sortBy) {
         case 'price-low':
+          // Handle properties with no configurations
+          if (a.configurations.length === 0 && b.configurations.length === 0) return 0;
+          if (a.configurations.length === 0) return 1; // Put at end
+          if (b.configurations.length === 0) return -1; // Put at end
+          
           const minPriceA = Math.min(...a.configurations.map(c => c.price));
           const minPriceB = Math.min(...b.configurations.map(c => c.price));
           return minPriceA - minPriceB;
         case 'price-high':
+          // Handle properties with no configurations
+          if (a.configurations.length === 0 && b.configurations.length === 0) return 0;
+          if (a.configurations.length === 0) return 1; // Put at end
+          if (b.configurations.length === 0) return -1; // Put at end
+          
           const maxPriceA = Math.max(...a.configurations.map(c => c.price));
           const maxPriceB = Math.max(...b.configurations.map(c => c.price));
           return maxPriceB - maxPriceA;
