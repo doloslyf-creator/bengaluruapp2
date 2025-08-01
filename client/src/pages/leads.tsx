@@ -16,27 +16,27 @@ import { Phone, Mail, MapPin, TrendingUp, Users, Target, Award, Eye, Plus, Filte
 import type { Lead, LeadWithDetails, LeadStats } from "@shared/schema";
 
 const statusColors = {
-  "new": "bg-blue-100 text-blue-800",
-  "contacted": "bg-yellow-100 text-yellow-800", 
-  "qualified": "bg-green-100 text-green-800",
-  "demo-scheduled": "bg-purple-100 text-purple-800",
-  "proposal-sent": "bg-orange-100 text-orange-800",
-  "negotiation": "bg-red-100 text-red-800",
-  "closed-won": "bg-emerald-100 text-emerald-800",
-  "closed-lost": "bg-gray-100 text-gray-800",
-  "follow-up": "bg-indigo-100 text-indigo-800"
+  "new": "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg",
+  "contacted": "bg-gradient-to-r from-yellow-500 to-yellow-600 text-white shadow-lg", 
+  "qualified": "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg",
+  "demo-scheduled": "bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg",
+  "proposal-sent": "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg",
+  "negotiation": "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg",
+  "closed-won": "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg",
+  "closed-lost": "bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-lg",
+  "follow-up": "bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg"
 };
 
 const priorityColors = {
-  "high": "bg-red-100 text-red-800",
-  "medium": "bg-yellow-100 text-yellow-800",
-  "low": "bg-green-100 text-green-800"
+  "high": "bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg border-red-200",
+  "medium": "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg border-yellow-200",
+  "low": "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg border-green-200"
 };
 
 const leadTypeColors = {
-  "hot": "bg-red-100 text-red-800",
-  "warm": "bg-yellow-100 text-yellow-800", 
-  "cold": "bg-blue-100 text-blue-800"
+  "hot": "bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg animate-pulse",
+  "warm": "bg-gradient-to-r from-yellow-500 to-amber-500 text-white shadow-lg", 
+  "cold": "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg"
 };
 
 export default function LeadsPage() {
@@ -55,7 +55,7 @@ export default function LeadsPage() {
 
   // Fetch leads with filters
   const { data: leads = [], isLoading: leadsLoading } = useQuery<Lead[]>({
-    queryKey: ["/api/leads", filters]
+    queryKey: ["/api/leads"]
   });
 
   // Fetch lead statistics
@@ -65,7 +65,7 @@ export default function LeadsPage() {
 
   // Fetch selected lead details
   const { data: leadDetails } = useQuery<LeadWithDetails>({
-    queryKey: ["/api/leads", selectedLead?.leadId],
+    queryKey: [`/api/leads/${selectedLead?.leadId}`],
     enabled: !!selectedLead?.leadId,
   });
 
@@ -124,7 +124,7 @@ export default function LeadsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
