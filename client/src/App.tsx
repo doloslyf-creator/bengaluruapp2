@@ -10,7 +10,7 @@ import AdminDashboard from "@/pages/admin/dashboard";
 import AdminAnalytics from "@/pages/admin/analytics";
 import AdminZones from "@/pages/admin/zones";
 import AdminDevelopers from "@/pages/admin/developers";
-import AdminPropertyEdit from "@/pages/admin/property-edit";
+import PropertyEdit from "@/pages/property-edit";
 import Home from "@/pages/home";
 import NotFound from "@/pages/not-found";
 
@@ -41,7 +41,7 @@ function Router() {
       </Route>
       <Route path="/admin-panel/property/:id/edit">
         <ProtectedRoute>
-          <AdminPropertyEdit />
+          <PropertyEdit />
         </ProtectedRoute>
       </Route>
       <Route component={NotFound} />
