@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { Search, MapPin, Home, IndianRupee, Filter, ChevronRight } from "lucide-react";
+import { type Property } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,41 +24,52 @@ interface PropertyPreferences {
 export default function FindProperty() {
   const [, navigate] = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
-  const [preferences, setPreferences] = useState<PropertyPreferences>({
-    propertyType: "",
-    zone: "",
-    budgetRange: [50, 500], // in lakhs
-    bhkType: [],
-    amenities: [],
-    tags: []
+  
+  // Load cached preferences if returning from results page
+  const getCachedPreferences = (): PropertyPreferences => {
+    const cached = localStorage.getItem('propertyPreferences');
+    if (cached) {
+      try {
+        return JSON.parse(cached);
+      } catch {
+        // If parsing fails, return defaults
+      }
+    }
+    return {
+      propertyType: "",
+      zone: "",
+      budgetRange: [50, 500], // in lakhs
+      bhkType: [],
+      amenities: [],
+      tags: []
+    };
+  };
+
+  const [preferences, setPreferences] = useState<PropertyPreferences>(getCachedPreferences());
+
+  // Fetch properties to extract real options
+  const { data: properties = [] } = useQuery<Property[]>({
+    queryKey: ["/api/properties"],
   });
 
-  const zones = [
-    "north", "south", "east", "west", "central"
-  ];
+  // Extract real options from admin panel data
+  const zones = Array.from(new Set(properties.map(p => p.zone))).sort();
+  const propertyTypes = Array.from(new Set(properties.map(p => p.type))).map(type => ({
+    value: type,
+    label: type.charAt(0).toUpperCase() + type.slice(1)
+  }));
+  
+  const allTags = Array.from(new Set(properties.flatMap(p => p.tags || []))).sort();
+  const tags = allTags.map(tag => ({
+    value: tag,
+    label: tag.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())
+  }));
 
-  const propertyTypes = [
-    { value: "apartment", label: "Apartment" },
-    { value: "villa", label: "Villa" },
-    { value: "plot", label: "Plot" },
-    { value: "commercial", label: "Commercial" }
-  ];
-
+  // Static options that don't come from properties
   const bhkOptions = ["1BHK", "2BHK", "3BHK", "4BHK", "5BHK+"];
-
   const amenities = [
     "Swimming Pool", "Gym", "Parking", "Security", "Garden",
     "Clubhouse", "Children's Play Area", "Power Backup", "Lift"
-  ];
-
-  const tags = [
-    { value: "rera-approved", label: "RERA Approved" },
-    { value: "gated-community", label: "Gated Community" },
-    { value: "premium", label: "Premium" },
-    { value: "eco-friendly", label: "Eco Friendly" },
-    { value: "metro-connectivity", label: "Metro Connectivity" },
-    { value: "it-hub-proximity", label: "IT Hub Proximity" },
-    { value: "golf-course", label: "Golf Course View" }
   ];
 
   const handlePreferenceChange = (key: keyof PropertyPreferences, value: any) => {
@@ -77,6 +90,8 @@ export default function FindProperty() {
 
   const handleNext = () => {
     if (currentStep === 1) {
+      // Cache preferences before navigating
+      localStorage.setItem('propertyPreferences', JSON.stringify(preferences));
       navigate('/find-property/results', { state: { preferences } });
     }
   };
@@ -164,11 +179,13 @@ export default function FindProperty() {
                     <SelectValue placeholder="Select property type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {propertyTypes.map(type => (
+                    {propertyTypes.length > 0 ? propertyTypes.map(type => (
                       <SelectItem key={type.value} value={type.value}>
                         {type.label}
                       </SelectItem>
-                    ))}
+                    )) : (
+                      <SelectItem value="loading" disabled>Loading property types...</SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -195,11 +212,13 @@ export default function FindProperty() {
                     <SelectValue placeholder="Select zone" />
                   </SelectTrigger>
                   <SelectContent>
-                    {zones.map(zone => (
+                    {zones.length > 0 ? zones.map(zone => (
                       <SelectItem key={zone} value={zone}>
                         {zone.charAt(0).toUpperCase() + zone.slice(1)} Bengaluru
                       </SelectItem>
-                    ))}
+                    )) : (
+                      <SelectItem value="loading" disabled>Loading zones...</SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>

@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Grid3X3, List, MapPin, Calendar, Phone, ArrowLeft, Star, Eye, Heart } from "lucide-react";
+import { Grid3X3, List, MapPin, Calendar, Phone, ArrowLeft, Star, Eye, Heart, Filter, X, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
 import { formatPriceDisplay } from "@/lib/utils";
 import { type Property, type PropertyConfiguration } from "@shared/schema";
 
@@ -27,10 +31,33 @@ export default function PropertyResults() {
   const [, navigate] = useLocation();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [sortBy, setSortBy] = useState<'match' | 'price-low' | 'price-high' | 'name'>('match');
+  const [showFilters, setShowFilters] = useState(false);
   
-  // Get preferences from navigation state
+  // Get preferences from navigation state or localStorage
+  const getCachedPreferences = (): PropertyPreferences => {
+    const cached = localStorage.getItem('propertyPreferences');
+    if (cached) {
+      try {
+        return JSON.parse(cached);
+      } catch {
+        // If parsing fails, return defaults
+      }
+    }
+    return {
+      propertyType: "",
+      zone: "",
+      budgetRange: [50, 500],
+      bhkType: [],
+      amenities: [],
+      tags: []
+    };
+  };
+
   const location = useLocation()[0];
-  const preferences = (history.state?.preferences || {}) as PropertyPreferences;
+  const [preferences, setPreferences] = useState<PropertyPreferences>(
+    (history.state?.preferences) || getCachedPreferences()
+  );
 
   // Fetch all properties
   const { data: allProperties = [], isLoading } = useQuery<Property[]>({
@@ -54,9 +81,16 @@ export default function PropertyResults() {
   useEffect(() => {
     if (allProperties.length && allConfigurations.length) {
       const filtered = filterAndScoreProperties();
-      setMatchingProperties(filtered);
+      const sorted = sortProperties(filtered);
+      setMatchingProperties(sorted);
     }
-  }, [allProperties, allConfigurations, preferences]);
+  }, [allProperties, allConfigurations, preferences, sortBy]);
+
+  // Update preferences and cache when filters change
+  const updatePreferences = (newPreferences: PropertyPreferences) => {
+    setPreferences(newPreferences);
+    localStorage.setItem('propertyPreferences', JSON.stringify(newPreferences));
+  };
 
   const filterAndScoreProperties = (): PropertyWithConfigurations[] => {
     return allProperties
@@ -100,6 +134,26 @@ export default function PropertyResults() {
       })
       .filter(property => property.matchScore > 20) // Only show properties with decent match
       .sort((a, b) => b.matchScore - a.matchScore);
+  };
+
+  const sortProperties = (properties: PropertyWithConfigurations[]): PropertyWithConfigurations[] => {
+    return [...properties].sort((a, b) => {
+      switch (sortBy) {
+        case 'price-low':
+          const minPriceA = Math.min(...a.configurations.map(c => c.price));
+          const minPriceB = Math.min(...b.configurations.map(c => c.price));
+          return minPriceA - minPriceB;
+        case 'price-high':
+          const maxPriceA = Math.max(...a.configurations.map(c => c.price));
+          const maxPriceB = Math.max(...b.configurations.map(c => c.price));
+          return maxPriceB - maxPriceA;
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'match':
+        default:
+          return b.matchScore - a.matchScore;
+      }
+    });
   };
 
   const toggleFavorite = (propertyId: string) => {
@@ -175,6 +229,37 @@ export default function PropertyResults() {
               </div>
               
               <div className="flex items-center space-x-3">
+                <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="match">Best Match</SelectItem>
+                    <SelectItem value="price-low">Price: Low to High</SelectItem>
+                    <SelectItem value="price-high">Price: High to Low</SelectItem>
+                    <SelectItem value="name">Name A-Z</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Sheet open={showFilters} onOpenChange={setShowFilters}>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <SlidersHorizontal className="h-4 w-4 mr-2" />
+                      Filters
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent>
+                    <SheetHeader>
+                      <SheetTitle>Filter Properties</SheetTitle>
+                    </SheetHeader>
+                    <PropertyFilters 
+                      preferences={preferences} 
+                      onUpdatePreferences={updatePreferences}
+                      properties={allProperties}
+                    />
+                  </SheetContent>
+                </Sheet>
+
                 <div className="flex items-center bg-gray-100 rounded-lg p-1">
                   <Button
                     variant={viewMode === 'grid' ? 'default' : 'ghost'}
@@ -199,16 +284,36 @@ export default function PropertyResults() {
         {/* Filters Summary */}
         <div className="bg-white border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm text-gray-600">Filters:</span>
-              <Badge variant="secondary">{preferences.propertyType}</Badge>
-              <Badge variant="secondary">{preferences.zone} Bengaluru</Badge>
-              <Badge variant="secondary">
-                ₹{preferences.budgetRange[0]}L - ₹{preferences.budgetRange[1]}L
-              </Badge>
-              {preferences.bhkType.map(bhk => (
-                <Badge key={bhk} variant="outline">{bhk}</Badge>
-              ))}
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-sm text-gray-600">Active filters:</span>
+                {preferences.propertyType && <Badge variant="secondary">{preferences.propertyType}</Badge>}
+                {preferences.zone && <Badge variant="secondary">{preferences.zone} Bengaluru</Badge>}
+                <Badge variant="secondary">
+                  ₹{preferences.budgetRange[0]}L - ₹{preferences.budgetRange[1]}L
+                </Badge>
+                {preferences.bhkType.map(bhk => (
+                  <Badge key={bhk} variant="outline">{bhk}</Badge>
+                ))}
+                {preferences.tags.slice(0, 2).map(tag => (
+                  <Badge key={tag} variant="outline" className="text-xs">
+                    {tag.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                  </Badge>
+                ))}
+                {preferences.tags.length > 2 && (
+                  <Badge variant="outline" className="text-xs">
+                    +{preferences.tags.length - 2} more
+                  </Badge>
+                )}
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate('/find-property')}
+                className="shrink-0"
+              >
+                Refine Search
+              </Button>
             </div>
           </div>
         </div>
@@ -354,5 +459,175 @@ export default function PropertyResults() {
         </main>
       </div>
     </TooltipProvider>
+  );
+}
+
+// Property Filters Component
+interface PropertyFiltersProps {
+  preferences: PropertyPreferences;
+  onUpdatePreferences: (preferences: PropertyPreferences) => void;
+  properties: Property[];
+}
+
+function PropertyFilters({ preferences, onUpdatePreferences, properties }: PropertyFiltersProps) {
+  // Extract real options from properties
+  const zones = Array.from(new Set(properties.map(p => p.zone))).sort();
+  const propertyTypes = Array.from(new Set(properties.map(p => p.type))).map(type => ({
+    value: type,
+    label: type.charAt(0).toUpperCase() + type.slice(1)
+  }));
+  
+  const allTags = Array.from(new Set(properties.flatMap(p => p.tags || []))).sort();
+  const tags = allTags.map(tag => ({
+    value: tag,
+    label: tag.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())
+  }));
+
+  const bhkOptions = ["1BHK", "2BHK", "3BHK", "4BHK", "5BHK+"];
+
+  const handlePreferenceChange = (key: keyof PropertyPreferences, value: any) => {
+    const newPreferences = {
+      ...preferences,
+      [key]: value
+    };
+    onUpdatePreferences(newPreferences);
+  };
+
+  const handleArrayToggle = (key: keyof PropertyPreferences, value: string) => {
+    const currentArray = preferences[key] as string[];
+    const newArray = currentArray.includes(value)
+      ? currentArray.filter(item => item !== value)
+      : [...currentArray, value];
+    
+    handlePreferenceChange(key, newArray);
+  };
+
+  const formatBudget = (value: number) => {
+    if (value >= 100) {
+      return `₹${value / 100} Cr`;
+    }
+    return `₹${value} L`;
+  };
+
+  const clearAllFilters = () => {
+    const clearedPreferences = {
+      propertyType: "",
+      zone: "",
+      budgetRange: [50, 500] as [number, number],
+      bhkType: [],
+      amenities: [],
+      tags: []
+    };
+    onUpdatePreferences(clearedPreferences);
+  };
+
+  return (
+    <div className="space-y-6 py-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-medium">Filters</h3>
+        <Button variant="ghost" size="sm" onClick={clearAllFilters}>
+          Clear All
+        </Button>
+      </div>
+
+      {/* Property Type */}
+      <div className="space-y-3">
+        <label className="text-sm font-medium text-gray-700">Property Type</label>
+        <Select 
+          value={preferences.propertyType} 
+          onValueChange={(value) => handlePreferenceChange('propertyType', value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Any type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">Any Type</SelectItem>
+            {propertyTypes.map(type => (
+              <SelectItem key={type.value} value={type.value}>
+                {type.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Zone */}
+      <div className="space-y-3">
+        <label className="text-sm font-medium text-gray-700">Zone</label>
+        <Select 
+          value={preferences.zone} 
+          onValueChange={(value) => handlePreferenceChange('zone', value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Any zone" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">Any Zone</SelectItem>
+            {zones.map(zone => (
+              <SelectItem key={zone} value={zone}>
+                {zone.charAt(0).toUpperCase() + zone.slice(1)} Bengaluru
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Budget Range */}
+      <div className="space-y-4">
+        <label className="text-sm font-medium text-gray-700">Budget Range</label>
+        <div className="px-2">
+          <Slider
+            value={preferences.budgetRange}
+            onValueChange={(value) => handlePreferenceChange('budgetRange', value as [number, number])}
+            max={500}
+            min={10}
+            step={10}
+            className="w-full"
+          />
+          <div className="flex justify-between text-sm text-gray-600 mt-2">
+            <span>{formatBudget(preferences.budgetRange[0])}</span>
+            <span>{formatBudget(preferences.budgetRange[1])}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* BHK Configuration */}
+      <div className="space-y-3">
+        <label className="text-sm font-medium text-gray-700">BHK Type</label>
+        <div className="grid grid-cols-2 gap-3">
+          {bhkOptions.map(bhk => (
+            <div key={bhk} className="flex items-center space-x-2">
+              <Checkbox 
+                id={`filter-${bhk}`}
+                checked={preferences.bhkType.includes(bhk)}
+                onCheckedChange={() => handleArrayToggle('bhkType', bhk)}
+              />
+              <label htmlFor={`filter-${bhk}`} className="text-sm text-gray-700 cursor-pointer">
+                {bhk}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Tags */}
+      <div className="space-y-3">
+        <label className="text-sm font-medium text-gray-700">Features</label>
+        <div className="grid grid-cols-1 gap-3 max-h-48 overflow-y-auto">
+          {tags.slice(0, 10).map(tag => (
+            <div key={tag.value} className="flex items-center space-x-2">
+              <Checkbox 
+                id={`filter-${tag.value}`}
+                checked={preferences.tags.includes(tag.value)}
+                onCheckedChange={() => handleArrayToggle('tags', tag.value)}
+              />
+              <label htmlFor={`filter-${tag.value}`} className="text-sm text-gray-700 cursor-pointer">
+                {tag.label}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
