@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -8,9 +8,84 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+// import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useToast } from "@/hooks/use-toast";
 import { Shield, Phone, Key } from "lucide-react";
+
+// Custom OTP Input Component
+function OTPInputField({ value, onChange, length }: { 
+  value: string; 
+  onChange: (value: string) => void; 
+  length: number; 
+}) {
+  const [otp, setOtp] = useState(Array(length).fill(""));
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  useEffect(() => {
+    // Update internal state when value prop changes
+    if (value !== otp.join("")) {
+      setOtp(value.split("").concat(Array(length - value.length).fill("")));
+    }
+  }, [value, length, otp]);
+
+  const handleInputChange = (index: number, digit: string) => {
+    // Only allow single digits
+    if (digit.length > 1) return;
+    if (digit && !/^\d$/.test(digit)) return;
+
+    const newOtp = [...otp];
+    newOtp[index] = digit;
+    setOtp(newOtp);
+    
+    const otpString = newOtp.join("");
+    onChange(otpString);
+
+    // Auto-focus next input
+    if (digit && index < length - 1) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData("text");
+    const digits = pastedData.replace(/\D/g, "").slice(0, length);
+    const newOtp = digits.split("").concat(Array(length - digits.length).fill(""));
+    setOtp(newOtp);
+    onChange(digits);
+    
+    // Focus the next empty input or the last input
+    const nextIndex = Math.min(digits.length, length - 1);
+    inputRefs.current[nextIndex]?.focus();
+  };
+
+  return (
+    <div className="flex justify-center gap-3">
+      {Array(length).fill(0).map((_, index) => (
+        <input
+          key={index}
+          ref={(el) => (inputRefs.current[index] = el)}
+          type="text"
+          inputMode="numeric"
+          value={otp[index] || ""}
+          onChange={(e) => handleInputChange(index, e.target.value)}
+          onKeyDown={(e) => handleKeyDown(index, e)}
+          onPaste={handlePaste}
+          className="w-12 h-12 text-lg font-semibold border-2 border-violet-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 hover:border-violet-300 text-center focus:outline-none"
+          maxLength={1}
+          autoComplete="off"
+          autoFocus={index === 0}
+        />
+      ))}
+    </div>
+  );
+}
 
 const phoneSchema = z.object({
   phoneNumber: z.string()
@@ -153,43 +228,11 @@ export default function AdminLogin() {
                         Enter 6-Digit OTP
                       </FormLabel>
                       <FormControl>
-                        <div className="flex justify-center">
-                          <InputOTP
-                            maxLength={6}
-                            value={field.value || ""}
-                            onChange={field.onChange}
-                            className="gap-3"
-                            autoFocus
-                            pattern={'^\\d+$'}
-                          >
-                            <InputOTPGroup className="gap-3">
-                              <InputOTPSlot 
-                                index={0} 
-                                className="w-12 h-12 text-lg font-semibold border-2 border-violet-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 hover:border-violet-300" 
-                              />
-                              <InputOTPSlot 
-                                index={1} 
-                                className="w-12 h-12 text-lg font-semibold border-2 border-violet-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 hover:border-violet-300" 
-                              />
-                              <InputOTPSlot 
-                                index={2} 
-                                className="w-12 h-12 text-lg font-semibold border-2 border-violet-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 hover:border-violet-300" 
-                              />
-                              <InputOTPSlot 
-                                index={3} 
-                                className="w-12 h-12 text-lg font-semibold border-2 border-violet-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 hover:border-violet-300" 
-                              />
-                              <InputOTPSlot 
-                                index={4} 
-                                className="w-12 h-12 text-lg font-semibold border-2 border-violet-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 hover:border-violet-300" 
-                              />
-                              <InputOTPSlot 
-                                index={5} 
-                                className="w-12 h-12 text-lg font-semibold border-2 border-violet-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 hover:border-violet-300" 
-                              />
-                            </InputOTPGroup>
-                          </InputOTP>
-                        </div>
+                        <OTPInputField 
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                          length={6}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
