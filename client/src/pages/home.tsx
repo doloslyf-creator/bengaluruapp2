@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Search, Shield, Users, Star, ArrowRight, Building, MapPin, Award } from "lucide-react";
+import Marquee from "@/components/magicui/marquee";
 
 export default function Home() {
   return (
@@ -137,7 +138,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      {/* Testimonials Section with Animated Marquee */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -149,72 +150,118 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card>
-              <CardContent className="p-8">
-                <div className="flex items-center mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-muted-foreground mb-6 italic">
-                  "OwnItRight's team saved us from a potential legal nightmare. Their due diligence process caught issues that other consultants missed. Highly recommended!"
-                </p>
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold mr-4">
-                    RS
+          <div className="relative">
+            <Marquee pauseOnHover className="[--duration:20s]">
+              <Card className="mx-6 w-[350px] shrink-0">
+                <CardContent className="p-6">
+                  <div className="flex items-center mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
+                    ))}
                   </div>
-                  <div>
-                    <div className="font-semibold">Rajesh Sharma</div>
-                    <div className="text-sm text-muted-foreground">Software Engineer, Whitefield</div>
+                  <p className="text-muted-foreground mb-4 text-sm italic">
+                    "OwnItRight's team saved us from a potential legal nightmare. Their due diligence process caught issues that other consultants missed."
+                  </p>
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold mr-3 text-sm">
+                      RS
+                    </div>
+                    <div>
+                      <div className="font-semibold text-sm">Rajesh Sharma</div>
+                      <div className="text-xs text-muted-foreground">Software Engineer, Whitefield</div>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardContent className="p-8">
-                <div className="flex items-center mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-muted-foreground mb-6 italic">
-                  "The property search experience was seamless. Their expertise in Bengaluru market helped us find our dream home within budget. Professional and trustworthy team."
-                </p>
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold mr-4">
-                    PM
+              <Card className="mx-6 w-[350px] shrink-0">
+                <CardContent className="p-6">
+                  <div className="flex items-center mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
+                    ))}
                   </div>
-                  <div>
-                    <div className="font-semibold">Priya Menon</div>
-                    <div className="text-sm text-muted-foreground">Marketing Manager, Koramangala</div>
+                  <p className="text-muted-foreground mb-4 text-sm italic">
+                    "The property search experience was seamless. Their expertise in Bengaluru market helped us find our dream home within budget."
+                  </p>
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold mr-3 text-sm">
+                      PM
+                    </div>
+                    <div>
+                      <div className="font-semibold text-sm">Priya Menon</div>
+                      <div className="text-xs text-muted-foreground">Marketing Manager, Koramangala</div>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardContent className="p-8">
-                <div className="flex items-center mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-muted-foreground mb-6 italic">
-                  "After 5 years in property business, OwnItRight understands what buyers really need. Their transparent approach and detailed research gave us complete confidence."
-                </p>
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold mr-4">
-                    AK
+              <Card className="mx-6 w-[350px] shrink-0">
+                <CardContent className="p-6">
+                  <div className="flex items-center mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
+                    ))}
                   </div>
-                  <div>
-                    <div className="font-semibold">Anand Kumar</div>
-                    <div className="text-sm text-muted-foreground">Business Owner, Electronic City</div>
+                  <p className="text-muted-foreground mb-4 text-sm italic">
+                    "After 5 years in property business, OwnItRight understands what buyers really need. Their transparent approach gave us complete confidence."
+                  </p>
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold mr-3 text-sm">
+                      AK
+                    </div>
+                    <div>
+                      <div className="font-semibold text-sm">Anand Kumar</div>
+                      <div className="text-xs text-muted-foreground">Business Owner, Electronic City</div>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+
+              <Card className="mx-6 w-[350px] shrink-0">
+                <CardContent className="p-6">
+                  <div className="flex items-center mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
+                    ))}
+                  </div>
+                  <p className="text-muted-foreground mb-4 text-sm italic">
+                    "The 5+ years of experience really shows. They guided us through every step and made property buying stress-free. Excellent service!"
+                  </p>
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold mr-3 text-sm">
+                      ST
+                    </div>
+                    <div>
+                      <div className="font-semibold text-sm">Sneha Trivedi</div>
+                      <div className="text-xs text-muted-foreground">Doctor, Indiranagar</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="mx-6 w-[350px] shrink-0">
+                <CardContent className="p-6">
+                  <div className="flex items-center mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
+                    ))}
+                  </div>
+                  <p className="text-muted-foreground mb-4 text-sm italic">
+                    "Professional team with deep market knowledge. They helped us avoid costly mistakes and found exactly what we were looking for."
+                  </p>
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold mr-3 text-sm">
+                      VG
+                    </div>
+                    <div>
+                      <div className="font-semibold text-sm">Vikram Gupta</div>
+                      <div className="text-xs text-muted-foreground">Finance Manager, HSR Layout</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Marquee>
           </div>
         </div>
       </section>
