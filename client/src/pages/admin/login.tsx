@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useToast } from "@/hooks/use-toast";
 import { Shield, Phone, Key } from "lucide-react";
 
@@ -136,16 +137,46 @@ export default function AdminLogin() {
                   name="otp"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>OTP</FormLabel>
+                      <FormLabel className="flex items-center gap-2 justify-center">
+                        <Key className="w-4 h-4 text-violet-600" />
+                        Enter 6-Digit OTP
+                      </FormLabel>
                       <FormControl>
-                        <div className="relative">
-                          <Key className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                          <Input
-                            placeholder="123456"
-                            className="pl-10 text-center text-lg tracking-widest"
+                        <div className="flex justify-center">
+                          <InputOTP
                             maxLength={6}
-                            {...field}
-                          />
+                            value={field.value}
+                            onChange={field.onChange}
+                            className="gap-3"
+                            autoFocus
+                          >
+                            <InputOTPGroup className="gap-3">
+                              <InputOTPSlot 
+                                index={0} 
+                                className="w-12 h-12 text-lg font-semibold border-2 border-violet-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 hover:border-violet-300" 
+                              />
+                              <InputOTPSlot 
+                                index={1} 
+                                className="w-12 h-12 text-lg font-semibold border-2 border-violet-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 hover:border-violet-300" 
+                              />
+                              <InputOTPSlot 
+                                index={2} 
+                                className="w-12 h-12 text-lg font-semibold border-2 border-violet-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 hover:border-violet-300" 
+                              />
+                              <InputOTPSlot 
+                                index={3} 
+                                className="w-12 h-12 text-lg font-semibold border-2 border-violet-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 hover:border-violet-300" 
+                              />
+                              <InputOTPSlot 
+                                index={4} 
+                                className="w-12 h-12 text-lg font-semibold border-2 border-violet-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 hover:border-violet-300" 
+                              />
+                              <InputOTPSlot 
+                                index={5} 
+                                className="w-12 h-12 text-lg font-semibold border-2 border-violet-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 hover:border-violet-300" 
+                              />
+                            </InputOTPGroup>
+                          </InputOTP>
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -153,8 +184,9 @@ export default function AdminLogin() {
                   )}
                 />
                 
-                <div className="text-sm text-center text-gray-600 mb-4">
-                  OTP sent to +91 {phoneNumber}
+                <div className="text-sm text-center text-gray-600 mb-4 space-y-1">
+                  <p>OTP sent to +91 {phoneNumber}</p>
+                  <p className="text-xs text-violet-600">Check the server console for the OTP code</p>
                 </div>
                 
                 <Button type="submit" className="w-full bg-violet-600 hover:bg-violet-700">
