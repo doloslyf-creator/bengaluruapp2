@@ -55,36 +55,24 @@ export default function LeadsPage() {
 
   // Fetch leads with filters
   const { data: leads = [], isLoading: leadsLoading } = useQuery<Lead[]>({
-    queryKey: ["/api/leads", filters],
-    queryFn: async () => {
-      const queryParams = new URLSearchParams();
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value && value !== "all") queryParams.append(key, value);
-      });
-      return await apiRequest(`/api/leads?${queryParams}`);
-    }
+    queryKey: ["/api/leads", filters]
   });
 
   // Fetch lead statistics
   const { data: stats } = useQuery<LeadStats>({
-    queryKey: ["/api/leads/stats"],
-    queryFn: async () => await apiRequest("/api/leads/stats")
+    queryKey: ["/api/leads/stats"]
   });
 
   // Fetch selected lead details
   const { data: leadDetails } = useQuery<LeadWithDetails>({
     queryKey: ["/api/leads", selectedLead?.leadId],
-    queryFn: async () => await apiRequest(`/api/leads/${selectedLead?.leadId}`),
     enabled: !!selectedLead?.leadId,
   });
 
   // Update lead mutation
   const updateLeadMutation = useMutation({
-    mutationFn: async ({ leadId, updates }: { leadId: string; updates: any }) => {
-      return await apiRequest(`/api/leads/${leadId}`, {
-        method: "PUT",
-        body: updates,
-      });
+    mutationFn: ({ leadId, updates }: { leadId: string; updates: any }) => {
+      return apiRequest("PUT", `/api/leads/${leadId}`, updates);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/leads"] });
@@ -95,11 +83,8 @@ export default function LeadsPage() {
 
   // Add lead activity mutation
   const addActivityMutation = useMutation({
-    mutationFn: async ({ leadId, activity }: { leadId: string; activity: any }) => {
-      return await apiRequest(`/api/leads/${leadId}/activities`, {
-        method: "POST",
-        body: activity,
-      });
+    mutationFn: ({ leadId, activity }: { leadId: string; activity: any }) => {
+      return apiRequest("POST", `/api/leads/${leadId}/activities`, activity);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/leads", selectedLead?.leadId] });
@@ -109,11 +94,8 @@ export default function LeadsPage() {
 
   // Add lead note mutation
   const addNoteMutation = useMutation({
-    mutationFn: async ({ leadId, note }: { leadId: string; note: any }) => {
-      return await apiRequest(`/api/leads/${leadId}/notes`, {
-        method: "POST",
-        body: note,
-      });
+    mutationFn: ({ leadId, note }: { leadId: string; note: any }) => {
+      return apiRequest("POST", `/api/leads/${leadId}/notes`, note);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/leads", selectedLead?.leadId] });
@@ -123,11 +105,8 @@ export default function LeadsPage() {
 
   // Qualify lead mutation
   const qualifyLeadMutation = useMutation({
-    mutationFn: async ({ leadId, qualified, notes }: { leadId: string; qualified: boolean; notes: string }) => {
-      return await apiRequest(`/api/leads/${leadId}/qualify`, {
-        method: "POST",
-        body: { qualified, notes },
-      });
+    mutationFn: ({ leadId, qualified, notes }: { leadId: string; qualified: boolean; notes: string }) => {
+      return apiRequest("POST", `/api/leads/${leadId}/qualify`, { qualified, notes });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/leads"] });
