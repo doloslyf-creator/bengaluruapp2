@@ -99,8 +99,9 @@ const phoneSchema = z.object({
 
 const otpSchema = z.object({
   otp: z.string()
-    .length(6, "OTP must be 6 digits")
-    .regex(/^\d+$/, "OTP must contain only digits"),
+    .min(6, "OTP must be exactly 6 digits")
+    .max(6, "OTP must be exactly 6 digits") 
+    .regex(/^\d{6}$/, "OTP must contain only 6 digits"),
 });
 
 type PhoneForm = z.infer<typeof phoneSchema>;
@@ -158,6 +159,10 @@ export default function AdminLogin() {
 
   const onOtpSubmit = async (data: OtpForm) => {
     try {
+      console.log("Form data:", data);
+      console.log("OTP value:", data.otp, "Length:", data.otp.length, "Type:", typeof data.otp);
+      console.log("Form errors:", otpForm.formState.errors);
+      
       await login(phoneNumber, data.otp);
       toast({
         title: "Login Successful",
@@ -165,6 +170,7 @@ export default function AdminLogin() {
       });
       navigate("/admin-panel");
     } catch (error: any) {
+      console.error("Login error:", error);
       toast({
         title: "Error",
         description: error.message || "Invalid OTP. Please try again.",
