@@ -112,19 +112,19 @@ export default function PropertyEdit() {
       const { configurations, ...propertyData } = data;
       
       // Update property
-      await apiRequest(`/api/properties/${id}`, "PATCH", propertyData);
+      await apiRequest("PATCH", `/api/properties/${id}`, propertyData);
       
       // Update configurations
       for (const config of configurations) {
         if (config.id) {
           // Update existing configuration
-          await apiRequest(`/api/property-configurations/${config.id}`, "PATCH", {
+          await apiRequest("PATCH", `/api/property-configurations/${config.id}`, {
             ...config,
             propertyId: id,
           });
         } else {
           // Create new configuration
-          await apiRequest("/api/property-configurations", "POST", {
+          await apiRequest("POST", "/api/property-configurations", {
             ...config,
             propertyId: id,
           });
