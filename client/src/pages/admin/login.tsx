@@ -22,11 +22,14 @@ function OTPInputField({ value, onChange, length }: {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
-    // Update internal state when value prop changes
-    if (value !== otp.join("")) {
-      setOtp(value.split("").concat(Array(length - value.length).fill("")));
+    // Update internal state when value prop changes from external source (like form reset)
+    const currentValue = otp.join("");
+    if (value !== currentValue) {
+      const valueArray = value.split("").slice(0, length); // Limit to max length
+      const paddingLength = Math.max(0, length - valueArray.length); // Ensure non-negative
+      setOtp(valueArray.concat(Array(paddingLength).fill("")));
     }
-  }, [value, length, otp]);
+  }, [value, length]); // Remove otp from dependencies to avoid infinite loop
 
   const handleInputChange = (index: number, digit: string) => {
     // Only allow single digits
@@ -56,7 +59,8 @@ function OTPInputField({ value, onChange, length }: {
     e.preventDefault();
     const pastedData = e.clipboardData.getData("text");
     const digits = pastedData.replace(/\D/g, "").slice(0, length);
-    const newOtp = digits.split("").concat(Array(length - digits.length).fill(""));
+    const paddingLength = Math.max(0, length - digits.length);
+    const newOtp = digits.split("").concat(Array(paddingLength).fill(""));
     setOtp(newOtp);
     onChange(digits);
     
