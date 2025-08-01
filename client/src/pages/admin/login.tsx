@@ -41,6 +41,7 @@ function OTPInputField({ value, onChange, length }: {
     setOtp(newOtp);
     
     const otpString = newOtp.join("");
+    console.log("OTP Input Component - onChange called with:", otpString);
     onChange(otpString);
 
     // Auto-focus next input
@@ -62,6 +63,7 @@ function OTPInputField({ value, onChange, length }: {
     const paddingLength = Math.max(0, length - digits.length);
     const newOtp = digits.split("").concat(Array(paddingLength).fill(""));
     setOtp(newOtp);
+    console.log("OTP Input Component - paste onChange called with:", digits);
     onChange(digits);
     
     // Focus the next empty input or the last input
@@ -240,7 +242,10 @@ export default function AdminLogin() {
                       <FormControl>
                         <OTPInputField 
                           value={field.value || ""}
-                          onChange={field.onChange}
+                          onChange={(value) => {
+                            console.log("FormField onChange triggered with:", value);
+                            field.onChange(value);
+                          }}
                           length={6}
                         />
                       </FormControl>
