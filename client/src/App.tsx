@@ -14,6 +14,7 @@ import AdminDevelopers from "@/pages/admin/developers";
 import PropertyEdit from "@/pages/property-edit";
 import FindProperty from "@/pages/find-property";
 import PropertyResults from "@/pages/property-results";
+import PropertyDetails from "@/pages/property-details";
 import BookVisit from "@/pages/book-visit";
 import Consultation from "@/pages/consultation";
 import CustomerHome from "@/pages/customer-home";
@@ -61,6 +62,7 @@ function Router() {
       {/* Customer-facing routes */}
       <Route path="/find-property" component={FindProperty} />
       <Route path="/find-property/results" component={PropertyResults} />
+      <Route path="/property/:id" component={PropertyDetails} />
       <Route path="/book-visit" component={BookVisit} />
       <Route path="/consultation" component={Consultation} />
       

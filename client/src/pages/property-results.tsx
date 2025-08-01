@@ -383,8 +383,8 @@ export default function PropertyResults() {
                   <Card key={property.id} className="group hover:shadow-2xl transition-all duration-300 border-0 bg-white/95 backdrop-blur-sm hover:scale-[1.02] transform">
                     <CardHeader className="pb-3 bg-gradient-to-r from-blue-50/50 to-slate-50/50 border-b border-slate-100">
                       <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <CardTitle className="text-lg font-bold bg-gradient-to-r from-blue-600 to-slate-800 bg-clip-text text-transparent group-hover:from-blue-700 group-hover:to-slate-900 transition-all duration-300">{property.name}</CardTitle>
+                        <div className="flex-1 cursor-pointer" onClick={() => navigate(`/property/${property.id}`)}>
+                          <CardTitle className="text-lg font-bold bg-gradient-to-r from-blue-600 to-slate-800 bg-clip-text text-transparent group-hover:from-blue-700 group-hover:to-slate-900 transition-all duration-300 hover:underline">{property.name}</CardTitle>
                           <p className="text-sm text-slate-600 flex items-center mt-1">
                             <MapPin className="h-3 w-3 mr-1 text-blue-500" />
                             {property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)}
@@ -415,7 +415,10 @@ export default function PropertyResults() {
                     <CardContent className="pt-0">
                       <div className="space-y-4">
                         {/* Property Image Placeholder */}
-                        <div className="aspect-video bg-gradient-to-br from-blue-100 to-slate-200 rounded-xl flex items-center justify-center shadow-inner group-hover:shadow-lg transition-all duration-300">
+                        <div 
+                          className="aspect-video bg-gradient-to-br from-blue-100 to-slate-200 rounded-xl flex items-center justify-center shadow-inner group-hover:shadow-lg transition-all duration-300 cursor-pointer hover:scale-105"
+                          onClick={() => navigate(`/property/${property.id}`)}
+                        >
                           <div className="text-slate-500 text-center">
                             <div className="text-3xl mb-2 group-hover:scale-110 transition-transform duration-300">🏢</div>
                             <p className="text-xs font-medium">Property Gallery</p>
