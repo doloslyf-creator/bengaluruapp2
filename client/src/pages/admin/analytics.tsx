@@ -60,6 +60,7 @@ export default function AdminAnalytics() {
               <nav className="flex space-x-8">
                 <Link href="/admin-panel" className="text-gray-600 hover:text-gray-900">Dashboard</Link>
                 <Link href="/admin-panel/analytics" className="text-violet-600 font-medium">Analytics</Link>
+                <Link href="/admin-panel/leads" className="text-gray-600 hover:text-gray-900">Leads</Link>
                 <Link href="/admin-panel/developers" className="text-gray-600 hover:text-gray-900">Developers</Link>
                 <Link href="/admin-panel/zones" className="text-gray-600 hover:text-gray-900">Zones</Link>
               </nav>

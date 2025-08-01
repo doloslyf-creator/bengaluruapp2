@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertPropertySchema, insertPropertyConfigurationSchema, insertBookingSchema } from "@shared/schema";
+import { insertPropertySchema, insertPropertyConfigurationSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema } from "@shared/schema";
 import { z } from "zod";
 
 // In-memory session storage for demo (use Redis/database in production)
@@ -349,7 +349,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Customer-facing booking routes
+  // Customer-facing booking routes with lead management
   app.post("/api/bookings", async (req, res) => {
     try {
       const bookingData = {
@@ -359,14 +359,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       const validatedData = insertBookingSchema.parse(bookingData);
+      const booking = await storage.createBooking(validatedData);
       
-      // In a real app, you'd save this to database
-      // For now, we'll just return success with the booking ID
-      console.log("📅 New booking request:", validatedData);
+      console.log("📅 New booking request:", booking);
+      
+      // Automatically create a lead from the booking
+      const leadId = `LD${Date.now()}${Math.floor(Math.random() * 1000)}`;
+      const lead = await storage.createLead({
+        leadId,
+        source: "site-visit",
+        customerName: booking.name,
+        phone: booking.phone,
+        email: booking.email,
+        propertyName: booking.propertyName,
+        propertyId: booking.propertyId,
+        leadDetails: {
+          visitType: booking.visitType,
+          numberOfVisitors: booking.numberOfVisitors,
+          preferredDate: booking.preferredDate,
+          preferredTime: booking.preferredTime,
+          specialRequests: booking.specialRequests,
+        },
+        leadType: "warm",
+        priority: "medium",
+        leadScore: 60,
+      });
+
+      // Add initial activity
+      await storage.addLeadActivity({
+        leadId: lead.id,
+        activityType: "site-visit",
+        subject: `Site visit scheduled for ${booking.propertyName}`,
+        description: `Customer ${booking.name} scheduled a site visit for ${booking.propertyName}`,
+        outcome: "positive",
+        nextAction: `Contact customer on ${booking.preferredDate} at ${booking.preferredTime}`,
+        scheduledAt: booking.preferredDate && booking.preferredTime ? 
+          new Date(`${booking.preferredDate}T${booking.preferredTime}:00`) : undefined,
+        performedBy: "system",
+      });
+
+      console.log(`🎯 Auto-created lead: ${lead.leadId} from booking ${booking.bookingId}`);
       
       res.status(201).json({ 
         success: true,
-        bookingId: validatedData.bookingId,
+        bookingId: booking.bookingId,
+        leadId: lead.leadId,
         message: "Booking confirmed successfully" 
       });
     } catch (error) {
@@ -387,13 +424,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       const validatedData = insertBookingSchema.parse(consultationData);
+      const booking = await storage.createBooking(validatedData);
       
-      // In a real app, you'd save this to database
-      console.log("💬 New consultation request:", validatedData);
+      console.log("💬 New consultation request:", booking);
+      
+      // Automatically create a lead from the consultation
+      const leadId = `LD${Date.now()}${Math.floor(Math.random() * 1000)}`;
+      const lead = await storage.createLead({
+        leadId,
+        source: "consultation",
+        customerName: booking.name,
+        phone: booking.phone,
+        email: booking.email,
+        propertyName: booking.propertyName,
+        propertyId: booking.propertyId,
+        leadDetails: {
+          consultationType: booking.consultationType,
+          urgency: booking.urgency,
+          questions: booking.questions,
+        },
+        leadType: "hot",
+        priority: "high",
+        leadScore: 75,
+      });
+
+      // Add initial activity
+      await storage.addLeadActivity({
+        leadId: lead.id,
+        activityType: "call",
+        subject: `Consultation requested for ${booking.propertyName}`,
+        description: `Customer ${booking.name} requested ${booking.consultationType} consultation for ${booking.propertyName}`,
+        outcome: "positive",
+        nextAction: `Call customer for ${booking.consultationType} consultation`,
+        performedBy: "system",
+      });
+
+      console.log(`🎯 Auto-created lead: ${lead.leadId} from consultation ${booking.bookingId}`);
       
       res.status(201).json({ 
         success: true,
-        consultationId: validatedData.bookingId,
+        consultationId: booking.bookingId,
+        leadId: lead.leadId,
         message: "Consultation request submitted successfully" 
       });
     } catch (error) {
@@ -418,6 +489,205 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching all configurations:", error);
       res.status(500).json({ error: "Failed to fetch all configurations" });
+    }
+  });
+
+  // Lead Management API Routes
+  
+  // Get all leads with filtering
+  app.get("/api/leads", async (req, res) => {
+    try {
+      const filters = req.query;
+      const leads = Object.keys(filters).length > 0 
+        ? await storage.filterLeads(filters as any)
+        : await storage.getAllLeads();
+      res.json(leads);
+    } catch (error) {
+      console.error("Error fetching leads:", error);
+      res.status(500).json({ error: "Failed to fetch leads" });
+    }
+  });
+
+  // Get lead by ID with full details
+  app.get("/api/leads/:leadId", async (req, res) => {
+    try {
+      const lead = await storage.getLeadWithDetails(req.params.leadId);
+      if (!lead) {
+        return res.status(404).json({ error: "Lead not found" });
+      }
+      res.json(lead);
+    } catch (error) {
+      console.error("Error fetching lead:", error);
+      res.status(500).json({ error: "Failed to fetch lead" });
+    }
+  });
+
+  // Create new lead manually
+  app.post("/api/leads", async (req, res) => {
+    try {
+      const leadData = {
+        ...req.body,
+        leadId: `LD${Date.now()}${Math.floor(Math.random() * 1000)}`,
+      };
+      const validatedData = insertLeadSchema.parse(leadData);
+      const lead = await storage.createLead(validatedData);
+      
+      console.log(`🎯 Manual lead created: ${lead.leadId}`);
+      res.status(201).json(lead);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid lead data", details: error.errors });
+      }
+      console.error("Error creating lead:", error);
+      res.status(500).json({ error: "Failed to create lead" });
+    }
+  });
+
+  // Update lead
+  app.patch("/api/leads/:leadId", async (req, res) => {
+    try {
+      const updates = insertLeadSchema.partial().parse(req.body);
+      const lead = await storage.updateLead(req.params.leadId, updates);
+      if (!lead) {
+        return res.status(404).json({ error: "Lead not found" });
+      }
+      res.json(lead);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid lead data", details: error.errors });
+      }
+      console.error("Error updating lead:", error);
+      res.status(500).json({ error: "Failed to update lead" });
+    }
+  });
+
+  // Update lead score
+  app.post("/api/leads/:leadId/score", async (req, res) => {
+    try {
+      const { score, notes } = req.body;
+      const lead = await storage.updateLeadScore(req.params.leadId, score, notes);
+      if (!lead) {
+        return res.status(404).json({ error: "Lead not found" });
+      }
+      res.json(lead);
+    } catch (error) {
+      console.error("Error updating lead score:", error);
+      res.status(500).json({ error: "Failed to update lead score" });
+    }
+  });
+
+  // Qualify/disqualify lead
+  app.post("/api/leads/:leadId/qualify", async (req, res) => {
+    try {
+      const { qualified, notes } = req.body;
+      const lead = await storage.qualifyLead(req.params.leadId, qualified, notes);
+      if (!lead) {
+        return res.status(404).json({ error: "Lead not found" });
+      }
+      res.json(lead);
+    } catch (error) {
+      console.error("Error qualifying lead:", error);
+      res.status(500).json({ error: "Failed to qualify lead" });
+    }
+  });
+
+  // Add lead activity
+  app.post("/api/leads/:leadId/activities", async (req, res) => {
+    try {
+      const lead = await storage.getLead(req.params.leadId);
+      if (!lead) {
+        return res.status(404).json({ error: "Lead not found" });
+      }
+
+      const activityData = {
+        ...req.body,
+        leadId: lead.id,
+      };
+      const validatedData = insertLeadActivitySchema.parse(activityData);
+      const activity = await storage.addLeadActivity(validatedData);
+      res.status(201).json(activity);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid activity data", details: error.errors });
+      }
+      console.error("Error adding lead activity:", error);
+      res.status(500).json({ error: "Failed to add lead activity" });
+    }
+  });
+
+  // Get lead activities
+  app.get("/api/leads/:leadId/activities", async (req, res) => {
+    try {
+      const lead = await storage.getLead(req.params.leadId);
+      if (!lead) {
+        return res.status(404).json({ error: "Lead not found" });
+      }
+      const activities = await storage.getLeadActivities(lead.id);
+      res.json(activities);
+    } catch (error) {
+      console.error("Error fetching lead activities:", error);
+      res.status(500).json({ error: "Failed to fetch lead activities" });
+    }
+  });
+
+  // Add lead note
+  app.post("/api/leads/:leadId/notes", async (req, res) => {
+    try {
+      const lead = await storage.getLead(req.params.leadId);
+      if (!lead) {
+        return res.status(404).json({ error: "Lead not found" });
+      }
+
+      const noteData = {
+        ...req.body,
+        leadId: lead.id,
+      };
+      const validatedData = insertLeadNoteSchema.parse(noteData);
+      const note = await storage.addLeadNote(validatedData);
+      res.status(201).json(note);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid note data", details: error.errors });
+      }
+      console.error("Error adding lead note:", error);
+      res.status(500).json({ error: "Failed to add lead note" });
+    }
+  });
+
+  // Get lead notes
+  app.get("/api/leads/:leadId/notes", async (req, res) => {
+    try {
+      const lead = await storage.getLead(req.params.leadId);
+      if (!lead) {
+        return res.status(404).json({ error: "Lead not found" });
+      }
+      const notes = await storage.getLeadNotes(lead.id);
+      res.json(notes);
+    } catch (error) {
+      console.error("Error fetching lead notes:", error);
+      res.status(500).json({ error: "Failed to fetch lead notes" });
+    }
+  });
+
+  // Get lead statistics
+  app.get("/api/leads/stats", async (req, res) => {
+    try {
+      const stats = await storage.getLeadStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching lead stats:", error);
+      res.status(500).json({ error: "Failed to fetch lead statistics" });
+    }
+  });
+
+  // Get all bookings (for admin review)
+  app.get("/api/bookings", async (req, res) => {
+    try {
+      const bookings = await storage.getAllBookings();
+      res.json(bookings);
+    } catch (error) {
+      console.error("Error fetching bookings:", error);
+      res.status(500).json({ error: "Failed to fetch bookings" });
     }
   });
 

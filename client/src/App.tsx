@@ -17,6 +17,7 @@ import BookVisit from "@/pages/book-visit";
 import Consultation from "@/pages/consultation";
 import CustomerHome from "@/pages/customer-home";
 import Home from "@/pages/home";
+import LeadsPage from "@/pages/leads";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -48,6 +49,11 @@ function Router() {
       <Route path="/admin-panel/property/:id/edit">
         <ProtectedRoute>
           <PropertyEdit />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin-panel/leads">
+        <ProtectedRoute>
+          <LeadsPage />
         </ProtectedRoute>
       </Route>
       
