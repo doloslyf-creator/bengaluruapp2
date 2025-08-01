@@ -9,6 +9,7 @@ import { type Property, type PropertyConfiguration } from "@shared/schema";
 interface PropertyCardProps {
   property: Property;
   onClick: () => void;
+  onDelete?: (id: string) => void;
 }
 
 const statusColors = {
@@ -30,7 +31,7 @@ const tagColors = {
   "it-hub-proximity": "bg-cyan-100 text-cyan-800",
 };
 
-export function PropertyCard({ property, onClick }: PropertyCardProps) {
+export function PropertyCard({ property, onClick, onDelete }: PropertyCardProps) {
   // Fetch configurations for this property to show pricing
   const { data: configurations = [] } = useQuery<PropertyConfiguration[]>({
     queryKey: ["/api/property-configurations", property.id],
@@ -154,7 +155,9 @@ export function PropertyCard({ property, onClick }: PropertyCardProps) {
               size="sm"
               onClick={(e) => {
                 e.stopPropagation();
-                // TODO: Handle delete
+                if (confirm(`Are you sure you want to delete ${property.name}? This action cannot be undone.`)) {
+                  onDelete?.(property.id);
+                }
               }}
             >
               <Trash2 className="h-4 w-4 text-red-500" />

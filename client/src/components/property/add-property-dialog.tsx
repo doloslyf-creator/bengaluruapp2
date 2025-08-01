@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { X } from "lucide-react";
+import { X, Plus, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,9 +10,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insertPropertySchema, type InsertProperty } from "@shared/schema";
+import { z } from "zod";
 
 interface AddPropertyDialogProps {
   open: boolean;
@@ -45,10 +47,6 @@ export function AddPropertyDialog({ open, onOpenChange }: AddPropertyDialogProps
       area: "",
       zone: "east",
       address: "",
-      builtUpArea: 0,
-      landArea: 0,
-      price: 0,
-      bedrooms: "2-bhk",
       possessionDate: "",
       reraNumber: "",
       reraApproved: false,
@@ -57,17 +55,27 @@ export function AddPropertyDialog({ open, onOpenChange }: AddPropertyDialogProps
       tags: [],
       images: [],
       videos: [],
+      builtUpArea: 0,
+      landArea: 0,
+      price: 0,
+      bedrooms: "2-bhk",
     },
   });
 
+  const addConfiguration = () => {
+    // For now, we'll just add a basic property without configurations
+    // Configurations can be added later through the edit page
+  };
+
   const createPropertyMutation = useMutation({
-    mutationFn: (data: InsertProperty) => apiRequest("POST", "/api/properties", data),
+    mutationFn: (data: any) => apiRequest("POST", "/api/properties", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/properties"] });
       queryClient.invalidateQueries({ queryKey: ["/api/properties/stats"] });
+
       toast({
         title: "Success",
-        description: "Property added successfully!",
+        description: "Property added successfully! You can add configurations in the edit page.",
       });
       onOpenChange(false);
       form.reset();

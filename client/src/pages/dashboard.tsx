@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Building, Search, Plus } from "lucide-react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { PropertyCard } from "@/components/property/property-card";
@@ -9,9 +9,13 @@ import { PropertyFilters } from "@/components/property/property-filters";
 import { StatsCards } from "@/components/property/stats-cards";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import { type Property, type PropertyStats } from "@shared/schema";
 
 export default function Dashboard() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -43,6 +47,29 @@ export default function Dashboard() {
 
     return matchesSearch && matchesFilters;
   });
+
+  const deletePropertyMutation = useMutation({
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/properties/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/properties"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/properties/stats"] });
+      toast({
+        title: "Success",
+        description: "Property deleted successfully!",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete property. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDeleteProperty = (id: string) => {
+    deletePropertyMutation.mutate(id);
+  };
 
   const handlePropertyClick = (property: Property) => {
     setSelectedProperty(property);
@@ -124,6 +151,7 @@ export default function Dashboard() {
                   key={property.id}
                   property={property}
                   onClick={() => handlePropertyClick(property)}
+                  onDelete={handleDeleteProperty}
                 />
               ))}
             </div>
