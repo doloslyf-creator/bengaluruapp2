@@ -218,7 +218,7 @@ export default function Zones() {
             </Card>
           </div>
 
-          {isLoading ? (
+          {propertiesLoading || configurationsLoading ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="bg-white rounded-lg border border-border p-6">
@@ -356,7 +356,12 @@ export default function Zones() {
                             </div>
                             <div className="text-right">
                               <p className="font-medium text-gray-900 text-sm">
-                                {formatPrice(property.price)}
+                                {(() => {
+                                  const propertyConfigs = allConfigurations.filter(c => c.propertyId === property.id);
+                                  if (propertyConfigs.length === 0) return "Price on request";
+                                  const avgPrice = propertyConfigs.reduce((sum, c) => sum + c.price, 0) / propertyConfigs.length;
+                                  return formatPrice(avgPrice);
+                                })()}
                               </p>
                               <Badge 
                                 variant="secondary" 

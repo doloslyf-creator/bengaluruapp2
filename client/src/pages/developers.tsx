@@ -188,7 +188,7 @@ export default function Developers() {
             </Card>
           </div>
 
-          {isLoading ? (
+          {propertiesLoading || configurationsLoading ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="bg-white rounded-lg border border-border p-6">
@@ -215,9 +215,9 @@ export default function Developers() {
                   <div className="mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">{developer.name}</h3>
                     <div className="flex flex-wrap gap-2">
-                      {Array.from(developer.zones).map((zone: string) => (
-                        <Badge key={zone} variant="secondary" className="bg-blue-100 text-blue-800">
-                          {zone.charAt(0).toUpperCase() + zone.slice(1)}
+                      {Array.from(developer.zones).map((zone: unknown) => (
+                        <Badge key={zone as string} variant="secondary" className="bg-blue-100 text-blue-800">
+                          {(zone as string).charAt(0).toUpperCase() + (zone as string).slice(1)}
                         </Badge>
                       ))}
                     </div>
@@ -245,9 +245,9 @@ export default function Developers() {
                   <div className="mb-4">
                     <p className="text-sm text-gray-600 mb-2">Property Types:</p>
                     <div className="flex flex-wrap gap-2">
-                      {Array.from(developer.types).map((type: string) => (
-                        <Badge key={type} variant="outline" className="capitalize">
-                          {type}
+                      {Array.from(developer.types).map((type: unknown) => (
+                        <Badge key={type as string} variant="outline" className="capitalize">
+                          {type as string}
                         </Badge>
                       ))}
                     </div>
@@ -258,7 +258,12 @@ export default function Developers() {
                     <div className="space-y-1">
                       {developer.properties.slice(0, 2).map((property: Property) => (
                         <div key={property.id} className="text-sm text-gray-600">
-                          <span className="font-medium">{property.name}</span> - {formatPrice(property.price)}
+                          <span className="font-medium">{property.name}</span> - {(() => {
+                            const propertyConfigs = allConfigurations.filter(c => c.propertyId === property.id);
+                            if (propertyConfigs.length === 0) return "Price on request";
+                            const avgPrice = propertyConfigs.reduce((sum, c) => sum + c.price, 0) / propertyConfigs.length;
+                            return formatPrice(avgPrice);
+                          })()}
                         </div>
                       ))}
                       {developer.properties.length > 2 && (

@@ -1,8 +1,10 @@
-import { Edit, Download, MapPin, Calendar, Building } from "lucide-react";
+import { Edit, Download, MapPin, Calendar, Building, IndianRupee } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { type Property } from "@shared/schema";
+import { useQuery } from "@tanstack/react-query";
+import { formatPriceDisplay } from "@/lib/utils";
+import { type Property, type PropertyConfiguration } from "@shared/schema";
 
 interface PropertyDetailsDialogProps {
   property: Property | null;
@@ -32,12 +34,17 @@ const tagColors = {
 export function PropertyDetailsDialog({ property, open, onOpenChange }: PropertyDetailsDialogProps) {
   if (!property) return null;
 
-  const formatPrice = (price: number) => {
-    if (price >= 100) {
-      return `₹${(price / 100).toFixed(1)} Cr`;
-    }
-    return `₹${price} L`;
-  };
+  // Fetch configurations for this property
+  const { data: configurations = [] } = useQuery<PropertyConfiguration[]>({
+    queryKey: ["/api/property-configurations", property.id],
+    queryFn: async () => {
+      const response = await fetch(`/api/property-configurations/${property.id}`);
+      if (response.ok) {
+        return response.json();
+      }
+      return [];
+    },
+  });
 
   const formatArea = (area: number | null) => {
     if (!area) return "N/A";
@@ -84,35 +91,27 @@ export function PropertyDetailsDialog({ property, open, onOpenChange }: Property
                   <span className="font-medium ml-1 capitalize">{property.type}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Price:</span>
-                  <span className="font-medium ml-1">{formatPrice(property.price)}</span>
+                  <span className="text-gray-600">Developer:</span>
+                  <span className="font-medium ml-1">{property.developer}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Built-up Area:</span>
-                  <span className="font-medium ml-1">{formatArea(property.builtUpArea)}</span>
-                </div>
-                <div>
-                  <span className="text-gray-600">Land Area:</span>
-                  <span className="font-medium ml-1">{formatArea(property.landArea)}</span>
-                </div>
-                <div>
-                  <span className="text-gray-600">Bedrooms:</span>
-                  <span className="font-medium ml-1 uppercase">
-                    {property.bedrooms?.replace("-", " ") || "N/A"}
-                  </span>
+                  <span className="text-gray-600">Zone:</span>
+                  <span className="font-medium ml-1 capitalize">{property.zone} Bengaluru</span>
                 </div>
                 <div>
                   <span className="text-gray-600">Possession:</span>
                   <span className="font-medium ml-1">{property.possessionDate || "N/A"}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Developer:</span>
-                  <span className="font-medium ml-1">{property.developer}</span>
-                </div>
-                <div>
                   <span className="text-gray-600">Status:</span>
                   <Badge className={statusColors[property.status]}>
                     {property.status.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                  </Badge>
+                </div>
+                <div>
+                  <span className="text-gray-600">RERA Approved:</span>
+                  <Badge variant={property.reraApproved ? "default" : "secondary"}>
+                    {property.reraApproved ? "Yes" : "No"}
                   </Badge>
                 </div>
               </div>
@@ -128,6 +127,50 @@ export function PropertyDetailsDialog({ property, open, onOpenChange }: Property
               </p>
               <p className="text-gray-600 text-sm">{property.address}</p>
             </div>
+
+            {/* Property Configurations */}
+            {configurations.length > 0 && (
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  <IndianRupee className="h-4 w-4 mr-2" />
+                  Available Configurations
+                </h4>
+                <div className="space-y-3">
+                  {configurations.map((config, index) => (
+                    <div key={config.id} className="bg-gray-50 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-medium text-gray-900">{config.configuration}</h5>
+                        <span className="font-semibold text-primary text-lg">
+                          {formatPriceDisplay(config.price)}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                        <div>
+                          <span>Built-up Area: </span>
+                          <span className="font-medium">{config.builtUpArea?.toLocaleString()} sq ft</span>
+                        </div>
+                        <div>
+                          <span>Price per Sqft: </span>
+                          <span className="font-medium">₹{config.pricePerSqft?.toLocaleString()}</span>
+                        </div>
+                        {config.plotSize && (
+                          <div>
+                            <span>Plot Size: </span>
+                            <span className="font-medium">{config.plotSize?.toLocaleString()} sq ft</span>
+                          </div>
+                        )}
+                        <div>
+                          <span>Status: </span>
+                          <Badge variant={config.isAvailable ? "default" : "secondary"} className="text-xs">
+                            {config.isAvailable ? "Available" : "Sold Out"}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {property.reraNumber && (
               <div>

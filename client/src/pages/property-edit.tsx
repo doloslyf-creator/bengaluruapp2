@@ -562,7 +562,7 @@ export default function PropertyEdit() {
                           name={`configurations.${index}.price`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Total Price (₹ Lakhs)</FormLabel>
+                              <FormLabel>Total Price (₹ Crores)</FormLabel>
                               <FormControl>
                                 <Input 
                                   {...field} 
