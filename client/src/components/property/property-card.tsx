@@ -141,7 +141,7 @@ export function PropertyCard({ property, onClick, onDelete }: PropertyCardProps)
             )}
           </span>
           <div className="flex items-center space-x-2">
-            <Link href={`/property/${property.id}/edit`}>
+            <Link href={`/admin-panel/property/${property.id}/edit`}>
               <Button
                 variant="ghost"
                 size="sm"
