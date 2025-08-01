@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { OnboardingTooltip } from "@/components/onboarding/onboarding-tooltip";
 
 interface PropertyPreferences {
   propertyType: string;
@@ -202,25 +203,32 @@ export default function FindProperty() {
                     </TooltipContent>
                   </Tooltip>
                 </label>
-                <Select 
-                  value={preferences.propertyType} 
-                  onValueChange={(value) => handlePreferenceChange('propertyType', value)}
+                <OnboardingTooltip
+                  stepId="property-type-select"
+                  title="Choose Your Property Type"
+                  description="Start by selecting the type of property you're looking for. This helps us match you with the most relevant options."
+                  position="bottom"
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select property type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {displayPropertyTypes.length > 0 ? displayPropertyTypes.map(type => (
-                      <SelectItem key={type.value} value={type.value}>
-                        {type.label}
-                      </SelectItem>
-                    )) : (
-                      <SelectItem value="loading" disabled>
-                        {propertiesLoading ? "Loading property types..." : `No property types found (${properties.length} properties loaded)`}
-                      </SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
+                  <Select 
+                    value={preferences.propertyType} 
+                    onValueChange={(value) => handlePreferenceChange('propertyType', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select property type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {displayPropertyTypes.length > 0 ? displayPropertyTypes.map(type => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {type.label}
+                        </SelectItem>
+                      )) : (
+                        <SelectItem value="loading" disabled>
+                          {propertiesLoading ? "Loading property types..." : `No property types found (${properties.length} properties loaded)`}
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </OnboardingTooltip>
               </div>
 
               {/* Zone */}
@@ -237,25 +245,32 @@ export default function FindProperty() {
                     </TooltipContent>
                   </Tooltip>
                 </label>
-                <Select 
-                  value={preferences.zone} 
-                  onValueChange={(value) => handlePreferenceChange('zone', value)}
+                <OnboardingTooltip
+                  stepId="zone-select"
+                  title="Select Your Preferred Zone"
+                  description="Choose the area in Bengaluru where you'd like to find properties. Different zones offer different amenities and connectivity."
+                  position="bottom"
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select zone" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {displayZones.length > 0 ? displayZones.map(zone => (
-                      <SelectItem key={zone} value={zone}>
-                        {zone.charAt(0).toUpperCase() + zone.slice(1)} Bengaluru
-                      </SelectItem>
-                    )) : (
-                      <SelectItem value="loading" disabled>
-                        {propertiesLoading ? "Loading zones..." : `No zones found (${properties.length} properties loaded)`}
-                      </SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
+                  <Select 
+                    value={preferences.zone} 
+                    onValueChange={(value) => handlePreferenceChange('zone', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select zone" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {displayZones.length > 0 ? displayZones.map(zone => (
+                        <SelectItem key={zone} value={zone}>
+                          {zone.charAt(0).toUpperCase() + zone.slice(1)} Bengaluru
+                        </SelectItem>
+                      )) : (
+                        <SelectItem value="loading" disabled>
+                          {propertiesLoading ? "Loading zones..." : `No zones found (${properties.length} properties loaded)`}
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </OnboardingTooltip>
               </div>
 
               {/* Budget Range */}
@@ -272,20 +287,27 @@ export default function FindProperty() {
                     </TooltipContent>
                   </Tooltip>
                 </label>
-                <div className="px-4">
-                  <Slider
-                    value={preferences.budgetRange}
-                    onValueChange={(value) => handlePreferenceChange('budgetRange', value as [number, number])}
-                    max={500}
-                    min={10}
-                    step={10}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-sm text-gray-600 mt-2">
-                    <span>{formatBudget(preferences.budgetRange[0])}</span>
-                    <span>{formatBudget(preferences.budgetRange[1])}</span>
+                <OnboardingTooltip
+                  stepId="budget-slider"
+                  title="Set Your Budget Range"
+                  description="Use the slider to set your comfortable budget range. This helps us filter properties that match your financial preferences."
+                  position="top"
+                >
+                  <div className="px-4">
+                    <Slider
+                      value={preferences.budgetRange}
+                      onValueChange={(value) => handlePreferenceChange('budgetRange', value as [number, number])}
+                      max={500}
+                      min={10}
+                      step={10}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-sm text-gray-600 mt-2">
+                      <span>{formatBudget(preferences.budgetRange[0])}</span>
+                      <span>{formatBudget(preferences.budgetRange[1])}</span>
+                    </div>
                   </div>
-                </div>
+                </OnboardingTooltip>
               </div>
 
               {/* BHK Configuration */}
@@ -296,28 +318,35 @@ export default function FindProperty() {
                   </div>
                   <span>BHK Configuration</span>
                 </label>
-                <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
-                  {bhkOptions.map(bhk => (
-                    <label
-                      key={bhk}
-                      className={`
-                        flex items-center justify-center p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:scale-105
-                        ${preferences.bhkType.includes(bhk) 
-                          ? 'bg-gradient-to-r from-blue-500 to-blue-600 border-blue-500 text-white shadow-lg shadow-blue-200' 
-                          : 'bg-white border-slate-200 hover:border-blue-300 hover:shadow-md'
-                        }
-                      `}
-                    >
-                      <input
-                        type="checkbox"
-                        className="sr-only"
-                        checked={preferences.bhkType.includes(bhk)}
-                        onChange={() => handleArrayToggle('bhkType', bhk)}
-                      />
-                      <span className="text-sm font-semibold">{bhk}</span>
-                    </label>
-                  ))}
-                </div>
+                <OnboardingTooltip
+                  stepId="bhk-selection"
+                  title="Choose BHK Configuration"
+                  description="Select the number of bedrooms you prefer. You can choose multiple options to see more variety."
+                  position="bottom"
+                >
+                  <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+                    {bhkOptions.map(bhk => (
+                      <label
+                        key={bhk}
+                        className={`
+                          flex items-center justify-center p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:scale-105
+                          ${preferences.bhkType.includes(bhk) 
+                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 border-blue-500 text-white shadow-lg shadow-blue-200' 
+                            : 'bg-white border-slate-200 hover:border-blue-300 hover:shadow-md'
+                          }
+                        `}
+                      >
+                        <input
+                          type="checkbox"
+                          className="sr-only"
+                          checked={preferences.bhkType.includes(bhk)}
+                          onChange={() => handleArrayToggle('bhkType', bhk)}
+                        />
+                        <span className="text-sm font-semibold">{bhk}</span>
+                      </label>
+                    ))}
+                  </div>
+                </OnboardingTooltip>
               </div>
 
               {/* Special Features */}
@@ -377,14 +406,21 @@ export default function FindProperty() {
             >
               Back to Home
             </Button>
-            <Button 
-              onClick={handleNext}
-              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center space-x-3"
-              disabled={!preferences.propertyType || !preferences.zone}
+            <OnboardingTooltip
+              stepId="find-button"
+              title="Find Your Properties!"
+              description="Click here to search for properties matching your preferences. We'll show you the best matches first."
+              position="top"
             >
-              <span className="font-semibold">Find Matching Properties</span>
-              <ChevronRight className="h-5 w-5" />
-            </Button>
+              <Button 
+                onClick={handleNext}
+                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 flex items-center space-x-3"
+                disabled={!preferences.propertyType || !preferences.zone}
+              >
+                <span className="font-semibold">Find Matching Properties</span>
+                <ChevronRight className="h-5 w-5" />
+              </Button>
+            </OnboardingTooltip>
           </div>
         </main>
       </div>
