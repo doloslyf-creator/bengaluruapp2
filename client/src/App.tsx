@@ -7,6 +7,7 @@ import Dashboard from "@/pages/dashboard";
 import Analytics from "@/pages/analytics";
 import Developers from "@/pages/developers";
 import Zones from "@/pages/zones";
+import PropertyEdit from "@/pages/property-edit";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -16,6 +17,7 @@ function Router() {
       <Route path="/analytics" component={Analytics} />
       <Route path="/developers" component={Developers} />
       <Route path="/zones" component={Zones} />
+      <Route path="/property/:id/edit" component={PropertyEdit} />
       <Route component={NotFound} />
     </Switch>
   );

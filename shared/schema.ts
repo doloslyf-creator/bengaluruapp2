@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, boolean, timestamp, json } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, boolean, timestamp, json, decimal } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -15,11 +15,7 @@ export const properties = pgTable("properties", {
   zone: varchar("zone", { enum: ["north", "south", "east", "west", "central"] }).notNull(),
   address: text("address").notNull(),
   
-  // Property specifications
-  builtUpArea: integer("built_up_area"), // in sq ft
-  landArea: integer("land_area"), // in sq ft
-  price: integer("price").notNull(), // in lakhs
-  bedrooms: varchar("bedrooms", { enum: ["1-bhk", "2-bhk", "3-bhk", "4-bhk", "5-bhk"] }),
+  // Property specifications (simplified - detailed configs in separate table)
   possessionDate: text("possession_date"), // YYYY-MM format
   
   // Legal and regulatory
@@ -42,7 +38,31 @@ export const properties = pgTable("properties", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Property configurations table for multiple unit types per project
+export const propertyConfigurations = pgTable("property_configurations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  propertyId: varchar("property_id").notNull().references(() => properties.id, { onDelete: "cascade" }),
+  configuration: text("configuration").notNull(), // 1BHK, 2BHK, 3BHK, 4BHK, Villa, Plot
+  pricePerSqft: decimal("price_per_sqft", { precision: 10, scale: 2 }).notNull(),
+  builtUpArea: integer("built_up_area").notNull(), // in sqft (BUA)
+  plotSize: integer("plot_size"), // in sqft, optional for apartments
+  availabilityStatus: varchar("availability_status", { 
+    enum: ["available", "sold-out", "coming-soon", "limited"] 
+  }).notNull(),
+  totalUnits: integer("total_units"),
+  availableUnits: integer("available_units"),
+  price: integer("price").notNull(), // calculated total price in lakhs
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const insertPropertySchema = createInsertSchema(properties).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPropertyConfigurationSchema = createInsertSchema(propertyConfigurations).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
@@ -50,6 +70,12 @@ export const insertPropertySchema = createInsertSchema(properties).omit({
 
 export type InsertProperty = z.infer<typeof insertPropertySchema>;
 export type Property = typeof properties.$inferSelect;
+export type PropertyConfiguration = typeof propertyConfigurations.$inferSelect;
+export type InsertPropertyConfiguration = z.infer<typeof insertPropertyConfigurationSchema>;
+
+export interface PropertyWithConfigurations extends Property {
+  configurations: PropertyConfiguration[];
+}
 
 // Property statistics type
 export type PropertyStats = {

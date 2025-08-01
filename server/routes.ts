@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertPropertySchema } from "@shared/schema";
+import { insertPropertySchema, insertPropertyConfigurationSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -41,6 +41,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get property with configurations
+  app.get("/api/properties/:id/with-configurations", async (req, res) => {
+    try {
+      const property = await storage.getPropertyWithConfigurations(req.params.id);
+      if (!property) {
+        return res.status(404).json({ error: "Property not found" });
+      }
+      res.json(property);
+    } catch (error) {
+      console.error("Error fetching property with configurations:", error);
+      res.status(500).json({ error: "Failed to fetch property with configurations" });
+    }
+  });
+
   // Create new property
   app.post("/api/properties", async (req, res) => {
     try {
@@ -58,6 +72,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Update property
   app.put("/api/properties/:id", async (req, res) => {
+    try {
+      const updates = insertPropertySchema.partial().parse(req.body);
+      const property = await storage.updateProperty(req.params.id, updates);
+      if (!property) {
+        return res.status(404).json({ error: "Property not found" });
+      }
+      res.json(property);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid property data", details: error.errors });
+      }
+      console.error("Error updating property:", error);
+      res.status(500).json({ error: "Failed to update property" });
+    }
+  });
+
+  // Update property (PATCH method for partial updates)
+  app.patch("/api/properties/:id", async (req, res) => {
     try {
       const updates = insertPropertySchema.partial().parse(req.body);
       const property = await storage.updateProperty(req.params.id, updates);
@@ -111,7 +143,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Property Configuration Routes
+  app.get("/api/property-configurations/:propertyId", async (req, res) => {
+    try {
+      const configurations = await storage.getPropertyConfigurations(req.params.propertyId);
+      res.json(configurations);
+    } catch (error) {
+      console.error("Error fetching property configurations:", error);
+      res.status(500).json({ error: "Failed to fetch property configurations" });
+    }
+  });
 
+  app.post("/api/property-configurations", async (req, res) => {
+    try {
+      const validatedData = insertPropertyConfigurationSchema.parse(req.body);
+      const configuration = await storage.createPropertyConfiguration(validatedData);
+      res.status(201).json(configuration);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Validation failed", details: error.errors });
+      }
+      console.error("Error creating property configuration:", error);
+      res.status(500).json({ error: "Failed to create property configuration" });
+    }
+  });
+
+  app.patch("/api/property-configurations/:id", async (req, res) => {
+    try {
+      const validatedData = insertPropertyConfigurationSchema.partial().parse(req.body);
+      const configuration = await storage.updatePropertyConfiguration(req.params.id, validatedData);
+      if (!configuration) {
+        return res.status(404).json({ error: "Property configuration not found" });
+      }
+      res.json(configuration);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Validation failed", details: error.errors });
+      }
+      console.error("Error updating property configuration:", error);
+      res.status(500).json({ error: "Failed to update property configuration" });
+    }
+  });
+
+  app.delete("/api/property-configurations/:id", async (req, res) => {
+    try {
+      const deleted = await storage.deletePropertyConfiguration(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Property configuration not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting property configuration:", error);
+      res.status(500).json({ error: "Failed to delete property configuration" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;

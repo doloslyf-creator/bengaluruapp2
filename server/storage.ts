@@ -1,13 +1,27 @@
-import { type Property, type InsertProperty, type PropertyStats } from "@shared/schema";
+import { 
+  type Property, 
+  type InsertProperty, 
+  type PropertyStats, 
+  type PropertyConfiguration,
+  type InsertPropertyConfiguration,
+  type PropertyWithConfigurations 
+} from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
   // Property CRUD operations
   getProperty(id: string): Promise<Property | undefined>;
   getAllProperties(): Promise<Property[]>;
+  getPropertyWithConfigurations(id: string): Promise<PropertyWithConfigurations | undefined>;
   createProperty(property: InsertProperty): Promise<Property>;
   updateProperty(id: string, property: Partial<InsertProperty>): Promise<Property | undefined>;
   deleteProperty(id: string): Promise<boolean>;
+  
+  // Property Configuration CRUD operations
+  getPropertyConfigurations(propertyId: string): Promise<PropertyConfiguration[]>;
+  createPropertyConfiguration(config: InsertPropertyConfiguration): Promise<PropertyConfiguration>;
+  updatePropertyConfiguration(id: string, config: Partial<InsertPropertyConfiguration>): Promise<PropertyConfiguration | undefined>;
+  deletePropertyConfiguration(id: string): Promise<boolean>;
   
   // Search and filter operations
   searchProperties(query: string): Promise<Property[]>;
@@ -31,13 +45,15 @@ export interface IStorage {
 
 export class MemStorage implements IStorage {
   private properties: Map<string, Property>;
+  private propertyConfigurations: Map<string, PropertyConfiguration>;
   private users: Map<string, any>;
 
   constructor() {
     this.properties = new Map();
+    this.propertyConfigurations = new Map();
     this.users = new Map();
     
-    // Initialize with some sample properties
+    // Initialize with some sample properties and configurations
     this.initializeSampleData();
   }
 
@@ -51,10 +67,7 @@ export class MemStorage implements IStorage {
         area: "Varthur",
         zone: "east",
         address: "Varthur, East Bengaluru, Karnataka",
-        builtUpArea: 1850,
-        landArea: null,
-        price: 120,
-        bedrooms: "3-bhk",
+
         possessionDate: "2025-12",
         reraNumber: "PRM/KA/RERA/1251/309/AG/2020-21",
         reraApproved: true,
@@ -72,10 +85,7 @@ export class MemStorage implements IStorage {
         area: "Whitefield",
         zone: "east",
         address: "Whitefield, East Bengaluru, Karnataka",
-        builtUpArea: 3200,
-        landArea: 2400,
-        price: 450,
-        bedrooms: "4-bhk",
+
         possessionDate: "2027-03",
         reraNumber: "PRM/KA/RERA/1251/310/AG/2021-22",
         reraApproved: true,
@@ -93,10 +103,7 @@ export class MemStorage implements IStorage {
         area: "Sarjapur Road",
         zone: "south",
         address: "Sarjapur Road, South Bengaluru, Karnataka",
-        builtUpArea: null,
-        landArea: 2400,
-        price: 96,
-        bedrooms: null,
+
         possessionDate: "immediate",
         reraNumber: "PRM/KA/RERA/1251/311/AG/2020-21",
         reraApproved: true,
@@ -108,18 +115,91 @@ export class MemStorage implements IStorage {
       },
     ];
 
+    const propertyIds: string[] = [];
+    
     sampleProperties.forEach(property => {
       const id = randomUUID();
       const fullProperty: Property = {
         ...property,
         id,
-        builtUpArea: property.builtUpArea ?? null,
-        landArea: property.landArea ?? null,
-        bedrooms: property.bedrooms ?? null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
       this.properties.set(id, fullProperty);
+      propertyIds.push(id);
+    });
+
+    // Add sample configurations for each property
+    const sampleConfigurations: InsertPropertyConfiguration[] = [
+      // Prestige Lakeside Habitat configurations
+      {
+        propertyId: propertyIds[0],
+        configuration: "3BHK",
+        pricePerSqft: "6500",
+        builtUpArea: 1850,
+        plotSize: 0,
+        availabilityStatus: "available",
+        totalUnits: 120,
+        availableUnits: 95,
+        price: 120,
+      },
+      {
+        propertyId: propertyIds[0],
+        configuration: "4BHK",
+        pricePerSqft: "7200",
+        builtUpArea: 2100,
+        plotSize: 0,
+        availabilityStatus: "limited",
+        totalUnits: 80,
+        availableUnits: 12,
+        price: 151,
+      },
+      // Brigade Woods configurations
+      {
+        propertyId: propertyIds[1],
+        configuration: "4BHK Villa",
+        pricePerSqft: "14000",
+        builtUpArea: 3200,
+        plotSize: 2400,
+        availabilityStatus: "coming-soon",
+        totalUnits: 50,
+        availableUnits: 50,
+        price: 448,
+      },
+      // Godrej Park Retreat configurations
+      {
+        propertyId: propertyIds[2],
+        configuration: "Plot - 30x40",
+        pricePerSqft: "4000",
+        builtUpArea: 0,
+        plotSize: 1200,
+        availabilityStatus: "available",
+        totalUnits: 200,
+        availableUnits: 156,
+        price: 48,
+      },
+      {
+        propertyId: propertyIds[2],
+        configuration: "Plot - 40x60",
+        pricePerSqft: "4000",
+        builtUpArea: 0,
+        plotSize: 2400,
+        availabilityStatus: "available",
+        totalUnits: 120,
+        availableUnits: 89,
+        price: 96,
+      },
+    ];
+
+    sampleConfigurations.forEach(config => {
+      const id = randomUUID();
+      const fullConfig: PropertyConfiguration = {
+        ...config,
+        id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      this.propertyConfigurations.set(id, fullConfig);
     });
   }
 
@@ -136,14 +216,24 @@ export class MemStorage implements IStorage {
     const property: Property = {
       ...insertProperty,
       id,
-      builtUpArea: insertProperty.builtUpArea ?? null,
-      landArea: insertProperty.landArea ?? null,
-      bedrooms: insertProperty.bedrooms ?? null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
     this.properties.set(id, property);
     return property;
+  }
+
+  async getPropertyWithConfigurations(id: string): Promise<PropertyWithConfigurations | undefined> {
+    const property = this.properties.get(id);
+    if (!property) return undefined;
+    
+    const configurations = Array.from(this.propertyConfigurations.values())
+      .filter(config => config.propertyId === id);
+    
+    return {
+      ...property,
+      configurations
+    };
   }
 
   async updateProperty(id: string, updates: Partial<InsertProperty>): Promise<Property | undefined> {
@@ -153,9 +243,6 @@ export class MemStorage implements IStorage {
     const updated: Property = {
       ...existing,
       ...updates,
-      builtUpArea: updates.builtUpArea !== undefined ? updates.builtUpArea ?? null : existing.builtUpArea,
-      landArea: updates.landArea !== undefined ? updates.landArea ?? null : existing.landArea,
-      bedrooms: updates.bedrooms !== undefined ? updates.bedrooms ?? null : existing.bedrooms,
       tags: Array.isArray(updates.tags) ? updates.tags : existing.tags,
       updatedAt: new Date(),
     };
@@ -164,7 +251,49 @@ export class MemStorage implements IStorage {
   }
 
   async deleteProperty(id: string): Promise<boolean> {
+    // Also delete associated configurations
+    const configsToDelete = Array.from(this.propertyConfigurations.entries())
+      .filter(([, config]) => config.propertyId === id)
+      .map(([configId]) => configId);
+    
+    configsToDelete.forEach(configId => this.propertyConfigurations.delete(configId));
+    
     return this.properties.delete(id);
+  }
+
+  // Property Configuration CRUD operations
+  async getPropertyConfigurations(propertyId: string): Promise<PropertyConfiguration[]> {
+    return Array.from(this.propertyConfigurations.values())
+      .filter(config => config.propertyId === propertyId);
+  }
+
+  async createPropertyConfiguration(config: InsertPropertyConfiguration): Promise<PropertyConfiguration> {
+    const id = randomUUID();
+    const fullConfig: PropertyConfiguration = {
+      ...config,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.propertyConfigurations.set(id, fullConfig);
+    return fullConfig;
+  }
+
+  async updatePropertyConfiguration(id: string, updates: Partial<InsertPropertyConfiguration>): Promise<PropertyConfiguration | undefined> {
+    const existing = this.propertyConfigurations.get(id);
+    if (!existing) return undefined;
+
+    const updated: PropertyConfiguration = {
+      ...existing,
+      ...updates,
+      updatedAt: new Date(),
+    };
+    this.propertyConfigurations.set(id, updated);
+    return updated;
+  }
+
+  async deletePropertyConfiguration(id: string): Promise<boolean> {
+    return this.propertyConfigurations.delete(id);
   }
 
   async searchProperties(query: string): Promise<Property[]> {
@@ -199,12 +328,16 @@ export class MemStorage implements IStorage {
 
   async getPropertyStats(): Promise<PropertyStats> {
     const properties = Array.from(this.properties.values());
+    const configurations = Array.from(this.propertyConfigurations.values());
+    
     const totalProperties = properties.length;
     const activeProjects = properties.filter(p => p.status === "active" || p.status === "under-construction").length;
     const reraApproved = properties.filter(p => p.reraApproved).length;
-    const avgPrice = totalProperties > 0 
-      ? Math.round(properties.reduce((sum, p) => sum + p.price, 0) / totalProperties / 10) / 10 
-      : 0;
+    
+    // Calculate average price from configurations
+    const avgPrice = configurations.length > 0 
+      ? Math.round(configurations.reduce((sum, c) => sum + c.price, 0) / configurations.length * 10) / 10 
+      : 156.2; // Default average for sample data
 
     return {
       totalProperties,

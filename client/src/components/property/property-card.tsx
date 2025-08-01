@@ -1,6 +1,7 @@
 import { Calendar, MapPin, Edit, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 import { type Property } from "@shared/schema";
 
 interface PropertyCardProps {
@@ -40,12 +41,7 @@ export function PropertyCard({ property, onClick }: PropertyCardProps) {
     return `${area.toLocaleString()} sq ft`;
   };
 
-  const getDisplayArea = () => {
-    if (property.type === "plot") {
-      return formatArea(property.landArea, "land");
-    }
-    return formatArea(property.builtUpArea, "built-up");
-  };
+  // Remove display area since it's now in configurations
 
   return (
     <div
@@ -90,17 +86,13 @@ export function PropertyCard({ property, onClick }: PropertyCardProps) {
             <span className="text-gray-600">Type:</span>
             <span className="ml-1 font-medium capitalize">{property.type}</span>
           </div>
-          {getDisplayArea() && (
-            <div>
-              <span className="text-gray-600">
-                {property.type === "plot" ? "Area:" : "BUA:"}
-              </span>
-              <span className="ml-1 font-medium">{getDisplayArea()}</span>
-            </div>
-          )}
           <div>
-            <span className="text-gray-600">Price:</span>
-            <span className="ml-1 font-medium">{formatPrice(property.price)}</span>
+            <span className="text-gray-600">Developer:</span>
+            <span className="ml-1 font-medium">{property.developer}</span>
+          </div>
+          <div>
+            <span className="text-gray-600">Zone:</span>
+            <span className="ml-1 font-medium capitalize">{property.zone} Bengaluru</span>
           </div>
           <div>
             <span className="text-gray-600">Possession:</span>
@@ -111,18 +103,23 @@ export function PropertyCard({ property, onClick }: PropertyCardProps) {
         </div>
         
         <div className="flex items-center justify-between pt-4 border-t border-border">
-          <span className="text-sm text-gray-600">{property.developer}</span>
+          <span className="text-sm text-gray-600">
+            {property.reraApproved && (
+              <Badge variant="outline" className="text-xs">
+                RERA Approved
+              </Badge>
+            )}
+          </span>
           <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                // TODO: Handle edit
-              }}
-            >
-              <Edit className="h-4 w-4" />
-            </Button>
+            <Link href={`/property/${property.id}/edit`}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            </Link>
             <Button
               variant="ghost"
               size="sm"
