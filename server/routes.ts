@@ -88,7 +88,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "OTP expired" });
       }
       
-      if (otpData.otp !== otp) {
+      // Development bypass for admin number
+      if (phoneNumber === "9560366601" && process.env.NODE_ENV === "development") {
+        console.log(`🔓 Development bypass: Admin login successful for ${phoneNumber}`);
+      } else if (otpData.otp !== otp) {
         return res.status(400).json({ error: "Invalid OTP" });
       }
       
