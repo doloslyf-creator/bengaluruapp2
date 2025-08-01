@@ -254,7 +254,27 @@ export default function AdminLogin() {
                   <p className="text-xs text-violet-600">Check the server console for the OTP code</p>
                 </div>
                 
-                <Button type="submit" className="w-full bg-violet-600 hover:bg-violet-700">
+                <Button 
+                  type="submit" 
+                  className="w-full bg-violet-600 hover:bg-violet-700"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const currentValue = otpForm.getValues("otp");
+                    console.log("Button clicked - Current OTP value:", currentValue, "Length:", currentValue.length);
+                    console.log("Form state:", otpForm.formState);
+                    console.log("Form errors:", otpForm.formState.errors);
+                    
+                    // Check if validation passes
+                    const isValid = otpSchema.safeParse({ otp: currentValue });
+                    console.log("Manual validation result:", isValid);
+                    
+                    if (isValid.success) {
+                      onOtpSubmit({ otp: currentValue });
+                    } else {
+                      console.log("Validation failed:", isValid.error.errors);
+                    }
+                  }}
+                >
                   Verify & Login
                 </Button>
                 
