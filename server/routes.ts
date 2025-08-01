@@ -8,6 +8,12 @@ import { z } from "zod";
 const sessions = new Map<string, { phoneNumber: string; isAdmin: boolean; sessionId: string }>();
 const otpStore = new Map<string, { otp: string; expiresAt: number }>();
 
+// Admin phone numbers - add authorized numbers here
+const adminPhoneNumbers = new Set([
+  "9560366601", // Your number
+  "9876543210"  // Demo number
+]);
+
 // Helper function to generate OTP
 function generateOTP(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -42,15 +48,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid phone number" });
       }
 
+      // Check if phone number is authorized admin
+      if (!adminPhoneNumbers.has(phoneNumber)) {
+        return res.status(403).json({ error: "Phone number not authorized for admin access" });
+      }
+
       const otp = generateOTP();
       const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
       
       otpStore.set(phoneNumber, { otp, expiresAt });
       
-      // In production, send actual SMS
-      console.log(`OTP for ${phoneNumber}: ${otp}`);
+      // In production, integrate with SMS service like Twilio
+      // For development, OTP is logged to console
+      console.log(`🔐 Admin OTP for ${phoneNumber}: ${otp} (expires in 5 minutes)`);
       
-      res.json({ message: "OTP sent successfully" });
+      res.json({ 
+        message: "OTP sent successfully",
+        // Only in development - remove in production
+        developmentNote: process.env.NODE_ENV === "development" ? 
+          "OTP is logged to server console for development" : undefined
+      });
     } catch (error) {
       console.error("Error sending OTP:", error);
       res.status(500).json({ error: "Failed to send OTP" });

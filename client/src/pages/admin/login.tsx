@@ -54,7 +54,7 @@ export default function AdminLogin() {
       setStep("otp");
       toast({
         title: "OTP Sent",
-        description: "Please check your phone for the verification code.",
+        description: "OTP has been generated. Check server console in development mode.",
       });
     } catch (error: any) {
       toast({
@@ -92,8 +92,8 @@ export default function AdminLogin() {
           <CardTitle className="text-2xl">Admin Login</CardTitle>
           <CardDescription>
             {step === "phone" 
-              ? "Enter your registered phone number to receive an OTP"
-              : "Enter the 6-digit OTP sent to your phone"
+              ? "Enter your registered admin phone number to receive an OTP"
+              : "Enter the 6-digit OTP (check server console in development)"
             }
           </CardDescription>
         </CardHeader>

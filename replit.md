@@ -8,6 +8,13 @@ This is a full-stack property management application built with Express.js backe
 
 Preferred communication style: Simple, everyday language.
 
+## Authentication
+
+- Admin phone number: 9560366601 (authorized for admin access)
+- OTP system implemented for secure login
+- Development mode: OTP codes are logged to server console
+- Production note: Integrate with SMS service (Twilio recommended)
+
 ## System Architecture
 
 ### Frontend Architecture
