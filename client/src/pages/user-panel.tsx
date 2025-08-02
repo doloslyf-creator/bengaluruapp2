@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
 import { 
   User, Home, Calendar, MessageCircle, FileText, 
   Star, Heart, MapPin, Phone, Mail, 
   Eye, Download, ExternalLink, Clock, 
   IndianRupee, CheckCircle, AlertCircle, XCircle,
-  Filter, Search, ChevronRight, Settings, Bell
+  Filter, Search, ChevronRight, Settings, Bell, Calculator, Building
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -190,10 +191,31 @@ export default function UserPanel() {
                     <div className="text-xs text-gray-600">Bookings</div>
                   </div>
                 </div>
-                <Button variant="outline" className="w-full">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Edit Profile
-                </Button>
+                
+                <Separator />
+                
+                {/* Quick Actions */}
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm text-gray-900">Quick Actions</h4>
+                  <div className="space-y-2">
+                    <Link href="/find-property">
+                      <Button variant="outline" size="sm" className="w-full justify-start">
+                        <Search className="h-4 w-4 mr-2" />
+                        Find Properties
+                      </Button>
+                    </Link>
+                    <Link href="/user-panel/valuation-reports">
+                      <Button variant="outline" size="sm" className="w-full justify-start">
+                        <Calculator className="h-4 w-4 mr-2" />
+                        Valuation Reports
+                      </Button>
+                    </Link>
+                    <Button variant="outline" size="sm" className="w-full justify-start">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Edit Profile
+                    </Button>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -246,17 +268,19 @@ export default function UserPanel() {
                       </div>
                     </CardContent>
                   </Card>
-                  <Card>
-                    <CardContent className="pt-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-gray-600">Total Spent</p>
-                          <p className="text-3xl font-bold text-orange-600">₹{(userStats.totalSpent / 100).toLocaleString()}</p>
+                  <Link href="/user-panel/valuation-reports">
+                    <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                      <CardContent className="pt-6">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-gray-600">Valuation Reports</p>
+                            <p className="text-3xl font-bold text-purple-600">View</p>
+                          </div>
+                          <Calculator className="h-8 w-8 text-purple-600" />
                         </div>
-                        <IndianRupee className="h-8 w-8 text-orange-600" />
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 </div>
 
                 {/* Recent Activity */}

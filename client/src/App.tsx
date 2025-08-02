@@ -22,6 +22,7 @@ import PropertyResults from "@/pages/property-results";
 import BookVisit from "@/pages/book-visit";
 import Consultation from "@/pages/consultation";
 import UserPanel from "@/pages/user-panel";
+import UserValuationReports from "@/pages/user-valuation-reports";
 import CustomerHome from "@/pages/customer-home";
 import Home from "@/pages/home";
 import LeadsPage from "@/pages/leads";
@@ -54,6 +55,7 @@ function Router() {
       <Route path="/book-visit" component={BookVisit} />
       <Route path="/consultation" component={Consultation} />
       <Route path="/user-panel" component={UserPanel} />
+      <Route path="/user-panel/valuation-reports" component={UserValuationReports} />
       
       <Route component={NotFound} />
     </Switch>
