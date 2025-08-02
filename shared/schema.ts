@@ -3,6 +3,86 @@ import { pgTable, text, varchar, integer, boolean, timestamp, json, decimal, rea
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Property Scoring System - Comprehensive scoring with detailed criteria
+export const propertyScores = pgTable("property_scores", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  propertyId: varchar("property_id").notNull(),
+  
+  // Scoring metadata
+  scoringVersion: text("scoring_version").default("1.0"),
+  scoredBy: text("scored_by"), // Admin user who created the score
+  scoringDate: timestamp("scoring_date").defaultNow(),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+  
+  // Location Score (25 points total)
+  transportConnectivity: integer("transport_connectivity").default(0), // 0-8 points
+  transportNotes: text("transport_notes"),
+  infrastructureDevelopment: integer("infrastructure_development").default(0), // 0-7 points
+  infrastructureNotes: text("infrastructure_notes"),
+  socialInfrastructure: integer("social_infrastructure").default(0), // 0-5 points
+  socialNotes: text("social_notes"),
+  employmentHubs: integer("employment_hubs").default(0), // 0-5 points
+  employmentNotes: text("employment_notes"),
+  
+  // Amenities & Features Score (20 points total)
+  basicAmenities: integer("basic_amenities").default(0), // 0-8 points
+  basicAmenitiesNotes: text("basic_amenities_notes"),
+  lifestyleAmenities: integer("lifestyle_amenities").default(0), // 0-7 points
+  lifestyleAmenitiesNotes: text("lifestyle_amenities_notes"),
+  modernFeatures: integer("modern_features").default(0), // 0-5 points
+  modernFeaturesNotes: text("modern_features_notes"),
+  
+  // Legal & Compliance Score (20 points total)
+  reraCompliance: integer("rera_compliance").default(0), // 0-8 points
+  reraComplianceNotes: text("rera_compliance_notes"),
+  titleClarity: integer("title_clarity").default(0), // 0-7 points
+  titleClarityNotes: text("title_clarity_notes"),
+  approvals: integer("approvals").default(0), // 0-5 points
+  approvalsNotes: text("approvals_notes"),
+  
+  // Value Proposition Score (15 points total)
+  priceCompetitiveness: integer("price_competitiveness").default(0), // 0-8 points
+  priceCompetitivenessNotes: text("price_competitiveness_notes"),
+  appreciationPotential: integer("appreciation_potential").default(0), // 0-4 points
+  appreciationPotentialNotes: text("appreciation_potential_notes"),
+  rentalYield: integer("rental_yield").default(0), // 0-3 points
+  rentalYieldNotes: text("rental_yield_notes"),
+  
+  // Developer Credibility Score (10 points total)
+  trackRecord: integer("track_record").default(0), // 0-5 points
+  trackRecordNotes: text("track_record_notes"),
+  financialStability: integer("financial_stability").default(0), // 0-3 points
+  financialStabilityNotes: text("financial_stability_notes"),
+  customerSatisfaction: integer("customer_satisfaction").default(0), // 0-2 points
+  customerSatisfactionNotes: text("customer_satisfaction_notes"),
+  
+  // Construction Quality Score (10 points total)
+  structuralQuality: integer("structural_quality").default(0), // 0-5 points
+  structuralQualityNotes: text("structural_quality_notes"),
+  finishingStandards: integer("finishing_standards").default(0), // 0-3 points
+  finishingStandardsNotes: text("finishing_standards_notes"),
+  maintenanceStandards: integer("maintenance_standards").default(0), // 0-2 points
+  maintenanceStandardsNotes: text("maintenance_standards_notes"),
+  
+  // Calculated scores
+  locationScoreTotal: integer("location_score_total").default(0), // max 25
+  amenitiesScoreTotal: integer("amenities_score_total").default(0), // max 20
+  legalScoreTotal: integer("legal_score_total").default(0), // max 20
+  valueScoreTotal: integer("value_score_total").default(0), // max 15
+  developerScoreTotal: integer("developer_score_total").default(0), // max 10
+  constructionScoreTotal: integer("construction_score_total").default(0), // max 10
+  overallScoreTotal: integer("overall_score_total").default(0), // max 100
+  overallGrade: varchar("overall_grade", { enum: ["A+", "A", "B+", "B", "C+", "C", "D"] }),
+  
+  // Additional insights
+  keyStrengths: json("key_strengths").$type<string[]>().default([]),
+  areasOfConcern: json("areas_of_concern").$type<string[]>().default([]),
+  recommendationSummary: text("recommendation_summary"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const properties = pgTable("properties", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
@@ -36,7 +116,10 @@ export const properties = pgTable("properties", {
   
 
   
-  // Widget Data - Property Scoring
+  // Property Scoring (linked to propertyScores table)
+  propertyScoreId: varchar("property_score_id").references(() => propertyScores.id),
+  
+  // Widget Data - Legacy scoring (kept for backward compatibility)
   locationScore: integer("location_score").default(0), // 1-5
   amenitiesScore: integer("amenities_score").default(0), // 1-5
   valueScore: integer("value_score").default(0), // 1-5
@@ -460,10 +543,18 @@ export const insertPropertyConfigurationSchema = createInsertSchema(propertyConf
   updatedAt: true,
 });
 
+export const insertPropertyScoreSchema = createInsertSchema(propertyScores).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type InsertProperty = z.infer<typeof insertPropertySchema>;
 export type Property = typeof properties.$inferSelect;
 export type PropertyConfiguration = typeof propertyConfigurations.$inferSelect;
 export type InsertPropertyConfiguration = z.infer<typeof insertPropertyConfigurationSchema>;
+export type PropertyScore = typeof propertyScores.$inferSelect;
+export type InsertPropertyScore = z.infer<typeof insertPropertyScoreSchema>;
 
 export interface PropertyWithConfigurations extends Property {
   configurations: PropertyConfiguration[];

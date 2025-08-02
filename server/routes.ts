@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertPropertySchema, insertPropertyConfigurationSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertPropertyValuationReportSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations } from "@shared/schema";
+import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertPropertyValuationReportSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
@@ -228,6 +228,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting property configuration:", error);
       res.status(500).json({ error: "Failed to delete property configuration" });
+    }
+  });
+
+  // Property Scoring Routes
+  app.get("/api/property-scores", async (req, res) => {
+    try {
+      const scores = await storage.getAllPropertyScores();
+      res.json(scores);
+    } catch (error) {
+      console.error("Error fetching property scores:", error);
+      res.status(500).json({ error: "Failed to fetch property scores" });
+    }
+  });
+
+  app.get("/api/property-scores/:propertyId", async (req, res) => {
+    try {
+      const score = await storage.getPropertyScore(req.params.propertyId);
+      if (!score) {
+        return res.status(404).json({ error: "Property score not found" });
+      }
+      res.json(score);
+    } catch (error) {
+      console.error("Error fetching property score:", error);
+      res.status(500).json({ error: "Failed to fetch property score" });
+    }
+  });
+
+  app.post("/api/property-scores", async (req, res) => {
+    try {
+      const validatedData = insertPropertyScoreSchema.parse(req.body);
+      const score = await storage.createPropertyScore(validatedData);
+      res.status(201).json(score);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Validation failed", details: error.errors });
+      }
+      console.error("Error creating property score:", error);
+      res.status(500).json({ error: "Failed to create property score" });
+    }
+  });
+
+  app.patch("/api/property-scores/:id", async (req, res) => {
+    try {
+      const validatedData = insertPropertyScoreSchema.partial().parse(req.body);
+      const score = await storage.updatePropertyScore(req.params.id, validatedData);
+      if (!score) {
+        return res.status(404).json({ error: "Property score not found" });
+      }
+      res.json(score);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Validation failed", details: error.errors });
+      }
+      console.error("Error updating property score:", error);
+      res.status(500).json({ error: "Failed to update property score" });
+    }
+  });
+
+  app.delete("/api/property-scores/:id", async (req, res) => {
+    try {
+      const deleted = await storage.deletePropertyScore(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Property score not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting property score:", error);
+      res.status(500).json({ error: "Failed to delete property score" });
     }
   });
 

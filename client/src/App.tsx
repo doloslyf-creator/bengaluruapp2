@@ -7,6 +7,7 @@ import AdminDashboard from "@/pages/admin/dashboard";
 import AdminProperties from "@/pages/admin/properties";
 import PropertiesView from "@/pages/admin/properties-view";
 import PropertiesAdd from "@/pages/admin/properties-add";
+import PropertyScoring from "@/pages/admin/property-scoring";
 import AdminAnalytics from "@/pages/admin/analytics";
 import AdminZones from "@/pages/admin/zones";
 import ZonesView from "@/pages/admin/zones-view";
@@ -47,6 +48,7 @@ function Router() {
       <Route path="/admin-panel/properties" component={AdminProperties} />
       <Route path="/admin-panel/properties/view" component={PropertiesView} />
       <Route path="/admin-panel/properties/add" component={PropertiesAdd} />
+      <Route path="/admin-panel/property-scoring" component={PropertyScoring} />
       <Route path="/admin-panel/analytics" component={AdminAnalytics} />
       <Route path="/admin-panel/developers" component={AdminDevelopers} />
       <Route path="/admin-panel/developers/view" component={DevelopersView} />

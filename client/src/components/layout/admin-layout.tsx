@@ -13,7 +13,8 @@ import {
   ArrowLeft,
   ShoppingCart,
   Calculator,
-  Scale
+  Scale,
+  Star
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -38,6 +39,12 @@ const navigation = [
     href: "/admin-panel/properties", 
     icon: Building2,
     description: "Manage Property Listings"
+  },
+  { 
+    name: "Property Scoring", 
+    href: "/admin-panel/property-scoring", 
+    icon: Star,
+    description: "Property Evaluation & Scoring"
   },
   { 
     name: "Analytics", 

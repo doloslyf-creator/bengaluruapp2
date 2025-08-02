@@ -5,6 +5,8 @@ import {
   type PropertyConfiguration,
   type InsertPropertyConfiguration,
   type PropertyWithConfigurations,
+  type PropertyScore,
+  type InsertPropertyScore,
   type Lead,
   type InsertLead,
   type LeadWithDetails,
@@ -24,7 +26,8 @@ import {
   type CustomerNote,
   type InsertCustomerNote,
   properties, 
-  propertyConfigurations, 
+  propertyConfigurations,
+  propertyScores,
   leads, 
   leadActivities, 
   leadNotes, 
@@ -46,6 +49,13 @@ export interface IStorage {
   createProperty(property: InsertProperty): Promise<Property>;
   updateProperty(id: string, property: Partial<InsertProperty>): Promise<Property | undefined>;
   deleteProperty(id: string): Promise<boolean>;
+  
+  // Property Scoring operations
+  createPropertyScore(score: InsertPropertyScore): Promise<PropertyScore>;
+  getPropertyScore(propertyId: string): Promise<PropertyScore | undefined>;
+  updatePropertyScore(id: string, score: Partial<InsertPropertyScore>): Promise<PropertyScore | undefined>;
+  deletePropertyScore(id: string): Promise<boolean>;
+  getAllPropertyScores(): Promise<PropertyScore[]>;
   
   // Property Configuration CRUD operations
   getPropertyConfigurations(propertyId: string): Promise<PropertyConfiguration[]>;
@@ -862,6 +872,27 @@ export class MemStorage implements IStorage {
     this.users.set(id, user);
     return user;
   }
+
+  // Property Scoring operations (MemStorage placeholder implementations)
+  async createPropertyScore(score: InsertPropertyScore): Promise<PropertyScore> {
+    throw new Error("Property scoring not implemented in MemStorage");
+  }
+
+  async getPropertyScore(propertyId: string): Promise<PropertyScore | undefined> {
+    return undefined;
+  }
+
+  async updatePropertyScore(id: string, score: Partial<InsertPropertyScore>): Promise<PropertyScore | undefined> {
+    return undefined;
+  }
+
+  async deletePropertyScore(id: string): Promise<boolean> {
+    return false;
+  }
+
+  async getAllPropertyScores(): Promise<PropertyScore[]> {
+    return [];
+  }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -906,9 +937,187 @@ export class DatabaseStorage implements IStorage {
   async deleteProperty(id: string): Promise<boolean> {
     // Delete associated configurations first
     await db.delete(propertyConfigurations).where(eq(propertyConfigurations.propertyId, id));
+    // Delete associated property scores
+    await db.delete(propertyScores).where(eq(propertyScores.propertyId, id));
     
     const result = await db.delete(properties).where(eq(properties.id, id));
     return result.rowCount > 0;
+  }
+
+  // Property Scoring operations
+  async createPropertyScore(insertScore: InsertPropertyScore): Promise<PropertyScore> {
+    // Calculate totals
+    const locationTotal = (insertScore.transportConnectivity || 0) + 
+                         (insertScore.infrastructureDevelopment || 0) + 
+                         (insertScore.socialInfrastructure || 0) + 
+                         (insertScore.employmentHubs || 0);
+    
+    const amenitiesTotal = (insertScore.basicAmenities || 0) + 
+                          (insertScore.lifestyleAmenities || 0) + 
+                          (insertScore.modernFeatures || 0);
+    
+    const legalTotal = (insertScore.reraCompliance || 0) + 
+                      (insertScore.titleClarity || 0) + 
+                      (insertScore.approvals || 0);
+    
+    const valueTotal = (insertScore.priceCompetitiveness || 0) + 
+                      (insertScore.appreciationPotential || 0) + 
+                      (insertScore.rentalYield || 0);
+    
+    const developerTotal = (insertScore.trackRecord || 0) + 
+                          (insertScore.financialStability || 0) + 
+                          (insertScore.customerSatisfaction || 0);
+    
+    const constructionTotal = (insertScore.structuralQuality || 0) + 
+                             (insertScore.finishingStandards || 0) + 
+                             (insertScore.maintenanceStandards || 0);
+                             
+    const overallTotal = locationTotal + amenitiesTotal + legalTotal + valueTotal + developerTotal + constructionTotal;
+    
+    // Calculate grade based on overall score
+    let grade: "A+" | "A" | "B+" | "B" | "C+" | "C" | "D" = "D";
+    if (overallTotal >= 90) grade = "A+";
+    else if (overallTotal >= 80) grade = "A";
+    else if (overallTotal >= 70) grade = "B+";
+    else if (overallTotal >= 60) grade = "B";
+    else if (overallTotal >= 50) grade = "C+";
+    else if (overallTotal >= 40) grade = "C";
+    
+    const scoreWithTotals = {
+      ...insertScore,
+      locationScoreTotal: locationTotal,
+      amenitiesScoreTotal: amenitiesTotal,
+      legalScoreTotal: legalTotal,
+      valueScoreTotal: valueTotal,
+      developerScoreTotal: developerTotal,
+      constructionScoreTotal: constructionTotal,
+      overallScoreTotal: overallTotal,
+      overallGrade: grade
+    };
+
+    const [score] = await db.insert(propertyScores)
+      .values(scoreWithTotals)
+      .returning();
+      
+    // Update property with the score reference and legacy scores
+    await db.update(properties)
+      .set({
+        propertyScoreId: score.id,
+        locationScore: Math.round(locationTotal / 5), // Convert to 1-5 scale for legacy compatibility
+        amenitiesScore: Math.round(amenitiesTotal / 4), // Convert to 1-5 scale
+        valueScore: Math.round(valueTotal / 3), // Convert to 1-5 scale
+        overallScore: (overallTotal / 20).toFixed(1) // Convert to 1-5 scale
+      })
+      .where(eq(properties.id, insertScore.propertyId));
+      
+    return score;
+  }
+
+  async getPropertyScore(propertyId: string): Promise<PropertyScore | undefined> {
+    const [score] = await db.select().from(propertyScores)
+      .where(eq(propertyScores.propertyId, propertyId));
+    return score || undefined;
+  }
+
+  async updatePropertyScore(id: string, updates: Partial<InsertPropertyScore>): Promise<PropertyScore | undefined> {
+    // Get current score to calculate new totals
+    const [currentScore] = await db.select().from(propertyScores).where(eq(propertyScores.id, id));
+    if (!currentScore) return undefined;
+    
+    const mergedScore = { ...currentScore, ...updates };
+    
+    // Recalculate totals
+    const locationTotal = (mergedScore.transportConnectivity || 0) + 
+                         (mergedScore.infrastructureDevelopment || 0) + 
+                         (mergedScore.socialInfrastructure || 0) + 
+                         (mergedScore.employmentHubs || 0);
+    
+    const amenitiesTotal = (mergedScore.basicAmenities || 0) + 
+                          (mergedScore.lifestyleAmenities || 0) + 
+                          (mergedScore.modernFeatures || 0);
+    
+    const legalTotal = (mergedScore.reraCompliance || 0) + 
+                      (mergedScore.titleClarity || 0) + 
+                      (mergedScore.approvals || 0);
+    
+    const valueTotal = (mergedScore.priceCompetitiveness || 0) + 
+                      (mergedScore.appreciationPotential || 0) + 
+                      (mergedScore.rentalYield || 0);
+    
+    const developerTotal = (mergedScore.trackRecord || 0) + 
+                          (mergedScore.financialStability || 0) + 
+                          (mergedScore.customerSatisfaction || 0);
+    
+    const constructionTotal = (mergedScore.structuralQuality || 0) + 
+                             (mergedScore.finishingStandards || 0) + 
+                             (mergedScore.maintenanceStandards || 0);
+                             
+    const overallTotal = locationTotal + amenitiesTotal + legalTotal + valueTotal + developerTotal + constructionTotal;
+    
+    // Calculate grade
+    let grade: "A+" | "A" | "B+" | "B" | "C+" | "C" | "D" = "D";
+    if (overallTotal >= 90) grade = "A+";
+    else if (overallTotal >= 80) grade = "A";
+    else if (overallTotal >= 70) grade = "B+";
+    else if (overallTotal >= 60) grade = "B";
+    else if (overallTotal >= 50) grade = "C+";
+    else if (overallTotal >= 40) grade = "C";
+    
+    const updatesWithTotals = {
+      ...updates,
+      locationScoreTotal: locationTotal,
+      amenitiesScoreTotal: amenitiesTotal,
+      legalScoreTotal: legalTotal,
+      valueScoreTotal: valueTotal,
+      developerScoreTotal: developerTotal,
+      constructionScoreTotal: constructionTotal,
+      overallScoreTotal: overallTotal,
+      overallGrade: grade,
+      lastUpdated: new Date()
+    };
+
+    const [updatedScore] = await db.update(propertyScores)
+      .set(updatesWithTotals)
+      .where(eq(propertyScores.id, id))
+      .returning();
+      
+    // Update legacy scores in properties table
+    if (updatedScore) {
+      await db.update(properties)
+        .set({
+          locationScore: Math.round(locationTotal / 5),
+          amenitiesScore: Math.round(amenitiesTotal / 4),
+          valueScore: Math.round(valueTotal / 3),
+          overallScore: (overallTotal / 20).toFixed(1)
+        })
+        .where(eq(properties.id, updatedScore.propertyId));
+    }
+      
+    return updatedScore || undefined;
+  }
+
+  async deletePropertyScore(id: string): Promise<boolean> {
+    // Get the property ID first to update the property
+    const [score] = await db.select().from(propertyScores).where(eq(propertyScores.id, id));
+    if (score) {
+      // Reset property score reference and legacy scores
+      await db.update(properties)
+        .set({
+          propertyScoreId: null,
+          locationScore: 0,
+          amenitiesScore: 0,
+          valueScore: 0,
+          overallScore: "0.0"
+        })
+        .where(eq(properties.id, score.propertyId));
+    }
+    
+    const result = await db.delete(propertyScores).where(eq(propertyScores.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getAllPropertyScores(): Promise<PropertyScore[]> {
+    return await db.select().from(propertyScores).orderBy(desc(propertyScores.overallScoreTotal));
   }
 
   // Property Configuration CRUD operations
