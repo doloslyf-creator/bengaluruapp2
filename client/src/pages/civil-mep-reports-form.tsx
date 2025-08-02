@@ -77,7 +77,7 @@ export default function CivilMepReportsForm() {
     queryKey: ["/api/properties"]
   });
 
-  const filteredProperties = properties.filter((property: Property) => 
+  const filteredProperties = properties.filter((property: any) => 
     property.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     property.area?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     property.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -204,7 +204,7 @@ export default function CivilMepReportsForm() {
                     <p className="text-gray-500">No properties found matching your search.</p>
                   </div>
                 ) : (
-                  filteredProperties.map((property: Property) => (
+                  filteredProperties.map((property: any) => (
                     <motion.div
                       key={property.id}
                       whileHover={{ scale: 1.01 }}
@@ -233,9 +233,9 @@ export default function CivilMepReportsForm() {
                             {property.address}
                           </div>
                           <div className="flex items-center space-x-4 text-sm text-gray-600">
-                            <span className="font-medium">{property.bhkType}</span>
-                            <span>{property.area} sq ft</span>
-                            <span className="font-semibold text-gray-900">₹{(property.price / 10000000).toFixed(2)}Cr</span>
+                            <span className="font-medium">{property.type}</span>
+                            <span>{property.developer}</span>
+                            <span className="font-medium text-green-600">{property.status}</span>
                           </div>
                         </div>
                         {selectedProperty?.id === property.id && (
