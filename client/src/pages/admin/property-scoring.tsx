@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Property, PropertyScore, InsertPropertyScore } from "@shared/schema";
 import { Star, MapPin, Building2, Award, TrendingUp, Shield, Wrench, DollarSign, Users, Construction, Plus, Edit2, Trash2, AlertCircle, CheckCircle2 } from "lucide-react";
+import AdminLayout from "@/components/layout/admin-layout";
 
 interface ScoringField {
   key: keyof InsertPropertyScore;
@@ -218,152 +219,153 @@ export default function PropertyScoring() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Property Scoring</h1>
-          <p className="text-gray-600">Comprehensive property evaluation and scoring system</p>
+    <AdminLayout title="Property Scoring">
+      <div className="p-6 space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Property Scoring</h1>
+            <p className="text-gray-600">Comprehensive property evaluation and scoring system</p>
+          </div>
+          <Badge variant="outline" className="text-sm">
+            {propertyScores.length} Properties Scored
+          </Badge>
         </div>
-        <Badge variant="outline" className="text-sm">
-          {propertyScores.length} Properties Scored
-        </Badge>
-      </div>
 
-      {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <Award className="h-5 w-5 text-green-600" />
-              <span className="text-sm text-gray-600">A+ Properties</span>
-            </div>
-            <div className="text-2xl font-bold text-green-600">
-              {propertyScores.filter(s => s.overallGrade === "A+").length}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <TrendingUp className="h-5 w-5 text-blue-600" />
-              <span className="text-sm text-gray-600">Avg Score</span>
-            </div>
-            <div className="text-2xl font-bold text-blue-600">
-              {propertyScores.length > 0 
-                ? Math.round(propertyScores.reduce((sum, s) => sum + s.overallScoreTotal, 0) / propertyScores.length)
-                : 0
-              }
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <Building2 className="h-5 w-5 text-purple-600" />
-              <span className="text-sm text-gray-600">Total Properties</span>
-            </div>
-            <div className="text-2xl font-bold text-purple-600">
-              {properties.length}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <AlertCircle className="h-5 w-5 text-orange-600" />
-              <span className="text-sm text-gray-600">Needs Scoring</span>
-            </div>
-            <div className="text-2xl font-bold text-orange-600">
-              {properties.length - propertyScores.length}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+        {/* Overview Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card className="bg-white shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2">
+                <Award className="h-5 w-5 text-green-600" />
+                <span className="text-sm text-gray-600">A+ Properties</span>
+              </div>
+              <div className="text-2xl font-bold text-green-600">
+                {propertyScores.filter(s => s.overallGrade === "A+").length}
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2">
+                <TrendingUp className="h-5 w-5 text-blue-600" />
+                <span className="text-sm text-gray-600">Avg Score</span>
+              </div>
+              <div className="text-2xl font-bold text-blue-600">
+                {propertyScores.length > 0 
+                  ? Math.round(propertyScores.reduce((sum, s) => sum + s.overallScoreTotal, 0) / propertyScores.length)
+                  : 0
+                }
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2">
+                <Building2 className="h-5 w-5 text-purple-600" />
+                <span className="text-sm text-gray-600">Total Properties</span>
+              </div>
+              <div className="text-2xl font-bold text-purple-600">
+                {properties.length}
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2">
+                <AlertCircle className="h-5 w-5 text-orange-600" />
+                <span className="text-sm text-gray-600">Needs Scoring</span>
+              </div>
+              <div className="text-2xl font-bold text-orange-600">
+                {properties.length - propertyScores.length}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-      {/* Properties List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Properties & Scores</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {propertiesWithScores.map(({ property, score }) => (
-              <div key={property.id} className="border rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <h3 className="font-semibold text-lg">{property.name}</h3>
+        {/* Properties List */}
+        <Card className="bg-white shadow-sm">
+          <CardHeader>
+            <CardTitle>Properties & Scores</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {propertiesWithScores.map(({ property, score }) => (
+                <div key={property.id} className="border rounded-lg p-4 bg-white">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <h3 className="font-semibold text-lg">{property.name}</h3>
+                        {score && (
+                          <Badge className={getGradeColor(score.overallGrade || "D")}>
+                            Grade {score.overallGrade}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600 space-x-4">
+                        <span className="flex items-center">
+                          <MapPin className="h-4 w-4 mr-1" />
+                          {property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)}
+                        </span>
+                        <span className="flex items-center">
+                          <Building2 className="h-4 w-4 mr-1" />
+                          {property.developer}
+                        </span>
+                      </div>
                       {score && (
-                        <Badge className={getGradeColor(score.overallGrade || "D")}>
-                          Grade {score.overallGrade}
-                        </Badge>
+                        <div className="mt-3">
+                          <div className="flex items-center space-x-2 mb-2">
+                            <span className="text-sm font-medium">Overall Score:</span>
+                            <span className="text-lg font-bold text-primary">{score.overallScoreTotal}/100</span>
+                            <Progress value={score.overallScoreTotal} className="flex-1 max-w-xs" />
+                          </div>
+                          <div className="flex space-x-6 text-xs">
+                            <span>Location: {score.locationScoreTotal}/25</span>
+                            <span>Amenities: {score.amenitiesScoreTotal}/20</span>
+                            <span>Legal: {score.legalScoreTotal}/20</span>
+                            <span>Value: {score.valueScoreTotal}/15</span>
+                            <span>Developer: {score.developerScoreTotal}/10</span>
+                            <span>Construction: {score.constructionScoreTotal}/10</span>
+                          </div>
+                        </div>
                       )}
                     </div>
-                    <div className="flex items-center text-sm text-gray-600 space-x-4">
-                      <span className="flex items-center">
-                        <MapPin className="h-4 w-4 mr-1" />
-                        {property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)}
-                      </span>
-                      <span className="flex items-center">
-                        <Building2 className="h-4 w-4 mr-1" />
-                        {property.developer}
-                      </span>
+                    <div className="flex space-x-2">
+                      {score ? (
+                        <>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => openEditDialog(property, score)}
+                          >
+                            <Edit2 className="h-4 w-4 mr-1" />
+                            Edit Score
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => deleteMutation.mutate(score.id)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </>
+                      ) : (
+                        <Button 
+                          size="sm"
+                          onClick={() => openCreateDialog(property)}
+                        >
+                          <Plus className="h-4 w-4 mr-1" />
+                          Add Score
+                        </Button>
+                      )}
                     </div>
-                    {score && (
-                      <div className="mt-3">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <span className="text-sm font-medium">Overall Score:</span>
-                          <span className="text-lg font-bold text-primary">{score.overallScoreTotal}/100</span>
-                          <Progress value={score.overallScoreTotal} className="flex-1 max-w-xs" />
-                        </div>
-                        <div className="flex space-x-6 text-xs">
-                          <span>Location: {score.locationScoreTotal}/25</span>
-                          <span>Amenities: {score.amenitiesScoreTotal}/20</span>
-                          <span>Legal: {score.legalScoreTotal}/20</span>
-                          <span>Value: {score.valueScoreTotal}/15</span>
-                          <span>Developer: {score.developerScoreTotal}/10</span>
-                          <span>Construction: {score.constructionScoreTotal}/10</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex space-x-2">
-                    {score ? (
-                      <>
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => openEditDialog(property, score)}
-                        >
-                          <Edit2 className="h-4 w-4 mr-1" />
-                          Edit Score
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => deleteMutation.mutate(score.id)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </>
-                    ) : (
-                      <Button 
-                        size="sm"
-                        onClick={() => openCreateDialog(property)}
-                      >
-                        <Plus className="h-4 w-4 mr-1" />
-                        Add Score
-                      </Button>
-                    )}
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
       {/* Scoring Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -376,7 +378,7 @@ export default function PropertyScoring() {
           
           <div className="space-y-6">
             {/* Overall Score Display */}
-            <Card>
+            <Card className="bg-white shadow-sm">
               <CardContent className="p-4">
                 <div className="text-center">
                   <div className="text-3xl font-bold text-primary mb-2">
@@ -493,6 +495,7 @@ export default function PropertyScoring() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }
