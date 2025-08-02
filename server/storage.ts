@@ -25,6 +25,8 @@ import {
   type InsertReportPayment,
   type CustomerNote,
   type InsertCustomerNote,
+  type AppSettings,
+  type InsertAppSettings,
   properties, 
   propertyConfigurations,
   propertyScores,
@@ -35,7 +37,8 @@ import {
   civilMepReports,
   propertyValuationReports,
   reportPayments,
-  customerNotes
+  customerNotes,
+  appSettings
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, ilike, gte, lte, desc, sql } from "drizzle-orm";
@@ -140,6 +143,11 @@ export interface IStorage {
   updatePaymentStatus(paymentId: string, status: string): Promise<ReportPayment | undefined>;
   getCivilMepReportStats(): Promise<any>;
   getValuationReportStats(): Promise<any>;
+
+  // App Settings operations
+  getAppSettings(): Promise<AppSettings | undefined>;
+  updateAppSettings(settings: Partial<InsertAppSettings>): Promise<AppSettings>;
+  initializeAppSettings(): Promise<AppSettings>;
 }
 
 export class MemStorage implements IStorage {
@@ -150,6 +158,7 @@ export class MemStorage implements IStorage {
   private leadActivities: Map<string, LeadActivity[]>;
   private leadNotes: Map<string, LeadNote[]>;
   private users: Map<string, any>;
+  private appSettings: AppSettings | null;
 
   constructor() {
     this.properties = new Map();
@@ -159,9 +168,13 @@ export class MemStorage implements IStorage {
     this.leadActivities = new Map();
     this.leadNotes = new Map();
     this.users = new Map();
+    this.appSettings = null;
     
     // Initialize with some sample properties and configurations
     this.initializeSampleData();
+    
+    // Initialize default app settings
+    this.initializeDefaultAppSettings();
   }
 
   private initializeSampleData() {
@@ -892,6 +905,125 @@ export class MemStorage implements IStorage {
 
   async getAllPropertyScores(): Promise<PropertyScore[]> {
     return [];
+  }
+
+  // App Settings operations
+  private initializeDefaultAppSettings() {
+    this.appSettings = {
+      id: randomUUID(),
+      businessName: "OwnItRight – Curated Property Advisors",
+      logoUrl: null,
+      faviconUrl: null,
+      contactEmail: "contact@ownitright.com",
+      phoneNumber: "+91 98765 43210",
+      whatsappNumber: "+91 98765 43210",
+      officeAddress: "Bengaluru, Karnataka, India",
+      defaultCurrency: "INR",
+      currencySymbol: "₹",
+      timezone: "Asia/Kolkata",
+      dateFormat: "DD/MM/YYYY",
+      maintenanceMode: false,
+      maintenanceMessage: "We are currently performing maintenance. Please check back later.",
+      primaryColor: "#2563eb",
+      secondaryColor: "#64748b",
+      metaTitle: "OwnItRight - Property Discovery Platform",
+      metaDescription: "Discover your perfect property in Bengaluru with our advanced property discovery platform",
+      enableBookings: true,
+      enableConsultations: true,
+      enableReports: true,
+      enableBlog: true,
+      lastUpdatedBy: "admin",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+  }
+
+  async getAppSettings(): Promise<AppSettings | undefined> {
+    return this.appSettings || undefined;
+  }
+
+  async updateAppSettings(settingsData: Partial<InsertAppSettings>): Promise<AppSettings> {
+    if (!this.appSettings) {
+      this.initializeDefaultAppSettings();
+    }
+
+    this.appSettings = {
+      ...this.appSettings!,
+      ...settingsData,
+      updatedAt: new Date(),
+    };
+
+    return this.appSettings;
+  }
+
+  async initializeAppSettings(): Promise<AppSettings> {
+    this.initializeDefaultAppSettings();
+    return this.appSettings!;
+  }
+
+  // Placeholder implementations for CIVIL+MEP and Valuation reports
+  async enableCivilMepReport(propertyId: string): Promise<Property | undefined> {
+    return undefined;
+  }
+
+  async getCivilMepReport(propertyId: string): Promise<CivilMepReport | undefined> {
+    return undefined;
+  }
+
+  async createCivilMepReport(report: InsertCivilMepReport): Promise<CivilMepReport> {
+    throw new Error("CIVIL+MEP reports not implemented in MemStorage");
+  }
+
+  async updateCivilMepReport(reportId: string, updates: Partial<InsertCivilMepReport>): Promise<CivilMepReport | undefined> {
+    return undefined;
+  }
+
+  async getPropertiesWithReports(statusFilter?: string): Promise<Array<Property & { civilMepReport?: CivilMepReport; reportStats?: any }>> {
+    return [];
+  }
+
+  async enableValuationReport(propertyId: string): Promise<Property | undefined> {
+    return undefined;
+  }
+
+  async getValuationReport(propertyId: string): Promise<PropertyValuationReport | undefined> {
+    return undefined;
+  }
+
+  async createValuationReport(report: InsertPropertyValuationReport): Promise<PropertyValuationReport> {
+    throw new Error("Valuation reports not implemented in MemStorage");
+  }
+
+  async updateValuationReport(reportId: string, updates: Partial<InsertPropertyValuationReport>): Promise<PropertyValuationReport | undefined> {
+    return undefined;
+  }
+
+  async getPropertiesWithValuationReports(statusFilter?: string): Promise<Array<Property & { valuationReport?: PropertyValuationReport; reportStats?: any }>> {
+    return [];
+  }
+
+  async createReportPayment(payment: InsertReportPayment): Promise<ReportPayment> {
+    throw new Error("Report payments not implemented in MemStorage");
+  }
+
+  async getReportPayments(reportId: string, reportType?: string): Promise<ReportPayment[]> {
+    return [];
+  }
+
+  async getAllReportPayments(): Promise<ReportPayment[]> {
+    return [];
+  }
+
+  async updatePaymentStatus(paymentId: string, status: string): Promise<ReportPayment | undefined> {
+    return undefined;
+  }
+
+  async getCivilMepReportStats(): Promise<any> {
+    return {};
+  }
+
+  async getValuationReportStats(): Promise<any> {
+    return {};
   }
 }
 
@@ -1815,6 +1947,57 @@ export class DatabaseStorage implements IStorage {
       .where(or(eq(this.leads.email, customerId), eq(this.leads.phone, customerId)));
     
     return { success: true, customerId, status };
+  }
+
+  // App Settings operations
+  async getAppSettings(): Promise<AppSettings | undefined> {
+    const [settings] = await db.select().from(appSettings).limit(1);
+    return settings;
+  }
+
+  async updateAppSettings(settingsData: Partial<InsertAppSettings>): Promise<AppSettings> {
+    const existing = await this.getAppSettings();
+    
+    if (existing) {
+      const [updated] = await db.update(appSettings)
+        .set({
+          ...settingsData,
+          updatedAt: new Date(),
+        })
+        .where(eq(appSettings.id, existing.id))
+        .returning();
+      return updated;
+    } else {
+      return await this.initializeAppSettings();
+    }
+  }
+
+  async initializeAppSettings(): Promise<AppSettings> {
+    const [settings] = await db.insert(appSettings)
+      .values({
+        businessName: "OwnItRight – Curated Property Advisors",
+        contactEmail: "contact@ownitright.com",
+        phoneNumber: "+91 98765 43210",
+        whatsappNumber: "+91 98765 43210",
+        officeAddress: "Bengaluru, Karnataka, India",
+        defaultCurrency: "INR",
+        currencySymbol: "₹",
+        timezone: "Asia/Kolkata",
+        dateFormat: "DD/MM/YYYY",
+        maintenanceMode: false,
+        maintenanceMessage: "We are currently performing maintenance. Please check back later.",
+        primaryColor: "#2563eb",
+        secondaryColor: "#64748b",
+        metaTitle: "OwnItRight - Property Discovery Platform",
+        metaDescription: "Discover your perfect property in Bengaluru with our advanced property discovery platform",
+        enableBookings: true,
+        enableConsultations: true,
+        enableReports: true,
+        enableBlog: true,
+        lastUpdatedBy: "admin"
+      })
+      .returning();
+    return settings;
   }
 }
 

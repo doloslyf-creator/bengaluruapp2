@@ -37,6 +37,7 @@ import LeadsPage from "@/pages/leads";
 import LegalTracker from "@/pages/admin/legal-tracker-enhanced";
 import LegalManagement from "@/pages/admin/legal-management";
 import UserLegalTracker from "@/pages/user-legal-tracker-enhanced";
+import AdminSettings from "@/pages/admin/settings";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -70,6 +71,7 @@ function Router() {
       <Route path="/admin-panel/legal-tracker/manage" component={LegalTracker} />
       <Route path="/admin-panel/legal-tracker/team" component={LegalTracker} />
       <Route path="/admin-panel/legal-tracker/reports" component={LegalTracker} />
+      <Route path="/admin-panel/settings" component={AdminSettings} />
       
       {/* Customer-facing routes */}
       <Route path="/find-property" component={FindProperty} />

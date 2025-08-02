@@ -106,6 +106,12 @@ const navigation = [
     icon: MapPin,
     description: "Location Management"
   },
+  { 
+    name: "Settings", 
+    href: "/admin-panel/settings", 
+    icon: Settings,
+    description: "App Configuration"
+  },
 ];
 
 export function AdminLayout({ children, title, showBackButton = false, backUrl = "/admin-panel" }: AdminLayoutProps) {

@@ -791,3 +791,58 @@ export const customerNotes = pgTable("customer_notes", {
 export const insertCustomerNoteSchema = createInsertSchema(customerNotes);
 export type InsertCustomerNote = z.infer<typeof insertCustomerNoteSchema>;
 export type CustomerNote = typeof customerNotes.$inferSelect;
+
+// App Settings table for general application configuration
+export const appSettings = pgTable("app_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  
+  // General Branding Settings
+  businessName: text("business_name").default("OwnItRight – Curated Property Advisors"),
+  logoUrl: text("logo_url"), // PNG/SVG logo for navbar and reports
+  faviconUrl: text("favicon_url"), // Favicon file URL
+  
+  // Contact Information
+  contactEmail: text("contact_email").default("contact@ownitright.com"),
+  phoneNumber: text("phone_number").default("+91 98765 43210"),
+  whatsappNumber: text("whatsapp_number").default("+91 98765 43210"),
+  officeAddress: text("office_address").default("Bengaluru, Karnataka, India"),
+  
+  // Localization Settings
+  defaultCurrency: varchar("default_currency", { enum: ["INR", "USD", "EUR"] }).default("INR"),
+  currencySymbol: text("currency_symbol").default("₹"),
+  timezone: text("timezone").default("Asia/Kolkata"),
+  dateFormat: varchar("date_format", { enum: ["DD/MM/YYYY", "MM/DD/YYYY", "YYYY-MM-DD"] }).default("DD/MM/YYYY"),
+  
+  // Application Behavior
+  maintenanceMode: boolean("maintenance_mode").default(false),
+  maintenanceMessage: text("maintenance_message").default("We are currently performing maintenance. Please check back later."),
+  
+  // Theme and UI Settings (for future expansion)
+  primaryColor: text("primary_color").default("#2563eb"), // Default blue
+  secondaryColor: text("secondary_color").default("#64748b"), // Default slate
+  
+  // SEO and Metadata
+  metaTitle: text("meta_title").default("OwnItRight - Property Discovery Platform"),
+  metaDescription: text("meta_description").default("Discover your perfect property in Bengaluru with our advanced property discovery platform"),
+  
+  // Feature Flags
+  enableBookings: boolean("enable_bookings").default(true),
+  enableConsultations: boolean("enable_consultations").default(true),
+  enableReports: boolean("enable_reports").default(true),
+  enableBlog: boolean("enable_blog").default(true),
+  
+  // Admin User Settings
+  lastUpdatedBy: text("last_updated_by").default("admin"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertAppSettingsSchema = createInsertSchema(appSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type AppSettings = typeof appSettings.$inferSelect;
+export type InsertAppSettings = z.infer<typeof insertAppSettingsSchema>;

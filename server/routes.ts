@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertPropertyValuationReportSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations } from "@shared/schema";
+import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertPropertyValuationReportSchema, insertAppSettingsSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
@@ -1485,6 +1485,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating legal step:", error);
       res.status(500).json({ error: "Failed to update legal step" });
+    }
+  });
+
+  // App Settings routes
+  app.get("/api/settings", async (req, res) => {
+    try {
+      let settings = await storage.getAppSettings();
+      if (!settings) {
+        settings = await storage.initializeAppSettings();
+      }
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching app settings:", error);
+      res.status(500).json({ error: "Failed to fetch app settings" });
+    }
+  });
+
+  app.patch("/api/settings", async (req, res) => {
+    try {
+      const validation = insertAppSettingsSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ 
+          error: "Invalid settings data", 
+          details: validation.error.format() 
+        });
+      }
+
+      const updatedSettings = await storage.updateAppSettings(validation.data);
+      res.json(updatedSettings);
+    } catch (error) {
+      console.error("Error updating app settings:", error);
+      res.status(500).json({ error: "Failed to update app settings" });
     }
   });
 
