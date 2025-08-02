@@ -154,7 +154,11 @@ export default function PropertyDetail() {
       
       // Price range similarity (if configurations available - up to 20 points)
       if (property.configurations.length > 0) {
-        const currentPrices = property.configurations.map(c => c.price);
+        const currentPrices = property.configurations.map(c => {
+          const pricePerSqft = parseFloat(c.pricePerSqft.toString());
+          const builtUpArea = c.builtUpArea;
+          return pricePerSqft * builtUpArea;
+        });
         const currentAvgPrice = currentPrices.reduce((a, b) => a + b, 0) / currentPrices.length;
         
         // This is a simplified scoring - in production you'd fetch all configurations
@@ -561,7 +565,7 @@ export default function PropertyDetail() {
                       >
                         <div className="font-medium text-lg">{config.configuration}</div>
                         <div className="text-sm text-gray-600">{config.builtUpArea.toLocaleString()} sq ft</div>
-                        <div className="text-primary font-bold">{formatPriceDisplay(config.price)}</div>
+                        <div className="text-primary font-bold">{formatPriceDisplay(parseFloat(config.pricePerSqft.toString()) * config.builtUpArea)}</div>
                         <Badge variant="outline" className="mt-2">
                           {config.availabilityStatus}
                         </Badge>
