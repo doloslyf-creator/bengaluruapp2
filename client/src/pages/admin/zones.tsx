@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/components/auth/auth-provider";
 import { Link } from "wouter";
 import { LogOut, MapPin, Building, TrendingUp, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { type Property } from "@shared/schema";
 
 export default function AdminZones() {
-  const { logout } = useAuth();
 
   const { data: properties = [] } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
@@ -60,9 +58,7 @@ export default function AdminZones() {
     return colors[zone as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200";
   };
 
-  const handleLogout = () => {
-    logout();
-  };
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -84,10 +80,7 @@ export default function AdminZones() {
                 <Link href="/admin-panel/zones" className="text-violet-600 font-medium">Zones</Link>
               </nav>
               
-              <Button variant="ghost" onClick={handleLogout}>
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </Button>
+
             </div>
           </div>
         </div>

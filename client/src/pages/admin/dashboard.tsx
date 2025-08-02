@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/components/auth/auth-provider";
 import { Link, useLocation } from "wouter";
-import { Plus, Search, LogOut } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { PropertyCard } from "@/components/property/property-card";
 import { AddPropertyDialog } from "@/components/property/add-property-dialog";
 import { PropertyDetailsDialog } from "@/components/property/property-details-dialog";
@@ -15,7 +14,6 @@ import { apiRequest } from "@/lib/queryClient";
 import { type Property, type PropertyStats } from "@shared/schema";
 
 export default function AdminDashboard() {
-  const { user, logout } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, navigate] = useLocation();
@@ -83,10 +81,7 @@ export default function AdminDashboard() {
     navigate(`/admin-panel/property/${property.id}/edit`);
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -96,7 +91,7 @@ export default function AdminDashboard() {
           <div className="flex justify-between items-center py-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Property Admin Panel</h1>
-              <p className="text-gray-600">Welcome back, Admin ({user?.phoneNumber})</p>
+              <p className="text-gray-600">Welcome back, Admin</p>
             </div>
             
             <div className="flex items-center gap-4">
@@ -108,10 +103,7 @@ export default function AdminDashboard() {
                 <Link href="/admin-panel/zones" className="text-gray-600 hover:text-gray-900">Zones</Link>
               </nav>
               
-              <Button variant="ghost" onClick={handleLogout}>
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </Button>
+
             </div>
           </div>
         </div>
@@ -182,7 +174,6 @@ export default function AdminDashboard() {
                   property={property}
                   onClick={() => handlePropertyClick(property)}
                   onDelete={handleDeleteProperty}
-                  onEdit={() => handleEditClick(property)}
                 />
               ))}
             </div>
@@ -200,7 +191,6 @@ export default function AdminDashboard() {
         property={selectedProperty}
         open={showDetailsDialog}
         onOpenChange={setShowDetailsDialog}
-        onEdit={handleEditClick}
       />
     </div>
   );

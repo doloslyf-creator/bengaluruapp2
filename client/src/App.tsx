@@ -3,9 +3,6 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthProvider } from "@/components/auth/auth-provider";
-import { ProtectedRoute } from "@/components/auth/protected-route";
-import AdminLogin from "@/pages/admin/login";
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminAnalytics from "@/pages/admin/analytics";
 import AdminZones from "@/pages/admin/zones";
@@ -25,37 +22,12 @@ function Router() {
     <Switch>
       <Route path="/" component={CustomerHome} />
       <Route path="/admin" component={Home} />
-      <Route path="/admin-panel/login" component={AdminLogin} />
-      <Route path="/admin-panel">
-        <ProtectedRoute>
-          <AdminDashboard />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/admin-panel/analytics">
-        <ProtectedRoute>
-          <AdminAnalytics />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/admin-panel/developers">
-        <ProtectedRoute>
-          <AdminDevelopers />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/admin-panel/zones">
-        <ProtectedRoute>
-          <AdminZones />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/admin-panel/property/:id/edit">
-        <ProtectedRoute>
-          <PropertyEdit />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/admin-panel/leads">
-        <ProtectedRoute>
-          <LeadsPage />
-        </ProtectedRoute>
-      </Route>
+      <Route path="/admin-panel" component={AdminDashboard} />
+      <Route path="/admin-panel/analytics" component={AdminAnalytics} />
+      <Route path="/admin-panel/developers" component={AdminDevelopers} />
+      <Route path="/admin-panel/zones" component={AdminZones} />
+      <Route path="/admin-panel/property/:id/edit" component={PropertyEdit} />
+      <Route path="/admin-panel/leads" component={LeadsPage} />
       
       {/* Customer-facing routes */}
       <Route path="/find-property" component={FindProperty} />
@@ -71,12 +43,10 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Router />
+      </TooltipProvider>
     </QueryClientProvider>
   );
 }

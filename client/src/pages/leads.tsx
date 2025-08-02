@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/components/auth/auth-provider";
 import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Phone, Mail, MapPin, TrendingUp, Users, Target, Award, Eye, Plus, Filter, LogOut } from "lucide-react";
+import { Phone, Mail, MapPin, TrendingUp, Users, Target, Award, Eye, Plus, Filter } from "lucide-react";
 import type { Lead, LeadWithDetails, LeadStats } from "@shared/schema";
 
 const statusColors = {
@@ -49,7 +48,6 @@ export default function LeadsPage() {
   });
   const [searchTerm, setSearchTerm] = useState("");
   
-  const { logout } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -143,10 +141,7 @@ export default function LeadsPage() {
                 <Link href="/property-config" className="text-gray-600 hover:text-gray-900">Configuration</Link>
               </nav>
               
-              <Button variant="ghost" onClick={logout}>
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </Button>
+
             </div>
           </div>
         </div>
