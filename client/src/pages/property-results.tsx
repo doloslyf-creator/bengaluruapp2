@@ -68,7 +68,7 @@ export default function PropertyResults() {
 
   // Fetch configurations for all properties
   const { data: allConfigurations = [] } = useQuery<PropertyConfiguration[]>({
-    queryKey: ["/api/property-configurations"],
+    queryKey: ["/api/property-configurations/all"],
     queryFn: async () => {
       const response = await fetch('/api/property-configurations/all');
       if (response.ok) {

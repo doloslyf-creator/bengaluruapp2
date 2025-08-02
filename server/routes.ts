@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertPropertySchema, insertPropertyConfigurationSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, leads, bookings, reportPayments, customerNotes } from "@shared/schema";
+import { insertPropertySchema, insertPropertyConfigurationSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
@@ -164,14 +164,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all configurations across all properties
-  app.get("/api/all-configurations", async (req, res) => {
+  app.get("/api/property-configurations/all", async (req, res) => {
     try {
-      const properties = await storage.getAllProperties();
-      const allConfigurations: any[] = [];
-      for (const property of properties) {
-        const configurations = await storage.getPropertyConfigurations(property.id);
-        allConfigurations.push(...configurations);
-      }
+      console.log("Fetching all configurations...");
+      const allConfigurations = await db.select().from(propertyConfigurations);
+      console.log("Found configurations:", allConfigurations.length);
       res.json(allConfigurations);
     } catch (error) {
       console.error("Error fetching all configurations:", error);
