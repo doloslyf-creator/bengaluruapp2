@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertPropertySchema, insertPropertyConfigurationSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations } from "@shared/schema";
+import { insertPropertySchema, insertPropertyConfigurationSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertPropertyValuationReportSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
@@ -658,6 +658,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (report) {
         const paymentData = {
           reportId: report.id,
+          reportType: "civil-mep" as const,
           propertyId,
           customerName,
           customerEmail,
@@ -675,14 +676,136 @@ export async function registerRoutes(app: Express): Promise<Server> {
           success: true, 
           paymentId: payment.id,
           reportId: report.id,
+          reportType: "civil-mep",
           message: "Access granted for 7 days. Payment due within 7 days." 
         });
       } else {
         throw new Error("Failed to create or retrieve report");
       }
     } catch (error) {
-      console.error("Error processing pay-later request:", error);
-      res.status(500).json({ error: "Failed to process pay-later request" });
+      console.error("Error processing CIVIL+MEP pay-later request:", error);
+      res.status(500).json({ error: "Failed to process CIVIL+MEP pay-later request" });
+    }
+  });
+
+  // Property Valuation Report pay later endpoint
+  app.post("/api/valuation-reports/pay-later", async (req, res) => {
+    try {
+      const { customerName, customerEmail, customerPhone, propertyId } = req.body;
+      
+      // First, create a basic Valuation report record if it doesn't exist
+      let report;
+      try {
+        // Check if report exists by property ID
+        report = await storage.getValuationReport(propertyId);
+        if (!report) {
+          throw new Error("Report not found");
+        }
+      } catch (error) {
+        // Report doesn't exist, create a placeholder report
+        const property = await storage.getProperty(propertyId);
+        if (!property) {
+          return res.status(404).json({ error: "Property not found" });
+        }
+
+        const reportData = {
+          propertyId: propertyId,
+          reportVersion: "1.0",
+          generatedBy: "System - Pay Later",
+          reportDate: new Date(),
+          marketAnalysis: {
+            currentMarketTrend: "To be assessed",
+            areaGrowthRate: 0,
+            demandSupplyRatio: "To be assessed",
+            marketSentiment: "To be assessed",
+            competitorAnalysis: []
+          },
+          propertyAssessment: {
+            structuralCondition: "To be assessed",
+            ageOfProperty: 0,
+            maintenanceLevel: "To be assessed",
+            amenitiesRating: 0,
+            locationAdvantages: [],
+            locationDisadvantages: [],
+            futureGrowthPotential: 0
+          },
+          costBreakdown: {
+            landValue: 0,
+            constructionCost: 0,
+            developmentCharges: 0,
+            registrationStampDuty: 0,
+            gstOnConstruction: 0,
+            parkingCharges: 0,
+            clubhouseMaintenance: 0,
+            interiorFittings: 0,
+            movingCosts: 0,
+            legalCharges: 0,
+            totalEstimatedCost: 0,
+            hiddenCosts: []
+          },
+          financialAnalysis: {
+            currentValuation: 0,
+            appreciationProjection: [],
+            rentalYield: 0,
+            monthlyRentalIncome: 0,
+            roiAnalysis: {
+              breakEvenPeriod: 0,
+              totalRoi5Years: 0,
+              totalRoi10Years: 0
+            },
+            loanEligibility: {
+              maxLoanAmount: 0,
+              suggestedDownPayment: 0,
+              emiEstimate: 0
+            }
+          },
+          investmentRecommendation: "hold" as const,
+          riskAssessment: {
+            overallRisk: "medium",
+            riskFactors: [],
+            mitigationStrategies: []
+          },
+          executiveSummary: "Report pending - Access granted via pay-later option",
+          overallScore: "0.0",
+          keyHighlights: [],
+          reportPdfUrl: null,
+          supportingDocuments: []
+        };
+        
+        report = await storage.createValuationReport(reportData);
+      }
+      
+      if (report) {
+        const paymentData = {
+          reportId: report.id,
+          reportType: "valuation" as const,
+          propertyId,
+          customerName,
+          customerEmail,
+          customerPhone,
+          amount: "15000.00",
+          paymentMethod: "pay-later" as const,
+          paymentStatus: "pay-later-pending" as const,
+          payLaterDueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          accessGrantedAt: new Date()
+        };
+
+        const payment = await storage.createReportPayment(paymentData);
+        
+        res.json({ 
+          success: true, 
+          paymentId: payment.id,
+          reportId: report.id,
+          reportType: "valuation",
+          message: "Property Valuation Report access granted for 7 days. Payment due within 7 days.",
+          amount: "15000.00"
+        });
+      } else {
+        throw new Error("Failed to create or retrieve valuation report");
+      }
+    } catch (error) {
+      console.error("Error processing valuation pay-later request:", error);
+      res.status(500).json({ error: "Failed to process valuation pay-later request" });
     }
   });
 

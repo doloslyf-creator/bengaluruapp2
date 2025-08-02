@@ -18,6 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { formatPriceDisplay } from "@/lib/utils";
 import { type Property, type PropertyConfiguration } from "@shared/schema";
 import CivilMepSection from "@/components/property/civil-mep-section";
+import { ValuationReportSection } from "@/components/property/valuation-report-section";
 import { Skeleton, PropertyDetailHeaderSkeleton } from "@/components/ui/skeleton";
 
 interface PropertyWithConfigurations extends Property {
@@ -1054,6 +1055,11 @@ export default function PropertyDetail() {
       {/* CIVIL+MEP Engineering Reports Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <CivilMepSection property={property} />
+      </section>
+
+      {/* Property Valuation Report Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <ValuationReportSection property={property} />
       </section>
     </div>
   );

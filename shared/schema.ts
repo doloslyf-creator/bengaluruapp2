@@ -72,6 +72,13 @@ export const properties = pgTable("properties", {
   civilMepReportPrice: decimal("civil_mep_report_price", { precision: 10, scale: 2 }).default("2999.00"), // Price in INR
   civilMepReportStatus: varchar("civil_mep_report_status", { enum: ["draft", "completed", "reviewing"] }).default("draft"),
   
+  // Property Valuation Report System
+  hasValuationReport: boolean("has_valuation_report").default(false),
+  valuationReportPrice: decimal("valuation_report_price", { precision: 10, scale: 2 }).default("15000.00"),
+  valuationReportStatus: varchar("valuation_report_status", { 
+    enum: ["draft", "in-progress", "completed", "archived"] 
+  }).default("draft"),
+  
   // Timestamps
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -208,10 +215,108 @@ export const civilMepReports = pgTable("civil_mep_reports", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Payment tracking for CIVIL+MEP reports
+// Property Valuation Reports table
+export const propertyValuationReports = pgTable("property_valuation_reports", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  propertyId: varchar("property_id").notNull().references(() => properties.id),
+  
+  // Report Meta
+  reportVersion: text("report_version").default("1.0"),
+  generatedBy: text("generated_by"), // Valuer/consultant name
+  reportDate: timestamp("report_date").defaultNow(),
+  
+  // Market Analysis
+  marketAnalysis: json("market_analysis").$type<{
+    currentMarketTrend: string;
+    areaGrowthRate: number; // % per annum
+    demandSupplyRatio: string;
+    marketSentiment: string;
+    competitorAnalysis: Array<{
+      propertyName: string;
+      pricePerSqft: number;
+      distanceKm: number;
+      amenitiesComparison: string;
+    }>;
+  }>(),
+  
+  // Property Assessment
+  propertyAssessment: json("property_assessment").$type<{
+    structuralCondition: string;
+    ageOfProperty: number; // years
+    maintenanceLevel: string;
+    amenitiesRating: number; // 1-10
+    locationAdvantages: string[];
+    locationDisadvantages: string[];
+    futureGrowthPotential: number; // 1-10
+  }>(),
+  
+  // Cost Breakdown & Valuation
+  costBreakdown: json("cost_breakdown").$type<{
+    landValue: number;
+    constructionCost: number;
+    developmentCharges: number;
+    registrationStampDuty: number;
+    gstOnConstruction: number;
+    parkingCharges: number;
+    clubhouseMaintenance: number;
+    interiorFittings: number;
+    movingCosts: number;
+    legalCharges: number;
+    totalEstimatedCost: number;
+    hiddenCosts: Array<{ item: string; amount: number; description: string }>;
+  }>(),
+  
+  // Financial Analysis
+  financialAnalysis: json("financial_analysis").$type<{
+    currentValuation: number;
+    appreciationProjection: Array<{
+      year: number;
+      projectedValue: number;
+      appreciationRate: number;
+    }>;
+    rentalYield: number; // % per annum
+    monthlyRentalIncome: number;
+    roiAnalysis: {
+      breakEvenPeriod: number; // years
+      totalRoi5Years: number; // %
+      totalRoi10Years: number; // %
+    };
+    loanEligibility: {
+      maxLoanAmount: number;
+      suggestedDownPayment: number;
+      emiEstimate: number;
+    };
+  }>(),
+  
+  // Investment Recommendation
+  investmentRecommendation: varchar("investment_recommendation", { 
+    enum: ["excellent-buy", "good-buy", "hold", "avoid"] 
+  }),
+  riskAssessment: json("risk_assessment").$type<{
+    overallRisk: string; // low, medium, high
+    riskFactors: string[];
+    mitigationStrategies: string[];
+  }>(),
+  
+  // Executive Summary
+  executiveSummary: text("executive_summary"),
+  overallScore: decimal("overall_score", { precision: 3, scale: 1 }).default("0.0"), // 1-10
+  keyHighlights: json("key_highlights").$type<string[]>().default([]),
+  
+  // Report Files
+  reportPdfUrl: text("report_pdf_url"), // Generated PDF report
+  supportingDocuments: json("supporting_documents").$type<string[]>().default([]),
+  
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Payment tracking for reports (CIVIL+MEP and Valuation)
 export const reportPayments = pgTable("report_payments", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  reportId: varchar("report_id").notNull().references(() => civilMepReports.id),
+  reportId: varchar("report_id"), // Can be null for general service orders
+  reportType: varchar("report_type", { enum: ["civil-mep", "valuation"] }).notNull().default("civil-mep"),
   propertyId: varchar("property_id").notNull().references(() => properties.id),
   
   // Customer Information
@@ -293,6 +398,13 @@ export const propertyConfigurations = pgTable("property_configurations", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Property Valuation Report schemas
+export const insertPropertyValuationReportSchema = createInsertSchema(propertyValuationReports).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertPropertySchema = createInsertSchema(properties).omit({
   id: true,
   createdAt: true,
@@ -369,6 +481,8 @@ export type InsertBooking = z.infer<typeof insertBookingSchema>;
 export type Booking = typeof bookings.$inferSelect;
 export type CivilMepReport = typeof civilMepReports.$inferSelect;
 export type InsertCivilMepReport = z.infer<typeof insertCivilMepReportSchema>;
+export type PropertyValuationReport = typeof propertyValuationReports.$inferSelect;
+export type InsertPropertyValuationReport = z.infer<typeof insertPropertyValuationReportSchema>;
 export type ReportPayment = typeof reportPayments.$inferSelect;
 export type InsertReportPayment = z.infer<typeof insertReportPaymentSchema>;
 

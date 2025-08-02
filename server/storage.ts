@@ -17,6 +17,8 @@ import {
   type InsertBooking,
   type CivilMepReport,
   type InsertCivilMepReport,
+  type PropertyValuationReport,
+  type InsertPropertyValuationReport,
   type ReportPayment,
   type InsertReportPayment,
   type CustomerNote,
@@ -28,6 +30,7 @@ import {
   leadNotes, 
   bookings,
   civilMepReports,
+  propertyValuationReports,
   reportPayments,
   customerNotes
 } from "@shared/schema";
@@ -113,11 +116,20 @@ export interface IStorage {
   updateCivilMepReport(reportId: string, updates: Partial<InsertCivilMepReport>): Promise<CivilMepReport | undefined>;
   getPropertiesWithReports(statusFilter?: string): Promise<Array<Property & { civilMepReport?: CivilMepReport; reportStats?: any }>>;
   
-  // Report Payment operations
+  // Property Valuation Report operations
+  enableValuationReport(propertyId: string): Promise<Property | undefined>;
+  getValuationReport(propertyId: string): Promise<PropertyValuationReport | undefined>;
+  createValuationReport(report: InsertPropertyValuationReport): Promise<PropertyValuationReport>;
+  updateValuationReport(reportId: string, updates: Partial<InsertPropertyValuationReport>): Promise<PropertyValuationReport | undefined>;
+  getPropertiesWithValuationReports(statusFilter?: string): Promise<Array<Property & { valuationReport?: PropertyValuationReport; reportStats?: any }>>;
+  
+  // Report Payment operations (both CIVIL+MEP and Valuation)
   createReportPayment(payment: InsertReportPayment): Promise<ReportPayment>;
-  getReportPayments(reportId: string): Promise<ReportPayment[]>;
+  getReportPayments(reportId: string, reportType?: string): Promise<ReportPayment[]>;
+  getAllReportPayments(): Promise<ReportPayment[]>;
   updatePaymentStatus(paymentId: string, status: string): Promise<ReportPayment | undefined>;
   getCivilMepReportStats(): Promise<any>;
+  getValuationReportStats(): Promise<any>;
 }
 
 export class MemStorage implements IStorage {
@@ -1210,9 +1222,22 @@ export class DatabaseStorage implements IStorage {
     return newPayment;
   }
 
-  async getReportPayments(reportId: string): Promise<ReportPayment[]> {
-    return await db.select().from(reportPayments)
-      .where(eq(reportPayments.reportId, reportId));
+  async getReportPayments(reportId: string, reportType?: string): Promise<ReportPayment[]> {
+    let query = db.select().from(reportPayments);
+    
+    if (reportId && reportType) {
+      query = query.where(and(eq(reportPayments.reportId, reportId), eq(reportPayments.reportType, reportType)));
+    } else if (reportId) {
+      query = query.where(eq(reportPayments.reportId, reportId));
+    } else if (reportType) {
+      query = query.where(eq(reportPayments.reportType, reportType));
+    }
+    
+    return await query;
+  }
+
+  async getAllReportPayments(): Promise<ReportPayment[]> {
+    return await db.select().from(reportPayments);
   }
 
   async updatePaymentStatus(paymentId: string, status: string): Promise<ReportPayment | undefined> {
@@ -1225,13 +1250,85 @@ export class DatabaseStorage implements IStorage {
 
   async getCivilMepReportStats(): Promise<any> {
     const allReports = await db.select().from(civilMepReports);
-    const allPayments = await db.select().from(reportPayments);
+    const civilMepPayments = await db.select().from(reportPayments)
+      .where(eq(reportPayments.reportType, "civil-mep"));
     
     return {
       totalReports: allReports.length,
-      completedReports: allReports.filter(r => r.civilMepReportStatus === 'completed').length,
-      totalRevenue: allPayments.reduce((sum, p) => sum + Number(p.amount), 0),
-      pendingPayments: allPayments.filter(p => p.paymentStatus === 'pay-later-pending').length
+      totalRevenue: civilMepPayments.reduce((sum, p) => sum + Number(p.amount), 0),
+      pendingPayments: civilMepPayments.filter(p => p.paymentStatus === 'pay-later-pending').length
+    };
+  }
+
+  // Property Valuation Report operations
+  async enableValuationReport(propertyId: string): Promise<Property | undefined> {
+    const [property] = await db.update(properties)
+      .set({ hasValuationReport: true })
+      .where(eq(properties.id, propertyId))
+      .returning();
+    return property || undefined;
+  }
+
+  async getValuationReport(propertyId: string): Promise<PropertyValuationReport | undefined> {
+    const [report] = await db.select().from(propertyValuationReports)
+      .where(eq(propertyValuationReports.propertyId, propertyId));
+    return report || undefined;
+  }
+
+  async createValuationReport(report: InsertPropertyValuationReport): Promise<PropertyValuationReport> {
+    const [newReport] = await db.insert(propertyValuationReports)
+      .values(report)
+      .returning();
+    return newReport;
+  }
+
+  async updateValuationReport(reportId: string, updates: Partial<InsertPropertyValuationReport>): Promise<PropertyValuationReport | undefined> {
+    const [report] = await db.update(propertyValuationReports)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(propertyValuationReports.id, reportId))
+      .returning();
+    return report || undefined;
+  }
+
+  async getPropertiesWithValuationReports(statusFilter?: string): Promise<Array<Property & { valuationReport?: PropertyValuationReport; reportStats?: any }>> {
+    const allProperties = await db.select().from(properties);
+    
+    const result = [];
+    for (const property of allProperties) {
+      const [report] = await db.select().from(propertyValuationReports)
+        .where(eq(propertyValuationReports.propertyId, property.id));
+      
+      let reportStats = null;
+      if (report) {
+        const payments = await db.select().from(reportPayments)
+          .where(and(eq(reportPayments.reportId, report.id), eq(reportPayments.reportType, "valuation")));
+        
+        reportStats = {
+          totalPayments: payments.length,
+          totalRevenue: payments.reduce((sum, p) => sum + Number(p.amount), 0),
+          pendingPayments: payments.filter(p => p.paymentStatus === 'pay-later-pending').length
+        };
+      }
+      
+      result.push({
+        ...property,
+        valuationReport: report || undefined,
+        reportStats
+      });
+    }
+    
+    return result;
+  }
+
+  async getValuationReportStats(): Promise<any> {
+    const allReports = await db.select().from(propertyValuationReports);
+    const valuationPayments = await db.select().from(reportPayments)
+      .where(eq(reportPayments.reportType, "valuation"));
+    
+    return {
+      totalReports: allReports.length,
+      totalRevenue: valuationPayments.reduce((sum, p) => sum + Number(p.amount), 0),
+      pendingPayments: valuationPayments.filter(p => p.paymentStatus === 'pay-later-pending').length
     };
   }
 
