@@ -24,6 +24,7 @@ import CivilMepReportsForm from "@/pages/civil-mep-reports-form";
 import LegalDueDiligencePage from "@/pages/legal-due-diligence";
 import LegalDueDiligenceForm from "@/pages/legal-due-diligence-form";
 import Contact from "@/pages/contact";
+import ContactThankYou from "@/pages/contact-thank-you";
 import Orders from "@/pages/admin/orders";
 import Customers from "@/pages/admin/customers";
 import ValuationReports from "@/pages/admin/valuation-reports";
@@ -95,6 +96,7 @@ function Router() {
       <Route path="/legal-due-diligence" component={LegalDueDiligencePage} />
       <Route path="/legal-due-diligence/form" component={LegalDueDiligenceForm} />
       <Route path="/contact" component={Contact} />
+      <Route path="/contact/thank-you" component={ContactThankYou} />
       <Route path="/book-visit" component={BookVisit} />
       <Route path="/consultation" component={Consultation} />
       <Route path="/user-panel" component={UserPanel} />

@@ -556,10 +556,10 @@ export default function Contact() {
                 </Button>
               ) : (
                 <Button
-                  onClick={() => setLocation("/properties")}
+                  onClick={() => setLocation("/contact/thank-you")}
                   className="bg-gradient-to-r from-green-600 to-blue-600 hover:shadow-lg flex items-center space-x-2"
                 >
-                  <span>Start Property Search</span>
+                  <span>Submit & Continue</span>
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               )}
