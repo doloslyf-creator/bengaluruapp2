@@ -13,6 +13,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { 
@@ -26,6 +28,19 @@ const propertyEditSchema = insertPropertySchema.extend({
   configurations: z.array(insertPropertyConfigurationSchema.extend({
     id: z.string().optional(),
   })).min(1, "At least one configuration is required"),
+  // Widget data fields
+  avgPricePerSqft: z.number().optional(),
+  avgSellingTime: z.number().optional(), 
+  marketTrend: z.string().optional(),
+  locationScore: z.number().min(1).max(5).optional(),
+  amenitiesScore: z.number().min(1).max(5).optional(),
+  valueScore: z.number().min(1).max(5).optional(),
+  overallScore: z.number().optional(),
+  areaAvgPriceMin: z.number().optional(),
+  areaAvgPriceMax: z.number().optional(),
+  cityAvgPriceMin: z.number().optional(),
+  cityAvgPriceMax: z.number().optional(),
+  priceComparison: z.string().optional(),
 });
 
 type PropertyEditForm = z.infer<typeof propertyEditSchema>;
@@ -250,6 +265,14 @@ export default function PropertyEdit() {
         <main className="flex-1 overflow-y-auto p-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <Tabs defaultValue="basic" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="basic">Basic Info</TabsTrigger>
+                  <TabsTrigger value="media">Media</TabsTrigger>
+                  <TabsTrigger value="widgets">Widget Data</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="basic" className="space-y-6 mt-6">
               {/* Basic Property Information */}
               <Card className="p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
@@ -727,7 +750,7 @@ export default function PropertyEdit() {
                             
                             {field.value && field.value.length > 0 && (
                               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                {field.value.map((image: string, index: number) => (
+                                {(field.value as string[]).map((image: string, index: number) => (
                                   <div key={index} className="relative">
                                     <img 
                                       src={image} 
@@ -740,7 +763,7 @@ export default function PropertyEdit() {
                                       size="sm"
                                       className="absolute top-1 right-1 h-6 w-6 p-0"
                                       onClick={() => {
-                                        const newImages = (field.value || []).filter((_: string, i: number) => i !== index);
+                                        const newImages = (field.value as string[] || []).filter((_: string, i: number) => i !== index);
                                         field.onChange(newImages);
                                       }}
                                     >
@@ -758,6 +781,269 @@ export default function PropertyEdit() {
                   />
                 </div>
               </Card>
+                </TabsContent>
+
+                <TabsContent value="media" className="space-y-6 mt-6">
+                  <Card className="card-stripe">
+                    <CardHeader>
+                      <CardTitle>Media & Content</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <FormField
+                        control={form.control}
+                        name="youtubeVideoUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>YouTube Video URL (Optional)</FormLabel>
+                            <FormControl>
+                              <Input {...field} value={field.value || ""} placeholder="https://www.youtube.com/watch?v=..." />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="widgets" className="space-y-6 mt-6">
+                  {/* Market Insights */}
+                  <Card className="card-stripe">
+                    <CardHeader>
+                      <CardTitle className="text-heading-3">Market Insights</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="avgPricePerSqft"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Average Price per Sqft (₹)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  placeholder="12500" 
+                                  {...field} 
+                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                  value={field.value || ""} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="avgSellingTime"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Average Selling Time (months)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  placeholder="18" 
+                                  {...field} 
+                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                  value={field.value || ""} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <FormField
+                        control={form.control}
+                        name="marketTrend"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Market Trend</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Property values increased by 15% this year" {...field} value={field.value || ""} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </CardContent>
+                  </Card>
+
+                  {/* Property Scoring */}
+                  <Card className="card-stripe">
+                    <CardHeader>
+                      <CardTitle className="text-heading-3">Property Scoring</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="locationScore"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Location Score (1-5)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  min="1" 
+                                  max="5" 
+                                  placeholder="4" 
+                                  {...field} 
+                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                  value={field.value || ""} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="amenitiesScore"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Amenities Score (1-5)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  min="1" 
+                                  max="5" 
+                                  placeholder="5" 
+                                  {...field} 
+                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                  value={field.value || ""} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="valueScore"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Value Score (1-5)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  min="1" 
+                                  max="5" 
+                                  placeholder="4" 
+                                  {...field} 
+                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                  value={field.value || ""} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Price Comparison */}
+                  <Card className="card-stripe">
+                    <CardHeader>
+                      <CardTitle className="text-heading-3">Price Comparison</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="areaAvgPriceMin"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Area Min Price (Lakhs)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  placeholder="95" 
+                                  {...field} 
+                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                  value={field.value || ""} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="areaAvgPriceMax"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Area Max Price (Lakhs)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  placeholder="120" 
+                                  {...field} 
+                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                  value={field.value || ""} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="cityAvgPriceMin"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>City Min Price (Lakhs)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  placeholder="85" 
+                                  {...field} 
+                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                  value={field.value || ""} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="cityAvgPriceMax"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>City Max Price (Lakhs)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  placeholder="110" 
+                                  {...field} 
+                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                                  value={field.value || ""} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <FormField
+                        control={form.control}
+                        name="priceComparison"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Price Comparison Message</FormLabel>
+                            <FormControl>
+                              <Input placeholder="12% below area average - Great value!" {...field} value={field.value || ""} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
             </form>
           </Form>
         </main>

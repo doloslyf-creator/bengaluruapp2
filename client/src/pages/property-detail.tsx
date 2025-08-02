@@ -761,18 +761,22 @@ export default function PropertyDetail() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 gap-3">
                   <div className="text-center p-4 bg-muted/30 rounded-xl">
-                    <div className="text-heading-3 text-success font-semibold">₹12,500</div>
+                    <div className="text-heading-3 text-success font-semibold">
+                      {property.avgPricePerSqft ? `₹${property.avgPricePerSqft.toLocaleString()}` : "₹12,500"}
+                    </div>
                     <div className="text-caption text-muted-foreground">Avg. Price/sqft in {property.zone}</div>
                   </div>
                   <div className="text-center p-4 bg-muted/30 rounded-xl">
-                    <div className="text-heading-3 text-primary font-semibold">18 months</div>
+                    <div className="text-heading-3 text-primary font-semibold">
+                      {property.avgSellingTime ? `${property.avgSellingTime} months` : "18 months"}
+                    </div>
                     <div className="text-caption text-muted-foreground">Average Selling Time</div>
                   </div>
                 </div>
                 <div className="p-3 bg-success/10 rounded-xl border border-success/20">
                   <div className="flex items-center text-success text-body-small font-medium">
                     <TrendingUp className="h-4 w-4 mr-2" />
-                    Property values increased by 15% this year
+                    {property.marketTrend || "Property values increased by 15% this year"}
                   </div>
                 </div>
               </CardContent>
@@ -938,7 +942,9 @@ export default function PropertyDetail() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="text-center mb-4">
-                  <div className="text-display text-warning font-bold">8.5</div>
+                  <div className="text-display text-warning font-bold">
+                    {property.overallScore ? Number(property.overallScore).toFixed(1) : (((property.locationScore || 4) + (property.amenitiesScore || 5) + (property.valueScore || 4)) / 3).toFixed(1)}
+                  </div>
                   <div className="text-caption text-muted-foreground">Overall Rating</div>
                 </div>
                 <div className="space-y-3">
@@ -946,7 +952,7 @@ export default function PropertyDetail() {
                     <span className="text-body-small text-muted-foreground">Location</span>
                     <div className="flex">
                       {[1,2,3,4,5].map((star) => (
-                        <Star key={star} className={`h-4 w-4 ${star <= 4 ? 'text-warning fill-current' : 'text-muted'}`} />
+                        <Star key={star} className={`h-4 w-4 ${star <= (property.locationScore || 4) ? 'text-warning fill-current' : 'text-muted'}`} />
                       ))}
                     </div>
                   </div>
@@ -954,7 +960,7 @@ export default function PropertyDetail() {
                     <span className="text-body-small text-muted-foreground">Amenities</span>
                     <div className="flex">
                       {[1,2,3,4,5].map((star) => (
-                        <Star key={star} className={`h-4 w-4 ${star <= 5 ? 'text-warning fill-current' : 'text-muted'}`} />
+                        <Star key={star} className={`h-4 w-4 ${star <= (property.amenitiesScore || 5) ? 'text-warning fill-current' : 'text-muted'}`} />
                       ))}
                     </div>
                   </div>
@@ -962,7 +968,7 @@ export default function PropertyDetail() {
                     <span className="text-body-small text-muted-foreground">Value for Money</span>
                     <div className="flex">
                       {[1,2,3,4,5].map((star) => (
-                        <Star key={star} className={`h-4 w-4 ${star <= 4 ? 'text-warning fill-current' : 'text-muted'}`} />
+                        <Star key={star} className={`h-4 w-4 ${star <= (property.valueScore || 4) ? 'text-warning fill-current' : 'text-muted'}`} />
                       ))}
                     </div>
                   </div>
@@ -986,17 +992,27 @@ export default function PropertyDetail() {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
                     <span className="text-body-small text-muted-foreground">Area Average</span>
-                    <span className="text-body-small font-medium text-muted-foreground">₹95L - ₹1.2Cr</span>
+                    <span className="text-body-small font-medium text-muted-foreground">
+                      {property.areaAvgPriceMin && property.areaAvgPriceMax 
+                        ? `₹${property.areaAvgPriceMin}L - ₹${property.areaAvgPriceMax}L`
+                        : "₹95L - ₹1.2Cr"
+                      }
+                    </span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
                     <span className="text-body-small text-muted-foreground">City Average</span>
-                    <span className="text-body-small font-medium text-muted-foreground">₹85L - ₹1.1Cr</span>
+                    <span className="text-body-small font-medium text-muted-foreground">
+                      {property.cityAvgPriceMin && property.cityAvgPriceMax 
+                        ? `₹${property.cityAvgPriceMin}L - ₹${property.cityAvgPriceMax}L`
+                        : "₹85L - ₹1.1Cr"
+                      }
+                    </span>
                   </div>
                 </div>
                 <div className="p-3 bg-success/10 rounded-xl border border-success/20">
                   <div className="flex items-center text-success text-body-small font-medium">
                     <TrendingUp className="h-4 w-4 mr-2" />
-                    12% below area average - Great value!
+                    {property.priceComparison || "12% below area average - Great value!"}
                   </div>
                 </div>
               </CardContent>

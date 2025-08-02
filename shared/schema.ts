@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, boolean, timestamp, json, decimal } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, boolean, timestamp, json, decimal, real } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -33,6 +33,39 @@ export const properties = pgTable("properties", {
   images: json("images").$type<string[]>().notNull().default([]),
   videos: json("videos").$type<string[]>().notNull().default([]),
   youtubeVideoUrl: text("youtube_video_url"), // YouTube video URL for property overview
+  
+  // Widget Data - Market Insights
+  avgPricePerSqft: integer("avg_price_per_sqft"), // in rupees
+  avgSellingTime: integer("avg_selling_time"), // in months
+  marketTrend: text("market_trend"), // e.g., "15% increase this year"
+  
+  // Widget Data - Location Amenities
+  nearbyAmenities: json("nearby_amenities").$type<Array<{
+    name: string;
+    type: string;
+    distance: number; // in km
+    icon: string;
+  }>>().default([]),
+  
+  // Widget Data - Construction Timeline
+  constructionTimeline: json("construction_timeline").$type<Array<{
+    milestone: string;
+    date: string;
+    status: 'completed' | 'current' | 'upcoming';
+  }>>().default([]),
+  
+  // Widget Data - Property Scoring
+  locationScore: integer("location_score").default(0), // 1-5
+  amenitiesScore: integer("amenities_score").default(0), // 1-5
+  valueScore: integer("value_score").default(0), // 1-5
+  overallScore: decimal("overall_score", { precision: 3, scale: 1 }).default("0.0"), // calculated average
+  
+  // Widget Data - Price Comparison
+  areaAvgPriceMin: integer("area_avg_price_min"), // in lakhs
+  areaAvgPriceMax: integer("area_avg_price_max"), // in lakhs
+  cityAvgPriceMin: integer("city_avg_price_min"), // in lakhs
+  cityAvgPriceMax: integer("city_avg_price_max"), // in lakhs
+  priceComparison: text("price_comparison"), // e.g., "12% below area average"
   
   // Timestamps
   createdAt: timestamp("created_at").defaultNow(),
