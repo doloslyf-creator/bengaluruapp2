@@ -71,6 +71,38 @@ export default function PropertyDetail() {
     // In a real app, this would save to user preferences
   };
 
+  const handleShare = async () => {
+    const propertyUrl = window.location.href;
+    const shareData = {
+      title: `${property.name} - Property in ${property.area}, ${property.zone} Bengaluru`,
+      text: `Check out this ${property.type} by ${property.developer} in ${property.area}. ${getPriceRange()}`,
+      url: propertyUrl
+    };
+
+    try {
+      // Try native Web Share API first (mobile/modern browsers)
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+      
+      // Fallback: Copy to clipboard
+      await navigator.clipboard.writeText(propertyUrl);
+      
+      // Show success message (you could use a toast here)
+      alert('Property link copied to clipboard!');
+    } catch (error) {
+      // Final fallback: Manual copy
+      const textArea = document.createElement('textarea');
+      textArea.value = propertyUrl;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Property link copied to clipboard!');
+    }
+  };
+
   const getPriceRange = () => {
     if (!property?.configurations.length) return "Price on request";
     const prices = property.configurations.map(c => c.price);
@@ -181,7 +213,7 @@ export default function PropertyDetail() {
                 <Heart className={`h-4 w-4 mr-2 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
                 {isFavorite ? 'Saved' : 'Save'}
               </Button>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={handleShare}>
                 <Share2 className="h-4 w-4 mr-2" />
                 Share
               </Button>
