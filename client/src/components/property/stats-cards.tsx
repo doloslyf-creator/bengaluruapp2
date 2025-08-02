@@ -38,7 +38,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
     },
     {
       title: "RERA Approved",
-      value: stats.reraApproved.toString(),
+      value: (stats.reraApprovedCount || 0).toString(),
       icon: Tag,
       bgColor: "bg-blue-100",
       iconColor: "text-blue-600",
