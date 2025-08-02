@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   AlertTriangle, 
@@ -45,6 +46,7 @@ interface CivilMepRequest {
 
 export default function CivilMepReports() {
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [showForm, setShowForm] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
@@ -688,7 +690,7 @@ export default function CivilMepReports() {
                 className="inline-block"
               >
                 <Button
-                  onClick={() => setShowForm(true)}
+                  onClick={() => setLocation("/civil-mep-reports/form")}
                   className="bg-gradient-to-r from-red-600 to-orange-600 hover:shadow-lg text-white px-8 py-4 text-lg font-semibold rounded-xl"
                 >
                   Get My Engineering Report Now

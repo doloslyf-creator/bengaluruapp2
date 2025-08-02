@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   AlertTriangle, 
@@ -47,6 +48,7 @@ interface LegalDueDiligenceRequest {
 
 export default function LegalDueDiligence() {
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [showForm, setShowForm] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
@@ -737,7 +739,7 @@ export default function LegalDueDiligence() {
                 className="inline-block"
               >
                 <Button
-                  onClick={() => setShowForm(true)}
+                  onClick={() => setLocation("/legal-due-diligence/form")}
                   className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-lg text-white px-8 py-4 text-lg font-semibold rounded-xl"
                 >
                   Get Legal Verification Now
