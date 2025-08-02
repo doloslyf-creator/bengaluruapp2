@@ -76,15 +76,15 @@ export default function LegalDueDiligenceForm() {
 
   const queryClient = useQueryClient();
 
-  const { data: properties = [], isLoading: isLoadingProperties } = useQuery({
+  const { data: properties = [], isLoading: isLoadingProperties } = useQuery<Property[]>({
     queryKey: ["/api/properties"]
   });
 
   const filteredProperties = properties.filter((property: Property) => 
-    property.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    property.area?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    property.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    property.developer?.toLowerCase().includes(searchTerm.toLowerCase())
+    property.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    property.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    property.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    property.builder?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const submitLegalDueDiligenceRequest = useMutation({
@@ -99,7 +99,8 @@ export default function LegalDueDiligenceForm() {
       if (requestData.urgencyLevel === "priority") baseAmount += 3000;
 
       // Create service order via new API
-      return await apiRequest("/api/orders/service", {
+      return await apiRequest({
+        url: "/api/orders/service",
         method: "POST",
         body: JSON.stringify({
           serviceType: 'legal-due-diligence',
@@ -107,7 +108,7 @@ export default function LegalDueDiligenceForm() {
           customerEmail: requestData.contactEmail,
           customerPhone: requestData.contactPhone,
           propertyId: requestData.propertyId,
-          propertyName: selectedProperty?.name || 'Selected Property',
+          propertyName: selectedProperty?.title || 'Selected Property',
           amount: baseAmount,
           requirements: `Buyer Type: ${requestData.buyerType}, Urgency: ${requestData.urgencyLevel}, Reason: ${requestData.requestReason}, Concerns: ${requestData.specificConcerns.join(', ')}, Notes: ${requestData.additionalNotes || 'None'}`
         })
@@ -248,7 +249,7 @@ export default function LegalDueDiligenceForm() {
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-2">
-                            <h4 className="font-semibold text-gray-900">{property.name}</h4>
+                            <h4 className="font-semibold text-gray-900">{property.title}</h4>
                             {property.legallyVerified && (
                               <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">
                                 Verified
@@ -257,7 +258,7 @@ export default function LegalDueDiligenceForm() {
                           </div>
                           <div className="flex items-center text-gray-600 text-sm mb-2">
                             <MapPin className="h-4 w-4 mr-1" />
-                            {property.address}
+                            {property.location}
                           </div>
                           <div className="flex items-center space-x-4 text-sm text-gray-600">
                             <span className="font-medium">{property.bhkType}</span>
