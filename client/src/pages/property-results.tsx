@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Grid3X3, List, MapPin, Calendar, Phone, ArrowLeft, Star, Eye, Heart, Filter, X, SlidersHorizontal } from "lucide-react";
+import { Grid3X3, List, MapPin, Calendar, Phone, ArrowLeft, Star, Eye, Heart, Filter, X, SlidersHorizontal, IndianRupee, Building, Shield } from "lucide-react";
 import Header from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -128,7 +128,12 @@ export default function PropertyResults() {
         if (propertyConfigs.length === 0) {
           score += 20; // Default score when no price data available
         } else {
-          const prices = propertyConfigs.map(c => c.price);
+          // Calculate actual prices using pricePerSqft * builtUpArea
+          const prices = propertyConfigs.map(c => {
+            const pricePerSqft = parseFloat(c.pricePerSqft.toString());
+            const builtUpArea = c.builtUpArea;
+            return pricePerSqft * builtUpArea;
+          });
           const minPrice = Math.min(...prices) / 10000000; // Convert to crores
           const maxPrice = Math.max(...prices) / 10000000;
           const budgetMin = preferences.budgetRange[0] / 100; // Convert from lakhs to crores
@@ -180,8 +185,10 @@ export default function PropertyResults() {
           if (a.configurations.length === 0) return 1; // Put at end
           if (b.configurations.length === 0) return -1; // Put at end
           
-          const minPriceA = Math.min(...a.configurations.map(c => c.price));
-          const minPriceB = Math.min(...b.configurations.map(c => c.price));
+          const lowPricesA = a.configurations.map(c => parseFloat(c.pricePerSqft.toString()) * c.builtUpArea);
+          const lowPricesB = b.configurations.map(c => parseFloat(c.pricePerSqft.toString()) * c.builtUpArea);
+          const minPriceA = Math.min(...lowPricesA);
+          const minPriceB = Math.min(...lowPricesB);
           return minPriceA - minPriceB;
         case 'price-high':
           // Handle properties with no configurations
@@ -189,8 +196,10 @@ export default function PropertyResults() {
           if (a.configurations.length === 0) return 1; // Put at end
           if (b.configurations.length === 0) return -1; // Put at end
           
-          const maxPriceA = Math.max(...a.configurations.map(c => c.price));
-          const maxPriceB = Math.max(...b.configurations.map(c => c.price));
+          const highPricesA = a.configurations.map(c => parseFloat(c.pricePerSqft.toString()) * c.builtUpArea);
+          const highPricesB = b.configurations.map(c => parseFloat(c.pricePerSqft.toString()) * c.builtUpArea);
+          const maxPriceA = Math.max(...highPricesA);
+          const maxPriceB = Math.max(...highPricesB);
           return maxPriceB - maxPriceA;
         case 'name':
           return a.name.localeCompare(b.name);
@@ -225,7 +234,14 @@ export default function PropertyResults() {
 
   const getPriceRange = (configurations: PropertyConfiguration[]) => {
     if (!configurations.length) return "Price on request";
-    const prices = configurations.map(c => c.price);
+    
+    // Calculate actual prices using pricePerSqft * builtUpArea
+    const prices = configurations.map(c => {
+      const pricePerSqft = parseFloat(c.pricePerSqft.toString());
+      const builtUpArea = c.builtUpArea;
+      return pricePerSqft * builtUpArea;
+    });
+    
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
     
@@ -418,106 +434,157 @@ export default function PropertyResults() {
                 const matchInfo = getMatchLabel(property.matchScore);
                 
                 return (
-                  <Card key={property.id} className="hover:shadow-lg transition-shadow cursor-pointer group">
+                  <Card key={property.id} className="hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer group border-0 shadow-md bg-gradient-to-br from-white to-gray-50/50">
                     <div onClick={() => handleViewProperty(property)}>
-                      <CardHeader className="pb-3">
-                        <div className="flex items-start justify-between">
+                      <CardHeader className="pb-3 relative">
+                        {/* Status Badge */}
+                        <div className="absolute top-4 right-4 z-10">
+                          <Badge 
+                            className={`
+                              ${property.status === 'active' ? 'bg-green-100 text-green-800 border-green-200' : ''}
+                              ${property.status === 'pre-launch' ? 'bg-blue-100 text-blue-800 border-blue-200' : ''}
+                              ${property.status === 'under-construction' ? 'bg-orange-100 text-orange-800 border-orange-200' : ''}
+                              ${property.status === 'completed' ? 'bg-green-100 text-green-800 border-green-200' : ''}
+                              ${property.status === 'sold-out' ? 'bg-red-100 text-red-800 border-red-200' : ''}
+                              text-xs font-medium px-2 py-1 rounded-md
+                            `}
+                          >
+                            {property.status.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                          </Badge>
+                        </div>
+                        
+                        <div className="flex items-start justify-between pr-20">
                           <div className="flex-1">
-                            <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                            <CardTitle className="text-xl font-bold group-hover:text-primary transition-colors mb-2">
                               {property.name}
                             </CardTitle>
-                            <p className="text-sm text-gray-600 flex items-center mt-1">
-                              <MapPin className="h-3 w-3 mr-1" />
-                              {property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)}
+                            <p className="text-sm text-gray-600 flex items-center">
+                              <MapPin className="h-4 w-4 mr-2 text-primary" />
+                              {property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)} Bengaluru
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              By {property.developer}
                             </p>
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <Badge className={matchInfo.color}>
-                              {matchInfo.label}
-                            </Badge>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleFavorite(property.id);
-                              }}
-                            >
-                              <Heart 
-                                className={`h-4 w-4 ${
-                                  favorites.has(property.id) 
-                                    ? 'fill-red-500 text-red-500' 
-                                    : 'text-gray-400'
-                                }`} 
-                              />
-                            </Button>
-                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleFavorite(property.id);
+                            }}
+                            className="absolute top-12 right-4"
+                          >
+                            <Heart 
+                              className={`h-5 w-5 ${
+                                favorites.has(property.id) 
+                                  ? 'fill-red-500 text-red-500' 
+                                  : 'text-gray-400 hover:text-red-400'
+                              }`} 
+                            />
+                          </Button>
                         </div>
                       </CardHeader>
                       
                       <CardContent className="pt-0">
                         <div className="space-y-4">
                           {/* Property Image Placeholder */}
-                          <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-                            <div className="text-gray-400 text-center">
-                              <div className="text-2xl mb-1">🏢</div>
-                              <p className="text-xs">Property Image</p>
+                          <div className="aspect-[4/3] bg-gradient-to-br from-primary/5 to-primary/15 rounded-xl flex items-center justify-center group-hover:scale-[1.02] transition-transform duration-300 relative overflow-hidden border border-primary/10">
+                            <div className="text-primary/60 text-center">
+                              <div className="text-4xl mb-2">🏢</div>
+                              <p className="text-sm font-medium">Property Image</p>
                             </div>
+                            {/* Overlay gradient */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                           </div>
 
-                          {/* Price and Configuration */}
-                          <div className="space-y-2">
-                            <div className="text-lg font-semibold text-primary">
-                              {getPriceRange(property.configurations)}
+                          {/* Price Section - Enhanced */}
+                          <div className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-xl p-4 border border-primary/20">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center">
+                                <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center mr-3">
+                                  <IndianRupee className="h-5 w-5 text-primary" />
+                                </div>
+                                <div>
+                                  <p className="text-xs text-gray-600 font-medium">Price Range</p>
+                                  <div className="text-xl font-bold text-primary">
+                                    {getPriceRange(property.configurations)}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <Badge className={matchInfo.color + " text-xs font-semibold"}>
+                                  {matchInfo.label}
+                                </Badge>
+                                <div className="flex items-center mt-1">
+                                  <Star className="h-3 w-3 text-yellow-400 fill-current mr-1" />
+                                  <span className="text-xs text-gray-600">{property.matchScore}%</span>
+                                </div>
+                              </div>
                             </div>
-                            
-                            {property.configurations.length > 0 && (
-                              <div className="flex flex-wrap gap-1">
-                                {property.configurations.slice(0, 3).map((config, index) => (
-                                  <Badge key={index} variant="outline" className="text-xs">
+                          </div>
+                          
+                          {/* Configuration Types */}
+                          {property.configurations.length > 0 && (
+                            <div>
+                              <p className="text-xs text-gray-600 mb-2 font-medium">Available Configurations</p>
+                              <div className="flex flex-wrap gap-2">
+                                {property.configurations.slice(0, 4).map((config, index) => (
+                                  <Badge key={index} variant="outline" className="text-xs bg-white border-primary/30 text-gray-700 hover:bg-primary/5">
                                     {config.configuration}
                                   </Badge>
                                 ))}
-                                {property.configurations.length > 3 && (
-                                  <Badge variant="outline" className="text-xs">
-                                    +{property.configurations.length - 3} more
+                                {property.configurations.length > 4 && (
+                                  <Badge variant="outline" className="text-xs bg-white border-primary/30 text-gray-700">
+                                    +{property.configurations.length - 4} more
                                   </Badge>
                                 )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Key Features */}
+                          <div className="grid grid-cols-2 gap-3 text-xs">
+                            <div className="flex items-center">
+                              <Building className="h-4 w-4 text-primary mr-2" />
+                              <span className="text-gray-600">{property.type.charAt(0).toUpperCase() + property.type.slice(1)}</span>
+                            </div>
+                            <div className="flex items-center">
+                              <Calendar className="h-4 w-4 text-primary mr-2" />
+                              <span className="text-gray-600">
+                                {property.possessionDate === "immediate" ? "Ready" : property.possessionDate}
+                              </span>
+                            </div>
+                            {property.reraApproved && (
+                              <div className="flex items-center col-span-2">
+                                <Shield className="h-4 w-4 text-green-600 mr-2" />
+                                <span className="text-green-600 font-medium">RERA Approved</span>
                               </div>
                             )}
                           </div>
 
-                          {/* Tags */}
-                          <div className="flex flex-wrap gap-1">
-                            {property.tags.slice(0, 3).map(tag => (
-                              <Badge key={tag} variant="secondary" className="text-xs">
-                                {tag.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                              </Badge>
-                            ))}
-                          </div>
-
-                          {/* Match Score */}
-                          <div className="flex items-center space-x-2">
-                            <div className="flex items-center">
-                              <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                              <span className="text-sm font-medium ml-1">{property.matchScore}% Match</span>
+                          {/* Key Tags */}
+                          {property.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {property.tags.slice(0, 3).map(tag => (
+                                <Badge key={tag} variant="secondary" className="text-xs bg-gray-100 text-gray-700 hover:bg-gray-200">
+                                  {tag.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                </Badge>
+                              ))}
+                              {property.tags.length > 3 && (
+                                <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-700">
+                                  +{property.tags.length - 3} more
+                                </Badge>
+                              )}
                             </div>
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <span className="text-gray-400 cursor-help">ⓘ</span>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Match percentage based on your preferences</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </div>
+                          )}
                         </div>
                       </CardContent>
                     </div>
                     
                     {/* Action Buttons - Outside the clickable div */}
                     <CardContent className="pt-0 pb-4">
-                      <div className="flex space-x-2">
+                      <div className="flex space-x-3">
                         <Button 
                           variant="outline" 
                           size="sm"
@@ -525,10 +592,10 @@ export default function PropertyResults() {
                             e.stopPropagation();
                             handleBookVisit(property);
                           }}
-                          className="flex-1 flex items-center justify-center space-x-1"
+                          className="flex-1 flex items-center justify-center space-x-2 hover:bg-primary hover:text-white transition-colors border-primary/30"
                         >
-                          <Calendar className="h-3 w-3" />
-                          <span>Book Visit</span>
+                          <Calendar className="h-4 w-4" />
+                          <span className="font-medium">Book Visit</span>
                         </Button>
                         <Button 
                           size="sm"
@@ -536,10 +603,21 @@ export default function PropertyResults() {
                             e.stopPropagation();
                             handleConsult(property);
                           }}
-                          className="flex-1 flex items-center justify-center space-x-1"
+                          className="flex-1 flex items-center justify-center space-x-2 bg-primary hover:bg-primary/90 transition-colors shadow-md"
                         >
-                          <Phone className="h-3 w-3" />
-                          <span>Consult</span>
+                          <Phone className="h-4 w-4" />
+                          <span className="font-medium">Consult</span>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewProperty(property);
+                          }}
+                          className="px-3 border-primary/30 hover:bg-primary/5"
+                        >
+                          <Eye className="h-4 w-4" />
                         </Button>
                       </div>
                     </CardContent>
