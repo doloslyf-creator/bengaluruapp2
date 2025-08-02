@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -61,7 +60,12 @@ export default function TeamManagement() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data: InsertTeamMember) => apiRequest("/api/team-members", "POST", data),
+    mutationFn: (data: InsertTeamMember) => 
+      fetch("/api/team-members", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }).then(res => res.json()),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/team-members"] });
       setIsDialogOpen(false);
@@ -82,7 +86,11 @@ export default function TeamManagement() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<InsertTeamMember> }) =>
-      apiRequest(`/api/team-members/${id}`, "PUT", data),
+      fetch(`/api/team-members/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }).then(res => res.json()),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/team-members"] });
       setIsDialogOpen(false);
@@ -103,7 +111,10 @@ export default function TeamManagement() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiRequest(`/api/team-members/${id}`, "DELETE"),
+    mutationFn: (id: string) => 
+      fetch(`/api/team-members/${id}`, {
+        method: "DELETE",
+      }).then(res => res.json()),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/team-members"] });
       toast({
