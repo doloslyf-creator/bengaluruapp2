@@ -12,6 +12,7 @@ import {
   DollarSign,
   Clock,
   User,
+  UserPlus,
   Building,
   FileText,
   MessageSquare,
@@ -90,6 +91,26 @@ export default function Customers() {
   const [showCustomerDialog, setShowCustomerDialog] = useState(false);
   const [newNote, setNewNote] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
+  const [showAddCustomerDialog, setShowAddCustomerDialog] = useState(false);
+  const [showAddLeadDialog, setShowAddLeadDialog] = useState(false);
+  const [newCustomerForm, setNewCustomerForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    source: "",
+    interestedProperties: [] as string[],
+    notes: ""
+  });
+  const [newLeadForm, setNewLeadForm] = useState({
+    customerName: "",
+    customerEmail: "",
+    customerPhone: "",
+    source: "",
+    budget: "",
+    propertyType: "",
+    location: "",
+    notes: ""
+  });
 
   const { data: customers = [], isLoading } = useQuery<CustomerProfile[]>({
     queryKey: ["/api/customers"],
@@ -139,6 +160,66 @@ export default function Customers() {
     },
   });
 
+  const addCustomerMutation = useMutation({
+    mutationFn: (customerData: typeof newCustomerForm) => 
+      apiRequest("POST", "/api/customers", customerData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/customers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/customers/stats"] });
+      setShowAddCustomerDialog(false);
+      setNewCustomerForm({
+        name: "",
+        email: "",
+        phone: "",
+        source: "",
+        interestedProperties: [],
+        notes: ""
+      });
+      toast({
+        title: "Customer Added",
+        description: "New customer has been added successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to add customer",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const addLeadMutation = useMutation({
+    mutationFn: (leadData: typeof newLeadForm) => 
+      apiRequest("POST", "/api/leads", leadData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/customers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/customers/stats"] });
+      setShowAddLeadDialog(false);
+      setNewLeadForm({
+        customerName: "",
+        customerEmail: "",
+        customerPhone: "",
+        source: "",
+        budget: "",
+        propertyType: "",
+        location: "",
+        notes: ""
+      });
+      toast({
+        title: "Lead Added",
+        description: "New lead has been created successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to add lead",
+        variant: "destructive",
+      });
+    },
+  });
+
   const filteredCustomers = useMemo(() => {
     return customers.filter(customer => {
       const matchesSearch = 
@@ -177,6 +258,30 @@ export default function Customers() {
 
   const handleStatusUpdate = (customerId: string, newStatus: string) => {
     updateCustomerStatusMutation.mutate({ customerId, status: newStatus });
+  };
+
+  const handleAddCustomer = () => {
+    if (newCustomerForm.name && newCustomerForm.email && newCustomerForm.phone) {
+      addCustomerMutation.mutate(newCustomerForm);
+    } else {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields (name, email, phone)",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAddLead = () => {
+    if (newLeadForm.customerName && newLeadForm.customerEmail && newLeadForm.source) {
+      addLeadMutation.mutate(newLeadForm);
+    } else {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields (name, email, source)",
+        variant: "destructive",
+      });
+    }
   };
 
   // Sub-menu items for customer management
@@ -244,7 +349,7 @@ export default function Customers() {
                 <Upload className="h-4 w-4 mr-2" />
                 Import
               </Button>
-              <Button size="sm">
+              <Button size="sm" onClick={() => setShowAddCustomerDialog(true)}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Customer
               </Button>
@@ -1221,7 +1326,7 @@ export default function Customers() {
                         <Download className="h-4 w-4 mr-2" />
                         Export Leads
                       </Button>
-                      <Button size="sm">
+                      <Button size="sm" onClick={() => setShowAddLeadDialog(true)}>
                         <Plus className="h-4 w-4 mr-2" />
                         Add Lead
                       </Button>
@@ -2189,6 +2294,206 @@ export default function Customers() {
           )}
         </div>
       </div>
+
+      {/* Add Customer Dialog */}
+      <Dialog open={showAddCustomerDialog} onOpenChange={setShowAddCustomerDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <UserPlus className="h-5 w-5 mr-2" />
+              Add New Customer
+            </DialogTitle>
+            <DialogDescription>
+              Add a new customer to your CRM system
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Name *</label>
+              <Input
+                placeholder="Enter customer name"
+                value={newCustomerForm.name}
+                onChange={(e) => setNewCustomerForm({...newCustomerForm, name: e.target.value})}
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium">Email *</label>
+              <Input
+                type="email"
+                placeholder="customer@example.com"
+                value={newCustomerForm.email}
+                onChange={(e) => setNewCustomerForm({...newCustomerForm, email: e.target.value})}
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium">Phone *</label>
+              <Input
+                placeholder="+91 98765 43210"
+                value={newCustomerForm.phone}
+                onChange={(e) => setNewCustomerForm({...newCustomerForm, phone: e.target.value})}
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium">Source</label>
+              <Select value={newCustomerForm.source} onValueChange={(value) => setNewCustomerForm({...newCustomerForm, source: value})}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select lead source" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="website">Website</SelectItem>
+                  <SelectItem value="referral">Referral</SelectItem>
+                  <SelectItem value="social_media">Social Media</SelectItem>
+                  <SelectItem value="advertisement">Advertisement</SelectItem>
+                  <SelectItem value="walk_in">Walk-in</SelectItem>
+                  <SelectItem value="phone_call">Phone Call</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium">Notes</label>
+              <Textarea
+                placeholder="Add any additional notes..."
+                value={newCustomerForm.notes}
+                onChange={(e) => setNewCustomerForm({...newCustomerForm, notes: e.target.value})}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2 pt-4">
+            <Button variant="outline" onClick={() => setShowAddCustomerDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddCustomer} disabled={addCustomerMutation.isPending}>
+              {addCustomerMutation.isPending ? "Adding..." : "Add Customer"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Lead Dialog */}
+      <Dialog open={showAddLeadDialog} onOpenChange={setShowAddLeadDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <Target className="h-5 w-5 mr-2" />
+              Add New Lead
+            </DialogTitle>
+            <DialogDescription>
+              Create a new lead for lead management and nurturing
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Customer Name *</label>
+              <Input
+                placeholder="Enter customer name"
+                value={newLeadForm.customerName}
+                onChange={(e) => setNewLeadForm({...newLeadForm, customerName: e.target.value})}
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium">Email *</label>
+              <Input
+                type="email"
+                placeholder="customer@example.com"
+                value={newLeadForm.customerEmail}
+                onChange={(e) => setNewLeadForm({...newLeadForm, customerEmail: e.target.value})}
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium">Phone</label>
+              <Input
+                placeholder="+91 98765 43210"
+                value={newLeadForm.customerPhone}
+                onChange={(e) => setNewLeadForm({...newLeadForm, customerPhone: e.target.value})}
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium">Source *</label>
+              <Select value={newLeadForm.source} onValueChange={(value) => setNewLeadForm({...newLeadForm, source: value})}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select lead source" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="website">Website</SelectItem>
+                  <SelectItem value="referral">Referral</SelectItem>
+                  <SelectItem value="social_media">Social Media</SelectItem>
+                  <SelectItem value="advertisement">Advertisement</SelectItem>
+                  <SelectItem value="walk_in">Walk-in</SelectItem>
+                  <SelectItem value="phone_call">Phone Call</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium">Budget Range</label>
+              <Select value={newLeadForm.budget} onValueChange={(value) => setNewLeadForm({...newLeadForm, budget: value})}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select budget range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="under_50L">Under ₹50L</SelectItem>
+                  <SelectItem value="50L_1Cr">₹50L - ₹1Cr</SelectItem>
+                  <SelectItem value="1Cr_2Cr">₹1Cr - ₹2Cr</SelectItem>
+                  <SelectItem value="2Cr_5Cr">₹2Cr - ₹5Cr</SelectItem>
+                  <SelectItem value="above_5Cr">Above ₹5Cr</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium">Property Type</label>
+              <Select value={newLeadForm.propertyType} onValueChange={(value) => setNewLeadForm({...newLeadForm, propertyType: value})}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select property type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="apartment">Apartment</SelectItem>
+                  <SelectItem value="villa">Villa</SelectItem>
+                  <SelectItem value="plot">Plot</SelectItem>
+                  <SelectItem value="commercial">Commercial</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium">Preferred Location</label>
+              <Input
+                placeholder="e.g., Whitefield, HSR Layout"
+                value={newLeadForm.location}
+                onChange={(e) => setNewLeadForm({...newLeadForm, location: e.target.value})}
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium">Notes</label>
+              <Textarea
+                placeholder="Add any additional lead notes..."
+                value={newLeadForm.notes}
+                onChange={(e) => setNewLeadForm({...newLeadForm, notes: e.target.value})}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2 pt-4">
+            <Button variant="outline" onClick={() => setShowAddLeadDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddLead} disabled={addLeadMutation.isPending}>
+              {addLeadMutation.isPending ? "Adding..." : "Add Lead"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }

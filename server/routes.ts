@@ -1430,6 +1430,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create new customer directly
+  app.post("/api/customers", async (req, res) => {
+    try {
+      const { name, email, phone, source, notes } = req.body;
+      
+      // Validate required fields
+      if (!name || !email || !phone) {
+        return res.status(400).json({ error: "Name, email, and phone are required" });
+      }
+      
+      // Create a lead for this customer since our system is lead-based
+      const leadData = {
+        leadId: `LD${Date.now()}${Math.floor(Math.random() * 1000)}`,
+        source: source || "manual",
+        customerName: name,
+        phone: phone,
+        email: email,
+        leadType: "warm" as const,
+        priority: "medium" as const,
+        leadScore: 40,
+        status: "new" as const,
+        leadDetails: notes ? { customerNotes: notes } : undefined,
+      };
+      
+      const validatedData = insertLeadSchema.parse(leadData);
+      const lead = await storage.createLead(validatedData);
+      
+      // Add initial activity if notes were provided
+      if (notes) {
+        await storage.addLeadActivity({
+          leadId: lead.id,
+          activityType: "note",
+          subject: "Customer created with initial notes",
+          description: notes,
+          outcome: "neutral",
+          performedBy: "admin",
+        });
+      }
+      
+      console.log(`👤 Manual customer created: ${name} (${email})`);
+      res.status(201).json({
+        id: email,
+        name,
+        email,
+        phone,
+        status: "warm",
+        leadId: lead.leadId,
+        source: source || "manual",
+        message: "Customer created successfully"
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid customer data", details: error.errors });
+      }
+      console.error("Error creating customer:", error);
+      res.status(500).json({ error: "Failed to create customer" });
+    }
+  });
+
   // Customer CRM API - Add customer note
   app.post("/api/customers/:customerId/notes", async (req, res) => {
     try {
