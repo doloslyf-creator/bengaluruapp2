@@ -566,66 +566,161 @@ export default function EnhancedUserPanel() {
               </TabsContent>
 
               <TabsContent value="reports" className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center">
-                        <Calculator className="h-5 w-5 mr-2" />
-                        Valuation Reports
+                {/* Reports Grid - Aligned Layout */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Property Valuation Reports */}
+                  <Card className="border-l-4 border-l-green-500">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="flex items-center text-lg">
+                        <div className="p-2 bg-green-100 rounded-lg mr-3">
+                          <Calculator className="h-5 w-5 text-green-600" />
+                        </div>
+                        <div>
+                          <div className="text-gray-900">Property Valuation</div>
+                          <div className="text-sm text-gray-500 font-normal">Market Analysis Reports</div>
+                        </div>
                       </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                      <div className="text-center py-6">
-                        <div className="text-3xl font-bold text-primary mb-2">2</div>
-                        <p className="text-gray-600 mb-4">Reports Available</p>
-                        <Link href="/user-valuation-reports">
-                          <Button>View Reports</Button>
+                    <CardContent className="pt-0">
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="text-2xl font-bold text-green-600">2</div>
+                            <div className="text-sm text-gray-600">Reports Available</div>
+                          </div>
+                          <Badge className="bg-green-50 text-green-700 border-green-200">Active</Badge>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">Latest Report</span>
+                            <span className="font-medium">15 Dec 2024</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">Average Value</span>
+                            <span className="font-medium text-green-600">₹1.4Cr</span>
+                          </div>
+                        </div>
+                        <Link href="/user-valuation-reports" className="block">
+                          <Button className="w-full bg-green-600 hover:bg-green-700">
+                            <Eye className="h-4 w-4 mr-2" />
+                            View Reports
+                          </Button>
                         </Link>
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center">
-                        <Building className="h-5 w-5 mr-2" />
-                        CIVIL+MEP Reports
+                  {/* CIVIL+MEP Reports */}
+                  <Card className="border-l-4 border-l-purple-500">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="flex items-center text-lg">
+                        <div className="p-2 bg-purple-100 rounded-lg mr-3">
+                          <Building className="h-5 w-5 text-purple-600" />
+                        </div>
+                        <div>
+                          <div className="text-gray-900">CIVIL+MEP Reports</div>
+                          <div className="text-sm text-gray-500 font-normal">Engineering Assessments</div>
+                        </div>
                       </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                      <div className="text-center py-6">
-                        <div className="text-3xl font-bold text-primary mb-2">1</div>
-                        <p className="text-gray-600 mb-4">Engineering Report</p>
-                        <Link href="/user-civil-mep-reports">
-                          <Button>View Reports</Button>
+                    <CardContent className="pt-0">
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="text-2xl font-bold text-purple-600">1</div>
+                            <div className="text-sm text-gray-600">Engineering Report</div>
+                          </div>
+                          <Badge className="bg-purple-50 text-purple-700 border-purple-200">Completed</Badge>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">Latest Report</span>
+                            <span className="font-medium">12 Dec 2024</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">Report Cost</span>
+                            <span className="font-medium text-purple-600">₹25,000</span>
+                          </div>
+                        </div>
+                        <Link href="/user-civil-mep-reports" className="block">
+                          <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                            <Eye className="h-4 w-4 mr-2" />
+                            View Reports
+                          </Button>
+                        </Link>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Legal Due Diligence */}
+                  <Card className="border-l-4 border-l-orange-500">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="flex items-center text-lg">
+                        <div className="p-2 bg-orange-100 rounded-lg mr-3">
+                          <Scale className="h-5 w-5 text-orange-600" />
+                        </div>
+                        <div>
+                          <div className="text-gray-900">Legal Due Diligence</div>
+                          <div className="text-sm text-gray-500 font-normal">Verification Tracker</div>
+                        </div>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="text-2xl font-bold text-orange-600">85%</div>
+                            <div className="text-sm text-gray-600">Verification Complete</div>
+                          </div>
+                          <Badge className="bg-orange-50 text-orange-700 border-orange-200">In Progress</Badge>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">Active Properties</span>
+                            <span className="font-medium">2 Properties</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">Pending Steps</span>
+                            <span className="font-medium text-orange-600">3 Steps</span>
+                          </div>
+                        </div>
+                        <Link href="/user-legal-tracker-enhanced" className="block">
+                          <Button className="w-full bg-orange-600 hover:bg-orange-700">
+                            <Activity className="h-4 w-4 mr-2" />
+                            Track Progress
+                          </Button>
                         </Link>
                       </div>
                     </CardContent>
                   </Card>
                 </div>
 
-                <Card>
+                {/* Report Summary Card */}
+                <Card className="mt-6">
                   <CardHeader>
                     <CardTitle className="flex items-center">
-                      <Scale className="h-5 w-5 mr-2" />
-                      Legal Due Diligence Tracker
+                      <BarChart3 className="h-5 w-5 mr-2" />
+                      Reports Summary
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-center py-6">
-                      <div className="flex items-center justify-center space-x-4 mb-4">
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-green-600">85%</div>
-                          <p className="text-xs text-gray-600">Complete</p>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-blue-600">2</div>
-                          <p className="text-xs text-gray-600">Properties</p>
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-blue-600 mb-1">5</div>
+                        <div className="text-sm text-gray-600">Total Reports</div>
                       </div>
-                      <Link href="/user-legal-tracker-enhanced">
-                        <Button>Track Progress</Button>
-                      </Link>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-green-600 mb-1">₹45K</div>
+                        <div className="text-sm text-gray-600">Total Investment</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-purple-600 mb-1">92%</div>
+                        <div className="text-sm text-gray-600">Avg Completion</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-orange-600 mb-1">3</div>
+                        <div className="text-sm text-gray-600">Active Trackers</div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
