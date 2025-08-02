@@ -36,6 +36,7 @@ The API follows RESTful principles, providing standard CRUD operations for entit
 - **Lead Management System**: Comprehensive lead management with automated scoring (15-30 points per activity), qualification criteria (BANT methodology), conversion funnel visualization, pipeline management, and nurturing campaigns with performance analytics.
 - **Blog Management System**: Admin panel for full CRUD operations on blog posts, content categories, and SEO metadata.
 - **Branding**: "OwnItRight" brand update across the application with a custom wordmark logo.
+- **Enhanced Home Pages & Global Header**: Complete redesign of both customer-facing and admin home pages with modern, mobile-responsive design. Global header with scroll effects, comprehensive navigation, services dropdown, and enhanced mobile menu experience.
 
 ## External Dependencies
 
