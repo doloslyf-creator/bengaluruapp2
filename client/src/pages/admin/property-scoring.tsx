@@ -103,12 +103,12 @@ export default function PropertyScoring() {
   const queryClient = useQueryClient();
 
   // Fetch properties
-  const { data: properties = [], isLoading: propertiesLoading } = useQuery({
+  const { data: properties = [], isLoading: propertiesLoading } = useQuery<Property[]>({
     queryKey: ["/api/properties"]
   });
 
   // Fetch all property scores
-  const { data: propertyScores = [], isLoading: scoresLoading } = useQuery({
+  const { data: propertyScores = [], isLoading: scoresLoading } = useQuery<PropertyScore[]>({
     queryKey: ["/api/property-scores"]
   });
 
@@ -117,7 +117,7 @@ export default function PropertyScoring() {
     mutationFn: async (data: InsertPropertyScore) => {
       if (isEditMode && selectedProperty) {
         // Find existing score for this property
-        const existingScore = propertyScores.find(s => s.propertyId === selectedProperty.id);
+        const existingScore = propertyScores.find((s: PropertyScore) => s.propertyId === selectedProperty.id);
         if (existingScore) {
           return apiRequest("PATCH", `/api/property-scores/${existingScore.id}`, data);
         }
@@ -205,8 +205,8 @@ export default function PropertyScoring() {
   };
 
   // Get properties with their scores
-  const propertiesWithScores = properties.map(property => {
-    const score = propertyScores.find(s => s.propertyId === property.id);
+  const propertiesWithScores = properties.map((property: Property) => {
+    const score = propertyScores.find((s: PropertyScore) => s.propertyId === property.id);
     return { property, score };
   });
 
@@ -241,7 +241,7 @@ export default function PropertyScoring() {
                 <span className="text-sm text-gray-600">A+ Properties</span>
               </div>
               <div className="text-2xl font-bold text-green-600">
-                {propertyScores.filter(s => s.overallGrade === "A+").length}
+                {propertyScores.filter((s: PropertyScore) => s.overallGrade === "A+").length}
               </div>
             </CardContent>
           </Card>
@@ -253,7 +253,7 @@ export default function PropertyScoring() {
               </div>
               <div className="text-2xl font-bold text-blue-600">
                 {propertyScores.length > 0 
-                  ? Math.round(propertyScores.reduce((sum, s) => sum + s.overallScoreTotal, 0) / propertyScores.length)
+                  ? Math.round(propertyScores.reduce((sum: number, s: PropertyScore) => sum + s.overallScoreTotal, 0) / propertyScores.length)
                   : 0
                 }
               </div>
@@ -290,7 +290,7 @@ export default function PropertyScoring() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {propertiesWithScores.map(({ property, score }) => (
+              {propertiesWithScores.map(({ property, score }: { property: Property; score?: PropertyScore }) => (
                 <div key={property.id} className="border rounded-lg p-4 bg-white">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
