@@ -440,7 +440,7 @@ export default function CivilMepReportsForm() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50" style={{ paddingTop: '100px' }}>
       <Header />
       
       {/* Progress Bar */}

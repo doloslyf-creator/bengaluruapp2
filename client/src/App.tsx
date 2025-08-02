@@ -31,6 +31,7 @@ import PropertyEdit from "@/pages/property-edit";
 import PropertyDetail from "@/pages/property-detail";
 import FindProperty from "@/pages/find-property";
 import PropertyValuation from "@/pages/property-valuation";
+import PropertyValuationForm from "@/pages/property-valuation-form";
 import PropertyResults from "@/pages/property-results";
 import BookVisit from "@/pages/book-visit";
 import Consultation from "@/pages/consultation";
@@ -87,6 +88,7 @@ function Router() {
       <Route path="/find-property/results" component={PropertyResults} />
       <Route path="/property/:id" component={PropertyDetail} />
       <Route path="/property-valuation" component={PropertyValuation} />
+      <Route path="/property-valuation/form" component={PropertyValuationForm} />
       <Route path="/civil-mep-reports" component={CivilMepReportsPage} />
       <Route path="/civil-mep-reports/form" component={CivilMepReportsForm} />
       <Route path="/legal-due-diligence" component={LegalDueDiligencePage} />
