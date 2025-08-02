@@ -16,7 +16,7 @@ import {
   Zap, Wrench, Shield, Home
 } from "lucide-react";
 import { StatsCardSkeleton, TableSkeleton } from "@/components/ui/skeleton";
-// Note: Using simple navigation structure instead of complex layout components
+import AdminLayout from "@/components/layout/admin-layout";
 
 const CivilMepReports = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -129,21 +129,8 @@ const CivilMepReports = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Simple Admin Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-lg font-semibold text-gray-900">PropertyPro Admin</h1>
-          <nav className="flex space-x-4">
-            <a href="/admin-panel" className="text-gray-600 hover:text-gray-900">Dashboard</a>
-            <a href="/admin-panel/leads" className="text-gray-600 hover:text-gray-900">Leads</a>
-            <a href="/admin-panel/blog" className="text-gray-600 hover:text-gray-900">Blog</a>
-            <a href="/admin-panel/civil-mep-reports" className="text-violet-600 font-medium">CIVIL+MEP Reports</a>
-          </nav>
-        </div>
-      </div>
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <AdminLayout title="CIVIL+MEP Reports" subtitle="Manage comprehensive property engineering analysis reports">
+      <div className="p-6">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
@@ -841,7 +828,7 @@ const CivilMepReports = () => {
           </DialogContent>
         </Dialog>
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 

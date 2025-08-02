@@ -29,6 +29,7 @@ import {
 import { Plus, Search, Eye, Edit, Trash2, FileText, Users, TrendingUp, Clock } from "lucide-react";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
+import AdminLayout from "@/components/layout/admin-layout";
 import type { BlogPost } from "@shared/schema";
 import BlogEditor from "@/components/blog/blog-editor";
 
@@ -111,29 +112,8 @@ export default function BlogManagement() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Fixed Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900">Blog Management</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <nav className="flex space-x-8">
-                <Link href="/admin-panel" className="text-gray-600 hover:text-gray-900">Dashboard</Link>
-                <Link href="/admin-panel/analytics" className="text-gray-600 hover:text-gray-900">Analytics</Link>
-                <Link href="/admin-panel/leads" className="text-gray-600 hover:text-gray-900">Leads</Link>
-                <Link href="/admin-panel/developers" className="text-gray-600 hover:text-gray-900">Developers</Link>
-                <Link href="/admin-panel/zones" className="text-gray-600 hover:text-gray-900">Zones</Link>
-                <Link href="/admin-panel/blog" className="text-violet-600 font-medium">Blog</Link>
-              </nav>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <AdminLayout title="Blog Management">
+      <div className="p-6">
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
@@ -322,6 +302,6 @@ export default function BlogManagement() {
           </DialogContent>
         </Dialog>
       </div>
-    </div>
+    </AdminLayout>
   );
 }

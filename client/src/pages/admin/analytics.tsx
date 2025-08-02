@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { type Property, type PropertyConfiguration } from "@shared/schema";
 import { formatPriceInCrores } from "@/lib/utils";
+import AdminLayout from "@/components/layout/admin-layout";
 
 export default function AdminAnalytics() {
 
@@ -42,33 +43,8 @@ export default function AdminAnalytics() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
-              <p className="text-gray-600">Property insights and market analysis</p>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <nav className="flex space-x-8">
-                <Link href="/admin-panel" className="text-gray-600 hover:text-gray-900">Dashboard</Link>
-                <Link href="/admin-panel/analytics" className="text-violet-600 font-medium">Analytics</Link>
-                <Link href="/admin-panel/leads" className="text-gray-600 hover:text-gray-900">Leads</Link>
-                <Link href="/admin-panel/blog" className="text-gray-600 hover:text-gray-900">Blog</Link>
-                <Link href="/admin-panel/developers" className="text-gray-600 hover:text-gray-900">Developers</Link>
-                <Link href="/admin-panel/zones" className="text-gray-600 hover:text-gray-900">Zones</Link>
-              </nav>
-              
-
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <AdminLayout title="Analytics Dashboard">
+      <div className="p-6">
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>
@@ -187,6 +163,6 @@ export default function AdminAnalytics() {
           </Card>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }

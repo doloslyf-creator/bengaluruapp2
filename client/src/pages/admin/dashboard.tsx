@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import AdminLayout from "@/components/layout/admin-layout";
 import { type Property, type PropertyStats } from "@shared/schema";
 
 export default function AdminDashboard() {
@@ -84,33 +85,8 @@ export default function AdminDashboard() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Property Admin Panel</h1>
-              <p className="text-gray-600">Welcome back, Admin</p>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <nav className="flex space-x-8">
-                <Link href="/admin-panel" className="text-violet-600 font-medium">Dashboard</Link>
-                <Link href="/admin-panel/analytics" className="text-gray-600 hover:text-gray-900">Analytics</Link>
-                <Link href="/admin-panel/leads" className="text-gray-600 hover:text-gray-900">Leads</Link>
-                <Link href="/admin-panel/blog" className="text-gray-600 hover:text-gray-900">Blog</Link>
-                <Link href="/admin-panel/developers" className="text-gray-600 hover:text-gray-900">Developers</Link>
-                <Link href="/admin-panel/zones" className="text-gray-600 hover:text-gray-900">Zones</Link>
-              </nav>
-              
-
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <AdminLayout title="Property Management Dashboard">
+      <div className="p-6">
         {/* Stats */}
         {stats && <StatsCards stats={stats} />}
 
@@ -180,19 +156,19 @@ export default function AdminDashboard() {
             </div>
           )}
         </div>
-      </div>
 
-      {/* Dialogs */}
-      <AddPropertyDialog 
-        open={showAddDialog} 
-        onOpenChange={setShowAddDialog}
-      />
-      
-      <PropertyDetailsDialog
-        property={selectedProperty}
-        open={showDetailsDialog}
-        onOpenChange={setShowDetailsDialog}
-      />
-    </div>
+        {/* Dialogs */}
+        <AddPropertyDialog 
+          open={showAddDialog} 
+          onOpenChange={setShowAddDialog}
+        />
+        
+        <PropertyDetailsDialog
+          property={selectedProperty}
+          open={showDetailsDialog}
+          onOpenChange={setShowDetailsDialog}
+        />
+      </div>
+    </AdminLayout>
   );
 }
