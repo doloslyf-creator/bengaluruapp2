@@ -6,7 +6,8 @@ import {
   Star, Heart, Share2, Phone, MessageCircle, CheckCircle, 
   Info, Award, Shield, TrendingUp, Clock, Eye, Camera,
   Bed, Bath, Car, TreePine, Dumbbell, ShoppingCart, Wifi,
-  Waves, Zap, Home, ExternalLink, Download, ChevronLeft, ChevronRight, Play, BarChart3
+  Waves, Zap, Home, ExternalLink, Download, ChevronLeft, ChevronRight, Play, BarChart3,
+  Target, CheckCircle2, AlertCircle, XCircle, TrendingUp as TrendingUpIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,6 +30,205 @@ const extractYouTubeVideoId = (url: string): string => {
   const match = url.match(regex);
   return match ? match[1] : '';
 };
+
+// Property Match Analysis Component
+interface PropertyMatchAnalysisProps {
+  property: PropertyWithConfigurations;
+}
+
+function PropertyMatchAnalysis({ property }: PropertyMatchAnalysisProps) {
+  const [customerPreferences, setCustomerPreferences] = useState<any>(null);
+
+  useEffect(() => {
+    // Get customer search preferences from localStorage
+    const searchPrefs = localStorage.getItem('searchPreferences');
+    if (searchPrefs) {
+      try {
+        setCustomerPreferences(JSON.parse(searchPrefs));
+      } catch (error) {
+        console.error('Error parsing search preferences:', error);
+      }
+    }
+  }, []);
+
+  if (!customerPreferences) {
+    return null; // Don't show if no search preferences found
+  }
+
+  // Calculate match score using weighted algorithm
+  const calculateMatchScore = () => {
+    let score = 0;
+    const criteria = [];
+
+    // Property Type Match (30% weight)
+    if (customerPreferences.propertyType && customerPreferences.propertyType !== 'any') {
+      if (property.type === customerPreferences.propertyType) {
+        score += 30;
+        criteria.push({ name: 'Property Type', status: 'perfect', points: 30, reason: `Exact match: ${property.type}` });
+      } else {
+        criteria.push({ name: 'Property Type', status: 'mismatch', points: 0, reason: `Looking for ${customerPreferences.propertyType}, found ${property.type}` });
+      }
+    }
+
+    // Zone Match (25% weight)
+    if (customerPreferences.zones && customerPreferences.zones.length > 0) {
+      if (customerPreferences.zones.includes(property.zone)) {
+        score += 25;
+        criteria.push({ name: 'Location Zone', status: 'perfect', points: 25, reason: `Perfect zone match: ${property.zone}` });
+      } else {
+        criteria.push({ name: 'Location Zone', status: 'mismatch', points: 0, reason: `Preferred zones: ${customerPreferences.zones.join(', ')}, found: ${property.zone}` });
+      }
+    }
+
+    // Budget Match (25% weight)
+    if (customerPreferences.budgetRange) {
+      const [minBudget, maxBudget] = customerPreferences.budgetRange;
+      // Calculate price range from configurations
+      const prices = property.configurations?.map((c: any) => c.price) || [];
+      const propertyMinPrice = prices.length > 0 ? Math.min(...prices) / 100000 : 0; // Convert to lakhs
+      const propertyMaxPrice = prices.length > 0 ? Math.max(...prices) / 100000 : 0;
+      
+      if (propertyMinPrice >= minBudget && propertyMaxPrice <= maxBudget) {
+        score += 25;
+        criteria.push({ name: 'Budget', status: 'perfect', points: 25, reason: `Within budget: ₹${minBudget}L - ₹${maxBudget}L` });
+      } else if (propertyMinPrice <= maxBudget && propertyMaxPrice >= minBudget) {
+        score += 15;
+        criteria.push({ name: 'Budget', status: 'partial', points: 15, reason: `Partial overlap with budget: ₹${minBudget}L - ₹${maxBudget}L` });
+      } else {
+        criteria.push({ name: 'Budget', status: 'mismatch', points: 0, reason: `Budget ₹${minBudget}L - ₹${maxBudget}L vs Property ₹${propertyMinPrice}L - ₹${propertyMaxPrice}L` });
+      }
+    }
+
+    // Tags/Features Match (15% weight)
+    if (customerPreferences.tags && customerPreferences.tags.length > 0) {
+      const propertyTags = property.tags || [];
+      const matchingTags = customerPreferences.tags.filter((tag: string) => propertyTags.includes(tag));
+      const tagScore = (matchingTags.length / customerPreferences.tags.length) * 15;
+      score += tagScore;
+      
+      if (matchingTags.length > 0) {
+        criteria.push({ 
+          name: 'Features', 
+          status: matchingTags.length === customerPreferences.tags.length ? 'perfect' : 'partial', 
+          points: Math.round(tagScore), 
+          reason: `${matchingTags.length}/${customerPreferences.tags.length} preferred features: ${matchingTags.join(', ')}` 
+        });
+      } else {
+        criteria.push({ name: 'Features', status: 'mismatch', points: 0, reason: `None of your preferred features: ${customerPreferences.tags.join(', ')}` });
+      }
+    }
+
+    // BHK Match (5% weight)
+    if (customerPreferences.bhk && customerPreferences.bhk !== 'any') {
+      // Check if any configuration matches the BHK preference
+      const configurations = property.configurations || [];
+      const hasMatchingBHK = configurations.some((config: any) => 
+        config.configuration.toLowerCase().includes(customerPreferences.bhk.toLowerCase())
+      );
+      
+      if (hasMatchingBHK) {
+        score += 5;
+        criteria.push({ name: 'Configuration', status: 'perfect', points: 5, reason: `${customerPreferences.bhk} configuration available` });
+      } else {
+        criteria.push({ name: 'Configuration', status: 'mismatch', points: 0, reason: `Looking for ${customerPreferences.bhk}, other configurations available` });
+      }
+    }
+
+    return { score: Math.round(score), criteria };
+  };
+
+  const { score, criteria } = calculateMatchScore();
+
+  // Determine match level and styling
+  const getMatchLevel = (score: number) => {
+    if (score >= 80) return { level: 'Great Match', bgColor: 'bg-green-50 border-green-200', textColor: 'text-green-800', iconColor: 'text-green-600' };
+    if (score >= 60) return { level: 'Good Match', bgColor: 'bg-blue-50 border-blue-200', textColor: 'text-blue-800', iconColor: 'text-blue-600' };
+    if (score >= 40) return { level: 'Fair Match', bgColor: 'bg-yellow-50 border-yellow-200', textColor: 'text-yellow-800', iconColor: 'text-yellow-600' };
+    return { level: 'Partial Match', bgColor: 'bg-orange-50 border-orange-200', textColor: 'text-orange-800', iconColor: 'text-orange-600' };
+  };
+
+  const matchInfo = getMatchLevel(score);
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'perfect': return <CheckCircle2 className="h-4 w-4 text-green-600" />;
+      case 'partial': return <AlertCircle className="h-4 w-4 text-yellow-600" />;
+      case 'mismatch': return <XCircle className="h-4 w-4 text-red-600" />;
+      default: return <CheckCircle2 className="h-4 w-4 text-gray-400" />;
+    }
+  };
+
+  return (
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <Card className={`border-2 ${matchInfo.bgColor} ${matchInfo.textColor}`}>
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className={`p-2 rounded-full bg-white`}>
+                <Target className={`h-6 w-6 ${matchInfo.iconColor}`} />
+              </div>
+              <div>
+                <CardTitle className={`text-xl ${matchInfo.textColor}`}>
+                  {matchInfo.level} ({score}/100)
+                </CardTitle>
+                <p className="text-sm opacity-80 mt-1">
+                  Based on your search preferences from {new Date(customerPreferences.timestamp || Date.now()).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className={`text-2xl font-bold ${matchInfo.textColor}`}>{score}%</div>
+              <Progress value={score} className="w-20 mt-1" />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-4">
+            <h4 className="font-medium mb-2 text-gray-700">Your Search Criteria:</h4>
+            <div className="flex flex-wrap gap-2 text-sm">
+              {customerPreferences.propertyType && customerPreferences.propertyType !== 'any' && (
+                <Badge variant="outline">Type: {customerPreferences.propertyType}</Badge>
+              )}
+              {customerPreferences.zones && customerPreferences.zones.length > 0 && (
+                <Badge variant="outline">Zones: {customerPreferences.zones.join(', ')}</Badge>
+              )}
+              {customerPreferences.budgetRange && (
+                <Badge variant="outline">Budget: ₹{customerPreferences.budgetRange[0]}L - ₹{customerPreferences.budgetRange[1]}L</Badge>
+              )}
+              {customerPreferences.bhk && customerPreferences.bhk !== 'any' && (
+                <Badge variant="outline">Config: {customerPreferences.bhk}</Badge>
+              )}
+              {customerPreferences.tags && customerPreferences.tags.length > 0 && (
+                <Badge variant="outline">Features: {customerPreferences.tags.length} selected</Badge>
+              )}
+            </div>
+          </div>
+          
+          <div>
+            <h4 className="font-medium mb-3 text-gray-700">Match Breakdown:</h4>
+            <div className="space-y-3">
+              {criteria.map((criterion, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-100">
+                  <div className="flex items-center space-x-3">
+                    {getStatusIcon(criterion.status)}
+                    <div>
+                      <div className="font-medium text-gray-900">{criterion.name}</div>
+                      <div className="text-sm text-gray-600">{criterion.reason}</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-gray-900">+{criterion.points}</div>
+                    <div className="text-xs text-gray-500">points</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </section>
+  );
+}
 
 export default function PropertyDetail() {
   const [, navigate] = useLocation();
@@ -519,6 +719,9 @@ export default function PropertyDetail() {
           </div>
         </div>
       </section>
+
+      {/* Property Match Analysis */}
+      {property && <PropertyMatchAnalysis property={property} />}
 
       {/* Main Content */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
