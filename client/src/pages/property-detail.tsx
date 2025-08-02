@@ -176,7 +176,14 @@ export default function PropertyDetail() {
 
   const getPriceRange = () => {
     if (!property?.configurations.length) return "Price on request";
-    const prices = property.configurations.map(c => c.price);
+    
+    // Calculate actual prices using pricePerSqft * builtUpArea
+    const prices = property.configurations.map(c => {
+      const pricePerSqft = parseFloat(c.pricePerSqft.toString());
+      const builtUpArea = c.builtUpArea;
+      return pricePerSqft * builtUpArea;
+    });
+    
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
     

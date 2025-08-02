@@ -141,7 +141,7 @@ export function PropertyDetailsDialog({ property, open, onOpenChange }: Property
                       <div className="flex items-center justify-between mb-2">
                         <h5 className="font-medium text-gray-900">{config.configuration}</h5>
                         <span className="font-semibold text-primary text-lg">
-                          {formatPriceDisplay(config.price)}
+                          {formatPriceDisplay(parseFloat(config.pricePerSqft.toString()) * config.builtUpArea)}
                         </span>
                       </div>
                       <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">

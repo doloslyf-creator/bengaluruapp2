@@ -22,7 +22,10 @@ export default function AdminAnalytics() {
   const totalConfigurations = configurations.length;
   
   const averagePrice = configurations.length > 0 
-    ? configurations.reduce((sum, config) => sum + config.price, 0) / configurations.length 
+    ? configurations.reduce((sum, config) => {
+        const calculatedPrice = parseFloat(config.pricePerSqft.toString()) * config.builtUpArea;
+        return sum + calculatedPrice;
+      }, 0) / configurations.length 
     : 0;
 
   const propertyTypeDistribution = properties.reduce((acc, property) => {

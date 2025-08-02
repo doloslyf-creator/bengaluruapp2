@@ -52,7 +52,14 @@ export function PropertyCard({ property, onClick, onDelete }: PropertyCardProps)
   // Get price range from configurations
   const getPriceRange = () => {
     if (configurations.length === 0) return "Price on request";
-    const prices = configurations.map(c => c.price);
+    
+    // Calculate actual prices using pricePerSqft * builtUpArea
+    const prices = configurations.map(c => {
+      const pricePerSqft = parseFloat(c.pricePerSqft.toString());
+      const builtUpArea = c.builtUpArea;
+      return pricePerSqft * builtUpArea;
+    });
+    
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
     
