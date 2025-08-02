@@ -49,6 +49,7 @@ import LegalManagement from "@/pages/admin/legal-management";
 import UserLegalTracker from "@/pages/user-legal-tracker-enhanced";
 import AdminSettings from "@/pages/admin/settings";
 import TeamManagement from "@/pages/admin/team-management";
+import ReraManagement from "@/pages/admin/rera-management";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -86,6 +87,7 @@ function Router() {
       <Route path="/admin-panel/legal-tracker/reports" component={LegalTracker} />
       <Route path="/admin-panel/settings" component={AdminSettings} />
       <Route path="/admin-panel/team-management" component={TeamManagement} />
+      <Route path="/admin-panel/rera-management" component={ReraManagement} />
       
       {/* Customer-facing routes */}
       <Route path="/find-property" component={FindProperty} />

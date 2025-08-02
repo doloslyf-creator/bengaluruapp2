@@ -41,7 +41,10 @@ import {
   reportPayments,
   customerNotes,
   appSettings,
-  teamMembers
+  teamMembers,
+  reraData,
+  type ReraData,
+  type InsertReraData
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, ilike, gte, lte, desc, sql } from "drizzle-orm";
@@ -162,6 +165,14 @@ export interface IStorage {
   deleteTeamMember(id: string): Promise<boolean>;
   getTeamMembersByDepartment(department: string): Promise<TeamMember[]>;
   getActiveTeamMembers(): Promise<TeamMember[]>;
+
+  // RERA Data operations
+  createReraData(reraInfo: InsertReraData): Promise<ReraData>;
+  getReraData(reraId: string): Promise<ReraData | undefined>;
+  getReraDataByProperty(propertyId: string): Promise<ReraData | undefined>;
+  getAllReraData(): Promise<ReraData[]>;
+  updateReraData(reraId: string, updates: Partial<InsertReraData>): Promise<ReraData | undefined>;
+  deleteReraData(reraId: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
