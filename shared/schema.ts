@@ -792,6 +792,46 @@ export const insertCustomerNoteSchema = createInsertSchema(customerNotes);
 export type InsertCustomerNote = z.infer<typeof insertCustomerNoteSchema>;
 export type CustomerNote = typeof customerNotes.$inferSelect;
 
+// Valuation Requests table
+export const valuationRequests = pgTable("valuation_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  
+  // Property details
+  propertyType: text("property_type").notNull(),
+  location: text("location").notNull(),
+  area: integer("area").notNull(),
+  age: integer("age").notNull(),
+  bedrooms: text("bedrooms").notNull(),
+  amenities: json("amenities").$type<string[]>().default([]),
+  additionalInfo: text("additional_info"),
+  
+  // Contact details
+  contactName: text("contact_name").notNull(),
+  contactPhone: text("contact_phone").notNull(),
+  contactEmail: text("contact_email").notNull(),
+  
+  // Status and processing
+  status: varchar("status", { enum: ["pending", "in-progress", "completed", "cancelled"] }).default("pending"),
+  requestSource: text("request_source").default("website"),
+  
+  // Valuation results (filled after processing)
+  estimatedValue: decimal("estimated_value", { precision: 12, scale: 2 }),
+  valueRange: json("value_range").$type<{ min: number; max: number }>(),
+  confidenceLevel: varchar("confidence_level", { enum: ["high", "medium", "low"] }),
+  
+  // Report generation
+  reportGenerated: boolean("report_generated").default(false),
+  reportUrl: text("report_url"),
+  reportNotes: text("report_notes"),
+  
+  // Processing details
+  assignedTo: text("assigned_to"),
+  processedAt: timestamp("processed_at"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // App Settings table for general application configuration
 export const appSettings = pgTable("app_settings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -846,3 +886,15 @@ export const insertAppSettingsSchema = createInsertSchema(appSettings).omit({
 
 export type AppSettings = typeof appSettings.$inferSelect;
 export type InsertAppSettings = z.infer<typeof insertAppSettingsSchema>;
+
+// Valuation request schemas
+export const insertValuationRequestSchema = createInsertSchema(valuationRequests).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  status: true,
+  reportGenerated: true,
+});
+
+export type ValuationRequest = typeof valuationRequests.$inferSelect;
+export type InsertValuationRequest = z.infer<typeof insertValuationRequestSchema>;

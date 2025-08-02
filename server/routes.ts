@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
-import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertPropertyValuationReportSchema, insertAppSettingsSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, type CivilMepReport } from "@shared/schema";
+import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertPropertyValuationReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests, type CivilMepReport } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
@@ -1917,6 +1917,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating legal step:", error);
       res.status(500).json({ error: "Failed to update legal step" });
+    }
+  });
+
+  // Valuation Requests API
+  app.post("/api/valuation-requests", async (req, res) => {
+    try {
+      const validation = insertValuationRequestSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ 
+          error: "Invalid valuation request data", 
+          details: validation.error.format() 
+        });
+      }
+
+      const [valuationRequest] = await db.insert(valuationRequests)
+        .values(validation.data)
+        .returning();
+
+      console.log(`📊 New valuation request: ${valuationRequest.contactName} - ${valuationRequest.location}`);
+      res.status(201).json(valuationRequest);
+    } catch (error) {
+      console.error("Error creating valuation request:", error);
+      res.status(500).json({ error: "Failed to create valuation request" });
+    }
+  });
+
+  app.get("/api/valuation-requests", async (req, res) => {
+    try {
+      const requests = await db.select().from(valuationRequests);
+      res.json(requests);
+    } catch (error) {
+      console.error("Error fetching valuation requests:", error);
+      res.status(500).json({ error: "Failed to fetch valuation requests" });
+    }
+  });
+
+  app.get("/api/valuation-requests/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const [request] = await db.select().from(valuationRequests).where(eq(valuationRequests.id, id));
+      
+      if (!request) {
+        return res.status(404).json({ error: "Valuation request not found" });
+      }
+      
+      res.json(request);
+    } catch (error) {
+      console.error("Error fetching valuation request:", error);
+      res.status(500).json({ error: "Failed to fetch valuation request" });
+    }
+  });
+
+  app.patch("/api/valuation-requests/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updateData = req.body;
+      
+      const [updatedRequest] = await db.update(valuationRequests)
+        .set({ ...updateData, updatedAt: new Date() })
+        .where(eq(valuationRequests.id, id))
+        .returning();
+      
+      if (!updatedRequest) {
+        return res.status(404).json({ error: "Valuation request not found" });
+      }
+      
+      res.json(updatedRequest);
+    } catch (error) {
+      console.error("Error updating valuation request:", error);
+      res.status(500).json({ error: "Failed to update valuation request" });
     }
   });
 

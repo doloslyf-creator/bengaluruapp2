@@ -50,7 +50,7 @@ export default function Header() {
   ];
 
   const services = [
-    { name: "Property Valuation", href: "/services/valuation", description: "Professional property assessment" },
+    { name: "Property Valuation", href: "/property-valuation", description: "Professional property assessment" },
     { name: "CIVIL+MEP Reports", href: "/services/civil-mep", description: "Engineering analysis reports" },
     { name: "Legal Due Diligence", href: "/services/legal", description: "Complete legal verification" },
     { name: "Site Visit Booking", href: "/book-visit", description: "Schedule property visits" },

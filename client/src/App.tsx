@@ -26,6 +26,7 @@ import ValuationReportEdit from "@/pages/admin/valuation-report-edit";
 import PropertyEdit from "@/pages/property-edit";
 import PropertyDetail from "@/pages/property-detail";
 import FindProperty from "@/pages/find-property";
+import PropertyValuation from "@/pages/property-valuation";
 import PropertyResults from "@/pages/property-results";
 import BookVisit from "@/pages/book-visit";
 import Consultation from "@/pages/consultation";
@@ -81,6 +82,7 @@ function Router() {
       <Route path="/find-property" component={FindProperty} />
       <Route path="/find-property/results" component={PropertyResults} />
       <Route path="/property/:id" component={PropertyDetail} />
+      <Route path="/property-valuation" component={PropertyValuation} />
       <Route path="/book-visit" component={BookVisit} />
       <Route path="/consultation" component={Consultation} />
       <Route path="/user-panel" component={UserPanel} />
