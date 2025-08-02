@@ -166,9 +166,10 @@ function PropertyMatchAnalysis({ property }: PropertyMatchAnalysisProps) {
   };
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <Card className={`border-2 ${matchInfo.bgColor} ${matchInfo.textColor}`}>
-        <CardHeader className="pb-4">
+    <section className="flex justify-center px-4 sm:px-6 lg:px-8 py-6">
+      <div className="w-full max-w-2xl">
+        <Card className={`border-2 ${matchInfo.bgColor} ${matchInfo.textColor}`}>
+          <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className={`p-2 rounded-full bg-white`}>
@@ -188,8 +189,8 @@ function PropertyMatchAnalysis({ property }: PropertyMatchAnalysisProps) {
               <Progress value={score} className="w-20 mt-1" />
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
+          </CardHeader>
+          <CardContent>
           <div className="mb-4">
             <h4 className="font-medium mb-2 text-gray-700">Your Search Criteria:</h4>
             <div className="flex flex-wrap gap-2 text-sm">
@@ -210,29 +211,9 @@ function PropertyMatchAnalysis({ property }: PropertyMatchAnalysisProps) {
               )}
             </div>
           </div>
-          
-          <div>
-            <h4 className="font-medium mb-3 text-gray-700">Match Breakdown:</h4>
-            <div className="space-y-3">
-              {criteria.map((criterion, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-100">
-                  <div className="flex items-center space-x-3">
-                    {getStatusIcon(criterion.status)}
-                    <div>
-                      <div className="font-medium text-gray-900">{criterion.name}</div>
-                      <div className="text-sm text-gray-600">{criterion.reason}</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold text-gray-900">+{criterion.points}</div>
-                    <div className="text-xs text-gray-500">points</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </section>
   );
 }
