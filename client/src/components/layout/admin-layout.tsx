@@ -11,7 +11,8 @@ import {
   PenTool,
   Settings,
   ArrowLeft,
-  ShoppingCart
+  ShoppingCart,
+  Calculator
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -60,6 +61,12 @@ const navigation = [
     href: "/admin-panel/civil-mep-reports", 
     icon: FileText,
     description: "Engineering Reports"
+  },
+  { 
+    name: "Valuation Reports", 
+    href: "/admin-panel/valuation-reports", 
+    icon: Calculator,
+    description: "Property Valuations"
   },
   { 
     name: "Orders", 

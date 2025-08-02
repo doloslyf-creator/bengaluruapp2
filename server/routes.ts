@@ -878,6 +878,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Valuation Reports API - Get all valuation reports
+  app.get("/api/valuation-reports", async (req, res) => {
+    try {
+      const reports = await storage.getAllValuationReports();
+      res.json(reports);
+    } catch (error) {
+      console.error("Error fetching valuation reports:", error);
+      res.status(500).json({ error: "Failed to fetch valuation reports" });
+    }
+  });
+
+  // Valuation Reports API - Get valuation report stats
+  app.get("/api/valuation-reports/stats", async (req, res) => {
+    try {
+      const stats = await storage.getValuationReportStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching valuation report stats:", error);
+      res.status(500).json({ error: "Failed to fetch valuation report statistics" });
+    }
+  });
+
+  // Valuation Reports API - Create new report
+  app.post("/api/valuation-reports", async (req, res) => {
+    try {
+      const reportData = req.body;
+      const report = await storage.createValuationReport(reportData);
+      res.json(report);
+    } catch (error: any) {
+      console.error("Error creating valuation report:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Valuation Reports API - Get single report
+  app.get("/api/valuation-reports/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const report = await storage.getValuationReportById(id);
+      if (!report) {
+        return res.status(404).json({ error: "Report not found" });
+      }
+      res.json(report);
+    } catch (error) {
+      console.error("Error fetching valuation report:", error);
+      res.status(500).json({ error: "Failed to fetch valuation report" });
+    }
+  });
+
+  // Valuation Reports API - Update report
+  app.put("/api/valuation-reports/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const reportData = req.body;
+      const report = await storage.updateValuationReport(id, reportData);
+      if (!report) {
+        return res.status(404).json({ error: "Report not found" });
+      }
+      res.json(report);
+    } catch (error: any) {
+      console.error("Error updating valuation report:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Customer CRM API - Get all customers with unified data
   app.get("/api/customers", async (req, res) => {
     try {
