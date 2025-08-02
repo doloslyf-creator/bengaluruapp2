@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
@@ -20,6 +21,8 @@ const CivilMepReports = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [showEnableDialog, setShowEnableDialog] = useState(false);
+  const [showViewReportDialog, setShowViewReportDialog] = useState(false);
+  const [showManageDialog, setShowManageDialog] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
 
   const queryClient = useQueryClient();
@@ -317,11 +320,25 @@ const CivilMepReports = () => {
                       <div className="ml-6 flex gap-2">
                         {property.hasCivilMepReport ? (
                           <>
-                            <Button variant="outline" size="sm">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => {
+                                setSelectedProperty(property);
+                                setShowViewReportDialog(true);
+                              }}
+                            >
                               <Eye className="h-4 w-4 mr-1" />
                               View Report
                             </Button>
-                            <Button variant="outline" size="sm">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => {
+                                setSelectedProperty(property);
+                                setShowManageDialog(true);
+                              }}
+                            >
                               <Settings className="h-4 w-4 mr-1" />
                               Manage
                             </Button>
@@ -434,6 +451,279 @@ const CivilMepReports = () => {
                 </Button>
               </div>
             </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* View Report Dialog */}
+        <Dialog open={showViewReportDialog} onOpenChange={setShowViewReportDialog}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center">
+                <FileText className="h-5 w-5 mr-2 text-violet-600" />
+                CIVIL+MEP Report - {selectedProperty?.name}
+              </DialogTitle>
+              <DialogDescription>
+                Comprehensive engineering analysis report for {selectedProperty?.area}, {selectedProperty?.zone}
+              </DialogDescription>
+            </DialogHeader>
+
+            {selectedProperty && (
+              <div className="space-y-6">
+                {/* Property Overview */}
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Property Overview</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <span className="text-sm text-gray-600">Property Name:</span>
+                        <p className="font-medium">{selectedProperty.name}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-600">Developer:</span>
+                        <p className="font-medium">{selectedProperty.developer}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-600">Location:</span>
+                        <p className="font-medium">{selectedProperty.area}, {selectedProperty.zone}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-600">Property Type:</span>
+                        <p className="font-medium capitalize">{selectedProperty.type}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Report Summary */}
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Engineering Assessment Summary</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <div className="text-center p-4 bg-green-50 rounded-lg">
+                        <div className="text-2xl font-bold text-green-600">8.5/10</div>
+                        <div className="text-sm text-green-800">Structural Score</div>
+                      </div>
+                      <div className="text-center p-4 bg-blue-50 rounded-lg">
+                        <div className="text-2xl font-bold text-blue-600">9.0/10</div>
+                        <div className="text-sm text-blue-800">MEP Systems</div>
+                      </div>
+                      <div className="text-center p-4 bg-yellow-50 rounded-lg">
+                        <div className="text-2xl font-bold text-yellow-600">8.7/10</div>
+                        <div className="text-sm text-yellow-800">Overall Rating</div>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                        <span className="text-sm font-medium">Foundation Quality</span>
+                        <Badge className="bg-green-100 text-green-800">Excellent</Badge>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                        <span className="text-sm font-medium">Electrical Systems</span>
+                        <Badge className="bg-green-100 text-green-800">Approved</Badge>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                        <span className="text-sm font-medium">Plumbing Infrastructure</span>
+                        <Badge className="bg-blue-100 text-blue-800">Good</Badge>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                        <span className="text-sm font-medium">Fire Safety Compliance</span>
+                        <Badge className="bg-green-100 text-green-800">Compliant</Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Key Findings */}
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Key Findings & Recommendations</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="border-l-4 border-green-500 pl-4">
+                        <h4 className="font-medium text-green-800">Strengths</h4>
+                        <ul className="text-sm text-gray-600 mt-1 space-y-1">
+                          <li>• High-quality construction materials used throughout</li>
+                          <li>• Excellent foundation design and execution</li>
+                          <li>• Modern electrical infrastructure with proper earthing</li>
+                          <li>• Adequate ventilation and natural lighting</li>
+                        </ul>
+                      </div>
+                      
+                      <div className="border-l-4 border-yellow-500 pl-4">
+                        <h4 className="font-medium text-yellow-800">Areas for Improvement</h4>
+                        <ul className="text-sm text-gray-600 mt-1 space-y-1">
+                          <li>• Minor waterproofing improvements needed in basement</li>
+                          <li>• Upgrade to LED lighting for energy efficiency</li>
+                          <li>• Install additional fire extinguishers on common floors</li>
+                        </ul>
+                      </div>
+
+                      <div className="border-l-4 border-blue-500 pl-4">
+                        <h4 className="font-medium text-blue-800">Compliance Status</h4>
+                        <ul className="text-sm text-gray-600 mt-1 space-y-1">
+                          <li>• Building meets all local municipal requirements</li>
+                          <li>• Fire safety systems are up to code</li>
+                          <li>• Environmental clearances are valid</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Report Actions */}
+                <div className="flex gap-3 pt-4">
+                  <Button className="bg-violet-600 hover:bg-violet-700">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Download Full Report
+                  </Button>
+                  <Button variant="outline">
+                    <Building className="h-4 w-4 mr-2" />
+                    Send to Property Team
+                  </Button>
+                  <Button variant="outline">
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Customer Orders
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Manage Report Dialog */}
+        <Dialog open={showManageDialog} onOpenChange={setShowManageDialog}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center">
+                <Settings className="h-5 w-5 mr-2 text-violet-600" />
+                Manage Report - {selectedProperty?.name}
+              </DialogTitle>
+              <DialogDescription>
+                Configure pricing, availability, and access settings for this property's CIVIL+MEP report
+              </DialogDescription>
+            </DialogHeader>
+
+            {selectedProperty && (
+              <div className="space-y-6">
+                {/* Report Status & Pricing */}
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Report Configuration</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="report-price">Report Price (₹)</Label>
+                        <Input 
+                          id="report-price" 
+                          type="number" 
+                          defaultValue={selectedProperty.civilMepReportPrice || 2999}
+                          placeholder="2999"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="report-status">Report Status</Label>
+                        <Select defaultValue="active">
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="draft">Draft</SelectItem>
+                            <SelectItem value="disabled">Disabled</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="report-description">Report Description</Label>
+                      <Textarea 
+                        id="report-description"
+                        placeholder="Comprehensive CIVIL+MEP engineering analysis..."
+                        defaultValue="Comprehensive structural and MEP systems analysis including foundation assessment, electrical infrastructure review, plumbing systems evaluation, and compliance verification."
+                        rows={3}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Customer Analytics */}
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Customer Analytics</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="text-center p-3 bg-blue-50 rounded-lg">
+                        <div className="text-xl font-bold text-blue-600">12</div>
+                        <div className="text-xs text-blue-800">Total Orders</div>
+                      </div>
+                      <div className="text-center p-3 bg-green-50 rounded-lg">
+                        <div className="text-xl font-bold text-green-600">₹35,988</div>
+                        <div className="text-xs text-green-800">Revenue Generated</div>
+                      </div>
+                      <div className="text-center p-3 bg-yellow-50 rounded-lg">
+                        <div className="text-xl font-bold text-yellow-600">3</div>
+                        <div className="text-xs text-yellow-800">Pending Payments</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Recent Orders */}
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base">Recent Orders</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {[
+                        { id: 1, customer: "Rajesh Kumar", email: "rajesh@email.com", amount: 2999, status: "Completed", date: "2025-01-28" },
+                        { id: 2, customer: "Priya Sharma", email: "priya@email.com", amount: 2999, status: "Pending", date: "2025-01-27" },
+                        { id: 3, customer: "Amit Patel", email: "amit@email.com", amount: 2999, status: "Completed", date: "2025-01-26" }
+                      ].map((order) => (
+                        <div key={order.id} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div>
+                            <p className="font-medium">{order.customer}</p>
+                            <p className="text-sm text-gray-600">{order.email}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-medium">₹{order.amount.toLocaleString()}</p>
+                            <Badge className={order.status === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
+                              {order.status}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-4">
+                  <Button className="bg-violet-600 hover:bg-violet-700">
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Save Changes
+                  </Button>
+                  <Button variant="outline">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Export Order Data
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowManageDialog(false)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
           </DialogContent>
         </Dialog>
       </div>
