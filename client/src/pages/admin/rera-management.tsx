@@ -32,7 +32,7 @@ import {
   AlertTriangle, 
   Clock, 
   Building, 
-  Sync,
+  RefreshCw,
   Search,
   TrendingUp,
   FileCheck
@@ -256,7 +256,7 @@ export default function ReraManagement() {
           variant="outline"
           className="flex items-center gap-2"
         >
-          <Sync className="w-4 h-4" />
+          <RefreshCw className="w-4 h-4" />
           Auto-Sync Properties
         </Button>
       </div>
