@@ -19,6 +19,7 @@ import FindProperty from "@/pages/find-property";
 import PropertyResults from "@/pages/property-results";
 import BookVisit from "@/pages/book-visit";
 import Consultation from "@/pages/consultation";
+import UserPanel from "@/pages/user-panel";
 import CustomerHome from "@/pages/customer-home";
 import Home from "@/pages/home";
 import LeadsPage from "@/pages/leads";
@@ -48,6 +49,7 @@ function Router() {
       <Route path="/property/:id" component={PropertyDetail} />
       <Route path="/book-visit" component={BookVisit} />
       <Route path="/consultation" component={Consultation} />
+      <Route path="/user-panel" component={UserPanel} />
       
       <Route component={NotFound} />
     </Switch>
