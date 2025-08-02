@@ -977,19 +977,372 @@ export default function Customers() {
 
           {activeTab === "bookings" && (
             <div className="space-y-6">
+              {/* Booking Stats Overview */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Total Bookings</p>
+                        <p className="text-2xl font-bold text-gray-900">
+                          {filteredCustomers.reduce((sum, c) => sum + c.bookings.length, 0)}
+                        </p>
+                      </div>
+                      <Calendar className="h-8 w-8 text-blue-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Today's Visits</p>
+                        <p className="text-2xl font-bold text-green-600">4</p>
+                      </div>
+                      <MapPin className="h-8 w-8 text-green-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Pending Confirmations</p>
+                        <p className="text-2xl font-bold text-yellow-600">7</p>
+                      </div>
+                      <Clock className="h-8 w-8 text-yellow-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Completion Rate</p>
+                        <p className="text-2xl font-bold text-purple-600">85%</p>
+                      </div>
+                      <CheckCircle className="h-8 w-8 text-purple-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Booking Calendar View */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center">
+                        <Calendar className="h-5 w-5 mr-2" />
+                        Site Visit Calendar
+                      </CardTitle>
+                      <CardDescription>
+                        Schedule and manage property site visits and consultations
+                      </CardDescription>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Button variant="outline" size="sm">
+                        <Filter className="h-4 w-4 mr-2" />
+                        Filter
+                      </Button>
+                      <Button size="sm">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Schedule Visit
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-7 gap-1 mb-4">
+                    {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+                      <div key={day} className="p-2 text-center text-sm font-medium text-gray-600 border-b">
+                        {day}
+                      </div>
+                    ))}
+                    {Array.from({ length: 35 }, (_, i) => {
+                      const dayNumber = ((i - 2) % 31) + 1;
+                      const hasBooking = [3, 7, 12, 15, 18, 22, 25, 28].includes(dayNumber);
+                      return (
+                        <div 
+                          key={i} 
+                          className={`p-2 text-center text-sm border cursor-pointer hover:bg-gray-50 ${
+                            hasBooking ? 'bg-blue-50 border-blue-200' : ''
+                          }`}
+                        >
+                          <div className="font-medium">{dayNumber > 0 ? dayNumber : ''}</div>
+                          {hasBooking && (
+                            <div className="w-2 h-2 bg-blue-500 rounded-full mx-auto mt-1"></div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Booking Management Table */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center">
+                        <MapPin className="h-5 w-5 mr-2" />
+                        Booking Management
+                      </CardTitle>
+                      <CardDescription>
+                        Comprehensive booking tracking and visit coordination
+                      </CardDescription>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Button variant="outline" size="sm">
+                        <Download className="h-4 w-4 mr-2" />
+                        Export
+                      </Button>
+                      <Select defaultValue="all">
+                        <SelectTrigger className="w-32">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Status</SelectItem>
+                          <SelectItem value="confirmed">Confirmed</SelectItem>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="completed">Completed</SelectItem>
+                          <SelectItem value="cancelled">Cancelled</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Customer</TableHead>
+                        <TableHead>Property</TableHead>
+                        <TableHead>Visit Type</TableHead>
+                        <TableHead>Date & Time</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Team Member</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredCustomers.flatMap((customer) => 
+                        customer.bookings.map((booking, index) => (
+                          <TableRow key={`${customer.id}-${index}`}>
+                            <TableCell>
+                              <div>
+                                <div className="font-medium">{customer.name}</div>
+                                <div className="text-sm text-gray-500">{customer.phone}</div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="font-medium">{booking.propertyName}</div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={booking.bookingType === "Site Visit" ? "default" : "secondary"}>
+                                {booking.bookingType}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div>
+                                <div className="font-medium">
+                                  {format(new Date(booking.createdAt), "MMM dd, yyyy")}
+                                </div>
+                                <div className="text-sm text-gray-500">10:30 AM</div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge 
+                                variant={
+                                  booking.status === "confirmed" ? "default" :
+                                  booking.status === "completed" ? "default" :
+                                  booking.status === "pending" ? "secondary" : "destructive"
+                                }
+                                className={
+                                  booking.status === "confirmed" ? "bg-green-100 text-green-800" :
+                                  booking.status === "completed" ? "bg-blue-100 text-blue-800" :
+                                  booking.status === "pending" ? "bg-yellow-100 text-yellow-800" :
+                                  "bg-red-100 text-red-800"
+                                }
+                              >
+                                {booking.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                                  <User className="h-3 w-3 text-blue-600" />
+                                </div>
+                                <span className="text-sm">Rajesh Kumar</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center space-x-1">
+                                <Button variant="ghost" size="sm">
+                                  <Phone className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="sm">
+                                  <MessageSquare className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="sm">
+                                  <Calendar className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="sm">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+
+              {/* Team Performance & Visitor Analytics */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <Users className="h-5 w-5 mr-2" />
+                      Team Performance
+                    </CardTitle>
+                    <CardDescription>
+                      Site visit team productivity and customer satisfaction
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[
+                        { name: "Rajesh Kumar", visits: 12, rating: 4.8, conversions: 4 },
+                        { name: "Priya Sharma", visits: 8, rating: 4.9, conversions: 3 },
+                        { name: "Amit Patel", visits: 15, rating: 4.6, conversions: 5 },
+                        { name: "Sneha Reddy", visits: 10, rating: 4.7, conversions: 2 },
+                      ].map((member) => (
+                        <div key={member.name} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                              <User className="h-4 w-4 text-blue-600" />
+                            </div>
+                            <div>
+                              <div className="font-medium">{member.name}</div>
+                              <div className="text-sm text-gray-500">
+                                {member.visits} visits • ⭐ {member.rating}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-medium text-green-600">{member.conversions} conversions</div>
+                            <div className="text-sm text-gray-500">
+                              {Math.round((member.conversions / member.visits) * 100)}% rate
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <BarChart3 className="h-5 w-5 mr-2" />
+                      Visitor Analytics
+                    </CardTitle>
+                    <CardDescription>
+                      Site visit trends and conversion insights
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="text-center p-3 bg-blue-50 rounded-lg">
+                          <div className="text-2xl font-bold text-blue-600">32</div>
+                          <div className="text-sm text-gray-600">This Week</div>
+                        </div>
+                        <div className="text-center p-3 bg-green-50 rounded-lg">
+                          <div className="text-2xl font-bold text-green-600">28%</div>
+                          <div className="text-sm text-gray-600">Conversion</div>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Peak Hours</span>
+                          <span className="text-sm font-medium">10 AM - 12 PM</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Avg Visit Duration</span>
+                          <span className="text-sm font-medium">45 minutes</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">No-Show Rate</span>
+                          <span className="text-sm font-medium text-red-600">8%</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Reschedule Rate</span>
+                          <span className="text-sm font-medium text-yellow-600">12%</span>
+                        </div>
+                      </div>
+
+                      <div className="mt-4">
+                        <h4 className="text-sm font-medium mb-2">Popular Properties</h4>
+                        <div className="space-y-2">
+                          {[
+                            { name: "Prestige High Fields", visits: 8 },
+                            { name: "Brigade Eldorado", visits: 6 },
+                            { name: "Sobha Neopolis", visits: 5 },
+                          ].map((property) => (
+                            <div key={property.name} className="flex justify-between text-sm">
+                              <span className="text-gray-600">{property.name}</span>
+                              <span className="font-medium">{property.visits} visits</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Visit Scheduling Tools */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <CalendarDays className="h-5 w-5 mr-2" />
-                    Bookings & Site Visits
+                    <Clock className="h-5 w-5 mr-2" />
+                    Quick Scheduling Tools
                   </CardTitle>
                   <CardDescription>
-                    Manage property visits, scheduling, and follow-ups
+                    Streamlined booking and scheduling utilities
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-12 text-gray-500">
-                    Booking management features coming soon...
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Button variant="outline" className="p-6 h-auto flex-col space-y-2">
+                      <Calendar className="h-8 w-8 text-blue-600" />
+                      <div className="text-center">
+                        <div className="font-medium">Bulk Scheduling</div>
+                        <div className="text-sm text-gray-500">Schedule multiple visits</div>
+                      </div>
+                    </Button>
+                    
+                    <Button variant="outline" className="p-6 h-auto flex-col space-y-2">
+                      <Clock className="h-8 w-8 text-green-600" />
+                      <div className="text-center">
+                        <div className="font-medium">Auto-Reminders</div>
+                        <div className="text-sm text-gray-500">SMS & email alerts</div>
+                      </div>
+                    </Button>
+                    
+                    <Button variant="outline" className="p-6 h-auto flex-col space-y-2">
+                      <MapPin className="h-8 w-8 text-purple-600" />
+                      <div className="text-center">
+                        <div className="font-medium">Route Optimization</div>
+                        <div className="text-sm text-gray-500">Plan visit routes</div>
+                      </div>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
