@@ -7,7 +7,7 @@ OwnItRight is a comprehensive full-stack platform for property management and cu
 Preferred communication style: Simple, everyday language.
 Project approach: User appreciates comprehensive solutions that integrate real data with sophisticated customer experience.
 Focus areas: Customer-facing features, real data integration, and seamless user workflows.
-UI Design preferences: Clean, minimal design without unnecessary panels or borders. Prefer simple layouts that encourage clicking to view details rather than multiple action buttons. Match labels should be displayed in brackets at the top of cards.
+UI Design preferences: Clean, minimal design without unnecessary panels or borders. Prefer simple layouts that encourage clicking to view details rather than multiple action buttons. Match labels should be displayed in brackets at the top of cards. Strongly prefers compact, table-based interfaces over verbose card layouts for admin panels - values data density and efficiency.
 
 ## System Architecture
 
@@ -31,7 +31,7 @@ The API follows RESTful principles, providing standard CRUD operations for entit
 - **Booking System**: Site visit and consultation booking with confirmation workflows.
 - **Legal Due Diligence**: A 12-step tracker for legal verification, with admin and user panel interfaces, document management, and progress visualization.
 - **Professional Property Valuation Reports**: User-facing valuation reports with detailed property specifications, cost breakdowns, market analysis, and risk assessment.
-- **CIVIL+MEP Report System**: Engineering report ordering with "pay later" functionality and comprehensive order management.
+- **CIVIL+MEP Report System**: Engineering report ordering with "pay later" functionality and comprehensive order management. Features a compact table-based admin interface for efficient property and report management.
 - **Lead Management System**: Automatic lead generation from customer interactions, with scoring, activity tracking, and analytics.
 - **Blog Management System**: Admin panel for full CRUD operations on blog posts, content categories, and SEO metadata.
 - **Branding**: "OwnItRight" brand update across the application with a custom wordmark logo.
