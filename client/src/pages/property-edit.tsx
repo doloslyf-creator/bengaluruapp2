@@ -83,6 +83,7 @@ export default function PropertyEdit() {
         tags: property.tags,
         images: property.images,
         videos: property.videos,
+        youtubeVideoUrl: property.youtubeVideoUrl || "",
         configurations: property.configurations.length > 0 ? property.configurations.map(config => ({
           id: config.id,
           propertyId: config.propertyId,
@@ -645,6 +646,46 @@ export default function PropertyEdit() {
                         <FormLabel>Zoning Information</FormLabel>
                         <FormControl>
                           <Textarea {...field} value={field.value || ""} placeholder="Zoning classification and regulatory details" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </Card>
+
+              {/* Media and Content */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Media & Content</h3>
+                
+                <div className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="youtubeVideoUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>YouTube Video URL (Optional)</FormLabel>
+                        <FormControl>
+                          <Input {...field} value={field.value || ""} placeholder="https://www.youtube.com/watch?v=..." />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="tags"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Property Tags</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            value={Array.isArray(field.value) ? field.value.join(', ') : ''}
+                            onChange={(e) => field.onChange(e.target.value.split(',').map(tag => tag.trim()).filter(Boolean))}
+                            placeholder="luxury, gated-community, gym, swimming-pool" 
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

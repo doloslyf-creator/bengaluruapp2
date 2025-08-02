@@ -55,10 +55,7 @@ export function AddPropertyDialog({ open, onOpenChange }: AddPropertyDialogProps
       tags: [],
       images: [],
       videos: [],
-      builtUpArea: 0,
-      landArea: 0,
-      price: 0,
-      bedrooms: "2-bhk",
+      youtubeVideoUrl: "",
     },
   });
 
@@ -94,8 +91,6 @@ export function AddPropertyDialog({ open, onOpenChange }: AddPropertyDialogProps
     const formData = {
       ...data,
       tags: selectedTags,
-      builtUpArea: data.builtUpArea || null,
-      landArea: data.landArea || null,
     };
     createPropertyMutation.mutate(formData);
   };
@@ -211,56 +206,10 @@ export function AddPropertyDialog({ open, onOpenChange }: AddPropertyDialogProps
             </div>
           </div>
 
-          {/* Property Specifications */}
+          {/* RERA and Legal Information */}
           <div className="border-t border-border pt-6">
-            <h4 className="text-lg font-medium text-gray-900 mb-4">Property Specifications</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <Label htmlFor="builtUpArea">Built-up Area (sq ft)</Label>
-                <Input
-                  id="builtUpArea"
-                  type="number"
-                  {...form.register("builtUpArea", { valueAsNumber: true })}
-                  placeholder="1850"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="landArea">Land Area (sq ft)</Label>
-                <Input
-                  id="landArea"
-                  type="number"
-                  {...form.register("landArea", { valueAsNumber: true })}
-                  placeholder="2400"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="price">Price (₹ in Lakhs)</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  {...form.register("price", { valueAsNumber: true })}
-                  placeholder="120"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="bedrooms">Bedrooms</Label>
-                <Select onValueChange={(value) => form.setValue("bedrooms", value as any)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1-bhk">1 BHK</SelectItem>
-                    <SelectItem value="2-bhk">2 BHK</SelectItem>
-                    <SelectItem value="3-bhk">3 BHK</SelectItem>
-                    <SelectItem value="4-bhk">4 BHK</SelectItem>
-                    <SelectItem value="5-bhk">5+ BHK</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
+            <h4 className="text-lg font-medium text-gray-900 mb-4">Legal & Regulatory</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <Label htmlFor="possessionDate">Possession Date</Label>
                 <Input
