@@ -219,7 +219,14 @@ export default function AdminLogin() {
                   </div>
                 </div>
 
-                <div id="recaptcha-container" className="flex justify-center"></div>
+                <div id="recaptcha-container" className="flex justify-center min-h-[40px]"></div>
+                
+                {import.meta.env.DEV && (
+                  <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded border border-blue-200">
+                    <p className="font-medium">Development Mode</p>
+                    <p>OTP will be generated locally and logged to console</p>
+                  </div>
+                )}
 
                 <Button 
                   onClick={handleSendOTP}

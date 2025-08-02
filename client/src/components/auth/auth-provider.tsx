@@ -31,6 +31,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Listen to Firebase auth state changes
   useEffect(() => {
+    // Check for development auth first
+    if (import.meta.env.DEV) {
+      const devUser = firebaseOTPService.checkDevelopmentAuth();
+      if (devUser) {
+        setFirebaseUser(devUser as any);
+        setUser({
+          phoneNumber: devUser.phoneNumber,
+          isAdmin: true,
+          firebaseUser: devUser as any
+        });
+        setFirebaseLoading(false);
+        return;
+      }
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
       setFirebaseUser(fbUser);
       setFirebaseLoading(false);
