@@ -15,7 +15,13 @@ import {
   Eye,
   AlertTriangle,
   TrendingUp,
-  CheckCircle
+  CheckCircle,
+  Home,
+  CreditCard,
+  Scale,
+  Target,
+  Building,
+  Check
 } from "lucide-react";
 import Header from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
@@ -61,97 +67,193 @@ export default function PropertyValuation() {
       </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-4">
-        {/* Problem vs Solution Section - Compact */}
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* Problem Section */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="bg-gradient-to-br from-red-50 to-red-100 border-l-4 border-red-500 rounded-lg p-4 shadow-sm"
-          >
+      <main className="max-w-7xl mx-auto px-4 py-4 space-y-8">
+        
+        {/* Why You Need It Section */}
+        <section className="bg-white/80 backdrop-blur rounded-xl p-6 shadow-sm border border-blue-200">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Why You Need Professional Property Valuation</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="flex items-start space-x-3">
-              <AlertTriangle className="h-6 w-6 text-red-600 mt-0.5 flex-shrink-0" />
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Home className="h-5 w-5 text-blue-600" />
+              </div>
               <div>
-                <h2 className="text-lg font-bold text-red-800 mb-2">The Risk of Wrong Property Pricing</h2>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <p className="font-medium text-red-700 mb-1">🚨 What 60% of property buyers face:</p>
-                    <ul className="text-red-600 space-y-0.5">
-                      <li>• Overpaying by ₹10-30 lakhs without knowing</li>
-                      <li>• Buying properties with poor appreciation potential</li>
-                      <li>• Missing hidden legal and compliance issues</li>
-                      <li>• Lack of proper market comparable analysis</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <p className="font-medium text-red-700 mb-1">💰 The cost of guesswork:</p>
-                    <ul className="text-red-600 space-y-0.5">
-                      <li>• ₹10-30 lakhs overpayment on average</li>
-                      <li>• Poor ROI and appreciation rates</li>
-                      <li>• Difficulty in resale or rental</li>
-                      <li>• Legal complications during transactions</li>
-                    </ul>
-                  </div>
-                </div>
+                <h3 className="font-semibold text-gray-900">Buying a Property?</h3>
+                <p className="text-sm text-gray-600">Avoid overpaying by knowing the fair value</p>
               </div>
             </div>
-          </motion.div>
+            <div className="flex items-start space-x-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <TrendingUp className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900">Selling Your Property?</h3>
+                <p className="text-sm text-gray-600">Price it right to attract serious buyers</p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <CreditCard className="h-5 w-5 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900">Loan Against Property?</h3>
+                <p className="text-sm text-gray-600">Get accurate figures for financing</p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3">
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <Scale className="h-5 w-5 text-orange-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900">Legal Disputes?</h3>
+                <p className="text-sm text-gray-600">Independent third-party report</p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3">
+              <div className="p-2 bg-red-100 rounded-lg">
+                <Target className="h-5 w-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900">Investment Decisions?</h3>
+                <p className="text-sm text-gray-600">Identify appreciation potential</p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3">
+              <div className="p-2 bg-indigo-100 rounded-lg">
+                <Building className="h-5 w-5 text-indigo-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900">NRI Property Owner?</h3>
+                <p className="text-sm text-gray-600">Remote valuation services available</p>
+              </div>
+            </div>
+          </div>
+        </section>
 
-          {/* Solution Section */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500 rounded-lg p-4 shadow-sm"
-          >
-            <div className="flex items-start space-x-3">
-              <Shield className="h-6 w-6 text-green-600 mt-0.5 flex-shrink-0" />
-              <div>
-                <h2 className="text-lg font-bold text-green-800 mb-2">The Solution: Professional Property Valuation</h2>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <p className="font-medium text-green-700 mb-1">✅ What Priti's valuation includes:</p>
-                    <ul className="text-green-600 space-y-0.5">
-                      <li>• Comprehensive market research and analysis</li>
-                      <li>• Comparable property pricing study</li>
-                      <li>• Legal compliance and RERA verification</li>
-                      <li>• Future appreciation potential assessment</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <p className="font-medium text-green-700 mb-1">🛡️ Your protection guarantee:</p>
-                    <ul className="text-green-600 space-y-0.5">
-                      <li>• Accurate pricing within ±5% market value</li>
-                      <li>• 5+ years of Bengaluru market expertise</li>
-                      <li>• RERA-compliant documentation</li>
-                      <li>• Investment recommendation and ROI analysis</li>
-                    </ul>
-                  </div>
-                </div>
+        {/* What's Included Section */}
+        <section className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 shadow-sm border border-green-200">
+          <h2 className="text-xl font-bold text-green-800 mb-4">What's Included in Our Valuation Report</h2>
+          <p className="text-green-700 mb-4">Our reports go beyond surface-level estimations. You get:</p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="flex items-center space-x-2">
+              <Check className="h-4 w-4 text-green-600" />
+              <span className="text-sm text-green-800">Fair Market Value Estimate</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Check className="h-4 w-4 text-green-600" />
+              <span className="text-sm text-green-800">Comparative Market Analysis (CMA)</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Check className="h-4 w-4 text-green-600" />
+              <span className="text-sm text-green-800">Property Condition & Age Assessment</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Check className="h-4 w-4 text-green-600" />
+              <span className="text-sm text-green-800">Location & Infrastructure Score</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Check className="h-4 w-4 text-green-600" />
+              <span className="text-sm text-green-800">Legal & Zoning Overview</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Check className="h-4 w-4 text-green-600" />
+              <span className="text-sm text-green-800">Rental Yield Estimate</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Check className="h-4 w-4 text-green-600" />
+              <span className="text-sm text-green-800">Future Appreciation Potential</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Check className="h-4 w-4 text-green-600" />
+              <span className="text-sm text-green-800">Supporting Photographs & Maps</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Check className="h-4 w-4 text-green-600" />
+              <span className="text-sm text-green-800">RERA-Registered Valuer Certification</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing & Timeline Section */}
+        <section className="grid md:grid-cols-2 gap-6">
+          <div className="bg-white/80 backdrop-blur rounded-xl p-6 shadow-sm border border-gray-200">
+            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+              <Clock className="h-5 w-5 text-blue-600 mr-2" />
+              Delivery Timeline
+            </h3>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-700">Digital Report</span>
+                <span className="font-semibold text-blue-600">3-5 working days</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-700">Site Visit + Detailed Report</span>
+                <span className="font-semibold text-blue-600">5-7 working days</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-700">Express 48-Hour Report</span>
+                <span className="font-semibold text-orange-600">Additional fee</span>
               </div>
             </div>
-          </motion.div>
-        </div>
+          </div>
+
+          <div className="bg-white/80 backdrop-blur rounded-xl p-6 shadow-sm border border-gray-200">
+            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+              <IndianRupee className="h-5 w-5 text-green-600 mr-2" />
+              Transparent Pricing
+            </h3>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-700">Standard Desktop Valuation</span>
+                <span className="font-semibold text-green-600">₹2,999</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-700">On-Site Valuation with Expert Visit</span>
+                <span className="font-semibold text-green-600">From ₹6,999</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-700">RERA-Certified Valuation</span>
+                <span className="font-semibold text-blue-600">Custom Quote</span>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* CTA Section */}
-        <div className="text-center mt-6">
+        <section className="text-center bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl p-8 border border-primary/20">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Don't Guess. Know.</h2>
+          <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+            Request your property valuation today and take the next step with certainty. 
+            Get started in 3 simple steps: Submit property details, choose report type, receive your expert report.
+          </p>
           <motion.div
             whileHover={{ scale: 1.02 }}
             className="inline-block"
           >
             <Button
               onClick={() => setLocation("/property-valuation/form")}
-              className="bg-gradient-to-r from-primary to-primary/80 hover:shadow-lg text-white px-8 py-3 text-lg font-semibold rounded-xl"
+              className="bg-gradient-to-r from-primary to-primary/80 hover:shadow-lg text-white px-8 py-4 text-lg font-semibold rounded-xl"
             >
-              Get My Property Valuation Report
+              Request Your Valuation Report
               <ChevronRight className="h-5 w-5 ml-2" />
             </Button>
           </motion.div>
-          <p className="text-gray-600 mt-2 text-sm max-w-2xl mx-auto">
-            Get a comprehensive valuation analysis that includes market research, comparable pricing, 
-            legal verification, and investment recommendations.
-          </p>
-        </div>
+          
+          <div className="mt-6 flex justify-center items-center space-x-6 text-sm text-gray-600">
+            <div className="flex items-center space-x-1">
+              <Shield className="h-4 w-4 text-green-600" />
+              <span>Unbiased & Confidential</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <Award className="h-4 w-4 text-blue-600" />
+              <span>RERA-Compliant</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <CheckCircle className="h-4 w-4 text-purple-600" />
+              <span>100% Satisfaction Guarantee</span>
+            </div>
+          </div>
+        </section>
       </main>
 
       {/* What's Included Section */}
