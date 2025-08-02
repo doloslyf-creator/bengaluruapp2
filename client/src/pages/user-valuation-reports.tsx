@@ -245,17 +245,35 @@ export default function UserValuationReports() {
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Property Specifications</h3>
             <div className="grid grid-cols-3 gap-4">
-              <div className="bg-gray-50 p-4 rounded-lg text-center">
+              <div className="bg-gray-50 p-4 rounded-lg text-center group hover:bg-gray-100 transition-colors">
                 <div className="text-2xl font-bold text-gray-900">{(report.costBreakdown?.landAreaSqft || 0).toLocaleString()}</div>
                 <div className="text-sm text-gray-600 mt-1">Land Area (sq ft)</div>
+                {report.costBreakdown?.landAreaSqftComment && (
+                  <div className="mt-2 p-2 bg-white rounded text-xs text-gray-600 border-l-2 border-gray-400">
+                    <div className="font-medium text-gray-700 mb-1">Valuer Note:</div>
+                    {report.costBreakdown.landAreaSqftComment}
+                  </div>
+                )}
               </div>
-              <div className="bg-green-50 p-4 rounded-lg text-center border border-green-200">
+              <div className="bg-green-50 p-4 rounded-lg text-center border border-green-200 group hover:bg-green-100 transition-colors">
                 <div className="text-2xl font-bold text-green-700">{(report.costBreakdown?.builtUpAreaSqft || 0).toLocaleString()}</div>
                 <div className="text-sm text-green-600 mt-1">Built-up Area (sq ft)</div>
+                {report.costBreakdown?.builtUpAreaSqftComment && (
+                  <div className="mt-2 p-2 bg-white rounded text-xs text-green-600 border-l-2 border-green-400">
+                    <div className="font-medium text-green-700 mb-1">Valuer Note:</div>
+                    {report.costBreakdown.builtUpAreaSqftComment}
+                  </div>
+                )}
               </div>
-              <div className="bg-blue-50 p-4 rounded-lg text-center border border-blue-200">
+              <div className="bg-blue-50 p-4 rounded-lg text-center border border-blue-200 group hover:bg-blue-100 transition-colors">
                 <div className="text-2xl font-bold text-blue-700">{report.propertyAssessment?.propertyAge || 0}</div>
                 <div className="text-sm text-blue-600 mt-1">Property Age (years)</div>
+                {report.propertyAssessment?.propertyAgeComment && (
+                  <div className="mt-2 p-2 bg-white rounded text-xs text-blue-600 border-l-2 border-blue-400">
+                    <div className="font-medium text-blue-700 mb-1">Valuer Note:</div>
+                    {report.propertyAssessment.propertyAgeComment}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -275,20 +293,38 @@ export default function UserValuationReports() {
               </div>
               
               <div className="grid grid-cols-3 gap-4">
-                <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
+                <div className="bg-white p-4 rounded-lg shadow-sm border text-center group hover:shadow-md transition-shadow">
                   <div className="text-xl font-bold text-gray-900">{formatCurrency(report.costBreakdown?.basicCost || 0)}</div>
                   <div className="text-sm text-gray-600 mt-1">Basic Cost</div>
                   <div className="text-xs text-gray-500 mt-1">{((report.costBreakdown?.basicCost || 0) / (report.costBreakdown?.totalEstimatedCost || 1) * 100).toFixed(1)}%</div>
+                  {report.costBreakdown?.basicCostComment && (
+                    <div className="mt-2 p-2 bg-gray-50 rounded text-xs text-gray-600 border-l-2 border-gray-400 text-left">
+                      <div className="font-medium text-gray-700 mb-1">Valuer Note:</div>
+                      {report.costBreakdown.basicCostComment}
+                    </div>
+                  )}
                 </div>
-                <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
+                <div className="bg-white p-4 rounded-lg shadow-sm border text-center group hover:shadow-md transition-shadow">
                   <div className="text-xl font-bold text-orange-600">{formatCurrency(report.costBreakdown?.totalTaxes || 0)}</div>
                   <div className="text-sm text-gray-600 mt-1">Total Taxes</div>
                   <div className="text-xs text-gray-500 mt-1">{((report.costBreakdown?.totalTaxes || 0) / (report.costBreakdown?.totalEstimatedCost || 1) * 100).toFixed(1)}%</div>
+                  {report.costBreakdown?.totalTaxesComment && (
+                    <div className="mt-2 p-2 bg-orange-50 rounded text-xs text-orange-600 border-l-2 border-orange-400 text-left">
+                      <div className="font-medium text-orange-700 mb-1">Valuer Note:</div>
+                      {report.costBreakdown.totalTaxesComment}
+                    </div>
+                  )}
                 </div>
-                <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
+                <div className="bg-white p-4 rounded-lg shadow-sm border text-center group hover:shadow-md transition-shadow">
                   <div className="text-xl font-bold text-blue-600">{formatCurrency(report.costBreakdown?.totalAdditionalCost || 0)}</div>
                   <div className="text-sm text-gray-600 mt-1">Additional Costs</div>
                   <div className="text-xs text-gray-500 mt-1">{((report.costBreakdown?.totalAdditionalCost || 0) / (report.costBreakdown?.totalEstimatedCost || 1) * 100).toFixed(1)}%</div>
+                  {report.costBreakdown?.totalAdditionalCostComment && (
+                    <div className="mt-2 p-2 bg-blue-50 rounded text-xs text-blue-600 border-l-2 border-blue-400 text-left">
+                      <div className="font-medium text-blue-700 mb-1">Valuer Note:</div>
+                      {report.costBreakdown.totalAdditionalCostComment}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

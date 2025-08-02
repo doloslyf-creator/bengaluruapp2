@@ -623,7 +623,7 @@ export default function ValuationReportEdit() {
                     {/* Land Cost Section */}
                     <div>
                       <h4 className="text-lg font-medium mb-4 text-gray-800">Land Cost Details</h4>
-                      <div className="grid grid-cols-3 gap-4">
+                      <div className="grid grid-cols-3 gap-4 mb-4">
                         <div>
                           <Label htmlFor="landAreaSqft">Land Area (sq ft)</Label>
                           <Input
@@ -657,6 +657,38 @@ export default function ValuationReportEdit() {
                             className="bg-gray-50"
                           />
                           <span className="text-xs text-gray-500">Auto-calculated</span>
+                        </div>
+                      </div>
+                      
+                      {/* Comments for Land Cost */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="landAreaComment">Land Area - Comment/Source</Label>
+                          <textarea
+                            id="landAreaComment"
+                            className="w-full p-2 border border-gray-300 rounded-md resize-none text-sm"
+                            rows={2}
+                            value={formData.costBreakdown.landAreaSqftComment || ''}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, landAreaSqftComment: e.target.value }
+                            }))}
+                            placeholder="Source: Survey records, property documents, etc. Explain methodology used for area calculation"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="landValueComment">Land Value - Comment/Source</Label>
+                          <textarea
+                            id="landValueComment"
+                            className="w-full p-2 border border-gray-300 rounded-md resize-none text-sm"
+                            rows={2}
+                            value={formData.costBreakdown.landValueComment || ''}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, landValueComment: e.target.value }
+                            }))}
+                            placeholder="Source: Market comparisons, government rates, broker reports, etc. Explain valuation basis"
+                          />
                         </div>
                       </div>
                     </div>
@@ -698,6 +730,38 @@ export default function ValuationReportEdit() {
                             className="bg-gray-50"
                           />
                           <span className="text-xs text-gray-500">Auto-calculated</span>
+                        </div>
+                      </div>
+                      
+                      {/* Comments for Construction Cost */}
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                          <Label htmlFor="builtUpAreaComment">Built-up Area - Comment/Source</Label>
+                          <textarea
+                            id="builtUpAreaComment"
+                            className="w-full p-2 border border-gray-300 rounded-md resize-none text-sm"
+                            rows={2}
+                            value={formData.costBreakdown.builtUpAreaSqftComment || ''}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, builtUpAreaSqftComment: e.target.value }
+                            }))}
+                            placeholder="Source: Approved plans, carpet area measurements, RERA documents, etc."
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="constructionCostComment">Construction Cost - Comment/Source</Label>
+                          <textarea
+                            id="constructionCostComment"
+                            className="w-full p-2 border border-gray-300 rounded-md resize-none text-sm"
+                            rows={2}
+                            value={formData.costBreakdown.constructionCostComment || ''}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, constructionCostComment: e.target.value }
+                            }))}
+                            placeholder="Source: Market rates, contractor quotes, building specifications, quality grade analysis, etc."
+                          />
                         </div>
                       </div>
 

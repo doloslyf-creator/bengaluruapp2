@@ -225,45 +225,88 @@ export const propertyValuationReports = pgTable("property_valuation_reports", {
   generatedBy: text("generated_by"), // Valuer/consultant name
   reportDate: timestamp("report_date").defaultNow(),
   
-  // Market Analysis
+  // Market Analysis with Comments
   marketAnalysis: json("market_analysis").$type<{
     currentMarketTrend: string;
+    currentMarketTrendComment?: string;
     areaGrowthRate: number; // % per annum
+    areaGrowthRateComment?: string;
     demandSupplyRatio: string;
+    demandSupplyRatioComment?: string;
     marketSentiment: string;
+    marketSentimentComment?: string;
+    averagePricePerSqft?: number;
+    averagePricePerSqftComment?: string;
+    priceAppreciation?: number;
+    priceAppreciationComment?: string;
+    marketTrend?: string;
+    marketTrendComment?: string;
     competitorAnalysis: Array<{
       propertyName: string;
       pricePerSqft: number;
       distanceKm: number;
       amenitiesComparison: string;
+      comment?: string;
     }>;
   }>(),
   
-  // Property Assessment
+  // Property Assessment with Comments
   propertyAssessment: json("property_assessment").$type<{
     structuralCondition: string;
+    structuralConditionComment?: string;
     ageOfProperty: number; // years
+    ageOfPropertyComment?: string;
+    propertyAge?: number;
+    propertyAgeComment?: string;
     maintenanceLevel: string;
+    maintenanceLevelComment?: string;
     amenitiesRating: number; // 1-10
+    amenitiesRatingComment?: string;
     locationAdvantages: string[];
+    locationAdvantagesComment?: string;
     locationDisadvantages: string[];
+    locationDisadvantagesComment?: string;
     futureGrowthPotential: number; // 1-10
+    futureGrowthPotentialComment?: string;
   }>(),
   
-  // Cost Breakdown & Valuation
+  // Cost Breakdown & Valuation with Comments
   costBreakdown: json("cost_breakdown").$type<{
     landValue: number;
+    landValueComment?: string;
     constructionCost: number;
+    constructionCostComment?: string;
     developmentCharges: number;
+    developmentChargesComment?: string;
     registrationStampDuty: number;
+    registrationStampDutyComment?: string;
     gstOnConstruction: number;
+    gstOnConstructionComment?: string;
     parkingCharges: number;
+    parkingChargesComment?: string;
     clubhouseMaintenance: number;
+    clubhouseMaintenanceComment?: string;
     interiorFittings: number;
+    interiorFittingsComment?: string;
     movingCosts: number;
+    movingCostsComment?: string;
     legalCharges: number;
+    legalChargesComment?: string;
     totalEstimatedCost: number;
-    hiddenCosts: Array<{ item: string; amount: number; description: string }>;
+    totalEstimatedCostComment?: string;
+    hiddenCosts: Array<{ item: string; amount: number; description: string; comment?: string }>;
+    
+    // Additional breakdown with comments
+    landAreaSqft?: number;
+    landAreaSqftComment?: string;
+    builtUpAreaSqft?: number;
+    builtUpAreaSqftComment?: string;
+    basicCost?: number;
+    basicCostComment?: string;
+    totalTaxes?: number;
+    totalTaxesComment?: string;
+    totalAdditionalCost?: number;
+    totalAdditionalCostComment?: string;
   }>(),
   
   // Financial Analysis
