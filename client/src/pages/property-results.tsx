@@ -13,6 +13,7 @@ import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { formatPriceDisplay } from "@/lib/utils";
 import { type Property, type PropertyConfiguration } from "@shared/schema";
+import { PropertyCardSkeleton } from "@/components/ui/skeleton";
 
 interface PropertyPreferences {
   propertyType: string;
@@ -243,11 +244,39 @@ export default function PropertyResults() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-lg text-gray-600">Finding your perfect property...</p>
-        </div>
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        {/* Header Skeleton */}
+        <header className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="h-8 w-16 bg-gray-200 rounded animate-pulse"></div>
+                <div>
+                  <div className="h-6 w-32 bg-gray-200 rounded animate-pulse mb-1"></div>
+                  <div className="h-4 w-48 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Results Skeleton */}
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex justify-between items-center mb-6">
+            <div className="h-6 w-32 bg-gray-200 rounded animate-pulse"></div>
+            <div className="flex space-x-2">
+              <div className="h-8 w-20 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <PropertyCardSkeleton key={i} />
+            ))}
+          </div>
+        </main>
       </div>
     );
   }

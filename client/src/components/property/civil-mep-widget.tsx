@@ -46,11 +46,47 @@ const CivilMepWidget = ({ property }: CivilMepWidgetProps) => {
     
     try {
       if (paymentMethod === "immediate") {
-        // For development, simulate successful payment
-        toast({
-          title: "Payment Successful",
-          description: "Your CIVIL+MEP report access has been activated!"
-        });
+        // Initialize Razorpay payment
+        const options = {
+          key: "rzp_test_1DP5mmOlF5G5ag", // Test key for demo
+          amount: reportPrice * 100, // Amount in paise
+          currency: "INR",
+          name: "PropertyHub",
+          description: `CIVIL+MEP Report for ${property.name}`,
+          handler: function (response: any) {
+            toast({
+              title: "Payment Successful",
+              description: `Payment ID: ${response.razorpay_payment_id}. Your CIVIL+MEP report access has been activated!`
+            });
+            setShowPaymentDialog(false);
+            setIsProcessing(false);
+          },
+          prefill: {
+            name: customerInfo.name,
+            email: customerInfo.email,
+            contact: customerInfo.phone
+          },
+          theme: {
+            color: "#3B82F6"
+          },
+          modal: {
+            ondismiss: function() {
+              setIsProcessing(false);
+            }
+          }
+        };
+
+        if (window.Razorpay) {
+          const rzp = new window.Razorpay(options);
+          rzp.open();
+        } else {
+          toast({
+            title: "Payment Error",
+            description: "Payment gateway not loaded. Please try again.",
+            variant: "destructive"
+          });
+          setIsProcessing(false);
+        }
       } else {
         // Pay later option
         const response = await fetch("/api/civil-mep-reports/pay-later", {

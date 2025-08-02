@@ -13,6 +13,7 @@ import {
   Calendar, Clock, CheckCircle, AlertCircle, 
   Building, MapPin, BarChart3, Settings, Eye, Briefcase
 } from "lucide-react";
+import { StatsCardSkeleton, TableSkeleton } from "@/components/ui/skeleton";
 // Note: Using simple navigation structure instead of complex layout components
 
 const CivilMepReports = () => {

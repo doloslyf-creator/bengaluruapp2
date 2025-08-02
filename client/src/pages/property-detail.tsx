@@ -16,7 +16,8 @@ import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { formatPriceDisplay } from "@/lib/utils";
 import { type Property, type PropertyConfiguration } from "@shared/schema";
-import CivilMepWidget from "@/components/property/civil-mep-widget";
+import CivilMepSection from "@/components/property/civil-mep-section";
+import { Skeleton, PropertyDetailHeaderSkeleton } from "@/components/ui/skeleton";
 
 interface PropertyWithConfigurations extends Property {
   configurations: PropertyConfiguration[];
@@ -226,10 +227,40 @@ export default function PropertyDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-lg text-gray-600">Loading property details...</p>
+      <div className="min-h-screen bg-gray-50">
+        <PropertyDetailHeaderSkeleton />
+        <div className="container mx-auto px-4 py-6 space-y-6">
+          {/* Media Gallery Skeleton */}
+          <div className="bg-white rounded-lg overflow-hidden">
+            <Skeleton className="h-96 w-full" />
+            <div className="p-4 flex space-x-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-16 w-16 rounded" />
+              ))}
+            </div>
+          </div>
+          
+          {/* Content Tabs Skeleton */}
+          <div className="bg-white rounded-lg p-6">
+            <div className="flex space-x-4 border-b pb-4 mb-6">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-8 w-20" />
+              ))}
+            </div>
+            <div className="space-y-4">
+              <Skeleton className="h-6 w-3/4" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-2/3" />
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="space-y-2">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-6 w-12" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -953,8 +984,7 @@ export default function PropertyDetail() {
               </CardContent>
             </Card>
 
-            {/* CIVIL+MEP Report Widget */}
-            <CivilMepWidget property={property} />
+
 
             {/* Similar Properties - Dynamic */}
             <Card>
@@ -1014,6 +1044,11 @@ export default function PropertyDetail() {
             </Card>
           </div>
         </div>
+      </section>
+
+      {/* CIVIL+MEP Engineering Reports Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <CivilMepSection property={property} />
       </section>
     </div>
   );

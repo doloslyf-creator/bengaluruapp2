@@ -639,6 +639,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // CIVIL+MEP Pay Later Request
+  app.post("/api/civil-mep-reports/pay-later", async (req, res) => {
+    try {
+      const { reportId, customerName, customerEmail, customerPhone, propertyId } = req.body;
+      
+      // In production, this would save to database and trigger notification workflow
+      console.log("Pay Later Request:", {
+        reportId,
+        customerName,
+        customerEmail,
+        customerPhone,
+        propertyId,
+        timestamp: new Date().toISOString()
+      });
+      
+      res.json({ 
+        message: "Pay later request submitted successfully",
+        requestId: `PAY_LATER_${Date.now()}`
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
