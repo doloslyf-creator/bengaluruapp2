@@ -43,8 +43,8 @@ export default function CustomerHome() {
               <h1 className="text-2xl font-bold text-gray-900">PropertyFinder</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="outline" onClick={() => navigate('/admin-panel/login')}>
-                Admin Login
+              <Button variant="outline" onClick={() => navigate('/admin-panel')}>
+                Admin Panel
               </Button>
             </div>
           </div>

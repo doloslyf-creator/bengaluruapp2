@@ -294,7 +294,7 @@ export default function LeadsPage() {
                   <div
                     key={lead.id}
                     className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                    onClick={() => setSelectedLead(lead)}
+                    onClick={() => setSelectedLead({...lead, activities: [], notes: []})}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
@@ -337,7 +337,7 @@ export default function LeadsPage() {
                           className="mt-2"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setSelectedLead(lead);
+                            setSelectedLead({...lead, activities: [], notes: []});
                           }}
                         >
                           <Eye className="h-4 w-4 mr-2" />
@@ -350,7 +350,7 @@ export default function LeadsPage() {
                     <div className="mt-3 pt-3 border-t text-sm text-gray-600">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <strong>Created:</strong> {new Date(lead.createdAt).toLocaleDateString()}
+                          <strong>Created:</strong> {lead.createdAt ? new Date(lead.createdAt).toLocaleDateString() : 'N/A'}
                         </div>
                         <div>
                           <strong>Details:</strong> {lead.leadDetails && typeof lead.leadDetails === 'object' ? 
