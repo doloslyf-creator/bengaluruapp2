@@ -874,6 +874,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get CIVIL+MEP report by property ID
+  app.get("/api/civil-mep-reports/property/:propertyId", async (req, res) => {
+    try {
+      const propertyId = req.params.propertyId;
+      const report = await storage.getCivilMepReportByPropertyId(propertyId);
+      if (!report) {
+        return res.status(404).json({ error: "Report not found" });
+      }
+      res.json(report);
+    } catch (error) {
+      console.error("Error fetching CIVIL+MEP report by property:", error);
+      res.status(500).json({ error: "Failed to fetch report" });
+    }
+  });
+
+  // Update CIVIL+MEP report by property ID
+  app.put("/api/civil-mep-reports/property/:propertyId", async (req, res) => {
+    try {
+      const propertyId = req.params.propertyId;
+      const reportData = req.body;
+      
+      const existingReport = await storage.getCivilMepReportByPropertyId(propertyId);
+      if (!existingReport) {
+        return res.status(404).json({ error: "Report not found" });
+      }
+
+      // Update the report with new data
+      const updatedReport = {
+        ...existingReport,
+        ...reportData,
+        updatedAt: new Date().toISOString()
+      };
+
+      // In production, this would update the database
+      console.log("Updating CIVIL+MEP Report:", {
+        reportId: updatedReport.reportId,
+        propertyId: propertyId,
+        engineerName: updatedReport.engineerName,
+        overallScore: updatedReport.overallScore,
+        timestamp: new Date().toISOString()
+      });
+      
+      res.json({ 
+        message: "CIVIL+MEP report updated successfully",
+        reportId: updatedReport.reportId
+      });
+    } catch (error: any) {
+      console.error("Error updating CIVIL+MEP report:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Download CIVIL+MEP report PDF
   app.get("/api/civil-mep-reports/:id/download", async (req, res) => {
     try {

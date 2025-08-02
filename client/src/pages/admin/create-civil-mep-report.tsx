@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,7 +36,24 @@ interface ReportSection {
 }
 
 const CreateCivilMepReport = () => {
+  const [location] = useLocation();
+  const [isEditMode, setIsEditMode] = useState(false);
   const [selectedPropertyId, setSelectedPropertyId] = useState("");
+  
+  // Parse URL parameters
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.split('?')[1] || '');
+    const propertyId = urlParams.get('propertyId');
+    const editMode = urlParams.get('edit') === 'true';
+    
+    if (propertyId) {
+      setSelectedPropertyId(propertyId);
+    }
+    if (editMode) {
+      setIsEditMode(true);
+    }
+  }, [location]);
+  
   const [reportData, setReportData] = useState({
     reportTitle: "",
     engineerName: "",
@@ -125,6 +143,41 @@ const CreateCivilMepReport = () => {
     }
   });
 
+  // Fetch existing report data when in edit mode
+  const { data: existingReport } = useQuery({
+    queryKey: [`/api/civil-mep-reports/property/${selectedPropertyId}`],
+    enabled: isEditMode && !!selectedPropertyId,
+    queryFn: async () => {
+      const response = await fetch(`/api/civil-mep-reports/property/${selectedPropertyId}`);
+      if (!response.ok) throw new Error("Failed to fetch existing report");
+      return response.json();
+    }
+  });
+
+  // Populate form when existing report data is loaded
+  useEffect(() => {
+    if (existingReport && isEditMode) {
+      setReportData({
+        reportTitle: existingReport.reportTitle || "",
+        engineerName: existingReport.engineerName || "",
+        engineerLicense: existingReport.engineerLicense || "",
+        inspectionDate: existingReport.inspectionDate || "",
+        reportDate: existingReport.reportDate || "",
+        executiveSummary: existingReport.executiveSummary || "",
+        overallScore: existingReport.overallScore || 8.5,
+        structuralScore: existingReport.structuralScore || 8.5,
+        mepScore: existingReport.mepScore || 9.0,
+        complianceScore: existingReport.complianceScore || 8.7,
+        recommendations: existingReport.recommendations || "",
+        conclusions: existingReport.conclusions || ""
+      });
+      
+      if (existingReport.sections) {
+        setReportSections(existingReport.sections);
+      }
+    }
+  }, [existingReport, isEditMode]);
+
   // Handle document upload
   const handleGetUploadParameters = async () => {
     const response = await fetch("/api/documents/upload", {
@@ -176,15 +229,20 @@ const CreateCivilMepReport = () => {
     });
   };
 
-  // Create report mutation
+  // Create/Update report mutation
   const createReportMutation = useMutation({
     mutationFn: async (reportData: any) => {
-      const response = await fetch("/api/civil-mep-reports", {
-        method: "POST",
+      const url = isEditMode 
+        ? `/api/civil-mep-reports/property/${selectedPropertyId}`
+        : "/api/civil-mep-reports";
+      const method = isEditMode ? "PUT" : "POST";
+      
+      const response = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(reportData)
       });
-      if (!response.ok) throw new Error("Failed to create report");
+      if (!response.ok) throw new Error(`Failed to ${isEditMode ? 'update' : 'create'} report`);
       return response.json();
     },
     onSuccess: () => {
@@ -343,7 +401,10 @@ const CreateCivilMepReport = () => {
   }
 
   return (
-    <AdminLayout title="Create CIVIL+MEP Report" subtitle="Generate comprehensive property engineering analysis">
+    <AdminLayout 
+      title={isEditMode ? "Edit CIVIL+MEP Report" : "Create CIVIL+MEP Report"} 
+      subtitle={isEditMode ? "Update comprehensive property engineering analysis" : "Generate comprehensive property engineering analysis"}
+    >
       <div className="p-6 max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -356,10 +417,13 @@ const CreateCivilMepReport = () => {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 flex items-center">
                   <FileText className="h-8 w-8 mr-3 text-violet-600" />
-                  Create CIVIL+MEP Report
+                  {isEditMode ? "Edit CIVIL+MEP Report" : "Create CIVIL+MEP Report"}
                 </h1>
                 <p className="text-gray-600 mt-2">
-                  Generate comprehensive engineering analysis report for a property
+                  {isEditMode 
+                    ? "Update comprehensive engineering analysis report for the property" 
+                    : "Generate comprehensive engineering analysis report for a property"
+                  }
                 </p>
               </div>
             </div>
@@ -371,12 +435,12 @@ const CreateCivilMepReport = () => {
               {createReportMutation.isPending ? (
                 <>
                   <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
-                  Creating...
+                  {isEditMode ? "Updating..." : "Creating..."}
                 </>
               ) : (
                 <>
                   <Save className="h-4 w-4 mr-2" />
-                  Create Report
+                  {isEditMode ? "Update Report" : "Create Report"}
                 </>
               )}
             </Button>
@@ -398,7 +462,11 @@ const CreateCivilMepReport = () => {
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="property">Select Property *</Label>
-                    <Select value={selectedPropertyId} onValueChange={setSelectedPropertyId}>
+                    <Select 
+                      value={selectedPropertyId} 
+                      onValueChange={setSelectedPropertyId}
+                      disabled={isEditMode}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Choose a property..." />
                       </SelectTrigger>
@@ -410,6 +478,11 @@ const CreateCivilMepReport = () => {
                         ))}
                       </SelectContent>
                     </Select>
+                    {isEditMode && (
+                      <p className="text-sm text-gray-500 mt-1">
+                        Property selection is locked when editing an existing report
+                      </p>
+                    )}
                   </div>
 
                   {selectedProperty && (
