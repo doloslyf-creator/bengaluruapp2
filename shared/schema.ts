@@ -898,3 +898,35 @@ export const insertValuationRequestSchema = createInsertSchema(valuationRequests
 
 export type ValuationRequest = typeof valuationRequests.$inferSelect;
 export type InsertValuationRequest = z.infer<typeof insertValuationRequestSchema>;
+
+// Team members and role management
+export const teamMembers = pgTable("team_members", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  email: varchar("email").unique().notNull(),
+  phone: varchar("phone"),
+  role: varchar("role", { enum: ["admin", "manager", "agent", "analyst", "intern"] }).notNull().default("agent"),
+  department: varchar("department", { enum: ["sales", "legal", "technical", "finance", "operations"] }).notNull().default("sales"),
+  permissions: json("permissions").default('[]'), // Array of permission strings
+  status: varchar("status", { enum: ["active", "inactive", "suspended"] }).notNull().default("active"),
+  joinDate: timestamp("join_date").defaultNow(),
+  lastActive: timestamp("last_active"),
+  profileImage: varchar("profile_image"),
+  bio: varchar("bio"),
+  specializations: json("specializations").default('[]'), // Array of specialization areas
+  performanceScore: integer("performance_score").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertTeamMemberSchema = createInsertSchema(teamMembers).omit({ 
+  id: true, 
+  createdAt: true, 
+  updatedAt: true 
+});
+export type InsertTeamMember = z.infer<typeof insertTeamMemberSchema>;
+export type TeamMember = typeof teamMembers.$inferSelect;
+
+// User types - keeping existing ones
+export type UpsertUser = typeof users.$inferInsert;
+export type User = typeof users.$inferSelect;

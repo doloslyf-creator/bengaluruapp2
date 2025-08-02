@@ -2209,6 +2209,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Team member API routes
+  app.get("/api/team-members", async (req, res) => {
+    try {
+      const members = await storage.getAllTeamMembers();
+      res.json(members);
+    } catch (error) {
+      console.error("Error fetching team members:", error);
+      res.status(500).json({ error: "Failed to fetch team members" });
+    }
+  });
+
+  app.get("/api/team-members/:id", async (req, res) => {
+    try {
+      const member = await storage.getTeamMember(req.params.id);
+      if (!member) {
+        return res.status(404).json({ error: "Team member not found" });
+      }
+      res.json(member);
+    } catch (error) {
+      console.error("Error fetching team member:", error);
+      res.status(500).json({ error: "Failed to fetch team member" });
+    }
+  });
+
+  app.post("/api/team-members", async (req, res) => {
+    try {
+      const member = await storage.createTeamMember(req.body);
+      console.log(`👥 New team member added: ${member.name} as ${member.role}`);
+      res.status(201).json(member);
+    } catch (error) {
+      console.error("Error creating team member:", error);
+      res.status(500).json({ error: "Failed to create team member" });
+    }
+  });
+
+  app.put("/api/team-members/:id", async (req, res) => {
+    try {
+      const member = await storage.updateTeamMember(req.params.id, req.body);
+      if (!member) {
+        return res.status(404).json({ error: "Team member not found" });
+      }
+      console.log(`👥 Team member updated: ${member.name}`);
+      res.json(member);
+    } catch (error) {
+      console.error("Error updating team member:", error);
+      res.status(500).json({ error: "Failed to update team member" });
+    }
+  });
+
+  app.delete("/api/team-members/:id", async (req, res) => {
+    try {
+      const deleted = await storage.deleteTeamMember(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Team member not found" });
+      }
+      console.log(`👥 Team member deleted: ${req.params.id}`);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting team member:", error);
+      res.status(500).json({ error: "Failed to delete team member" });
+    }
+  });
+
+  app.get("/api/team-members/department/:department", async (req, res) => {
+    try {
+      const members = await storage.getTeamMembersByDepartment(req.params.department);
+      res.json(members);
+    } catch (error) {
+      console.error("Error fetching team members by department:", error);
+      res.status(500).json({ error: "Failed to fetch team members" });
+    }
+  });
+
+  app.get("/api/team-members/active", async (req, res) => {
+    try {
+      const members = await storage.getActiveTeamMembers();
+      res.json(members);
+    } catch (error) {
+      console.error("Error fetching active team members:", error);
+      res.status(500).json({ error: "Failed to fetch active team members" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

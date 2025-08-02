@@ -107,6 +107,12 @@ const navigation = [
     description: "Location Management"
   },
   { 
+    name: "Team Management", 
+    href: "/admin-panel/team-management", 
+    icon: Users2,
+    description: "Manage Team Members"
+  },
+  { 
     name: "Settings", 
     href: "/admin-panel/settings", 
     icon: Settings,
