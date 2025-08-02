@@ -6,6 +6,16 @@ This is a comprehensive full-stack property management and customer discovery pl
 
 ## Recent Changes (August 2025)
 
+**CIVIL+MEP Report Order Management System (Completed - August 2025)**
+- Fixed payment failure issue for "pay later" functionality by implementing proper database flow
+- Created comprehensive Orders management page at /admin-panel/orders with full order tracking
+- Implemented order statistics dashboard showing total orders, pending payments, completed payments, and revenue
+- Added order detail view with status update functionality (Mark as Paid, Mark as Overdue)
+- Built backend API endpoints for complete order management (/api/orders, /api/orders/stats, /api/orders/:id/status)
+- Fixed foreign key constraint error by ensuring civil_mep_reports records exist before creating payment records
+- System now creates placeholder CIVIL+MEP reports when customers use "pay later" option
+- Admin can track all customer orders with complete payment and due date information
+
 **Legal Data Persistence Fix (Completed - August 2025)**
 - Fixed critical bug where legal metadata appeared "lost" after tab switching or page reload
 - Issue was in property-edit.tsx form reset logic missing legal field assignments
@@ -129,6 +139,8 @@ Focus areas: Customer-facing features, real data integration, and seamless user 
 - **Dashboard Analytics**: Property statistics and summary information
 - **Persistent Preferences**: Customer search preferences cached across sessions
 - **Real-time Data Integration**: Customer dropdowns populated from actual admin panel data
+- **CIVIL+MEP Report System**: Complete engineering report ordering with "pay later" functionality
+- **Order Management**: Comprehensive order tracking with payment status updates and customer management
 
 ## External Dependencies
 
