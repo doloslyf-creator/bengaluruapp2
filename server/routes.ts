@@ -614,52 +614,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { reportId, customerName, customerEmail, customerPhone, propertyId } = req.body;
       
-      const paymentData = {
-        reportId,
-        propertyId,
-        customerName,
-        customerEmail,
-        customerPhone,
-        amount: "2999.00",
-        paymentMethod: "pay-later" as const,
-        paymentStatus: "pay-later-pending" as const,
-        payLaterDueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        accessGrantedAt: new Date()
-      };
+      // First, create a basic CIVIL+MEP report record if it doesn't exist
+      let report;
+      try {
+        // Check if report exists by property ID (since getCivilMepReport takes propertyId, not reportId)
+        report = await storage.getCivilMepReport(propertyId);
+        if (!report) {
+          throw new Error("Report not found");
+        }
+      } catch (error) {
+        // Report doesn't exist, create a placeholder report
+        const property = await storage.getProperty(propertyId);
+        if (!property) {
+          return res.status(404).json({ error: "Property not found" });
+        }
 
-      const payment = await storage.createReportPayment(paymentData);
-      res.json({ 
-        success: true, 
-        paymentId: payment.id,
-        message: "Access granted for 7 days. Payment due within 7 days." 
-      });
+        const reportData = {
+          propertyId: propertyId,
+          reportTitle: `CIVIL+MEP Report - ${property.name}`,
+          engineerName: "TBD",
+          engineerLicense: "TBD",
+          inspectionDate: new Date(),
+          reportDate: new Date(),
+          civilMepReportStatus: "draft" as const,
+          overallScore: "0.0",
+          executiveSummary: "Report pending - Access granted via pay-later option",
+          investmentRecommendation: "conditional" as const,
+          estimatedMaintenanceCost: "0.00"
+        };
+        
+        report = await storage.createCivilMepReport(reportData);
+      }
+      
+      if (report) {
+        const paymentData = {
+          reportId: report.id,
+          propertyId,
+          customerName,
+          customerEmail,
+          customerPhone,
+          amount: "2999.00",
+          paymentMethod: "pay-later" as const,
+          paymentStatus: "pay-later-pending" as const,
+          payLaterDueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          accessGrantedAt: new Date()
+        };
+
+        const payment = await storage.createReportPayment(paymentData);
+        
+        res.json({ 
+          success: true, 
+          paymentId: payment.id,
+          reportId: report.id,
+          message: "Access granted for 7 days. Payment due within 7 days." 
+        });
+      } else {
+        throw new Error("Failed to create or retrieve report");
+      }
     } catch (error) {
       console.error("Error processing pay-later request:", error);
       res.status(500).json({ error: "Failed to process pay-later request" });
-    }
-  });
-
-  // CIVIL+MEP Pay Later Request
-  app.post("/api/civil-mep-reports/pay-later", async (req, res) => {
-    try {
-      const { reportId, customerName, customerEmail, customerPhone, propertyId } = req.body;
-      
-      // In production, this would save to database and trigger notification workflow
-      console.log("Pay Later Request:", {
-        reportId,
-        customerName,
-        customerEmail,
-        customerPhone,
-        propertyId,
-        timestamp: new Date().toISOString()
-      });
-      
-      res.json({ 
-        message: "Pay later request submitted successfully",
-        requestId: `PAY_LATER_${Date.now()}`
-      });
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
     }
   });
 
