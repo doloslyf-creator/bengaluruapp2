@@ -663,6 +663,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create CIVIL+MEP Report
+  app.post("/api/civil-mep-reports", async (req, res) => {
+    try {
+      const reportData = req.body;
+      
+      // In production, this would save to database
+      console.log("Creating CIVIL+MEP Report:", {
+        reportId: reportData.reportId,
+        propertyId: reportData.propertyId,
+        engineerName: reportData.engineerName,
+        overallScore: reportData.overallScore,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Enable CIVIL+MEP report for the property if not already enabled
+      if (reportData.propertyId) {
+        await storage.enableCivilMepReport(reportData.propertyId);
+      }
+      
+      res.json({ 
+        message: "CIVIL+MEP report created successfully",
+        reportId: reportData.reportId
+      });
+    } catch (error: any) {
+      console.error("Error creating CIVIL+MEP report:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

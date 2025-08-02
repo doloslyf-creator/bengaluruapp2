@@ -155,13 +155,23 @@ const CivilMepReports = () => {
                 Manage comprehensive property engineering analysis reports
               </p>
             </div>
-            <Button
-              onClick={() => setShowEnableDialog(true)}
-              className="bg-violet-600 hover:bg-violet-700"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Enable for Property
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => window.location.href = '/admin-panel/create-civil-mep-report'}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                Create New Report
+              </Button>
+              <Button
+                onClick={() => setShowEnableDialog(true)}
+                variant="outline"
+                className="border-violet-600 text-violet-600 hover:bg-violet-50"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Enable for Property
+              </Button>
+            </div>
           </div>
         </div>
 
