@@ -4,7 +4,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowLeft, Plus, Trash2, Save } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Save, Camera } from "lucide-react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -686,6 +686,71 @@ export default function PropertyEdit() {
                             onChange={(e) => field.onChange(e.target.value.split(',').map(tag => tag.trim()).filter(Boolean))}
                             placeholder="luxury, gated-community, gym, swimming-pool" 
                           />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="images"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Property Images</FormLabel>
+                        <FormControl>
+                          <div className="space-y-4">
+                            <Input 
+                              type="file"
+                              multiple
+                              accept="image/*"
+                              onChange={(e) => {
+                                const files = Array.from(e.target.files || []);
+                                // For now, we'll store file names as placeholders
+                                // In production, you'd upload to cloud storage and store URLs
+                                const imageUrls = files.map(file => URL.createObjectURL(file));
+                                field.onChange([...(field.value || []), ...imageUrls]);
+                              }}
+                              className="hidden"
+                              id="image-upload"
+                            />
+                            <label 
+                              htmlFor="image-upload"
+                              className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-gray-400 transition-colors"
+                            >
+                              <div className="text-center">
+                                <Camera className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                                <p className="text-sm text-gray-600">Click to upload images</p>
+                                <p className="text-xs text-gray-400">PNG, JPG, GIF up to 10MB each</p>
+                              </div>
+                            </label>
+                            
+                            {field.value && field.value.length > 0 && (
+                              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                {field.value.map((image: string, index: number) => (
+                                  <div key={index} className="relative">
+                                    <img 
+                                      src={image} 
+                                      alt={`Property image ${index + 1}`}
+                                      className="w-full h-24 object-cover rounded-lg border"
+                                    />
+                                    <Button
+                                      type="button"
+                                      variant="destructive"
+                                      size="sm"
+                                      className="absolute top-1 right-1 h-6 w-6 p-0"
+                                      onClick={() => {
+                                        const newImages = (field.value || []).filter((_: string, i: number) => i !== index);
+                                        field.onChange(newImages);
+                                      }}
+                                    >
+                                      ×
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
