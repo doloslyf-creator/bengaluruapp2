@@ -129,124 +129,88 @@ const CivilMepReports = () => {
   };
 
   return (
-    <AdminLayout title="CIVIL+MEP Reports" subtitle="Manage comprehensive property engineering analysis reports">
+    <AdminLayout title="CIVIL+MEP Reports">
       <div className="p-6">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                <Briefcase className="h-8 w-8 mr-3 text-violet-600" />
-                CIVIL+MEP Reports
-              </h1>
-              <p className="text-gray-600 mt-2">
-                Manage comprehensive property engineering analysis reports
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                onClick={() => window.location.href = '/admin-panel/create-civil-mep-report'}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                <FileText className="h-4 w-4 mr-2" />
-                Create New Report
-              </Button>
-              <Button
-                onClick={() => setShowEnableDialog(true)}
-                variant="outline"
-                className="border-violet-600 text-violet-600 hover:bg-violet-50"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Enable for Property
-              </Button>
-            </div>
-          </div>
+        {/* Compact Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center">
+            <Briefcase className="h-7 w-7 mr-2 text-violet-600" />
+            CIVIL+MEP Reports
+          </h1>
+          <p className="text-gray-600 text-sm">
+            Comprehensive property engineering analysis reports
+          </p>
         </div>
 
-        {/* Statistics Cards */}
+        {/* Compact Statistics */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
+          <Card className="mb-6">
+            <CardContent className="p-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="flex items-center space-x-3">
                   <div className="p-2 bg-violet-100 rounded-lg">
-                    <FileText className="h-6 w-6 text-violet-600" />
+                    <FileText className="h-5 w-5 text-violet-600" />
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Total Reports</p>
-                    <p className="text-2xl font-bold text-gray-900">{stats.totalReports}</p>
+                  <div>
+                    <p className="text-xs text-gray-600">Total Reports</p>
+                    <p className="text-lg font-bold text-gray-900">{stats.totalReports}</p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
 
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
+                <div className="flex items-center space-x-3">
                   <div className="p-2 bg-green-100 rounded-lg">
-                    <CheckCircle className="h-6 w-6 text-green-600" />
+                    <CheckCircle className="h-5 w-5 text-green-600" />
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Completed</p>
-                    <p className="text-2xl font-bold text-gray-900">{stats.completedReports}</p>
+                  <div>
+                    <p className="text-xs text-gray-600">Completed</p>
+                    <p className="text-lg font-bold text-gray-900">{stats.completedReports}</p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
 
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
+                <div className="flex items-center space-x-3">
                   <div className="p-2 bg-green-100 rounded-lg">
-                    <IndianRupee className="h-6 w-6 text-green-600" />
+                    <IndianRupee className="h-5 w-5 text-green-600" />
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-                    <p className="text-2xl font-bold text-gray-900">{formatPrice(stats.totalRevenue)}</p>
+                  <div>
+                    <p className="text-xs text-gray-600">Revenue</p>
+                    <p className="text-lg font-bold text-gray-900">{formatPrice(stats.totalRevenue)}</p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
 
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
+                <div className="flex items-center space-x-3">
                   <div className="p-2 bg-yellow-100 rounded-lg">
-                    <Clock className="h-6 w-6 text-yellow-600" />
+                    <Clock className="h-5 w-5 text-yellow-600" />
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Pending Payments</p>
-                    <p className="text-2xl font-bold text-gray-900">{stats.pendingPayments}</p>
+                  <div>
+                    <p className="text-xs text-gray-600">Pending</p>
+                    <p className="text-lg font-bold text-gray-900">{stats.pendingPayments}</p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
-        {/* Filters */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <div className="flex flex-col sm:flex-row gap-4">
+        {/* Compact Filters */}
+        <Card className="mb-4">
+          <CardContent className="p-4">
+            <div className="flex flex-col sm:flex-row gap-3 items-end">
               <div className="flex-1">
-                <Label htmlFor="search">Search Properties</Label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                   <Input
-                    id="search"
-                    placeholder="Search by name, area, or developer..."
+                    placeholder="Search properties, areas, developers..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 h-9"
                   />
                 </div>
               </div>
               
-              <div className="sm:w-48">
-                <Label>Filter by Status</Label>
+              <div className="sm:w-40">
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger>
-                    <SelectValue />
+                  <SelectTrigger className="h-9">
+                    <SelectValue placeholder="Filter by status" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Properties</SelectItem>
@@ -256,108 +220,153 @@ const CivilMepReports = () => {
                   </SelectContent>
                 </Select>
               </div>
+              
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => window.location.href = '/admin-panel/create-civil-mep-report'}
+                  size="sm"
+                  className="bg-green-600 hover:bg-green-700 h-9"
+                >
+                  <FileText className="h-4 w-4 mr-1" />
+                  New Report
+                </Button>
+                <Button
+                  onClick={() => setShowEnableDialog(true)}
+                  variant="outline"
+                  size="sm"
+                  className="border-violet-600 text-violet-600 hover:bg-violet-50 h-9"
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Enable
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Properties List */}
+        {/* Properties Table - Compact View */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <Building className="h-5 w-5 mr-2" />
-              Properties ({filteredProperties.length})
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Building className="h-5 w-5 mr-2" />
+                Properties ({filteredProperties.length})
+              </div>
+              <div className="text-sm text-gray-500">
+                Compact view for better efficiency
+              </div>
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             {isLoading ? (
               <div className="text-center py-8">
                 <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4" />
                 <p className="text-gray-600">Loading properties...</p>
               </div>
             ) : filteredProperties.length > 0 ? (
-              <div className="space-y-4">
-                {filteredProperties.map((property: any) => (
-                  <div key={property.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between mb-2">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 border-b">
+                    <tr>
+                      <th className="text-left p-4 font-medium text-gray-900">Property</th>
+                      <th className="text-left p-4 font-medium text-gray-900">Location</th>
+                      <th className="text-left p-4 font-medium text-gray-900">Developer</th>
+                      <th className="text-left p-4 font-medium text-gray-900">Status</th>
+                      <th className="text-left p-4 font-medium text-gray-900">Stats</th>
+                      <th className="text-right p-4 font-medium text-gray-900">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredProperties.map((property: any, index: number) => (
+                      <tr key={property.id} className={`border-b hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}`}>
+                        <td className="p-4">
                           <div>
-                            <h3 className="font-semibold text-lg text-gray-900">{property.name}</h3>
-                            <p className="text-gray-600 flex items-center mt-1">
-                              <MapPin className="h-4 w-4 mr-1" />
-                              {property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)} Bengaluru
-                            </p>
-                            <p className="text-sm text-gray-500 mt-1">
-                              by {property.developer} • {property.type.charAt(0).toUpperCase() + property.type.slice(1)}
-                            </p>
+                            <h3 className="font-semibold text-gray-900">{property.name}</h3>
+                            <p className="text-sm text-gray-500">{property.type.charAt(0).toUpperCase() + property.type.slice(1)}</p>
                           </div>
-                          <div className="text-right">
-                            {getReportStatusBadge(property)}
+                        </td>
+                        <td className="p-4">
+                          <div className="text-sm">
+                            <p className="text-gray-900">{property.area}</p>
+                            <p className="text-gray-500">{property.zone.charAt(0).toUpperCase() + property.zone.slice(1)} Zone</p>
                           </div>
-                        </div>
-
-                        {/* Report Stats */}
-                        {property.reportStats && (
-                          <div className="grid grid-cols-3 gap-4 mt-3 p-3 bg-gray-50 rounded-lg">
-                            <div className="text-center">
-                              <p className="text-xs text-gray-600">Payments</p>
-                              <p className="font-semibold">{property.reportStats.totalPayments}</p>
+                        </td>
+                        <td className="p-4">
+                          <p className="text-sm text-gray-900">{property.developer}</p>
+                        </td>
+                        <td className="p-4">
+                          {getReportStatusBadge(property)}
+                        </td>
+                        <td className="p-4">
+                          {property.reportStats && property.hasCivilMepReport ? (
+                            <div className="text-xs">
+                              <div className="flex items-center gap-3">
+                                <span className="text-gray-600">
+                                  Rev: <span className="font-medium text-green-600">{formatPrice(property.reportStats.totalRevenue)}</span>
+                                </span>
+                                <span className="text-gray-600">
+                                  Pay: <span className="font-medium">{property.reportStats.totalPayments}</span>
+                                </span>
+                                {property.reportStats.pendingPayments > 0 && (
+                                  <span className="text-yellow-600 font-medium">
+                                    {property.reportStats.pendingPayments} pending
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                            <div className="text-center">
-                              <p className="text-xs text-gray-600">Revenue</p>
-                              <p className="font-semibold">{formatPrice(property.reportStats.totalRevenue)}</p>
-                            </div>
-                            <div className="text-center">
-                              <p className="text-xs text-gray-600">Pending</p>
-                              <p className="font-semibold text-yellow-600">{property.reportStats.pendingPayments}</p>
-                            </div>
+                          ) : (
+                            <span className="text-xs text-gray-400">No data</span>
+                          )}
+                        </td>
+                        <td className="p-4 text-right">
+                          <div className="flex gap-1 justify-end">
+                            {property.hasCivilMepReport ? (
+                              <>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedProperty(property);
+                                    setShowViewReportDialog(true);
+                                  }}
+                                  className="h-8 px-2"
+                                  title="View Report"
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedProperty(property);
+                                    setShowManageDialog(true);
+                                  }}
+                                  className="h-8 px-2"
+                                  title="Manage Report"
+                                >
+                                  <Settings className="h-4 w-4" />
+                                </Button>
+                              </>
+                            ) : (
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedProperty(property);
+                                  setShowEnableDialog(true);
+                                }}
+                                className="h-8 px-2 text-violet-600 hover:text-violet-700 hover:bg-violet-50"
+                                title="Enable Report"
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            )}
                           </div>
-                        )}
-                      </div>
-
-                      <div className="ml-6 flex gap-2">
-                        {property.hasCivilMepReport ? (
-                          <>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => {
-                                setSelectedProperty(property);
-                                setShowViewReportDialog(true);
-                              }}
-                            >
-                              <Eye className="h-4 w-4 mr-1" />
-                              View Report
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => {
-                                setSelectedProperty(property);
-                                setShowManageDialog(true);
-                              }}
-                            >
-                              <Settings className="h-4 w-4 mr-1" />
-                              Manage
-                            </Button>
-                          </>
-                        ) : (
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => {
-                              setSelectedProperty(property);
-                              setShowEnableDialog(true);
-                            }}
-                          >
-                            <Plus className="h-4 w-4 mr-1" />
-                            Enable Report
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             ) : (
               <div className="text-center py-12">
