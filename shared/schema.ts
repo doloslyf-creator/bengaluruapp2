@@ -32,6 +32,7 @@ export const properties = pgTable("properties", {
   // Media
   images: json("images").$type<string[]>().notNull().default([]),
   videos: json("videos").$type<string[]>().notNull().default([]),
+  youtubeVideoUrl: text("youtube_video_url"), // YouTube video URL for property overview
   
   // Timestamps
   createdAt: timestamp("created_at").defaultNow(),

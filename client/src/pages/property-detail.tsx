@@ -21,6 +21,13 @@ interface PropertyWithConfigurations extends Property {
   configurations: PropertyConfiguration[];
 }
 
+// Helper function to extract YouTube video ID from URL
+const extractYouTubeVideoId = (url: string): string => {
+  const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+  const match = url.match(regex);
+  return match ? match[1] : '';
+};
+
 export default function PropertyDetail() {
   const [, navigate] = useLocation();
   const [match, params] = useRoute("/property/:id");
@@ -190,31 +197,58 @@ export default function PropertyDetail() {
       <section className="bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Main Image */}
+            {/* Main Media - YouTube Video or Image Gallery */}
             <div className="lg:col-span-2">
-              <div className="relative aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden">
-                <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                  <div className="text-center">
-                    <Camera className="h-16 w-16 mx-auto mb-4" />
-                    <p className="text-xl font-medium">Property Gallery</p>
-                    <p className="text-sm">Professional photography coming soon</p>
+              {property.youtubeVideoUrl ? (
+                <div className="space-y-4">
+                  {/* YouTube Video */}
+                  <div className="relative aspect-video rounded-lg overflow-hidden">
+                    <iframe
+                      src={`https://www.youtube.com/embed/${extractYouTubeVideoId(property.youtubeVideoUrl)}`}
+                      title="Property Overview Video"
+                      className="w-full h-full"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                  
+                  {/* Gallery Preview */}
+                  <div className="relative aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden">
+                    <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                      <div className="text-center">
+                        <Camera className="h-12 w-12 mx-auto mb-2" />
+                        <p className="text-lg font-medium">Property Gallery</p>
+                        <p className="text-sm">Professional photography coming soon</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                {/* Image navigation dots */}
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
-                  <div className="flex space-x-2">
-                    {[1, 2, 3, 4, 5].map((_, index) => (
-                      <button
-                        key={index}
-                        className={`w-2 h-2 rounded-full ${
-                          index === activeImageIndex ? 'bg-white' : 'bg-white/50'
-                        }`}
-                        onClick={() => setActiveImageIndex(index)}
-                      />
-                    ))}
+              ) : (
+                <div className="relative aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden">
+                  <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                    <div className="text-center">
+                      <Camera className="h-16 w-16 mx-auto mb-4" />
+                      <p className="text-xl font-medium">Property Gallery</p>
+                      <p className="text-sm">Professional photography coming soon</p>
+                    </div>
+                  </div>
+                  {/* Image navigation dots */}
+                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+                    <div className="flex space-x-2">
+                      {[1, 2, 3, 4, 5].map((_, index) => (
+                        <button
+                          key={index}
+                          className={`w-2 h-2 rounded-full ${
+                            index === activeImageIndex ? 'bg-white' : 'bg-white/50'
+                          }`}
+                          onClick={() => setActiveImageIndex(index)}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Property Quick Info */}

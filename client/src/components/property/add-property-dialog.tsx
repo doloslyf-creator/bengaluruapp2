@@ -278,6 +278,15 @@ export function AddPropertyDialog({ open, onOpenChange }: AddPropertyDialogProps
                   placeholder="PRM/KA/RERA/1251/309/AG/2020-21"
                 />
               </div>
+
+              <div className="md:col-span-2">
+                <Label htmlFor="youtubeVideoUrl">YouTube Video URL (Optional)</Label>
+                <Input
+                  id="youtubeVideoUrl"
+                  {...form.register("youtubeVideoUrl")}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                />
+              </div>
             </div>
           </div>
 

@@ -14,6 +14,7 @@ This is a comprehensive full-stack property management and customer discovery pl
 - Integrated all property data including configurations, tags, RERA info, and investment metrics
 - Built responsive design with mobile-friendly sticky header and action buttons
 - Added property comparison features and similar property recommendations
+- **YouTube Video Integration**: Added YouTube video field (videoUrl) to property schema and updated database to support property overview videos as first element before gallery
 
 **Authentication Removal (Completed - August 2025)**
 - Completely removed Firebase and all authentication systems from the application
