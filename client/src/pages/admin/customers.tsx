@@ -1352,19 +1352,351 @@ export default function Customers() {
 
           {activeTab === "orders" && (
             <div className="space-y-6">
+              {/* Revenue Stats Overview */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Total Revenue</p>
+                        <p className="text-2xl font-bold text-gray-900">
+                          ₹{stats?.totalRevenue?.toLocaleString() || '0'}
+                        </p>
+                      </div>
+                      <DollarSign className="h-8 w-8 text-green-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Total Orders</p>
+                        <p className="text-2xl font-bold text-blue-600">
+                          {filteredCustomers.reduce((sum, c) => sum + c.orders.length, 0)}
+                        </p>
+                      </div>
+                      <ShoppingCart className="h-8 w-8 text-blue-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Avg Order Value</p>
+                        <p className="text-2xl font-bold text-purple-600">
+                          ₹{stats?.averageOrderValue?.toLocaleString() || '0'}
+                        </p>
+                      </div>
+                      <TrendingUp className="h-8 w-8 text-purple-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Pending Payments</p>
+                        <p className="text-2xl font-bold text-yellow-600">₹2.4L</p>
+                      </div>
+                      <Clock className="h-8 w-8 text-yellow-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Revenue Trends Chart */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <ShoppingCart className="h-5 w-5 mr-2" />
-                    Orders & Revenue Analytics
+                    <BarChart3 className="h-5 w-5 mr-2" />
+                    Revenue Trends
                   </CardTitle>
                   <CardDescription>
-                    Track orders, payments, and revenue metrics
+                    Monthly revenue and order volume analysis
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-12 text-gray-500">
-                    Order analytics features coming soon...
+                  <div className="space-y-4">
+                    {[
+                      { month: "Jan 2024", revenue: 45000, orders: 12, growth: "+15%" },
+                      { month: "Feb 2024", revenue: 52000, orders: 14, growth: "+16%" },
+                      { month: "Mar 2024", revenue: 48000, orders: 13, growth: "-8%" },
+                      { month: "Apr 2024", revenue: 61000, orders: 16, growth: "+27%" },
+                      { month: "May 2024", revenue: 58000, orders: 15, growth: "-5%" },
+                      { month: "Jun 2024", revenue: 67000, orders: 18, growth: "+16%" },
+                    ].map((data) => (
+                      <div key={data.month} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center space-x-4">
+                          <div className="font-medium">{data.month}</div>
+                          <div className="text-sm text-gray-500">{data.orders} orders</div>
+                        </div>
+                        <div className="flex items-center space-x-4">
+                          <div className="font-medium">₹{data.revenue.toLocaleString()}</div>
+                          <Badge 
+                            variant={data.growth.startsWith('+') ? 'default' : 'destructive'}
+                            className={data.growth.startsWith('+') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}
+                          >
+                            {data.growth}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Order Management Table */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center">
+                        <FileText className="h-5 w-5 mr-2" />
+                        Order Management
+                      </CardTitle>
+                      <CardDescription>
+                        Track all customer orders and payment status
+                      </CardDescription>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Button variant="outline" size="sm">
+                        <Download className="h-4 w-4 mr-2" />
+                        Export Orders
+                      </Button>
+                      <Select defaultValue="all">
+                        <SelectTrigger className="w-32">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Orders</SelectItem>
+                          <SelectItem value="paid">Paid</SelectItem>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="failed">Failed</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Customer</TableHead>
+                        <TableHead>Order Type</TableHead>
+                        <TableHead>Amount</TableHead>
+                        <TableHead>Payment Status</TableHead>
+                        <TableHead>Order Date</TableHead>
+                        <TableHead>Property</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredCustomers.flatMap((customer) => 
+                        customer.orders.map((order, index) => (
+                          <TableRow key={`${customer.id}-${index}`}>
+                            <TableCell>
+                              <div>
+                                <div className="font-medium">{customer.name}</div>
+                                <div className="text-sm text-gray-500">{customer.email}</div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline">
+                                CIVIL+MEP Report
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="font-medium">₹{parseFloat(order.amount).toLocaleString()}</div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge 
+                                variant={
+                                  order.paymentStatus === "paid" ? "default" :
+                                  order.paymentStatus === "pending" ? "secondary" : "destructive"
+                                }
+                                className={
+                                  order.paymentStatus === "paid" ? "bg-green-100 text-green-800" :
+                                  order.paymentStatus === "pending" ? "bg-yellow-100 text-yellow-800" :
+                                  "bg-red-100 text-red-800"
+                                }
+                              >
+                                {order.paymentStatus}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              {format(new Date(order.createdAt), "MMM dd, yyyy")}
+                            </TableCell>
+                            <TableCell>
+                              <div className="text-sm">Property Analysis</div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center space-x-1">
+                                <Button variant="ghost" size="sm">
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="sm">
+                                  <Download className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="sm">
+                                  <RefreshCw className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="sm">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+
+              {/* Revenue Analytics & Payment Insights */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <PieChart className="h-5 w-5 mr-2" />
+                      Revenue Breakdown
+                    </CardTitle>
+                    <CardDescription>
+                      Revenue distribution by service type
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[
+                        { service: "Property Valuation Reports", revenue: 180000, percentage: 45, color: "bg-blue-500" },
+                        { service: "CIVIL+MEP Reports", revenue: 140000, percentage: 35, color: "bg-green-500" },
+                        { service: "Legal Due Diligence", revenue: 60000, percentage: 15, color: "bg-purple-500" },
+                        { service: "Consultation Services", revenue: 20000, percentage: 5, color: "bg-yellow-500" },
+                      ].map((item) => (
+                        <div key={item.service} className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium">{item.service}</span>
+                            <span className="text-sm text-gray-500">{item.percentage}%</span>
+                          </div>
+                          <div className="flex items-center space-x-3">
+                            <div className="flex-1 bg-gray-200 rounded-full h-2">
+                              <div 
+                                className={`h-2 rounded-full ${item.color}`}
+                                style={{ width: `${item.percentage}%` }}
+                              ></div>
+                            </div>
+                            <span className="text-sm font-medium">₹{item.revenue.toLocaleString()}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <TrendingUp className="h-5 w-5 mr-2" />
+                      Payment Insights
+                    </CardTitle>
+                    <CardDescription>
+                      Payment patterns and customer behavior
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="text-center p-3 bg-green-50 rounded-lg">
+                          <div className="text-2xl font-bold text-green-600">92%</div>
+                          <div className="text-sm text-gray-600">Payment Success Rate</div>
+                        </div>
+                        <div className="text-center p-3 bg-blue-50 rounded-lg">
+                          <div className="text-2xl font-bold text-blue-600">3.2 days</div>
+                          <div className="text-sm text-gray-600">Avg Payment Time</div>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">UPI Payments</span>
+                          <span className="text-sm font-medium">65%</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Net Banking</span>
+                          <span className="text-sm font-medium">25%</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Credit/Debit Cards</span>
+                          <span className="text-sm font-medium">10%</span>
+                        </div>
+                      </div>
+
+                      <div className="mt-4">
+                        <h4 className="text-sm font-medium mb-2">Top Revenue Customers</h4>
+                        <div className="space-y-2">
+                          {[
+                            { name: "Rajesh Kumar", amount: 45000 },
+                            { name: "Priya Sharma", amount: 38000 },
+                            { name: "Amit Patel", amount: 32000 },
+                          ].map((customer) => (
+                            <div key={customer.name} className="flex justify-between text-sm">
+                              <span className="text-gray-600">{customer.name}</span>
+                              <span className="font-medium">₹{customer.amount.toLocaleString()}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Revenue Management Tools */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Settings className="h-5 w-5 mr-2" />
+                    Revenue Management Tools
+                  </CardTitle>
+                  <CardDescription>
+                    Financial operations and revenue optimization
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <Button variant="outline" className="p-6 h-auto flex-col space-y-2">
+                      <DollarSign className="h-8 w-8 text-green-600" />
+                      <div className="text-center">
+                        <div className="font-medium">Payment Reminders</div>
+                        <div className="text-sm text-gray-500">Automated follow-ups</div>
+                      </div>
+                    </Button>
+                    
+                    <Button variant="outline" className="p-6 h-auto flex-col space-y-2">
+                      <FileText className="h-8 w-8 text-blue-600" />
+                      <div className="text-center">
+                        <div className="font-medium">Invoice Generation</div>
+                        <div className="text-sm text-gray-500">Bulk invoicing</div>
+                      </div>
+                    </Button>
+                    
+                    <Button variant="outline" className="p-6 h-auto flex-col space-y-2">
+                      <BarChart3 className="h-8 w-8 text-purple-600" />
+                      <div className="text-center">
+                        <div className="font-medium">Revenue Forecasting</div>
+                        <div className="text-sm text-gray-500">Predictive analytics</div>
+                      </div>
+                    </Button>
+                    
+                    <Button variant="outline" className="p-6 h-auto flex-col space-y-2">
+                      <RefreshCw className="h-8 w-8 text-orange-600" />
+                      <div className="text-center">
+                        <div className="font-medium">Refund Management</div>
+                        <div className="text-sm text-gray-500">Process refunds</div>
+                      </div>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
