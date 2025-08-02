@@ -1,207 +1,60 @@
 # OwnItRight - Property Management Dashboard
 
 ## Overview
-
-This is a comprehensive full-stack property management and customer discovery platform built with Express.js backend and React frontend. The system combines admin property management with a sophisticated customer-facing property finder that enables property search, booking site visits, and consultation requests. It focuses on Indian real estate market features including RERA compliance, zoning information, and regional categorization with real-time integration between admin panel data and customer experience.
-
-## Recent Changes (August 2025)
-
-**Legal Due Diligence Tracker System (Completed - August 2025)**
-- Implemented comprehensive 12-step Legal Due Diligence Tracker based on industry best practices
-- Created admin panel Legal Tracker at `/admin-panel/legal-tracker` for managing property legal verification
-- Built customer-facing Legal Tracker at `/user-panel/legal-tracker` with progress visualization and document management
-- Added backend API endpoints for legal tracker management (/api/legal-trackers)
-- Integrated legal tracker into both admin and user navigation systems
-- Features include: progress tracking, document upload functionality, legal advisor chat, downloadable checklists
-- Covers all essential legal steps: title verification, encumbrance check, zoning compliance, building approvals, occupancy certificates, NOCs, RERA registration, tax clearance, developer verification, environmental clearance, legal opinion, and final verification
-- Professional interface with step-by-step status tracking (Verified, Pending, Not Verified) and date stamps
-
-**Professional Property Valuation Reports with User Panel (Completed - August 2025)**
-- Created comprehensive user-facing valuation reports panel at `/user-panel/valuation-reports`
-- Implemented professional report display matching industry standards from sample valuation document
-- Built detailed report dialog with property specifications, cost breakdown tables, market analysis, and risk assessment
-- Added valuation reports access from user panel with quick action links
-- Designed professional header layout and structured sections following industry valuation report formats
-- Integrated comprehensive cost breakdown display with percentage analysis and professional formatting
-- Enhanced admin cost breakdown system with detailed construction tables, automated tax calculations, and professional cost analysis
-- Added component-wise construction breakdown with specifications, rates, quantities, units, and auto-calculated amounts
-- Implemented automated tax calculations for GST, registration, and stamp duty with percentage-based real-time updates
-- Created three-tier cost summary system (Basic Cost, Total Taxes, Additional Costs) with professional gradient display
-
-**Brand Update to OwnItRight (Completed - August 2025)**
-- Updated brand name from PropertyHub to OwnItRight across all portals and interfaces
-- Created CSS wordmark logo with gradient styling and animations
-- Added tagline "Curated Properties" throughout the application
-- Updated admin panel, customer header, and user dashboard with new branding
-- Implemented sophisticated logo design with color-coded typography (Own=primary, It=orange, Right=blue)
-
-## Previous Changes
-
-**CIVIL+MEP Report Order Management System (Completed - August 2025)**
-- Fixed payment failure issue for "pay later" functionality by implementing proper database flow
-- Created comprehensive Orders management page at /admin-panel/orders with full order tracking
-- Implemented order statistics dashboard showing total orders, pending payments, completed payments, and revenue
-- Added order detail view with status update functionality (Mark as Paid, Mark as Overdue)
-- Built backend API endpoints for complete order management (/api/orders, /api/orders/stats, /api/orders/:id/status)
-- Fixed foreign key constraint error by ensuring civil_mep_reports records exist before creating payment records
-- System now creates placeholder CIVIL+MEP reports when customers use "pay later" option
-- Admin can track all customer orders with complete payment and due date information
-
-**Legal Data Persistence Fix (Completed - August 2025)**
-- Fixed critical bug where legal metadata appeared "lost" after tab switching or page reload
-- Issue was in property-edit.tsx form reset logic missing legal field assignments
-- Form now properly loads all legal fields from database into form state
-- Legal data persistence confirmed working correctly in PostgreSQL database
-- Users can now safely switch between tabs without losing legal information
-
-**Business Expansion with Blog Management (Completed - August 2025)**
-- Implemented professional OwnItRight header with customer navigation (Find Property, Insights, Contact)
-- Built comprehensive blog management system in admin panel with full CRUD operations
-- Added Blog navigation link consistently across all admin pages
-- Created 5 content categories perfect for real estate business (market insights, property guides, investment tips, legal updates, developer spotlights)
-- Implemented professional blog editor with auto-slug generation, reading time calculation, and SEO metadata
-- Added blog statistics dashboard showing posts, views, and performance metrics
-- Expanded database schema with comprehensive blog functionality
-
-**Single Property Detail Page (Completed - August 2025)**
-- Created comprehensive property detail page at `/property/:id` route
-- Designed unique layout with combined video/image slider and tabbed information
-- Implemented clickable property cards in results page with hover effects (removed separate "View Details" button)
-- Integrated all property data including configurations, tags, RERA info, and investment metrics
-- Built responsive design with mobile-friendly sticky header and action buttons
-- Added property comparison features and similar property recommendations
-- **YouTube Video Integration**: Added YouTube video field (videoUrl) to property schema and updated database to support property overview videos
-- **Combined Media Slider**: Unified video and image display with navigation arrows, thumbnails, and media indicators
-- **Image Upload System**: Added drag-and-drop image upload functionality to admin panel with preview and delete options
-- **Functional Share Button**: Implemented native sharing with Web Share API fallback to clipboard copy
-- **WhatsApp Direct Sharing**: Added dedicated WhatsApp share button with formatted message including property details
-- **Dynamic Similar Properties**: Implemented intelligent property matching algorithm with weighted scoring based on zone, type, developer, status, and tags
-
-**Complete Sub-Menu Organization & Dropdown Integration (Completed - August 2025)**
-- Successfully implemented Properties sub-menu structure with "View Properties" and "Add New Property" sections
-- Built Zones sub-menu system with "View Zones" table and "Add New Zone" functionality  
-- Implemented Developers sub-menu system with "View Developers" and "Add New Developer" sections
-- Added backend API endpoints for zones and developers data management with realistic Bengaluru data
-- Integrated Zones and Developers as dropdown options in property edit functionality replacing hardcoded values
-- Consistent professional design pattern across all admin sections with actionable table views and form interfaces
-
-**Enhanced Property Detail Widgets (Completed - August 2025)**
-- **Property Score Widget**: Overall rating system with detailed breakdowns for location, amenities, and value for money with real database scoring
-- **Price Comparison Widget**: Comparative analysis against area and city averages with value assessment indicators and admin-managed data
-
-**Legal Due Diligence System (Completed - August 2025)**
-- **Comprehensive Legal Metadata**: 16 structured legal fields covering title clearance, ownership, RERA compliance, documentation, and approvals
-- **4-Tab Admin Interface**: Extended admin panel with dedicated Legal tab for managing all legal metadata with proper form validation
-- **Legal Tab in Property Detail**: Professional display of legal information with status badges, document links, and compliance indicators
-- **Database Schema Integration**: Added all legal fields to PostgreSQL schema with proper types and relationships
-
-**Authentication Removal (Completed - August 2025)**
-- Completely removed Firebase and all authentication systems from the application
-- Made admin panel directly accessible without login requirements at /admin-panel
-- Updated all admin pages to remove authentication dependencies and logout functionality
-- Fixed TypeScript errors in leads.tsx that were preventing application from running
-- Removed Firebase package from dependencies and cleaned up all authentication imports
-
-**Lead Management System (Previously Completed)**
-- Built comprehensive lead management dashboard with filtering, search, and detailed lead views
-- Implemented automatic lead generation from customer bookings and consultations
-- Created lead scoring system (60 points for site visits, 75 points for consultations)
-- Added activity tracking, note-taking, and lead qualification workflows  
-- Integrated lead statistics and conversion tracking with real-time analytics
-- Updated admin navigation across all pages to include leads management
-- System automatically converts every customer interaction into qualified leads with complete contact information
-
-**Customer Property Finder System (Previously Completed)**
-- Built complete 4-page customer journey: Find Property → Property Results → Book Visit → Consultation
-- Implemented advanced property matching algorithm with weighted scoring (type 30%, zone 25%, budget 25%, tags 15%, BHK 5%)
-- Added localStorage caching system for search preferences that persist across navigation
-- Enhanced property results with multiple sorting options (Best Match, Price Low/High, Name A-Z)
-- Created advanced filtering panel with budget slider, zone selection, property type, and feature filters
-- Integrated real admin panel data extraction for zones, property types, and tags (no hardcoded options)
-- Fixed property selection dropdowns to dynamically populate from actual database properties
-- Implemented comprehensive booking system for site visits and consultations with confirmation workflows
-- **Strict Property Type Filtering (August 2025)**: Implemented precise filtering where villa selection shows only villas, plot selection shows only plots, ensuring customers see exactly what they requested
+OwnItRight is a comprehensive full-stack platform for property management and customer discovery, specifically tailored for the Indian real estate market. It integrates an admin property management system with a customer-facing property finder, facilitating property search, site visit bookings, and consultation requests. Key capabilities include real-time data integration, RERA compliance features, zoning information, regional categorization, a legal due diligence tracker, and professional property valuation reports. The platform aims to provide a seamless and transparent experience for both property managers and prospective buyers, enhancing efficiency and trust in real estate transactions.
 
 ## User Preferences
-
 Preferred communication style: Simple, everyday language.
 Project approach: User appreciates comprehensive solutions that integrate real data with sophisticated customer experience.
 Focus areas: Customer-facing features, real data integration, and seamless user workflows.
 
-## Authentication
-
-- **Firebase OTP Authentication**: Complete client-side authentication system
-- Admin phone number: +91 95603 66601 (authorized for admin access)
-- Firebase phone number verification with reCAPTCHA
-- Environment variables: VITE_FIREBASE_API_KEY, VITE_FIREBASE_APP_ID, VITE_FIREBASE_PROJECT_ID
-- No server-side authentication routes needed (Firebase handles everything)
-- Secure OTP delivery via Firebase SMS service
-
 ## System Architecture
 
 ### Frontend Architecture
-- **React with TypeScript**: Single-page application using functional components and hooks
-- **Styling**: Tailwind CSS with shadcn/ui component library for consistent design system
-- **State Management**: TanStack Query (React Query) for server state management and caching
-- **Routing**: Wouter for lightweight client-side routing
-- **Forms**: React Hook Form with Zod validation for type-safe form handling
-- **File Uploads**: Uppy integration for file upload capabilities with cloud storage support
+The frontend is a React-based single-page application built with TypeScript, utilizing functional components and hooks. Styling is managed with Tailwind CSS and the shadcn/ui component library. State management and caching for server data are handled by TanStack Query (React Query), while Wouter provides lightweight client-side routing. Form management leverages React Hook Form with Zod for type-safe validation. File uploads are integrated using Uppy.
 
 ### Backend Architecture
-- **Express.js**: RESTful API server with middleware for logging, error handling, and request parsing
-- **TypeScript**: Type-safe server implementation with shared schemas
-- **Database Integration**: Drizzle ORM configured for PostgreSQL with schema-first approach
-- **Storage Layer**: Abstracted storage interface with in-memory implementation and cloud storage capabilities
-- **Development Setup**: Vite integration for hot module replacement in development
+The backend is an Express.js RESTful API server implemented in TypeScript. It includes middleware for logging, error handling, and request parsing. Database integration is managed via Drizzle ORM for PostgreSQL. The system includes an abstracted storage interface with both in-memory and cloud storage capabilities. Development uses Vite for hot module replacement.
 
 ### Database Design
-- **PostgreSQL**: Primary database with Drizzle ORM for type-safe queries
-- **Schema Structure**: Properties table with comprehensive fields including location, specifications, legal compliance, and media storage
-- **Data Validation**: Shared Zod schemas between frontend and backend for consistent validation
-- **Migration Support**: Drizzle Kit for database schema migrations
+PostgreSQL is the primary database, accessed through Drizzle ORM for type-safe queries. The schema includes comprehensive fields for properties, covering location, specifications, legal compliance, and media storage. Data validation is ensured by shared Zod schemas between the frontend and backend, and Drizzle Kit is used for database schema migrations.
 
 ### API Structure
-- **RESTful Endpoints**: Standard CRUD operations for properties (`/api/properties`)
-- **Search & Filtering**: Advanced property search with multiple filter criteria
-- **Validation Layer**: Request validation using Zod schemas
-- **Error Handling**: Centralized error handling with proper HTTP status codes
-- **Logging**: Request/response logging for API monitoring
+The API follows RESTful principles, providing standard CRUD operations for entities like properties. It supports advanced property search and filtering. Request validation is implemented using Zod schemas, and a centralized error handling system provides appropriate HTTP status codes.
 
 ### Key Features
-- **Property Management**: Full CRUD operations with detailed property specifications
-- **Customer Property Discovery**: Advanced property finder with intelligent matching and filtering
-- **Indian Market Focus**: RERA compliance tracking, zone-based categorization, and regional pricing
-- **Media Support**: Image and video upload capabilities for property listings
-- **Advanced Search**: Text search across property names, developers, and locations
-- **Intelligent Filtering**: Dynamic multi-criteria filtering by type, status, zone, price range, and features
-- **Booking System**: Site visit and consultation booking with confirmation workflows
-- **Dashboard Analytics**: Property statistics and summary information
-- **Persistent Preferences**: Customer search preferences cached across sessions
-- **Real-time Data Integration**: Customer dropdowns populated from actual admin panel data
-- **CIVIL+MEP Report System**: Complete engineering report ordering with "pay later" functionality
-- **Order Management**: Comprehensive order tracking with payment status updates and customer management
+- **Property Management**: Full CRUD operations for detailed property specifications.
+- **Customer Property Discovery**: Advanced property finder with intelligent matching, filtering, and persistent search preferences.
+- **Indian Market Focus**: RERA compliance tracking, zone-based categorization, and regional pricing.
+- **Media Support**: Image and video upload capabilities for property listings, with a combined media slider.
+- **Booking System**: Site visit and consultation booking with confirmation workflows.
+- **Legal Due Diligence**: A 12-step tracker for legal verification, with admin and user panel interfaces, document management, and progress visualization.
+- **Professional Property Valuation Reports**: User-facing valuation reports with detailed property specifications, cost breakdowns, market analysis, and risk assessment.
+- **CIVIL+MEP Report System**: Engineering report ordering with "pay later" functionality and comprehensive order management.
+- **Lead Management System**: Automatic lead generation from customer interactions, with scoring, activity tracking, and analytics.
+- **Blog Management System**: Admin panel for full CRUD operations on blog posts, content categories, and SEO metadata.
+- **Branding**: "OwnItRight" brand update across the application with a custom wordmark logo.
 
 ## External Dependencies
 
 ### Database Services
-- **Neon Database**: PostgreSQL database hosting via `@neondatabase/serverless`
-- **Drizzle ORM**: Database toolkit with PostgreSQL dialect for type-safe queries
+- **Neon Database**: PostgreSQL database hosting.
+- **Drizzle ORM**: Database toolkit for type-safe queries.
 
 ### Cloud Storage
-- **Google Cloud Storage**: File storage service via `@google-cloud/storage`
-- **AWS S3**: Alternative cloud storage support through Uppy integration
+- **Google Cloud Storage**: Primary file storage service.
+- **AWS S3**: Supported as an alternative cloud storage option via Uppy integration.
 
 ### UI Components
-- **Radix UI**: Accessible component primitives for complex UI elements
-- **shadcn/ui**: Pre-built component library built on Radix UI and Tailwind CSS
-- **Lucide React**: Icon library for consistent iconography
+- **Radix UI**: Accessible component primitives.
+- **shadcn/ui**: Pre-built component library for consistent UI.
+- **Lucide React**: Icon library.
 
 ### Development Tools
-- **Vite**: Build tool and development server with React plugin
-- **ESBuild**: Fast bundler for production builds
-- **TypeScript**: Type checking and compilation
-- **Tailwind CSS**: Utility-first CSS framework with PostCSS processing
+- **Vite**: Build tool and development server.
+- **ESBuild**: Fast bundler.
+- **TypeScript**: Type checking and compilation.
+- **Tailwind CSS**: Utility-first CSS framework.
 
 ### File Upload
-- **Uppy**: Modular file uploader with dashboard, drag-drop, and cloud storage integrations
-- **Multiple Providers**: Support for AWS S3, Google Cloud, and other storage backends
+- **Uppy**: Modular file uploader with dashboard, drag-drop, and cloud storage integrations for various providers (AWS S3, Google Cloud).
