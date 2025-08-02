@@ -210,6 +210,12 @@ export default function UserPanel() {
                         Valuation Reports
                       </Button>
                     </Link>
+                    <Link href="/user-panel/civil-mep-reports">
+                      <Button variant="outline" size="sm" className="w-full justify-start">
+                        <Building className="h-4 w-4 mr-2" />
+                        CIVIL+MEP Reports
+                      </Button>
+                    </Link>
                     <Button variant="outline" size="sm" className="w-full justify-start">
                       <Settings className="h-4 w-4 mr-2" />
                       Edit Profile
@@ -223,18 +229,19 @@ export default function UserPanel() {
           {/* Main Panel */}
           <div className="lg:col-span-3">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-5 mb-8">
+              <TabsList className="grid w-full grid-cols-6 mb-8">
                 <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
                 <TabsTrigger value="properties">Properties</TabsTrigger>
                 <TabsTrigger value="bookings">Bookings</TabsTrigger>
                 <TabsTrigger value="consultations">Consultations</TabsTrigger>
                 <TabsTrigger value="orders">Orders</TabsTrigger>
+                <TabsTrigger value="civil-mep">CIVIL+MEP</TabsTrigger>
               </TabsList>
 
               {/* Dashboard Tab */}
               <TabsContent value="dashboard" className="space-y-6">
                 {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                   <Card>
                     <CardContent className="pt-6">
                       <div className="flex items-center justify-between">
@@ -277,6 +284,19 @@ export default function UserPanel() {
                             <p className="text-3xl font-bold text-purple-600">View</p>
                           </div>
                           <Calculator className="h-8 w-8 text-purple-600" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                  <Link href="/user-panel/civil-mep-reports">
+                    <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                      <CardContent className="pt-6">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-gray-600">CIVIL+MEP</p>
+                            <p className="text-3xl font-bold text-orange-600">View</p>
+                          </div>
+                          <Building className="h-8 w-8 text-orange-600" />
                         </div>
                       </CardContent>
                     </Card>
