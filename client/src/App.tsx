@@ -78,7 +78,7 @@ function Router() {
       <Route path="/admin-panel/valuation-reports" component={ValuationReports} />
       <Route path="/admin-panel/valuation-reports/:action/:id?" component={ValuationReportEdit} />
       <Route path="/admin-panel/property/:id/edit" component={PropertyEdit} />
-      <Route path="/admin-panel/leads" component={LeadsPage} />
+
       <Route path="/admin-panel/legal-management" component={LegalManagement} />
       <Route path="/admin-panel/legal-tracker" component={LegalTracker} />
       <Route path="/admin-panel/legal-tracker/manage" component={LegalTracker} />

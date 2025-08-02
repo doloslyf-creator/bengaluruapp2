@@ -52,12 +52,7 @@ const navigation = [
     icon: BarChart3,
     description: "Data & Insights"
   },
-  { 
-    name: "Leads", 
-    href: "/admin-panel/leads", 
-    icon: UserCheck,
-    description: "Customer Management"
-  },
+
   { 
     name: "Blog", 
     href: "/admin-panel/blog", 
