@@ -326,10 +326,10 @@ const CivilMepReports = () => {
                                   variant="ghost" 
                                   size="sm"
                                   onClick={() => {
-                                    window.location.href = `/admin-panel/civil-mep-reports/civ-mep-001`;
+                                    window.location.href = `/admin-panel/create-civil-mep-report?propertyId=${property.id}&edit=true`;
                                   }}
                                   className="h-8 px-2"
-                                  title="View Report"
+                                  title="Edit Report"
                                 >
                                   <Eye className="h-4 w-4" />
                                 </Button>
@@ -762,73 +762,116 @@ const CivilMepReports = () => {
                   </CardContent>
                 </Card>
 
-                {/* Customer Analytics */}
+                {/* Report Analytics */}
                 <Card>
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Customer Analytics</CardTitle>
+                    <CardTitle className="text-base">Report Analytics</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                       <div className="text-center p-3 bg-blue-50 rounded-lg">
-                        <div className="text-xl font-bold text-blue-600">12</div>
+                        <div className="text-xl font-bold text-blue-600">{selectedProperty?.reportStats?.totalPayments || 0}</div>
                         <div className="text-xs text-blue-800">Total Orders</div>
                       </div>
                       <div className="text-center p-3 bg-green-50 rounded-lg">
-                        <div className="text-xl font-bold text-green-600">₹35,988</div>
+                        <div className="text-xl font-bold text-green-600">
+                          {formatPrice(selectedProperty?.reportStats?.totalRevenue || 0)}
+                        </div>
                         <div className="text-xs text-green-800">Revenue Generated</div>
                       </div>
-                      <div className="text-center p-3 bg-yellow-50 rounded-lg">
-                        <div className="text-xl font-bold text-yellow-600">3</div>
-                        <div className="text-xs text-yellow-800">Pending Payments</div>
-                      </div>
                     </div>
+                    {selectedProperty?.reportStats?.pendingPayments > 0 && (
+                      <div className="mt-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-yellow-800">Pending Payments</span>
+                          <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
+                            {selectedProperty.reportStats.pendingPayments}
+                          </Badge>
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 
-                {/* Recent Orders */}
+                {/* Quick Actions */}
                 <Card>
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Recent Orders</CardTitle>
+                    <CardTitle className="text-base">Quick Actions</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-3">
-                      {[
-                        { id: 1, customer: "Rajesh Kumar", email: "rajesh@email.com", amount: 2999, status: "Completed", date: "2025-01-28" },
-                        { id: 2, customer: "Priya Sharma", email: "priya@email.com", amount: 2999, status: "Pending", date: "2025-01-27" },
-                        { id: 3, customer: "Amit Patel", email: "amit@email.com", amount: 2999, status: "Completed", date: "2025-01-26" }
-                      ].map((order) => (
-                        <div key={order.id} className="flex items-center justify-between p-3 border rounded-lg">
-                          <div>
-                            <p className="font-medium">{order.customer}</p>
-                            <p className="text-sm text-gray-600">{order.email}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-medium">₹{order.amount.toLocaleString()}</p>
-                            <Badge className={order.status === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
-                              {order.status}
-                            </Badge>
-                          </div>
-                        </div>
-                      ))}
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          window.location.href = `/admin-panel/create-civil-mep-report?propertyId=${selectedProperty?.id}&edit=true`;
+                        }}
+                        className="h-10 text-left justify-start"
+                      >
+                        <FileText className="h-4 w-4 mr-2" />
+                        Edit Report
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          window.location.href = `/admin-panel/civil-mep-reports/${selectedProperty?.id || 'civ-mep-001'}`;
+                        }}
+                        className="h-10 text-left justify-start"
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        View Details
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="h-10 text-left justify-start"
+                      >
+                        <IndianRupee className="h-4 w-4 mr-2" />
+                        Order History
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="h-10 text-left justify-start"
+                      >
+                        <BarChart3 className="h-4 w-4 mr-2" />
+                        Analytics
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
 
                 {/* Action Buttons */}
                 <div className="flex gap-3 pt-4">
-                  <Button className="bg-violet-600 hover:bg-violet-700">
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Save Changes
-                  </Button>
-                  <Button variant="outline">
+                  <Button 
+                    className="bg-violet-600 hover:bg-violet-700"
+                    onClick={() => {
+                      setShowManageDialog(false);
+                      window.location.href = `/admin-panel/create-civil-mep-report?propertyId=${selectedProperty?.id}&edit=true`;
+                    }}
+                  >
                     <FileText className="h-4 w-4 mr-2" />
-                    Export Order Data
+                    Edit Report
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      // Logic to disable report could be added here
+                      toast({
+                        title: "Report Status",
+                        description: "Report status management feature will be implemented."
+                      });
+                    }}
+                  >
+                    <AlertCircle className="h-4 w-4 mr-2" />
+                    Disable Report
                   </Button>
                   <Button 
                     variant="outline" 
                     onClick={() => setShowManageDialog(false)}
                   >
-                    Cancel
+                    Close
                   </Button>
                 </div>
               </div>
