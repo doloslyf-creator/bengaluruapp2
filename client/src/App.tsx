@@ -33,6 +33,8 @@ import UserCivilMepReports from "@/pages/user-civil-mep-reports";
 import CustomerHome from "@/pages/customer-home";
 import Home from "@/pages/home";
 import LeadsPage from "@/pages/leads";
+import LegalTracker from "@/pages/admin/legal-tracker";
+import UserLegalTracker from "@/pages/user-legal-tracker";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -60,6 +62,7 @@ function Router() {
       <Route path="/admin-panel/valuation-reports/:action/:id?" component={ValuationReportEdit} />
       <Route path="/admin-panel/property/:id/edit" component={PropertyEdit} />
       <Route path="/admin-panel/leads" component={LeadsPage} />
+      <Route path="/admin-panel/legal-tracker" component={LegalTracker} />
       
       {/* Customer-facing routes */}
       <Route path="/find-property" component={FindProperty} />
@@ -70,6 +73,7 @@ function Router() {
       <Route path="/user-panel" component={UserPanel} />
       <Route path="/user-panel/valuation-reports" component={UserValuationReports} />
       <Route path="/user-panel/civil-mep-reports" component={UserCivilMepReports} />
+      <Route path="/user-panel/legal-tracker" component={UserLegalTracker} />
       
       <Route component={NotFound} />
     </Switch>

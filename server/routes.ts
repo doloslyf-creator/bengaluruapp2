@@ -1268,6 +1268,158 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Legal Due Diligence Tracker API
+  app.get("/api/legal-trackers", async (req, res) => {
+    try {
+      // Return mock data for now - in production, would come from database
+      const trackers = [
+        {
+          propertyId: "cf7d5749-e008-4f43-b728-f24104891bb7",
+          propertyName: "Prestige Falcon City",
+          steps: [
+            {
+              id: 1,
+              title: "Property Title Verification",
+              description: "Ensures the seller holds a clear and marketable title to the property.",
+              action: "Confirm that the seller has valid ownership and that the title is free from any encumbrances (e.g., loans, disputes).",
+              documentsNeeded: ["Title deed", "Previous sale deeds"],
+              status: "verified",
+              dateVerified: "2025-01-15T10:30:00Z",
+              notes: "Title verified with clear ownership chain"
+            },
+            {
+              id: 2,
+              title: "Property Encumbrance Check",
+              description: "Verifies that the property is not mortgaged or involved in any legal dispute.",
+              action: "Check if there's a mortgage, lien, or any encumbrance listed in the encumbrance certificate.",
+              documentsNeeded: ["Encumbrance certificate (EC)"],
+              status: "verified",
+              dateVerified: "2025-01-16T14:20:00Z"
+            },
+            {
+              id: 3,
+              title: "Zoning and Land Use Check",
+              description: "Ensures the land is zoned correctly for the intended purpose (residential, commercial, etc.).",
+              action: "Confirm that the property is located in a residential zone or within legal boundaries for the intended use.",
+              documentsNeeded: ["Zoning certificate", "Land use approval from local municipal authority"],
+              status: "pending"
+            },
+            {
+              id: 4,
+              title: "Building Plan Approval",
+              description: "Ensures that the construction complies with local municipal and legal regulations.",
+              action: "Verify that the builder has received approval from the local authority for the building's layout and design.",
+              documentsNeeded: ["Building approval plan"],
+              status: "not-verified"
+            },
+            {
+              id: 5,
+              title: "Occupancy Certificate (OC)",
+              description: "A certificate issued by the local municipal authority stating the building is fit for occupation.",
+              action: "Confirm that the property has been issued an OC for legal occupation.",
+              documentsNeeded: ["Occupancy certificate"],
+              status: "not-verified"
+            },
+            {
+              id: 6,
+              title: "No Objection Certificates (NOCs)",
+              description: "Verifies that the required NOCs have been obtained from relevant authorities (fire, water, electricity, etc.).",
+              action: "Ensure the developer has obtained NOCs for utilities and other essential services.",
+              documentsNeeded: ["NOCs from relevant authorities"],
+              status: "not-verified"
+            },
+            {
+              id: 7,
+              title: "RERA Registration",
+              description: "Ensures that the property/project is registered with the Real Estate Regulatory Authority (RERA).",
+              action: "Verify that the builder has registered the project with RERA and is compliant with its regulations.",
+              documentsNeeded: ["RERA registration number"],
+              status: "verified",
+              dateVerified: "2025-01-10T09:15:00Z"
+            },
+            {
+              id: 8,
+              title: "Tax Payment and Land Revenue Records",
+              description: "Ensures that the property taxes have been paid and there are no arrears or disputes.",
+              action: "Verify that the seller has cleared all dues with the local municipality.",
+              documentsNeeded: ["Property tax receipts"],
+              status: "not-verified"
+            },
+            {
+              id: 9,
+              title: "Legal Title Verification of Developer/Builder",
+              description: "Ensures the developer has the legal right to develop and sell the property.",
+              action: "Check that the builder/developer is authorized to sell and construct on the land.",
+              documentsNeeded: ["Developer's title deed", "Authorization from landowner"],
+              status: "verified",
+              dateVerified: "2025-01-12T11:45:00Z"
+            },
+            {
+              id: 10,
+              title: "Clearance from Other Authorities",
+              description: "Ensures that there are no pending environmental clearances or issues with land use.",
+              action: "Verify that the property is free from environmental restrictions, forest land disputes, etc.",
+              documentsNeeded: ["Environmental clearance certificate", "Forest land certificate (if applicable)"],
+              status: "not-verified"
+            },
+            {
+              id: 11,
+              title: "Legal Opinion",
+              description: "A professional legal opinion to confirm that the property is free from litigation.",
+              action: "Hire a property lawyer to provide a legal opinion after reviewing all the documents.",
+              documentsNeeded: ["Lawyer's opinion letter"],
+              status: "not-verified"
+            },
+            {
+              id: 12,
+              title: "Final Verification",
+              description: "A final check to ensure that all due diligence steps have been completed satisfactorily.",
+              action: "Ensure that there are no red flags, and everything is in order.",
+              documentsNeeded: ["Summary of all verified documents"],
+              status: "not-verified"
+            }
+          ],
+          overallProgress: 42, // 5 verified out of 12 steps
+          lastUpdated: "2025-01-16T14:20:00Z"
+        }
+      ];
+      res.json(trackers);
+    } catch (error) {
+      console.error("Error fetching legal trackers:", error);
+      res.status(500).json({ error: "Failed to fetch legal trackers" });
+    }
+  });
+
+  app.post("/api/legal-trackers", async (req, res) => {
+    try {
+      const trackerData = req.body;
+      // In production, would save to database
+      const newTracker = {
+        ...trackerData,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      console.log("Legal tracker created:", newTracker);
+      res.json(newTracker);
+    } catch (error) {
+      console.error("Error creating legal tracker:", error);
+      res.status(500).json({ error: "Failed to create legal tracker" });
+    }
+  });
+
+  app.patch("/api/legal-trackers/:trackerId/steps/:stepId", async (req, res) => {
+    try {
+      const { trackerId, stepId } = req.params;
+      const updateData = req.body;
+      // In production, would update database
+      console.log("Legal step updated:", { trackerId, stepId, updateData });
+      res.json({ success: true, message: "Legal step updated successfully" });
+    } catch (error) {
+      console.error("Error updating legal step:", error);
+      res.status(500).json({ error: "Failed to update legal step" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

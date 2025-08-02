@@ -12,7 +12,8 @@ import {
   Settings,
   ArrowLeft,
   ShoppingCart,
-  Calculator
+  Calculator,
+  Scale
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -73,6 +74,12 @@ const navigation = [
     href: "/admin-panel/orders", 
     icon: ShoppingCart,
     description: "Order Management"
+  },
+  { 
+    name: "Legal Tracker", 
+    href: "/admin-panel/legal-tracker", 
+    icon: Scale,
+    description: "Legal Due Diligence"
   },
   { 
     name: "Customers", 

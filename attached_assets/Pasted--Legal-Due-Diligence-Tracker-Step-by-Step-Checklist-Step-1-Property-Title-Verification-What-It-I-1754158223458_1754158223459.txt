@@ -1,0 +1,117 @@
+📜 Legal Due Diligence Tracker: Step-by-Step Checklist
+Step 1: Property Title Verification
+What It Is: Ensures the seller holds a clear and marketable title to the property.
+
+Action: Confirm that the seller has valid ownership and that the title is free from any encumbrances (e.g., loans, disputes).
+
+Documents Needed: Title deed, previous sale deeds.
+
+Status Update: ✔️ Verified / ❌ Not Verified
+
+Step 2: Property Encumbrance Check
+What It Is: Verifies that the property is not mortgaged or involved in any legal dispute.
+
+Action: Check if there’s a mortgage, lien, or any encumbrance listed in the encumbrance certificate.
+
+Documents Needed: Encumbrance certificate (EC).
+
+Status Update: ✔️ Verified / ❌ Not Verified
+
+Step 3: Zoning and Land Use Check
+What It Is: Ensures the land is zoned correctly for the intended purpose (residential, commercial, etc.).
+
+Action: Confirm that the property is located in a residential zone or within legal boundaries for the intended use.
+
+Documents Needed: Zoning certificate, land use approval from local municipal authority.
+
+Status Update: ✔️ Verified / ❌ Not Verified
+
+Step 4: Building Plan Approval
+What It Is: Ensures that the construction complies with local municipal and legal regulations.
+
+Action: Verify that the builder has received approval from the local authority for the building’s layout and design.
+
+Documents Needed: Building approval plan.
+
+Status Update: ✔️ Verified / ❌ Not Verified
+
+Step 5: Occupancy Certificate (OC)
+What It Is: A certificate issued by the local municipal authority stating the building is fit for occupation.
+
+Action: Confirm that the property has been issued an OC for legal occupation.
+
+Documents Needed: Occupancy certificate.
+
+Status Update: ✔️ Verified / ❌ Not Verified
+
+Step 6: No Objection Certificates (NOCs)
+What It Is: Verifies that the required NOCs have been obtained from relevant authorities (fire, water, electricity, etc.).
+
+Action: Ensure the developer has obtained NOCs for utilities and other essential services.
+
+Documents Needed: NOCs from relevant authorities.
+
+Status Update: ✔️ Verified / ❌ Not Verified
+
+Step 7: RERA Registration
+What It Is: Ensures that the property/project is registered with the Real Estate Regulatory Authority (RERA).
+
+Action: Verify that the builder has registered the project with RERA and is compliant with its regulations.
+
+Documents Needed: RERA registration number.
+
+Status Update: ✔️ Verified / ❌ Not Verified
+
+Step 8: Tax Payment and Land Revenue Records
+What It Is: Ensures that the property taxes have been paid and there are no arrears or disputes.
+
+Action: Verify that the seller has cleared all dues with the local municipality.
+
+Documents Needed: Property tax receipts.
+
+Status Update: ✔️ Verified / ❌ Not Verified
+
+Step 9: Legal Title Verification of Developer/Builder (if applicable)
+What It Is: Ensures the developer has the legal right to develop and sell the property.
+
+Action: Check that the builder/developer is authorized to sell and construct on the land.
+
+Documents Needed: Developer’s title deed, authorization from landowner.
+
+Status Update: ✔️ Verified / ❌ Not Verified
+
+Step 10: Clearance from Other Authorities (Environmental, Forest, etc.)
+What It Is: Ensures that there are no pending environmental clearances or issues with land use.
+
+Action: Verify that the property is free from environmental restrictions, forest land disputes, etc.
+
+Documents Needed: Environmental clearance certificate, forest land certificate (if applicable).
+
+Status Update: ✔️ Verified / ❌ Not Verified
+
+Step 11: Legal Opinion
+What It Is: A professional legal opinion to confirm that the property is free from litigation.
+
+Action: Hire a property lawyer to provide a legal opinion after reviewing all the documents.
+
+Documents Needed: Lawyer's opinion letter.
+
+Status Update: ✔️ Verified / ❌ Not Verified
+
+Step 12: Final Verification
+What It Is: A final check to ensure that all due diligence steps have been completed satisfactorily.
+
+Action: Ensure that there are no red flags, and everything is in order.
+
+Documents Needed: Summary of all verified documents.
+
+Status Update: ✔️ Verified / ❌ Not Verified
+
+🛠️ Functionality for the User Dashboard
+Progress Tracker: A visual progress bar or checkmarks that updates as each step is verified.
+
+Document Upload Section: Allow users to upload documents directly into the platform for review.
+
+Legal Advisor Chat: Have a chat option where users can quickly ask legal queries related to the property they're viewing.
+
+Document Checklist: A downloadable checklist for the user to keep track of their progress offline.

@@ -6,6 +6,16 @@ This is a comprehensive full-stack property management and customer discovery pl
 
 ## Recent Changes (August 2025)
 
+**Legal Due Diligence Tracker System (Completed - August 2025)**
+- Implemented comprehensive 12-step Legal Due Diligence Tracker based on industry best practices
+- Created admin panel Legal Tracker at `/admin-panel/legal-tracker` for managing property legal verification
+- Built customer-facing Legal Tracker at `/user-panel/legal-tracker` with progress visualization and document management
+- Added backend API endpoints for legal tracker management (/api/legal-trackers)
+- Integrated legal tracker into both admin and user navigation systems
+- Features include: progress tracking, document upload functionality, legal advisor chat, downloadable checklists
+- Covers all essential legal steps: title verification, encumbrance check, zoning compliance, building approvals, occupancy certificates, NOCs, RERA registration, tax clearance, developer verification, environmental clearance, legal opinion, and final verification
+- Professional interface with step-by-step status tracking (Verified, Pending, Not Verified) and date stamps
+
 **Professional Property Valuation Reports with User Panel (Completed - August 2025)**
 - Created comprehensive user-facing valuation reports panel at `/user-panel/valuation-reports`
 - Implemented professional report display matching industry standards from sample valuation document
@@ -66,6 +76,14 @@ This is a comprehensive full-stack property management and customer discovery pl
 - **Functional Share Button**: Implemented native sharing with Web Share API fallback to clipboard copy
 - **WhatsApp Direct Sharing**: Added dedicated WhatsApp share button with formatted message including property details
 - **Dynamic Similar Properties**: Implemented intelligent property matching algorithm with weighted scoring based on zone, type, developer, status, and tags
+
+**Complete Sub-Menu Organization & Dropdown Integration (Completed - August 2025)**
+- Successfully implemented Properties sub-menu structure with "View Properties" and "Add New Property" sections
+- Built Zones sub-menu system with "View Zones" table and "Add New Zone" functionality  
+- Implemented Developers sub-menu system with "View Developers" and "Add New Developer" sections
+- Added backend API endpoints for zones and developers data management with realistic Bengaluru data
+- Integrated Zones and Developers as dropdown options in property edit functionality replacing hardcoded values
+- Consistent professional design pattern across all admin sections with actionable table views and form interfaces
 
 **Enhanced Property Detail Widgets (Completed - August 2025)**
 - **Property Score Widget**: Overall rating system with detailed breakdowns for location, amenities, and value for money with real database scoring

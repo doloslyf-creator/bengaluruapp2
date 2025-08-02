@@ -6,7 +6,7 @@ import {
   Star, Heart, MapPin, Phone, Mail, 
   Eye, Download, ExternalLink, Clock, 
   IndianRupee, CheckCircle, AlertCircle, XCircle,
-  Filter, Search, ChevronRight, Settings, Bell, Calculator, Building
+  Filter, Search, ChevronRight, Settings, Bell, Calculator, Building, Scale
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -216,6 +216,12 @@ export default function UserPanel() {
                         CIVIL+MEP Reports
                       </Button>
                     </Link>
+                    <Link href="/user-panel/legal-tracker">
+                      <Button variant="outline" size="sm" className="w-full justify-start">
+                        <Scale className="h-4 w-4 mr-2" />
+                        Legal Due Diligence
+                      </Button>
+                    </Link>
                     <Button variant="outline" size="sm" className="w-full justify-start">
                       <Settings className="h-4 w-4 mr-2" />
                       Edit Profile
@@ -297,6 +303,20 @@ export default function UserPanel() {
                             <p className="text-3xl font-bold text-orange-600">View</p>
                           </div>
                           <Building className="h-8 w-8 text-orange-600" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+
+                  <Link href="/user-panel/legal-tracker">
+                    <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                      <CardContent className="pt-6">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-gray-600">Legal Due Diligence</p>
+                            <p className="text-3xl font-bold text-purple-600">Track</p>
+                          </div>
+                          <Scale className="h-8 w-8 text-purple-600" />
                         </div>
                       </CardContent>
                     </Card>
