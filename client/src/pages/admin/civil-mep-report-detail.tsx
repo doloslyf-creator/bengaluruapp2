@@ -1,10 +1,11 @@
 import { useParams, useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
 import { 
   ArrowLeft, Download, FileText, Building, Calendar, User, 
   CheckCircle, AlertTriangle, Wrench, Zap, Shield, Home,
@@ -16,6 +17,7 @@ import AdminLayout from "@/components/layout/admin-layout";
 const CivilMepReportDetail = () => {
   const { id } = useParams();
   const [, navigate] = useLocation();
+  const { toast } = useToast();
 
   // Fetch report details
   const { data: report, isLoading, error } = useQuery({
@@ -26,6 +28,68 @@ const CivilMepReportDetail = () => {
       return response.json();
     },
     enabled: !!id
+  });
+
+  // Download PDF mutation
+  const downloadPDFMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/civil-mep-reports/${id}/download`);
+      if (!response.ok) throw new Error("Failed to download PDF");
+      return response.blob();
+    },
+    onSuccess: (blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `civil-mep-report-${id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast({
+        title: "Success",
+        description: "PDF report downloaded successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to download PDF report",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Generate Certificate mutation
+  const generateCertificateMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/civil-mep-reports/${id}/certificate`, {
+        method: 'POST'
+      });
+      if (!response.ok) throw new Error("Failed to generate certificate");
+      return response.blob();
+    },
+    onSuccess: (blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `compliance-certificate-${id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast({
+        title: "Success",
+        description: "Compliance certificate generated and downloaded successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to generate compliance certificate",
+        variant: "destructive",
+      });
+    }
   });
 
   if (isLoading) {
@@ -97,13 +161,20 @@ const CivilMepReportDetail = () => {
             </div>
           </div>
           <div className="flex space-x-2">
-            <Button variant="outline">
+            <Button 
+              variant="outline" 
+              onClick={() => downloadPDFMutation.mutate()}
+              disabled={downloadPDFMutation.isPending}
+            >
               <Download className="h-4 w-4 mr-2" />
-              Download PDF
+              {downloadPDFMutation.isPending ? "Downloading..." : "Download PDF"}
             </Button>
-            <Button>
+            <Button 
+              onClick={() => generateCertificateMutation.mutate()}
+              disabled={generateCertificateMutation.isPending}
+            >
               <FileText className="h-4 w-4 mr-2" />
-              Generate Certificate
+              {generateCertificateMutation.isPending ? "Generating..." : "Generate Certificate"}
             </Button>
           </div>
         </div>
