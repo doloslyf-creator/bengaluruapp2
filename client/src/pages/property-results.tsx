@@ -437,18 +437,33 @@ export default function PropertyResults() {
                   <Card key={property.id} className="hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer group border-0 shadow-md bg-gradient-to-br from-white to-gray-50/50">
                     <div onClick={() => handleViewProperty(property)}>
                       <CardHeader className="pb-3 relative">
-                        {/* Match Label on top */}
-                        <div className="absolute top-4 left-4 z-10">
-                          <Badge className={matchInfo.color + " text-xs font-semibold"}>
-                            ({matchInfo.label})
-                          </Badge>
-                        </div>
-                        
-                        <div className="flex items-start justify-between pt-8">
+                        <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <CardTitle className="text-xl font-bold group-hover:text-primary transition-colors mb-2">
-                              {property.name}
-                            </CardTitle>
+                            <div className="flex items-center justify-between mb-2">
+                              <CardTitle className="text-xl font-bold group-hover:text-primary transition-colors">
+                                {property.name}
+                              </CardTitle>
+                              <Badge className={matchInfo.color + " text-xs font-semibold ml-3"}>
+                                ({matchInfo.label})
+                              </Badge>
+                            </div>
+                            <div className="flex items-center mb-2">
+                              <Star className="h-3 w-3 text-yellow-400 fill-current mr-1" />
+                              <span className="text-xs text-gray-600 mr-2">{property.matchScore}% Match</span>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <span className="text-gray-400 cursor-help text-xs">ⓘ</span>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p className="text-sm">Match percentage based on your preferences:<br/>
+                                  • Property type match (30 points)<br/>
+                                  • Zone preference (25 points)<br/>
+                                  • Budget range (25 points)<br/>
+                                  • Tags & amenities (15 points)<br/>
+                                  • Configuration match (5 points)</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </div>
                             <p className="text-sm text-gray-600 flex items-center">
                               <MapPin className="h-4 w-4 mr-2 text-primary" />
                               {property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)} Bengaluru
