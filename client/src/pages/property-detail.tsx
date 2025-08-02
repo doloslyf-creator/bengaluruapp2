@@ -641,47 +641,192 @@ export default function PropertyDetail() {
                     </div>
                   </TabsContent>
                   
-                  <TabsContent value="legal" className="p-6 space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <h4 className="font-medium mb-3">RERA Compliance</h4>
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-gray-600">RERA Approved</span>
+                  <TabsContent value="legal" className="p-6 space-y-6">
+                    {/* Legal Verdict Badge */}
+                    {property.legalVerdictBadge && (
+                      <Card className="bg-success/10 border-success/20">
+                        <CardContent className="p-4">
+                          <div className="flex items-center text-success">
+                            <Shield className="h-5 w-5 mr-2" />
+                            <span className="font-semibold">{property.legalVerdictBadge}</span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Title and Ownership */}
+                      <Card className="card-stripe">
+                        <CardHeader>
+                          <CardTitle className="text-heading-3 flex items-center">
+                            <Shield className="h-5 w-5 mr-2 text-primary" />
+                            Title & Ownership
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          {property.titleClearanceStatus && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-muted-foreground">Title Clearance</span>
+                              <Badge variant={property.titleClearanceStatus === 'Clear' ? 'default' : property.titleClearanceStatus === 'Pending' ? 'secondary' : 'destructive'}>
+                                {property.titleClearanceStatus}
+                              </Badge>
+                            </div>
+                          )}
+                          {property.ownershipType && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-muted-foreground">Ownership Type</span>
+                              <span className="font-medium">{property.ownershipType}</span>
+                            </div>
+                          )}
+                          {property.legalOpinionProvidedBy && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-muted-foreground">Legal Opinion By</span>
+                              <span className="font-medium">{property.legalOpinionProvidedBy}</span>
+                            </div>
+                          )}
+                          {property.titleFlowSummary && (
+                            <div>
+                              <span className="text-muted-foreground block mb-2">Title Flow Summary</span>
+                              <p className="text-sm bg-muted/30 p-3 rounded-lg">{property.titleFlowSummary}</p>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+
+                      {/* RERA Compliance */}
+                      <Card className="card-stripe">
+                        <CardHeader>
+                          <CardTitle className="text-heading-3 flex items-center">
+                            <CheckCircle className="h-5 w-5 mr-2 text-success" />
+                            RERA Compliance
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="flex justify-between items-center">
+                            <span className="text-muted-foreground">RERA Registered</span>
                             <div className="flex items-center">
-                              <CheckCircle className={`h-4 w-4 mr-1 ${property.reraApproved ? 'text-green-600' : 'text-gray-400'}`} />
-                              <span className={property.reraApproved ? 'text-green-600' : 'text-gray-400'}>
-                                {property.reraApproved ? 'Yes' : 'Pending'}
+                              <CheckCircle className={`h-4 w-4 mr-2 ${property.reraRegistered ? 'text-success' : 'text-muted'}`} />
+                              <span className={property.reraRegistered ? 'text-success font-medium' : 'text-muted-foreground'}>
+                                {property.reraRegistered ? 'Yes' : 'No'}
                               </span>
                             </div>
                           </div>
-                          {property.reraNumber && (
-                            <div className="flex items-center justify-between">
-                              <span className="text-gray-600">RERA Number</span>
-                              <span className="font-mono text-sm">{property.reraNumber}</span>
+                          {property.reraID && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-muted-foreground">RERA ID</span>
+                              <span className="font-mono text-sm bg-muted/30 px-2 py-1 rounded">{property.reraID}</span>
                             </div>
                           )}
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <h4 className="font-medium mb-3">Documentation</h4>
-                        <div className="space-y-2">
-                          <Button variant="outline" size="sm" className="w-full justify-start">
-                            <Download className="h-4 w-4 mr-2" />
-                            Project Brochure
-                          </Button>
-                          <Button variant="outline" size="sm" className="w-full justify-start">
-                            <Download className="h-4 w-4 mr-2" />
-                            Floor Plans
-                          </Button>
-                          <Button variant="outline" size="sm" className="w-full justify-start">
-                            <Download className="h-4 w-4 mr-2" />
-                            Price List
-                          </Button>
-                        </div>
-                      </div>
+                          {property.reraLink && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-muted-foreground">RERA Record</span>
+                              <Button variant="outline" size="sm" asChild>
+                                <a href={property.reraLink} target="_blank" rel="noopener noreferrer">
+                                  <ExternalLink className="h-3 w-3 mr-1" />
+                                  View
+                                </a>
+                              </Button>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+
+                      {/* Documentation & Encumbrance */}
+                      <Card className="card-stripe">
+                        <CardHeader>
+                          <CardTitle className="text-heading-3 flex items-center">
+                            <Info className="h-5 w-5 mr-2 text-warning" />
+                            Documentation
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          {property.encumbranceStatus && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-muted-foreground">Encumbrance Status</span>
+                              <span className="text-sm text-right max-w-60">{property.encumbranceStatus}</span>
+                            </div>
+                          )}
+                          {property.mutationStatus && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-muted-foreground">Mutation Status</span>
+                              <span className="text-sm text-right max-w-60">{property.mutationStatus}</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between items-center">
+                            <span className="text-muted-foreground">DC Conversion</span>
+                            <div className="flex items-center">
+                              <CheckCircle className={`h-4 w-4 mr-2 ${property.conversionCertificate ? 'text-success' : 'text-muted'}`} />
+                              <span className={property.conversionCertificate ? 'text-success font-medium' : 'text-muted-foreground'}>
+                                {property.conversionCertificate ? 'Done' : 'Pending'}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            {property.ecExtractLink && (
+                              <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+                                <a href={property.ecExtractLink} target="_blank" rel="noopener noreferrer">
+                                  <Download className="h-4 w-4 mr-2" />
+                                  EC Extract
+                                </a>
+                              </Button>
+                            )}
+                            {property.layoutSanctionCopyLink && (
+                              <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+                                <a href={property.layoutSanctionCopyLink} target="_blank" rel="noopener noreferrer">
+                                  <Download className="h-4 w-4 mr-2" />
+                                  Layout Approval
+                                </a>
+                              </Button>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {/* Approvals & Litigation */}
+                      <Card className="card-stripe">
+                        <CardHeader>
+                          <CardTitle className="text-heading-3 flex items-center">
+                            <Building className="h-5 w-5 mr-2 text-primary" />
+                            Approvals & Status
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          {property.litigationStatus && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-muted-foreground">Litigation Status</span>
+                              <span className="text-sm text-right max-w-60">{property.litigationStatus}</span>
+                            </div>
+                          )}
+                          {property.approvingAuthorities && property.approvingAuthorities.length > 0 && (
+                            <div>
+                              <span className="text-muted-foreground block mb-2">Approving Authorities</span>
+                              <div className="flex flex-wrap gap-1">
+                                {property.approvingAuthorities.map((authority, index) => (
+                                  <Badge key={index} variant="outline" className="text-xs">
+                                    {authority}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
                     </div>
+
+                    {/* Legal Comments */}
+                    {property.legalComments && (
+                      <Card className="card-stripe">
+                        <CardHeader>
+                          <CardTitle className="text-heading-3 flex items-center">
+                            <MessageCircle className="h-5 w-5 mr-2 text-muted-foreground" />
+                            Legal Summary
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-muted-foreground italic">{property.legalComments}</p>
+                        </CardContent>
+                      </Card>
+                    )}
                   </TabsContent>
                 </Tabs>
               </CardContent>

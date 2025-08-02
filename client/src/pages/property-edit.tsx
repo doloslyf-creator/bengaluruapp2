@@ -38,6 +38,23 @@ const propertyEditSchema = insertPropertySchema.extend({
   cityAvgPriceMin: z.number().optional(),
   cityAvgPriceMax: z.number().optional(),
   priceComparison: z.string().optional(),
+  // Legal metadata fields
+  titleClearanceStatus: z.string().optional(),
+  ownershipType: z.string().optional(),
+  legalOpinionProvidedBy: z.string().optional(),
+  titleFlowSummary: z.string().optional(),
+  encumbranceStatus: z.string().optional(),
+  ecExtractLink: z.string().optional(),
+  mutationStatus: z.string().optional(),
+  conversionCertificate: z.boolean().optional(),
+  reraRegistered: z.boolean().optional(),
+  reraID: z.string().optional(),
+  reraLink: z.string().optional(),
+  litigationStatus: z.string().optional(),
+  approvingAuthorities: z.array(z.string()).optional(),
+  layoutSanctionCopyLink: z.string().optional(),
+  legalComments: z.string().optional(),
+  legalVerdictBadge: z.string().optional(),
 });
 
 type PropertyEditForm = z.infer<typeof propertyEditSchema>;
@@ -263,10 +280,11 @@ export default function PropertyEdit() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <Tabs defaultValue="basic" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="basic">Basic Info</TabsTrigger>
                   <TabsTrigger value="media">Media</TabsTrigger>
                   <TabsTrigger value="widgets">Widget Data</TabsTrigger>
+                  <TabsTrigger value="legal">Legal</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="basic" className="space-y-6 mt-6">
@@ -971,6 +989,306 @@ export default function PropertyEdit() {
                             <FormLabel>Price Comparison Message</FormLabel>
                             <FormControl>
                               <Input placeholder="12% below area average - Great value!" {...field} value={field.value || ""} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="legal" className="space-y-6 mt-6">
+                  {/* Title and Ownership */}
+                  <Card className="card-stripe">
+                    <CardHeader>
+                      <CardTitle className="text-heading-3">Title and Ownership</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="titleClearanceStatus"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Title Clearance Status</FormLabel>
+                              <FormControl>
+                                <Select onValueChange={field.onChange} value={field.value || ""}>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select status" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="Clear">Clear</SelectItem>
+                                    <SelectItem value="Pending">Pending</SelectItem>
+                                    <SelectItem value="Disputed">Disputed</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="ownershipType"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Ownership Type</FormLabel>
+                              <FormControl>
+                                <Select onValueChange={field.onChange} value={field.value || ""}>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select type" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="Freehold">Freehold</SelectItem>
+                                    <SelectItem value="Leasehold">Leasehold</SelectItem>
+                                    <SelectItem value="Joint Development">Joint Development</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <FormField
+                        control={form.control}
+                        name="legalOpinionProvidedBy"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Legal Opinion Provided By</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Veritas Legal LLP" {...field} value={field.value || ""} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="titleFlowSummary"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Title Flow Summary</FormLabel>
+                            <FormControl>
+                              <Textarea placeholder="Clear flow from 1982 to present via sale deed" {...field} value={field.value || ""} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </CardContent>
+                  </Card>
+
+                  {/* Encumbrance and Mutation */}
+                  <Card className="card-stripe">
+                    <CardHeader>
+                      <CardTitle className="text-heading-3">Encumbrance and Mutation</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="encumbranceStatus"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Encumbrance Status</FormLabel>
+                              <FormControl>
+                                <Input placeholder="No encumbrance as per EC till 2023" {...field} value={field.value || ""} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="mutationStatus"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Mutation Status</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Mutation completed and up to date" {...field} value={field.value || ""} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="ecExtractLink"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>EC Extract Link</FormLabel>
+                              <FormControl>
+                                <Input placeholder="https://.../EC-2023.pdf" {...field} value={field.value || ""} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="conversionCertificate"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                              <FormControl>
+                                <input 
+                                  type="checkbox" 
+                                  checked={field.value || false}
+                                  onChange={(e) => field.onChange(e.target.checked)}
+                                  className="rounded border border-input"
+                                />
+                              </FormControl>
+                              <FormLabel>DC Conversion Certificate</FormLabel>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* RERA Compliance */}
+                  <Card className="card-stripe">
+                    <CardHeader>
+                      <CardTitle className="text-heading-3">RERA Compliance</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="reraRegistered"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <input 
+                                type="checkbox" 
+                                checked={field.value || false}
+                                onChange={(e) => field.onChange(e.target.checked)}
+                                className="rounded border border-input"
+                              />
+                            </FormControl>
+                            <FormLabel>RERA Registered</FormLabel>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="reraID"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>RERA ID</FormLabel>
+                              <FormControl>
+                                <Input placeholder="PRM/KA/RERA/1251/310/PR/180222/001234" {...field} value={field.value || ""} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="reraLink"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>RERA Link</FormLabel>
+                              <FormControl>
+                                <Input placeholder="https://rera.karnataka.gov.in/..." {...field} value={field.value || ""} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Approvals and Litigation */}
+                  <Card className="card-stripe">
+                    <CardHeader>
+                      <CardTitle className="text-heading-3">Approvals and Litigation</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="litigationStatus"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Litigation Status</FormLabel>
+                            <FormControl>
+                              <Input placeholder="None reported as of June 2025" {...field} value={field.value || ""} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="approvingAuthorities"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Approving Authorities</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="BDA, BBMP, BWSSB (comma separated)"
+                                value={Array.isArray(field.value) ? field.value.join(', ') : ''}
+                                onChange={(e) => field.onChange(e.target.value.split(',').map(auth => auth.trim()).filter(Boolean))}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="layoutSanctionCopyLink"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Layout Sanction Copy Link</FormLabel>
+                            <FormControl>
+                              <Input placeholder="https://.../BDA-approval.pdf" {...field} value={field.value || ""} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </CardContent>
+                  </Card>
+
+                  {/* Legal Summary */}
+                  <Card className="card-stripe">
+                    <CardHeader>
+                      <CardTitle className="text-heading-3">Legal Summary</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="legalComments"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Legal Comments</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="All key title and compliance documents are verified. No red flags noted." 
+                                {...field} 
+                                value={field.value || ""} 
+                                rows={4}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="legalVerdictBadge"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Legal Verdict Badge</FormLabel>
+                            <FormControl>
+                              <Input placeholder="✓ Legally Vetted by OwnItRight" {...field} value={field.value || ""} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>

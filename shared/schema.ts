@@ -48,6 +48,24 @@ export const properties = pgTable("properties", {
   cityAvgPriceMin: integer("city_avg_price_min"), // in lakhs
   cityAvgPriceMax: integer("city_avg_price_max"), // in lakhs
   priceComparison: text("price_comparison"), // e.g., "12% below area average"
+
+  // Legal Due Diligence Metadata
+  titleClearanceStatus: text("title_clearance_status"), // Clear, Pending, Disputed
+  ownershipType: text("ownership_type"), // Freehold, Leasehold, Joint Development
+  legalOpinionProvidedBy: text("legal_opinion_provided_by"), // Lawyer/firm name
+  titleFlowSummary: text("title_flow_summary"), // Summary of title chain
+  encumbranceStatus: text("encumbrance_status"), // No encumbrance as per EC
+  ecExtractLink: text("ec_extract_link"), // URL to EC PDF
+  mutationStatus: text("mutation_status"), // Mutation completed status
+  conversionCertificate: boolean("conversion_certificate").default(false), // DC conversion done
+  reraRegistered: boolean("rera_registered").default(false), // RERA compliance
+  reraID: text("rera_id"), // RERA project ID
+  reraLink: text("rera_link"), // Direct link to RERA record
+  litigationStatus: text("litigation_status"), // Any known litigation
+  approvingAuthorities: json("approving_authorities").$type<string[]>().default([]), // Authority approvals
+  layoutSanctionCopyLink: text("layout_sanction_copy_link"), // PDF/Image of approval
+  legalComments: text("legal_comments"), // Lawyer's custom comment
+  legalVerdictBadge: text("legal_verdict_badge"), // Tagline or summary badge
   
   // Timestamps
   createdAt: timestamp("created_at").defaultNow(),
