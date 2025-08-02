@@ -449,109 +449,552 @@ export default function Customers() {
                                   <Eye className="h-4 w-4" />
                                 </Button>
                               </DialogTrigger>
-                              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                              <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
                                 <DialogHeader>
-                                  <DialogTitle>Customer Profile: {customer.name}</DialogTitle>
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <DialogTitle className="flex items-center space-x-3">
+                                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                          <User className="h-6 w-6 text-blue-600" />
+                                        </div>
+                                        <div>
+                                          <h2 className="text-xl font-bold">{customer.name}</h2>
+                                          <p className="text-sm text-gray-500">{customer.email}</p>
+                                        </div>
+                                      </DialogTitle>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                      {getStatusBadge(customer.status)}
+                                      <Badge variant="outline">Score: {customer.leadScore}</Badge>
+                                    </div>
+                                  </div>
                                   <DialogDescription>
-                                    Comprehensive customer relationship data
+                                    Complete customer relationship overview with all connected data
                                   </DialogDescription>
                                 </DialogHeader>
+                                
                                 {selectedCustomer && (
-                                  <Tabs defaultValue="overview" className="w-full">
-                                    <TabsList className="grid w-full grid-cols-4">
-                                      <TabsTrigger value="overview">Overview</TabsTrigger>
-                                      <TabsTrigger value="activities">Activities</TabsTrigger>
-                                      <TabsTrigger value="orders">Orders</TabsTrigger>
-                                      <TabsTrigger value="notes">Notes</TabsTrigger>
-                                    </TabsList>
-                                    <TabsContent value="overview" className="space-y-4">
-                                      <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                          <h4 className="font-medium">Contact Information</h4>
-                                          <div className="space-y-2 text-sm">
-                                            <div className="flex items-center"><Mail className="h-4 w-4 mr-2" />{selectedCustomer.email}</div>
-                                            <div className="flex items-center"><Phone className="h-4 w-4 mr-2" />{selectedCustomer.phone}</div>
-                                          </div>
-                                        </div>
-                                        <div>
-                                          <h4 className="font-medium">Status & Scoring</h4>
-                                          <div className="space-y-2">
-                                            {getStatusBadge(selectedCustomer.status)}
-                                            <div className="text-sm">Lead Score: {selectedCustomer.leadScore}/100</div>
-                                          </div>
-                                        </div>
+                                  <div className="space-y-6">
+                                    {/* Quick Stats */}
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                      <div className="bg-blue-50 p-4 rounded-lg text-center">
+                                        <div className="text-2xl font-bold text-blue-600">{selectedCustomer.orders.length}</div>
+                                        <div className="text-sm text-gray-600">Total Orders</div>
                                       </div>
-                                    </TabsContent>
-                                    <TabsContent value="activities" className="space-y-4">
-                                      <div>
-                                        <h4 className="font-medium mb-3">Recent Activities</h4>
-                                        <div className="space-y-3">
-                                          {selectedCustomer.leads.length > 0 && (
-                                            <div>
-                                              <h5 className="text-sm font-medium">Leads ({selectedCustomer.leads.length})</h5>
-                                              {selectedCustomer.leads.slice(0, 3).map((lead, idx) => (
-                                                <div key={idx} className="text-sm text-gray-600 ml-4">
-                                                  • {lead.customerName} - {lead.source}
+                                      <div className="bg-green-50 p-4 rounded-lg text-center">
+                                        <div className="text-2xl font-bold text-green-600">₹{selectedCustomer.totalSpent.toLocaleString()}</div>
+                                        <div className="text-sm text-gray-600">Total Spent</div>
+                                      </div>
+                                      <div className="bg-purple-50 p-4 rounded-lg text-center">
+                                        <div className="text-2xl font-bold text-purple-600">{selectedCustomer.bookings.length}</div>
+                                        <div className="text-sm text-gray-600">Site Visits</div>
+                                      </div>
+                                      <div className="bg-orange-50 p-4 rounded-lg text-center">
+                                        <div className="text-2xl font-bold text-orange-600">{selectedCustomer.leads.length}</div>
+                                        <div className="text-sm text-gray-600">Lead Activities</div>
+                                      </div>
+                                    </div>
+
+                                    <Tabs defaultValue="overview" className="w-full">
+                                      <TabsList className="grid w-full grid-cols-7">
+                                        <TabsTrigger value="overview">Overview</TabsTrigger>
+                                        <TabsTrigger value="reports">Reports</TabsTrigger>
+                                        <TabsTrigger value="orders">Orders</TabsTrigger>
+                                        <TabsTrigger value="bookings">Bookings</TabsTrigger>
+                                        <TabsTrigger value="schedules">Schedules</TabsTrigger>
+                                        <TabsTrigger value="communications">Communications</TabsTrigger>
+                                        <TabsTrigger value="notes">Notes</TabsTrigger>
+                                      </TabsList>
+
+                                      {/* Overview Tab */}
+                                      <TabsContent value="overview" className="space-y-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                          {/* Contact & Personal Info */}
+                                          <Card>
+                                            <CardHeader>
+                                              <CardTitle className="flex items-center">
+                                                <User className="h-5 w-5 mr-2" />
+                                                Contact Information
+                                              </CardTitle>
+                                            </CardHeader>
+                                            <CardContent className="space-y-3">
+                                              <div className="flex items-center justify-between">
+                                                <span className="text-sm text-gray-600">Email:</span>
+                                                <span className="font-medium">{selectedCustomer.email}</span>
+                                              </div>
+                                              <div className="flex items-center justify-between">
+                                                <span className="text-sm text-gray-600">Phone:</span>
+                                                <span className="font-medium">{selectedCustomer.phone}</span>
+                                              </div>
+                                              <div className="flex items-center justify-between">
+                                                <span className="text-sm text-gray-600">Source:</span>
+                                                <Badge variant="outline">{selectedCustomer.source}</Badge>
+                                              </div>
+                                              <div className="flex items-center justify-between">
+                                                <span className="text-sm text-gray-600">Last Activity:</span>
+                                                <span className="text-sm">{format(new Date(selectedCustomer.lastActivity), 'MMM dd, yyyy')}</span>
+                                              </div>
+                                              <div className="pt-2">
+                                                <div className="flex justify-between items-center mb-2">
+                                                  <span className="text-sm text-gray-600">Lead Score:</span>
+                                                  <span className="font-medium">{selectedCustomer.leadScore}/100</span>
+                                                </div>
+                                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                                  <div 
+                                                    className="bg-blue-500 h-2 rounded-full"
+                                                    style={{ width: `${selectedCustomer.leadScore}%` }}
+                                                  ></div>
+                                                </div>
+                                              </div>
+                                            </CardContent>
+                                          </Card>
+
+                                          {/* Property Interests */}
+                                          <Card>
+                                            <CardHeader>
+                                              <CardTitle className="flex items-center">
+                                                <Building className="h-5 w-5 mr-2" />
+                                                Property Interests
+                                              </CardTitle>
+                                            </CardHeader>
+                                            <CardContent>
+                                              {selectedCustomer.interestedProperties.length > 0 ? (
+                                                <div className="space-y-2">
+                                                  {selectedCustomer.interestedProperties.map((property, idx) => (
+                                                    <div key={idx} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                                                      <span className="text-sm font-medium">{property}</span>
+                                                      <Badge variant="secondary" size="sm">Interested</Badge>
+                                                    </div>
+                                                  ))}
+                                                </div>
+                                              ) : (
+                                                <p className="text-sm text-gray-500">No property interests recorded</p>
+                                              )}
+                                            </CardContent>
+                                          </Card>
+                                        </div>
+
+                                        {/* Recent Activities Timeline */}
+                                        <Card>
+                                          <CardHeader>
+                                            <CardTitle className="flex items-center">
+                                              <Activity className="h-5 w-5 mr-2" />
+                                              Recent Activities Timeline
+                                            </CardTitle>
+                                          </CardHeader>
+                                          <CardContent>
+                                            <div className="space-y-4">
+                                              {/* Combine all activities */}
+                                              {[
+                                                ...selectedCustomer.orders.map(order => ({
+                                                  type: 'order',
+                                                  date: order.createdAt,
+                                                  description: `Ordered ${order.reportType}`,
+                                                  amount: order.amount,
+                                                  status: order.status
+                                                })),
+                                                ...selectedCustomer.bookings.map(booking => ({
+                                                  type: 'booking',
+                                                  date: booking.createdAt,
+                                                  description: `Site visit booked for ${booking.propertyName}`,
+                                                  status: booking.status
+                                                })),
+                                                ...selectedCustomer.leads.map(lead => ({
+                                                  type: 'lead',
+                                                  date: lead.createdAt,
+                                                  description: `Lead from ${lead.source}`,
+                                                  status: lead.status
+                                                }))
+                                              ]
+                                              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                                              .slice(0, 10)
+                                              .map((activity, idx) => (
+                                                <div key={idx} className="flex items-start space-x-3">
+                                                  <div className={`w-3 h-3 rounded-full mt-2 ${
+                                                    activity.type === 'order' ? 'bg-green-500' :
+                                                    activity.type === 'booking' ? 'bg-blue-500' : 'bg-purple-500'
+                                                  }`}></div>
+                                                  <div className="flex-1">
+                                                    <div className="flex items-center justify-between">
+                                                      <p className="text-sm font-medium">{activity.description}</p>
+                                                      <span className="text-xs text-gray-500">{format(new Date(activity.date), 'MMM dd, yyyy')}</span>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2 mt-1">
+                                                      <Badge 
+                                                        variant="outline" 
+                                                        size="sm"
+                                                        className={
+                                                          activity.type === 'order' ? 'bg-green-50 text-green-700' :
+                                                          activity.type === 'booking' ? 'bg-blue-50 text-blue-700' : 'bg-purple-50 text-purple-700'
+                                                        }
+                                                      >
+                                                        {activity.type}
+                                                      </Badge>
+                                                      {activity.amount && (
+                                                        <span className="text-sm font-medium text-green-600">₹{parseFloat(activity.amount).toLocaleString()}</span>
+                                                      )}
+                                                    </div>
+                                                  </div>
                                                 </div>
                                               ))}
                                             </div>
-                                          )}
-                                          {selectedCustomer.bookings.length > 0 && (
-                                            <div>
-                                              <h5 className="text-sm font-medium">Bookings ({selectedCustomer.bookings.length})</h5>
-                                              {selectedCustomer.bookings.slice(0, 3).map((booking, idx) => (
-                                                <div key={idx} className="text-sm text-gray-600 ml-4">
-                                                  • {booking.propertyName} - {format(new Date(booking.visitDate), 'MMM dd, yyyy')}
+                                          </CardContent>
+                                        </Card>
+                                      </TabsContent>
+
+                                      {/* Reports Tab */}
+                                      <TabsContent value="reports" className="space-y-4">
+                                        <Card>
+                                          <CardHeader>
+                                            <CardTitle className="flex items-center justify-between">
+                                              <span className="flex items-center">
+                                                <FileText className="h-5 w-5 mr-2" />
+                                                Property Reports ({selectedCustomer.orders.length})
+                                              </span>
+                                              <Button size="sm">
+                                                <Plus className="h-4 w-4 mr-2" />
+                                                Generate Report
+                                              </Button>
+                                            </CardTitle>
+                                          </CardHeader>
+                                          <CardContent>
+                                            {selectedCustomer.orders.length > 0 ? (
+                                              <div className="space-y-3">
+                                                {selectedCustomer.orders.map((order, idx) => (
+                                                  <div key={idx} className="flex items-center justify-between p-4 border rounded-lg">
+                                                    <div className="flex items-center space-x-3">
+                                                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                                        <FileText className="h-5 w-5 text-blue-600" />
+                                                      </div>
+                                                      <div>
+                                                        <h4 className="font-medium">{order.reportType || 'CIVIL+MEP Report'}</h4>
+                                                        <p className="text-sm text-gray-500">
+                                                          {format(new Date(order.createdAt), 'MMM dd, yyyy')} • ₹{parseFloat(order.amount).toLocaleString()}
+                                                        </p>
+                                                      </div>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2">
+                                                      <Badge 
+                                                        variant={order.status === 'completed' ? 'default' : 'secondary'}
+                                                        className={order.status === 'completed' ? 'bg-green-100 text-green-800' : ''}
+                                                      >
+                                                        {order.status}
+                                                      </Badge>
+                                                      <Button variant="ghost" size="sm">
+                                                        <Download className="h-4 w-4" />
+                                                      </Button>
+                                                      <Button variant="ghost" size="sm">
+                                                        <Eye className="h-4 w-4" />
+                                                      </Button>
+                                                    </div>
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            ) : (
+                                              <div className="text-center py-8 text-gray-500">
+                                                <FileText className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+                                                <p>No reports generated yet</p>
+                                              </div>
+                                            )}
+                                          </CardContent>
+                                        </Card>
+                                      </TabsContent>
+
+                                      {/* Orders Tab */}
+                                      <TabsContent value="orders" className="space-y-4">
+                                        <Card>
+                                          <CardHeader>
+                                            <CardTitle className="flex items-center justify-between">
+                                              <span className="flex items-center">
+                                                <ShoppingCart className="h-5 w-5 mr-2" />
+                                                Order History (₹{selectedCustomer.totalSpent.toLocaleString()})
+                                              </span>
+                                              <Button size="sm">
+                                                <Plus className="h-4 w-4 mr-2" />
+                                                New Order
+                                              </Button>
+                                            </CardTitle>
+                                          </CardHeader>
+                                          <CardContent>
+                                            {selectedCustomer.orders.length > 0 ? (
+                                              <Table>
+                                                <TableHeader>
+                                                  <TableRow>
+                                                    <TableHead>Order ID</TableHead>
+                                                    <TableHead>Service</TableHead>
+                                                    <TableHead>Amount</TableHead>
+                                                    <TableHead>Payment Status</TableHead>
+                                                    <TableHead>Date</TableHead>
+                                                    <TableHead>Actions</TableHead>
+                                                  </TableRow>
+                                                </TableHeader>
+                                                <TableBody>
+                                                  {selectedCustomer.orders.map((order, idx) => (
+                                                    <TableRow key={idx}>
+                                                      <TableCell className="font-medium">#{order.id || `ORD-${idx + 1}`}</TableCell>
+                                                      <TableCell>{order.reportType || 'CIVIL+MEP Report'}</TableCell>
+                                                      <TableCell>₹{parseFloat(order.amount).toLocaleString()}</TableCell>
+                                                      <TableCell>
+                                                        <Badge 
+                                                          variant={order.paymentStatus === 'paid' ? 'default' : 'secondary'}
+                                                          className={order.paymentStatus === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}
+                                                        >
+                                                          {order.paymentStatus}
+                                                        </Badge>
+                                                      </TableCell>
+                                                      <TableCell>{format(new Date(order.createdAt), 'MMM dd, yyyy')}</TableCell>
+                                                      <TableCell>
+                                                        <div className="flex items-center space-x-1">
+                                                          <Button variant="ghost" size="sm">
+                                                            <Eye className="h-4 w-4" />
+                                                          </Button>
+                                                          <Button variant="ghost" size="sm">
+                                                            <Download className="h-4 w-4" />
+                                                          </Button>
+                                                        </div>
+                                                      </TableCell>
+                                                    </TableRow>
+                                                  ))}
+                                                </TableBody>
+                                              </Table>
+                                            ) : (
+                                              <div className="text-center py-8 text-gray-500">
+                                                <ShoppingCart className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+                                                <p>No orders placed yet</p>
+                                              </div>
+                                            )}
+                                          </CardContent>
+                                        </Card>
+                                      </TabsContent>
+
+                                      {/* Bookings Tab */}
+                                      <TabsContent value="bookings" className="space-y-4">
+                                        <Card>
+                                          <CardHeader>
+                                            <CardTitle className="flex items-center justify-between">
+                                              <span className="flex items-center">
+                                                <Calendar className="h-5 w-5 mr-2" />
+                                                Site Visits & Bookings ({selectedCustomer.bookings.length})
+                                              </span>
+                                              <Button size="sm">
+                                                <Plus className="h-4 w-4 mr-2" />
+                                                Schedule Visit
+                                              </Button>
+                                            </CardTitle>
+                                          </CardHeader>
+                                          <CardContent>
+                                            {selectedCustomer.bookings.length > 0 ? (
+                                              <div className="space-y-3">
+                                                {selectedCustomer.bookings.map((booking, idx) => (
+                                                  <div key={idx} className="flex items-center justify-between p-4 border rounded-lg">
+                                                    <div className="flex items-center space-x-3">
+                                                      <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                                        <MapPin className="h-5 w-5 text-green-600" />
+                                                      </div>
+                                                      <div>
+                                                        <h4 className="font-medium">{booking.propertyName}</h4>
+                                                        <p className="text-sm text-gray-500">
+                                                          {booking.bookingType} • {format(new Date(booking.visitDate), 'MMM dd, yyyy')}
+                                                        </p>
+                                                      </div>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2">
+                                                      <Badge 
+                                                        variant={booking.status === 'confirmed' ? 'default' : 'secondary'}
+                                                        className={
+                                                          booking.status === 'confirmed' ? 'bg-green-100 text-green-800' :
+                                                          booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                                          'bg-red-100 text-red-800'
+                                                        }
+                                                      >
+                                                        {booking.status}
+                                                      </Badge>
+                                                      <Button variant="ghost" size="sm">
+                                                        <Calendar className="h-4 w-4" />
+                                                      </Button>
+                                                      <Button variant="ghost" size="sm">
+                                                        <Phone className="h-4 w-4" />
+                                                      </Button>
+                                                    </div>
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            ) : (
+                                              <div className="text-center py-8 text-gray-500">
+                                                <Calendar className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+                                                <p>No site visits scheduled</p>
+                                              </div>
+                                            )}
+                                          </CardContent>
+                                        </Card>
+                                      </TabsContent>
+
+                                      {/* Schedules Tab */}
+                                      <TabsContent value="schedules" className="space-y-4">
+                                        <Card>
+                                          <CardHeader>
+                                            <CardTitle className="flex items-center justify-between">
+                                              <span className="flex items-center">
+                                                <Clock className="h-5 w-5 mr-2" />
+                                                Upcoming Schedules & Follow-ups
+                                              </span>
+                                              <Button size="sm">
+                                                <Plus className="h-4 w-4 mr-2" />
+                                                Add Schedule
+                                              </Button>
+                                            </CardTitle>
+                                          </CardHeader>
+                                          <CardContent>
+                                            <div className="space-y-3">
+                                              {/* Mock upcoming schedules */}
+                                              <div className="flex items-center justify-between p-4 border rounded-lg bg-blue-50">
+                                                <div className="flex items-center space-x-3">
+                                                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                                    <Phone className="h-5 w-5 text-blue-600" />
+                                                  </div>
+                                                  <div>
+                                                    <h4 className="font-medium">Follow-up Call</h4>
+                                                    <p className="text-sm text-gray-500">Discuss property valuation report feedback</p>
+                                                  </div>
+                                                </div>
+                                                <div className="text-right">
+                                                  <p className="text-sm font-medium">Tomorrow, 2:00 PM</p>
+                                                  <Badge variant="outline" size="sm">High Priority</Badge>
+                                                </div>
+                                              </div>
+                                              
+                                              <div className="flex items-center justify-between p-4 border rounded-lg">
+                                                <div className="flex items-center space-x-3">
+                                                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                                    <MessageSquare className="h-5 w-5 text-green-600" />
+                                                  </div>
+                                                  <div>
+                                                    <h4 className="font-medium">Send Property Updates</h4>
+                                                    <p className="text-sm text-gray-500">Weekly property matches based on preferences</p>
+                                                  </div>
+                                                </div>
+                                                <div className="text-right">
+                                                  <p className="text-sm font-medium">Every Friday</p>
+                                                  <Badge variant="secondary" size="sm">Recurring</Badge>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </CardContent>
+                                        </Card>
+                                      </TabsContent>
+
+                                      {/* Communications Tab */}
+                                      <TabsContent value="communications" className="space-y-4">
+                                        <Card>
+                                          <CardHeader>
+                                            <CardTitle className="flex items-center justify-between">
+                                              <span className="flex items-center">
+                                                <MessageSquare className="h-5 w-5 mr-2" />
+                                                Communication History
+                                              </span>
+                                              <div className="flex items-center space-x-2">
+                                                <Button variant="outline" size="sm">
+                                                  <Phone className="h-4 w-4 mr-2" />
+                                                  Call
+                                                </Button>
+                                                <Button size="sm">
+                                                  <Send className="h-4 w-4 mr-2" />
+                                                  Email
+                                                </Button>
+                                              </div>
+                                            </CardTitle>
+                                          </CardHeader>
+                                          <CardContent>
+                                            <div className="space-y-4">
+                                              {/* Mock communication history */}
+                                              {[
+                                                { type: 'email', subject: 'Property Valuation Report Ready', date: '2024-01-15', status: 'sent' },
+                                                { type: 'call', subject: 'Follow-up on site visit', date: '2024-01-12', status: 'completed', duration: '12 min' },
+                                                { type: 'sms', subject: 'Reminder: Site visit tomorrow', date: '2024-01-10', status: 'delivered' },
+                                                { type: 'email', subject: 'Welcome to OwnItRight', date: '2024-01-05', status: 'opened' },
+                                              ].map((comm, idx) => (
+                                                <div key={idx} className="flex items-start space-x-3 p-3 border rounded-lg">
+                                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                                    comm.type === 'email' ? 'bg-blue-100' :
+                                                    comm.type === 'call' ? 'bg-green-100' : 'bg-purple-100'
+                                                  }`}>
+                                                    {comm.type === 'email' ? <Mail className="h-4 w-4 text-blue-600" /> :
+                                                     comm.type === 'call' ? <Phone className="h-4 w-4 text-green-600" /> :
+                                                     <MessageSquare className="h-4 w-4 text-purple-600" />}
+                                                  </div>
+                                                  <div className="flex-1">
+                                                    <div className="flex items-center justify-between">
+                                                      <h4 className="font-medium">{comm.subject}</h4>
+                                                      <span className="text-xs text-gray-500">{format(new Date(comm.date), 'MMM dd, yyyy')}</span>
+                                                    </div>
+                                                    <div className="flex items-center space-x-2 mt-1">
+                                                      <Badge variant="outline" size="sm">{comm.type}</Badge>
+                                                      <Badge variant="secondary" size="sm">{comm.status}</Badge>
+                                                      {comm.duration && <span className="text-xs text-gray-500">{comm.duration}</span>}
+                                                    </div>
+                                                  </div>
                                                 </div>
                                               ))}
                                             </div>
-                                          )}
-                                        </div>
-                                      </div>
-                                    </TabsContent>
-                                    <TabsContent value="orders" className="space-y-4">
-                                      <div>
-                                        <h4 className="font-medium mb-3">Order History ({selectedCustomer.orders.length})</h4>
-                                        <div className="space-y-2">
-                                          {selectedCustomer.orders.map((order, idx) => (
-                                            <div key={idx} className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                                              <div>
-                                                <div className="font-medium">{order.reportType}</div>
-                                                <div className="text-sm text-gray-600">{format(new Date(order.createdAt), 'MMM dd, yyyy')}</div>
+                                          </CardContent>
+                                        </Card>
+                                      </TabsContent>
+
+                                      {/* Notes Tab */}
+                                      <TabsContent value="notes" className="space-y-4">
+                                        <Card>
+                                          <CardHeader>
+                                            <CardTitle className="flex items-center">
+                                              <FileText className="h-5 w-5 mr-2" />
+                                              Customer Notes & Internal Comments
+                                            </CardTitle>
+                                          </CardHeader>
+                                          <CardContent>
+                                            <div className="space-y-4">
+                                              <div className="flex space-x-2">
+                                                <Textarea 
+                                                  placeholder="Add a note about this customer..."
+                                                  value={newNote}
+                                                  onChange={(e) => setNewNote(e.target.value)}
+                                                  className="flex-1"
+                                                />
+                                                <Button onClick={handleAddNote} disabled={!newNote.trim()}>
+                                                  <Plus className="h-4 w-4 mr-2" />
+                                                  Add Note
+                                                </Button>
                                               </div>
-                                              <div className="text-right">
-                                                <div className="font-medium">₹{order.amount}</div>
-                                                <div className="text-sm text-green-600">{order.status}</div>
-                                              </div>
+                                              
+                                              {selectedCustomer.notes && selectedCustomer.notes.length > 0 ? (
+                                                <div className="space-y-3">
+                                                  {selectedCustomer.notes.map((note, idx) => (
+                                                    <div key={idx} className="p-4 border rounded-lg">
+                                                      <div className="flex items-start justify-between">
+                                                        <p className="text-sm">{note.content}</p>
+                                                        <Button variant="ghost" size="sm">
+                                                          <MoreHorizontal className="h-4 w-4" />
+                                                        </Button>
+                                                      </div>
+                                                      <div className="flex items-center justify-between mt-2 pt-2 border-t">
+                                                        <span className="text-xs text-gray-500">
+                                                          {format(new Date(note.createdAt), 'MMM dd, yyyy HH:mm')}
+                                                        </span>
+                                                        <Badge variant="outline" size="sm">Admin</Badge>
+                                                      </div>
+                                                    </div>
+                                                  ))}
+                                                </div>
+                                              ) : (
+                                                <div className="text-center py-8 text-gray-500">
+                                                  <FileText className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+                                                  <p>No notes added yet</p>
+                                                </div>
+                                              )}
                                             </div>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    </TabsContent>
-                                    <TabsContent value="notes" className="space-y-4">
-                                      <div>
-                                        <h4 className="font-medium mb-3">Customer Notes</h4>
-                                        <div className="space-y-3">
-                                          <div className="flex space-x-2">
-                                            <Textarea 
-                                              placeholder="Add a note about this customer..."
-                                              value={newNote}
-                                              onChange={(e) => setNewNote(e.target.value)}
-                                            />
-                                            <Button onClick={handleAddNote} disabled={!newNote.trim()}>
-                                              Add Note
-                                            </Button>
-                                          </div>
-                                          {selectedCustomer.notes && selectedCustomer.notes.map((note, idx) => (
-                                            <div key={idx} className="p-3 bg-gray-50 rounded">
-                                              <div className="text-sm">{note.content}</div>
-                                              <div className="text-xs text-gray-500 mt-1">{format(new Date(note.createdAt), 'MMM dd, yyyy HH:mm')}</div>
-                                            </div>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    </TabsContent>
-                                  </Tabs>
+                                          </CardContent>
+                                        </Card>
+                                      </TabsContent>
+                                    </Tabs>
+                                  </div>
                                 )}
                               </DialogContent>
                             </Dialog>
