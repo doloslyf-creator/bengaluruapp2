@@ -860,40 +860,7 @@ export default function PropertyDetail() {
               </CardContent>
             </Card>
 
-            {/* Investment Metrics - Enhanced */}
-            <Card className="card-stripe">
-              <CardHeader>
-                <CardTitle className="text-heading-3 text-foreground flex items-center">
-                  <TrendingUp className="h-5 w-5 mr-2 text-success" />
-                  Investment Insights
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <div className="flex justify-between text-body-small mb-2">
-                    <span className="text-muted-foreground">Area Appreciation</span>
-                    <span className="text-success font-semibold">+12% YoY</span>
-                  </div>
-                  <Progress value={75} className="h-3 rounded-full" />
-                </div>
-                
-                <div>
-                  <div className="flex justify-between text-body-small mb-2">
-                    <span className="text-muted-foreground">Rental Yield</span>
-                    <span className="text-primary font-semibold">3.2%</span>
-                  </div>
-                  <Progress value={65} className="h-3 rounded-full" />
-                </div>
-                
-                <div>
-                  <div className="flex justify-between text-body-small mb-2">
-                    <span className="text-muted-foreground">Infrastructure Score</span>
-                    <span className="text-warning font-semibold">8.5/10</span>
-                  </div>
-                  <Progress value={85} className="h-3 rounded-full" />
-                </div>
-              </CardContent>
-            </Card>
+
 
 
 
