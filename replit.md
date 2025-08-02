@@ -55,6 +55,7 @@ This is a comprehensive full-stack property management and customer discovery pl
 - Integrated real admin panel data extraction for zones, property types, and tags (no hardcoded options)
 - Fixed property selection dropdowns to dynamically populate from actual database properties
 - Implemented comprehensive booking system for site visits and consultations with confirmation workflows
+- **Strict Property Type Filtering (August 2025)**: Implemented precise filtering where villa selection shows only villas, plot selection shows only plots, ensuring customers see exactly what they requested
 
 ## User Preferences
 

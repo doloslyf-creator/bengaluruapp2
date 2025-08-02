@@ -98,14 +98,23 @@ export default function PropertyResults() {
     console.log('Preferences:', preferences);
     
     return allProperties
+      .filter(property => {
+        // STRICT filtering: If property type is selected, only show matching properties
+        if (preferences.propertyType && preferences.propertyType !== property.type) {
+          return false;
+        }
+        return true;
+      })
       .map(property => {
         const propertyConfigs = allConfigurations.filter(config => config.propertyId === property.id);
         
         let score = 0;
         
-        // Property type match (30 points) - if no preference set, give partial score
-        if (!preferences.propertyType || preferences.propertyType === property.type) {
-          score += preferences.propertyType ? 30 : 15;
+        // Property type match (30 points) - since we've pre-filtered, always give full score
+        if (preferences.propertyType && preferences.propertyType === property.type) {
+          score += 30;
+        } else if (!preferences.propertyType) {
+          score += 15; // Default score when no type preference
         }
         
         // Zone match (25 points) - if no preference set, give partial score
