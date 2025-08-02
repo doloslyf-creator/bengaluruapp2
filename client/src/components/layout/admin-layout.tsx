@@ -14,7 +14,8 @@ import {
   ShoppingCart,
   Calculator,
   Scale,
-  Star
+  Star,
+  Shield
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -106,6 +107,12 @@ const navigation = [
     href: "/admin-panel/team-management", 
     icon: Users2,
     description: "Manage Team Members"
+  },
+  { 
+    name: "RERA Management", 
+    href: "/admin-panel/rera-management", 
+    icon: Shield,
+    description: "RERA Compliance & Verification"
   },
   { 
     name: "Settings", 
