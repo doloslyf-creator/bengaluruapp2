@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { Eye, Phone, Mail, Calendar, DollarSign, Clock, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { Eye, Phone, Mail, Calendar, DollarSign, Clock, CheckCircle, XCircle, AlertCircle, Filter, Wrench, Calculator } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
@@ -15,6 +16,7 @@ import AdminLayout from "@/components/layout/admin-layout";
 interface ReportPayment {
   id: string;
   reportId: string;
+  reportType: string;
   propertyId: string;
   customerName: string;
   customerEmail: string;
@@ -47,6 +49,7 @@ export default function Orders() {
   const queryClient = useQueryClient();
   const [selectedOrder, setSelectedOrder] = useState<OrderWithDetails | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [serviceFilter, setServiceFilter] = useState<string>("all");
 
   const { data: orders = [], isLoading } = useQuery<OrderWithDetails[]>({
     queryKey: ["/api/orders"],
@@ -77,8 +80,9 @@ export default function Orders() {
   });
 
   const filteredOrders = orders.filter(order => {
-    if (statusFilter === "all") return true;
-    return order.paymentStatus === statusFilter;
+    const statusMatch = statusFilter === "all" || order.paymentStatus === statusFilter;
+    const serviceMatch = serviceFilter === "all" || order.reportType === serviceFilter;
+    return statusMatch && serviceMatch;
   });
 
   const getStatusBadge = (status: string) => {
@@ -107,8 +111,8 @@ export default function Orders() {
         <header className="border-b border-gray-200 bg-white px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-medium text-gray-900">CIVIL+MEP Report Orders</h2>
-              <p className="text-sm text-gray-600">Track customer orders and payments</p>
+              <h2 className="text-lg font-medium text-gray-900">Report Orders Management</h2>
+              <p className="text-sm text-gray-600">Track CIVIL+MEP and Property Valuation report orders</p>
             </div>
           </div>
         </header>
@@ -165,22 +169,51 @@ export default function Orders() {
             </div>
           )}
 
-          {/* Filter Tabs */}
-          <Tabs value={statusFilter} onValueChange={setStatusFilter} className="mb-6">
-            <TabsList>
-              <TabsTrigger value="all">All Orders</TabsTrigger>
-              <TabsTrigger value="pay-later-pending">Pay Later</TabsTrigger>
-              <TabsTrigger value="completed">Completed</TabsTrigger>
-              <TabsTrigger value="overdue">Overdue</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          {/* Filters Section */}
+          <div className="mb-6 space-y-4">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <Filter className="h-4 w-4 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">Filters:</span>
+              </div>
+              <Select value={serviceFilter} onValueChange={setServiceFilter}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Filter by service" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Services</SelectItem>
+                  <SelectItem value="civil-mep">
+                    <div className="flex items-center space-x-2">
+                      <Wrench className="h-4 w-4 text-blue-600" />
+                      <span>CIVIL+MEP Reports</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="valuation">
+                    <div className="flex items-center space-x-2">
+                      <Calculator className="h-4 w-4 text-emerald-600" />
+                      <span>Property Valuation</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <Tabs value={statusFilter} onValueChange={setStatusFilter}>
+              <TabsList>
+                <TabsTrigger value="all">All Orders</TabsTrigger>
+                <TabsTrigger value="pay-later-pending">Pay Later</TabsTrigger>
+                <TabsTrigger value="completed">Completed</TabsTrigger>
+                <TabsTrigger value="overdue">Overdue</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
 
           {/* Orders Table */}
           <Card>
             <CardHeader>
               <CardTitle>Recent Orders</CardTitle>
               <CardDescription>
-                All CIVIL+MEP report orders with payment tracking
+                All report orders with payment tracking ({filteredOrders.length} {serviceFilter === 'all' ? 'total' : serviceFilter === 'civil-mep' ? 'CIVIL+MEP' : 'valuation'} orders)
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -204,6 +237,7 @@ export default function Orders() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Order ID</TableHead>
+                      <TableHead>Service Type</TableHead>
                       <TableHead>Customer</TableHead>
                       <TableHead>Property</TableHead>
                       <TableHead>Amount</TableHead>
@@ -216,6 +250,23 @@ export default function Orders() {
                     {filteredOrders.map((order) => (
                       <TableRow key={order.id}>
                         <TableCell className="font-mono text-sm">{order.id.slice(-8)}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center space-x-2">
+                            {order.reportType === 'civil-mep' ? (
+                              <>
+                                <Wrench className="h-4 w-4 text-blue-600" />
+                                <span className="text-sm font-medium">CIVIL+MEP</span>
+                              </>
+                            ) : order.reportType === 'valuation' ? (
+                              <>
+                                <Calculator className="h-4 w-4 text-emerald-600" />
+                                <span className="text-sm font-medium">Valuation</span>
+                              </>
+                            ) : (
+                              <span className="text-sm text-gray-500">Unknown</span>
+                            )}
+                          </div>
+                        </TableCell>
                         <TableCell>
                           <div>
                             <div className="font-medium">{order.customerName}</div>

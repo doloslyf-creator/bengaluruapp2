@@ -1341,13 +1341,32 @@ export class DatabaseStorage implements IStorage {
       const [property] = await db.select().from(properties)
         .where(eq(properties.id, payment.propertyId));
       
-      const [report] = await db.select().from(civilMepReports)
+      let reportTitle = "Report";
+      let reportType = "unknown";
+      
+      // Check if it's a CIVIL+MEP report
+      const [civilMepReport] = await db.select().from(civilMepReports)
         .where(eq(civilMepReports.id, payment.reportId));
+      
+      if (civilMepReport) {
+        reportTitle = civilMepReport.reportTitle || "CIVIL+MEP Report";
+        reportType = "civil-mep";
+      } else {
+        // Check if it's a Valuation report
+        const [valuationReport] = await db.select().from(propertyValuationReports)
+          .where(eq(propertyValuationReports.id, payment.reportId));
+        
+        if (valuationReport) {
+          reportTitle = "Property Valuation Report";
+          reportType = "valuation";
+        }
+      }
       
       result.push({
         ...payment,
+        reportType,
         propertyName: property?.name || "Unknown Property",
-        reportTitle: report?.reportTitle || "CIVIL+MEP Report"
+        reportTitle
       });
     }
     
