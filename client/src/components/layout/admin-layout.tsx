@@ -112,8 +112,12 @@ export function AdminLayout({ children, title, showBackButton = false, backUrl =
             <div className="flex items-center space-x-2">
               <Building2 className="h-8 w-8 text-primary" />
               <div className="flex flex-col">
-                <span className="text-lg font-bold text-gray-900">PropertyHub</span>
-                <span className="text-xs text-gray-500 -mt-1">Admin Panel</span>
+                <div className="flex flex-col">
+                  <div className="text-lg font-black tracking-tight text-gray-900">
+                    Own<span className="text-orange-500">It</span><span className="text-blue-600">Right</span>
+                  </div>
+                  <span className="text-xs text-gray-500 -mt-1">Curated Properties • Admin Panel</span>
+                </div>
               </div>
             </div>
           </div>

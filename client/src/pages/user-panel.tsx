@@ -136,8 +136,10 @@ export default function UserPanel() {
             <div className="flex items-center space-x-4">
               <Home className="h-8 w-8 text-primary" />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">My PropertyHub</h1>
-                <p className="text-sm text-gray-600">Manage your property journey</p>
+                <div className="text-2xl font-black tracking-tight text-gray-900">
+                  My Own<span className="text-orange-500">It</span><span className="text-blue-600">Right</span>
+                </div>
+                <p className="text-sm text-gray-600">Curated Properties • User Dashboard</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">

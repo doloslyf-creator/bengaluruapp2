@@ -1,10 +1,19 @@
-# Property Management Dashboard
+# OwnItRight - Property Management Dashboard
 
 ## Overview
 
 This is a comprehensive full-stack property management and customer discovery platform built with Express.js backend and React frontend. The system combines admin property management with a sophisticated customer-facing property finder that enables property search, booking site visits, and consultation requests. It focuses on Indian real estate market features including RERA compliance, zoning information, and regional categorization with real-time integration between admin panel data and customer experience.
 
 ## Recent Changes (August 2025)
+
+**Brand Update to OwnItRight (Completed - August 2025)**
+- Updated brand name from PropertyHub to OwnItRight across all portals and interfaces
+- Created CSS wordmark logo with gradient styling and animations
+- Added tagline "Curated Properties" throughout the application
+- Updated admin panel, customer header, and user dashboard with new branding
+- Implemented sophisticated logo design with color-coded typography (Own=primary, It=orange, Right=blue)
+
+## Previous Changes
 
 **CIVIL+MEP Report Order Management System (Completed - August 2025)**
 - Fixed payment failure issue for "pay later" functionality by implementing proper database flow
@@ -24,7 +33,7 @@ This is a comprehensive full-stack property management and customer discovery pl
 - Users can now safely switch between tabs without losing legal information
 
 **Business Expansion with Blog Management (Completed - August 2025)**
-- Implemented professional PropertyHub header with customer navigation (Find Property, Insights, Contact)
+- Implemented professional OwnItRight header with customer navigation (Find Property, Insights, Contact)
 - Built comprehensive blog management system in admin panel with full CRUD operations
 - Added Blog navigation link consistently across all admin pages
 - Created 5 content categories perfect for real estate business (market insights, property guides, investment tips, legal updates, developer spotlights)

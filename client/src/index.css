@@ -4,6 +4,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* OwnItRight Logo Styles */
+.logo-gradient {
+  background: linear-gradient(135deg, #2563eb 0%, #f97316 50%, #2563eb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: logoShine 3s ease-in-out infinite;
+}
+
+@keyframes logoShine {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.logo-gradient:hover {
+  animation: logoShine 1s ease-in-out infinite;
+}
+
 :root {
   /* Stripe-inspired color system */
   --background: hsl(0, 0%, 100%);

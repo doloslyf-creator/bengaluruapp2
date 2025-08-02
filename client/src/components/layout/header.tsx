@@ -43,8 +43,10 @@ export default function Header() {
           <Link href="/" className="flex items-center space-x-2">
             <Building2 className="h-7 w-7 text-primary" />
             <div className="flex flex-col">
-              <span className="text-lg font-bold text-gray-900">PropertyHub</span>
-              <span className="text-xs text-gray-500 -mt-1">Bengaluru Real Estate</span>
+              <div className="text-lg font-black tracking-tight text-gray-900">
+                Own<span className="text-orange-500">It</span><span className="text-blue-600">Right</span>
+              </div>
+              <span className="text-xs text-gray-500 -mt-1">Curated Properties</span>
             </div>
           </Link>
         </div>
