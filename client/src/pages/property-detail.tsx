@@ -641,53 +641,53 @@ export default function PropertyDetail() {
                     </div>
                   </TabsContent>
                   
-                  <TabsContent value="legal" className="p-6 space-y-6">
+                  <TabsContent value="legal" className="p-4 space-y-4">
                     {/* Legal Verdict Badge */}
                     {property.legalVerdictBadge && (
                       <Card className="bg-success/10 border-success/20">
-                        <CardContent className="p-4">
+                        <CardContent className="p-3">
                           <div className="flex items-center text-success">
-                            <Shield className="h-5 w-5 mr-2" />
-                            <span className="font-semibold">{property.legalVerdictBadge}</span>
+                            <Shield className="h-4 w-4 mr-2" />
+                            <span className="text-sm font-medium">{property.legalVerdictBadge}</span>
                           </div>
                         </CardContent>
                       </Card>
                     )}
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       {/* Title and Ownership */}
                       <Card className="card-stripe">
-                        <CardHeader>
-                          <CardTitle className="text-heading-3 flex items-center">
-                            <Shield className="h-5 w-5 mr-2 text-primary" />
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm font-medium flex items-center">
+                            <Shield className="h-4 w-4 mr-2 text-primary" />
                             Title & Ownership
                           </CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-4">
+                        <CardContent className="space-y-2 pt-0">
                           {property.titleClearanceStatus && (
                             <div className="flex justify-between items-center">
-                              <span className="text-muted-foreground">Title Clearance</span>
-                              <Badge variant={property.titleClearanceStatus === 'Clear' ? 'default' : property.titleClearanceStatus === 'Pending' ? 'secondary' : 'destructive'}>
+                              <span className="text-xs text-muted-foreground">Title Clearance</span>
+                              <Badge variant={property.titleClearanceStatus === 'Clear' ? 'default' : property.titleClearanceStatus === 'Pending' ? 'secondary' : 'destructive'} className="text-xs">
                                 {property.titleClearanceStatus}
                               </Badge>
                             </div>
                           )}
                           {property.ownershipType && (
                             <div className="flex justify-between items-center">
-                              <span className="text-muted-foreground">Ownership Type</span>
-                              <span className="font-medium">{property.ownershipType}</span>
+                              <span className="text-xs text-muted-foreground">Ownership Type</span>
+                              <span className="text-xs font-medium">{property.ownershipType}</span>
                             </div>
                           )}
                           {property.legalOpinionProvidedBy && (
                             <div className="flex justify-between items-center">
-                              <span className="text-muted-foreground">Legal Opinion By</span>
-                              <span className="font-medium">{property.legalOpinionProvidedBy}</span>
+                              <span className="text-xs text-muted-foreground">Legal Opinion By</span>
+                              <span className="text-xs font-medium">{property.legalOpinionProvidedBy}</span>
                             </div>
                           )}
                           {property.titleFlowSummary && (
                             <div>
-                              <span className="text-muted-foreground block mb-2">Title Flow Summary</span>
-                              <p className="text-sm bg-muted/30 p-3 rounded-lg">{property.titleFlowSummary}</p>
+                              <span className="text-xs text-muted-foreground block mb-1">Title Flow Summary</span>
+                              <p className="text-xs bg-muted/30 p-2 rounded-md">{property.titleFlowSummary}</p>
                             </div>
                           )}
                         </CardContent>
@@ -695,34 +695,34 @@ export default function PropertyDetail() {
 
                       {/* RERA Compliance */}
                       <Card className="card-stripe">
-                        <CardHeader>
-                          <CardTitle className="text-heading-3 flex items-center">
-                            <CheckCircle className="h-5 w-5 mr-2 text-success" />
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm font-medium flex items-center">
+                            <CheckCircle className="h-4 w-4 mr-2 text-success" />
                             RERA Compliance
                           </CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-4">
+                        <CardContent className="space-y-2 pt-0">
                           <div className="flex justify-between items-center">
-                            <span className="text-muted-foreground">RERA Registered</span>
+                            <span className="text-xs text-muted-foreground">RERA Registered</span>
                             <div className="flex items-center">
-                              <CheckCircle className={`h-4 w-4 mr-2 ${property.reraRegistered ? 'text-success' : 'text-muted'}`} />
-                              <span className={property.reraRegistered ? 'text-success font-medium' : 'text-muted-foreground'}>
+                              <CheckCircle className={`h-3 w-3 mr-1 ${property.reraRegistered ? 'text-success' : 'text-muted'}`} />
+                              <span className={`text-xs ${property.reraRegistered ? 'text-success font-medium' : 'text-muted-foreground'}`}>
                                 {property.reraRegistered ? 'Yes' : 'No'}
                               </span>
                             </div>
                           </div>
                           {property.reraID && (
                             <div className="flex justify-between items-center">
-                              <span className="text-muted-foreground">RERA ID</span>
-                              <span className="font-mono text-sm bg-muted/30 px-2 py-1 rounded">{property.reraID}</span>
+                              <span className="text-xs text-muted-foreground">RERA ID</span>
+                              <span className="font-mono text-xs bg-muted/30 px-1 py-0.5 rounded">{property.reraID}</span>
                             </div>
                           )}
                           {property.reraLink && (
                             <div className="flex justify-between items-center">
-                              <span className="text-muted-foreground">RERA Record</span>
-                              <Button variant="outline" size="sm" asChild>
+                              <span className="text-xs text-muted-foreground">RERA Record</span>
+                              <Button variant="outline" size="sm" className="h-6 text-xs" asChild>
                                 <a href={property.reraLink} target="_blank" rel="noopener noreferrer">
-                                  <ExternalLink className="h-3 w-3 mr-1" />
+                                  <ExternalLink className="h-2 w-2 mr-1" />
                                   View
                                 </a>
                               </Button>
@@ -733,47 +733,47 @@ export default function PropertyDetail() {
 
                       {/* Documentation & Encumbrance */}
                       <Card className="card-stripe">
-                        <CardHeader>
-                          <CardTitle className="text-heading-3 flex items-center">
-                            <Info className="h-5 w-5 mr-2 text-warning" />
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm font-medium flex items-center">
+                            <Info className="h-4 w-4 mr-2 text-warning" />
                             Documentation
                           </CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-4">
+                        <CardContent className="space-y-2 pt-0">
                           {property.encumbranceStatus && (
                             <div className="flex justify-between items-center">
-                              <span className="text-muted-foreground">Encumbrance Status</span>
-                              <span className="text-sm text-right max-w-60">{property.encumbranceStatus}</span>
+                              <span className="text-xs text-muted-foreground">Encumbrance Status</span>
+                              <span className="text-xs text-right max-w-40">{property.encumbranceStatus}</span>
                             </div>
                           )}
                           {property.mutationStatus && (
                             <div className="flex justify-between items-center">
-                              <span className="text-muted-foreground">Mutation Status</span>
-                              <span className="text-sm text-right max-w-60">{property.mutationStatus}</span>
+                              <span className="text-xs text-muted-foreground">Mutation Status</span>
+                              <span className="text-xs text-right max-w-40">{property.mutationStatus}</span>
                             </div>
                           )}
                           <div className="flex justify-between items-center">
-                            <span className="text-muted-foreground">DC Conversion</span>
+                            <span className="text-xs text-muted-foreground">DC Conversion</span>
                             <div className="flex items-center">
-                              <CheckCircle className={`h-4 w-4 mr-2 ${property.conversionCertificate ? 'text-success' : 'text-muted'}`} />
-                              <span className={property.conversionCertificate ? 'text-success font-medium' : 'text-muted-foreground'}>
+                              <CheckCircle className={`h-3 w-3 mr-1 ${property.conversionCertificate ? 'text-success' : 'text-muted'}`} />
+                              <span className={`text-xs ${property.conversionCertificate ? 'text-success font-medium' : 'text-muted-foreground'}`}>
                                 {property.conversionCertificate ? 'Done' : 'Pending'}
                               </span>
                             </div>
                           </div>
-                          <div className="space-y-2">
+                          <div className="space-y-1">
                             {property.ecExtractLink && (
-                              <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+                              <Button variant="outline" size="sm" className="w-full justify-start h-7 text-xs" asChild>
                                 <a href={property.ecExtractLink} target="_blank" rel="noopener noreferrer">
-                                  <Download className="h-4 w-4 mr-2" />
+                                  <Download className="h-3 w-3 mr-1" />
                                   EC Extract
                                 </a>
                               </Button>
                             )}
                             {property.layoutSanctionCopyLink && (
-                              <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+                              <Button variant="outline" size="sm" className="w-full justify-start h-7 text-xs" asChild>
                                 <a href={property.layoutSanctionCopyLink} target="_blank" rel="noopener noreferrer">
-                                  <Download className="h-4 w-4 mr-2" />
+                                  <Download className="h-3 w-3 mr-1" />
                                   Layout Approval
                                 </a>
                               </Button>
@@ -784,25 +784,25 @@ export default function PropertyDetail() {
 
                       {/* Approvals & Litigation */}
                       <Card className="card-stripe">
-                        <CardHeader>
-                          <CardTitle className="text-heading-3 flex items-center">
-                            <Building className="h-5 w-5 mr-2 text-primary" />
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm font-medium flex items-center">
+                            <Building className="h-4 w-4 mr-2 text-primary" />
                             Approvals & Status
                           </CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-4">
+                        <CardContent className="space-y-2 pt-0">
                           {property.litigationStatus && (
                             <div className="flex justify-between items-center">
-                              <span className="text-muted-foreground">Litigation Status</span>
-                              <span className="text-sm text-right max-w-60">{property.litigationStatus}</span>
+                              <span className="text-xs text-muted-foreground">Litigation Status</span>
+                              <span className="text-xs text-right max-w-40">{property.litigationStatus}</span>
                             </div>
                           )}
                           {property.approvingAuthorities && property.approvingAuthorities.length > 0 && (
                             <div>
-                              <span className="text-muted-foreground block mb-2">Approving Authorities</span>
+                              <span className="text-xs text-muted-foreground block mb-1">Approving Authorities</span>
                               <div className="flex flex-wrap gap-1">
                                 {property.approvingAuthorities.map((authority, index) => (
-                                  <Badge key={index} variant="outline" className="text-xs">
+                                  <Badge key={index} variant="outline" className="text-xs h-5">
                                     {authority}
                                   </Badge>
                                 ))}
@@ -816,14 +816,14 @@ export default function PropertyDetail() {
                     {/* Legal Comments */}
                     {property.legalComments && (
                       <Card className="card-stripe">
-                        <CardHeader>
-                          <CardTitle className="text-heading-3 flex items-center">
-                            <MessageCircle className="h-5 w-5 mr-2 text-muted-foreground" />
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm font-medium flex items-center">
+                            <MessageCircle className="h-4 w-4 mr-2 text-muted-foreground" />
                             Legal Summary
                           </CardTitle>
                         </CardHeader>
-                        <CardContent>
-                          <p className="text-muted-foreground italic">{property.legalComments}</p>
+                        <CardContent className="pt-0">
+                          <p className="text-xs text-muted-foreground italic">{property.legalComments}</p>
                         </CardContent>
                       </Card>
                     )}
@@ -901,41 +901,41 @@ export default function PropertyDetail() {
 
             {/* Property Score Widget */}
             <Card className="card-stripe">
-              <CardHeader>
-                <CardTitle className="text-heading-3 text-foreground flex items-center">
-                  <Award className="h-5 w-5 mr-2 text-warning" />
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base font-medium text-foreground flex items-center">
+                  <Award className="h-4 w-4 mr-2 text-warning" />
                   Property Score
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-center mb-4">
-                  <div className="text-display text-warning font-bold">
+              <CardContent className="space-y-1 pt-0">
+                <div className="text-center mb-2">
+                  <div className="text-xl text-warning font-bold">
                     {property.overallScore ? Number(property.overallScore).toFixed(1) : (((property.locationScore || 4) + (property.amenitiesScore || 5) + (property.valueScore || 4)) / 3).toFixed(1)}
                   </div>
-                  <div className="text-caption text-muted-foreground">Overall Rating</div>
+                  <div className="text-xs text-muted-foreground">Overall Rating</div>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-1.5">
                   <div className="flex justify-between items-center">
-                    <span className="text-body-small text-muted-foreground">Location</span>
+                    <span className="text-xs text-muted-foreground">Location</span>
                     <div className="flex">
                       {[1,2,3,4,5].map((star) => (
-                        <Star key={star} className={`h-4 w-4 ${star <= (property.locationScore || 4) ? 'text-warning fill-current' : 'text-muted'}`} />
+                        <Star key={star} className={`h-3 w-3 ${star <= (property.locationScore || 4) ? 'text-warning fill-current' : 'text-muted'}`} />
                       ))}
                     </div>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-body-small text-muted-foreground">Amenities</span>
+                    <span className="text-xs text-muted-foreground">Amenities</span>
                     <div className="flex">
                       {[1,2,3,4,5].map((star) => (
-                        <Star key={star} className={`h-4 w-4 ${star <= (property.amenitiesScore || 5) ? 'text-warning fill-current' : 'text-muted'}`} />
+                        <Star key={star} className={`h-3 w-3 ${star <= (property.amenitiesScore || 5) ? 'text-warning fill-current' : 'text-muted'}`} />
                       ))}
                     </div>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-body-small text-muted-foreground">Value for Money</span>
+                    <span className="text-xs text-muted-foreground">Value for Money</span>
                     <div className="flex">
                       {[1,2,3,4,5].map((star) => (
-                        <Star key={star} className={`h-4 w-4 ${star <= (property.valueScore || 4) ? 'text-warning fill-current' : 'text-muted'}`} />
+                        <Star key={star} className={`h-3 w-3 ${star <= (property.valueScore || 4) ? 'text-warning fill-current' : 'text-muted'}`} />
                       ))}
                     </div>
                   </div>
@@ -945,30 +945,30 @@ export default function PropertyDetail() {
 
             {/* Price Comparison Widget */}
             <Card className="card-stripe">
-              <CardHeader>
-                <CardTitle className="text-heading-3 text-foreground flex items-center">
-                  <BarChart3 className="h-5 w-5 mr-2 text-primary" />
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base font-medium text-foreground flex items-center">
+                  <BarChart3 className="h-4 w-4 mr-2 text-primary" />
                   Price Comparison
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-center p-4 bg-primary/5 rounded-xl border border-primary/20">
-                  <div className="text-caption text-muted-foreground">This Property</div>
-                  <div className="text-heading-3 text-primary font-semibold">{getPriceRange()}</div>
+              <CardContent className="space-y-2 pt-0">
+                <div className="text-center p-3 bg-primary/5 rounded-lg border border-primary/20">
+                  <div className="text-xs text-muted-foreground">This Property</div>
+                  <div className="text-lg text-primary font-semibold">{getPriceRange()}</div>
                 </div>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
-                    <span className="text-body-small text-muted-foreground">Area Average</span>
-                    <span className="text-body-small font-medium text-muted-foreground">
+                <div className="space-y-1.5">
+                  <div className="flex justify-between items-center p-2 bg-muted/30 rounded-md">
+                    <span className="text-xs text-muted-foreground">Area Average</span>
+                    <span className="text-xs font-medium text-muted-foreground">
                       {property.areaAvgPriceMin && property.areaAvgPriceMax 
                         ? `₹${property.areaAvgPriceMin}L - ₹${property.areaAvgPriceMax}L`
                         : "₹95L - ₹1.2Cr"
                       }
                     </span>
                   </div>
-                  <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
-                    <span className="text-body-small text-muted-foreground">City Average</span>
-                    <span className="text-body-small font-medium text-muted-foreground">
+                  <div className="flex justify-between items-center p-2 bg-muted/30 rounded-md">
+                    <span className="text-xs text-muted-foreground">City Average</span>
+                    <span className="text-xs font-medium text-muted-foreground">
                       {property.cityAvgPriceMin && property.cityAvgPriceMax 
                         ? `₹${property.cityAvgPriceMin}L - ₹${property.cityAvgPriceMax}L`
                         : "₹85L - ₹1.1Cr"
@@ -976,9 +976,9 @@ export default function PropertyDetail() {
                     </span>
                   </div>
                 </div>
-                <div className="p-3 bg-success/10 rounded-xl border border-success/20">
-                  <div className="flex items-center text-success text-body-small font-medium">
-                    <TrendingUp className="h-4 w-4 mr-2" />
+                <div className="p-2 bg-success/10 rounded-lg border border-success/20">
+                  <div className="flex items-center text-success text-xs font-medium">
+                    <TrendingUp className="h-3 w-3 mr-1" />
                     {property.priceComparison || "12% below area average - Great value!"}
                   </div>
                 </div>
