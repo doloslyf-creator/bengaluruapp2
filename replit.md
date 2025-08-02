@@ -6,6 +6,22 @@ This is a comprehensive full-stack property management and customer discovery pl
 
 ## Recent Changes (August 2025)
 
+**Legal Data Persistence Fix (Completed - August 2025)**
+- Fixed critical bug where legal metadata appeared "lost" after tab switching or page reload
+- Issue was in property-edit.tsx form reset logic missing legal field assignments
+- Form now properly loads all legal fields from database into form state
+- Legal data persistence confirmed working correctly in PostgreSQL database
+- Users can now safely switch between tabs without losing legal information
+
+**Business Expansion with Blog Management (Completed - August 2025)**
+- Implemented professional PropertyHub header with customer navigation (Find Property, Insights, Contact)
+- Built comprehensive blog management system in admin panel with full CRUD operations
+- Added Blog navigation link consistently across all admin pages
+- Created 5 content categories perfect for real estate business (market insights, property guides, investment tips, legal updates, developer spotlights)
+- Implemented professional blog editor with auto-slug generation, reading time calculation, and SEO metadata
+- Added blog statistics dashboard showing posts, views, and performance metrics
+- Expanded database schema with comprehensive blog functionality
+
 **Single Property Detail Page (Completed - August 2025)**
 - Created comprehensive property detail page at `/property/:id` route
 - Designed unique layout with combined video/image slider and tabbed information
