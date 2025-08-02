@@ -16,6 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { formatPriceDisplay } from "@/lib/utils";
 import { type Property, type PropertyConfiguration } from "@shared/schema";
+import CivilMepWidget from "@/components/property/civil-mep-widget";
 
 interface PropertyWithConfigurations extends Property {
   configurations: PropertyConfiguration[];
@@ -951,6 +952,9 @@ export default function PropertyDetail() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* CIVIL+MEP Report Widget */}
+            <CivilMepWidget property={property} />
 
             {/* Similar Properties - Dynamic */}
             <Card>

@@ -15,12 +15,18 @@ import {
   type LeadStats,
   type Booking,
   type InsertBooking,
+  type CivilMepReport,
+  type InsertCivilMepReport,
+  type ReportPayment,
+  type InsertReportPayment,
   properties, 
   propertyConfigurations, 
   leads, 
   leadActivities, 
   leadNotes, 
-  bookings
+  bookings,
+  civilMepReports,
+  reportPayments
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, ilike, gte, lte, desc, sql } from "drizzle-orm";
@@ -96,6 +102,19 @@ export interface IStorage {
   getUser(id: string): Promise<any>;
   getUserByUsername(username: string): Promise<any>;
   createUser(user: any): Promise<any>;
+
+  // CIVIL+MEP Report operations
+  enableCivilMepReport(propertyId: string): Promise<Property | undefined>;
+  getCivilMepReport(propertyId: string): Promise<CivilMepReport | undefined>;
+  createCivilMepReport(report: InsertCivilMepReport): Promise<CivilMepReport>;
+  updateCivilMepReport(reportId: string, updates: Partial<InsertCivilMepReport>): Promise<CivilMepReport | undefined>;
+  getPropertiesWithReports(statusFilter?: string): Promise<Array<Property & { civilMepReport?: CivilMepReport; reportStats?: any }>>;
+  
+  // Report Payment operations
+  createReportPayment(payment: InsertReportPayment): Promise<ReportPayment>;
+  getReportPayments(reportId: string): Promise<ReportPayment[]>;
+  updatePaymentStatus(paymentId: string, status: string): Promise<ReportPayment | undefined>;
+  getCivilMepReportStats(): Promise<any>;
 }
 
 export class MemStorage implements IStorage {
@@ -1119,6 +1138,98 @@ export class DatabaseStorage implements IStorage {
   async createUser(insertUser: any): Promise<any> {
     const id = randomUUID();
     return { ...insertUser, id };
+  }
+
+  // CIVIL+MEP Report operations
+  async enableCivilMepReport(propertyId: string): Promise<Property | undefined> {
+    const [property] = await db.update(properties)
+      .set({ hasCivilMepReport: true })
+      .where(eq(properties.id, propertyId))
+      .returning();
+    return property || undefined;
+  }
+
+  async getCivilMepReport(propertyId: string): Promise<CivilMepReport | undefined> {
+    const [report] = await db.select().from(civilMepReports)
+      .where(eq(civilMepReports.propertyId, propertyId));
+    return report || undefined;
+  }
+
+  async createCivilMepReport(report: InsertCivilMepReport): Promise<CivilMepReport> {
+    const [newReport] = await db.insert(civilMepReports)
+      .values(report)
+      .returning();
+    return newReport;
+  }
+
+  async updateCivilMepReport(reportId: string, updates: Partial<InsertCivilMepReport>): Promise<CivilMepReport | undefined> {
+    const [report] = await db.update(civilMepReports)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(civilMepReports.id, reportId))
+      .returning();
+    return report || undefined;
+  }
+
+  async getPropertiesWithReports(statusFilter?: string): Promise<Array<Property & { civilMepReport?: CivilMepReport; reportStats?: any }>> {
+    const allProperties = await db.select().from(properties);
+    
+    const result = [];
+    for (const property of allProperties) {
+      const [report] = await db.select().from(civilMepReports)
+        .where(eq(civilMepReports.propertyId, property.id));
+      
+      let reportStats = null;
+      if (report) {
+        const payments = await db.select().from(reportPayments)
+          .where(eq(reportPayments.reportId, report.id));
+        
+        reportStats = {
+          totalPayments: payments.length,
+          totalRevenue: payments.reduce((sum, p) => sum + Number(p.amount), 0),
+          pendingPayments: payments.filter(p => p.paymentStatus === 'pay-later-pending').length
+        };
+      }
+      
+      result.push({
+        ...property,
+        civilMepReport: report || undefined,
+        reportStats
+      });
+    }
+    
+    return result;
+  }
+
+  async createReportPayment(payment: InsertReportPayment): Promise<ReportPayment> {
+    const [newPayment] = await db.insert(reportPayments)
+      .values(payment)
+      .returning();
+    return newPayment;
+  }
+
+  async getReportPayments(reportId: string): Promise<ReportPayment[]> {
+    return await db.select().from(reportPayments)
+      .where(eq(reportPayments.reportId, reportId));
+  }
+
+  async updatePaymentStatus(paymentId: string, status: string): Promise<ReportPayment | undefined> {
+    const [payment] = await db.update(reportPayments)
+      .set({ paymentStatus: status as any, updatedAt: new Date() })
+      .where(eq(reportPayments.id, paymentId))
+      .returning();
+    return payment || undefined;
+  }
+
+  async getCivilMepReportStats(): Promise<any> {
+    const allReports = await db.select().from(civilMepReports);
+    const allPayments = await db.select().from(reportPayments);
+    
+    return {
+      totalReports: allReports.length,
+      completedReports: allReports.filter(r => r.civilMepReportStatus === 'completed').length,
+      totalRevenue: allPayments.reduce((sum, p) => sum + Number(p.amount), 0),
+      pendingPayments: allPayments.filter(p => p.paymentStatus === 'pay-later-pending').length
+    };
   }
 }
 

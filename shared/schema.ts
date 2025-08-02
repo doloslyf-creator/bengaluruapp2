@@ -66,6 +66,175 @@ export const properties = pgTable("properties", {
   layoutSanctionCopyLink: text("layout_sanction_copy_link"), // PDF/Image of approval
   legalComments: text("legal_comments"), // Lawyer's custom comment
   legalVerdictBadge: text("legal_verdict_badge"), // Tagline or summary badge
+
+  // CIVIL+MEP Report System
+  hasCivilMepReport: boolean("has_civil_mep_report").default(false), // Does this property have a report
+  civilMepReportPrice: decimal("civil_mep_report_price", { precision: 10, scale: 2 }).default("2999.00"), // Price in INR
+  civilMepReportStatus: varchar("civil_mep_report_status", { enum: ["draft", "completed", "reviewing"] }).default("draft"),
+  
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// CIVIL+MEP Reports table for comprehensive property analysis
+export const civilMepReports = pgTable("civil_mep_reports", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  propertyId: varchar("property_id").notNull().references(() => properties.id),
+  
+  // Report Meta
+  reportType: varchar("report_type", { enum: ["civil", "mep", "combined"] }).notNull().default("combined"),
+  reportVersion: text("report_version").default("1.0"),
+  generatedBy: text("generated_by"), // Engineer/consultant name
+  reportDate: timestamp("report_date").defaultNow(),
+  
+  // Civil Engineering Analysis
+  structuralAnalysis: json("structural_analysis").$type<{
+    foundationType: string;
+    structuralSystem: string;
+    materialQuality: string;
+    loadBearingCapacity: string;
+    seismicCompliance: string;
+    structuralSafety: number; // 1-10 score
+  }>(),
+  
+  materialBreakdown: json("material_breakdown").$type<{
+    concrete: { grade: string; quantity: string; cost: number };
+    steel: { grade: string; quantity: string; cost: number };
+    bricks: { type: string; quantity: string; cost: number };
+    cement: { brand: string; quantity: string; cost: number };
+    aggregates: { type: string; quantity: string; cost: number };
+    otherMaterials: Array<{ name: string; quantity: string; cost: number }>;
+  }>(),
+  
+  costBreakdown: json("cost_breakdown").$type<{
+    civilWork: number;
+    mepWork: number;
+    finishingWork: number;
+    laborCosts: number;
+    materialCosts: number;
+    overheadCosts: number;
+    contingency: number;
+    totalEstimatedCost: number;
+  }>(),
+  
+  qualityAssessment: json("quality_assessment").$type<{
+    workmanshipGrade: string; // A+, A, B+, B, C
+    materialGrade: string;
+    finishingQuality: string;
+    overallQuality: number; // 1-10 score
+    certifications: string[];
+  }>(),
+  
+  // MEP (Mechanical, Electrical, Plumbing) Analysis
+  mepSystems: json("mep_systems").$type<{
+    electrical: {
+      loadCapacity: string;
+      wiringStandard: string;
+      safetyCompliance: string;
+      backupSystems: string[];
+      energyEfficiency: number; // 1-10 score
+    };
+    plumbing: {
+      waterSupplySystem: string;
+      drainageSystem: string;
+      sewageTreatment: string;
+      waterQuality: string;
+      pressureRating: string;
+    };
+    hvac: {
+      ventilationSystem: string;
+      airQuality: string;
+      temperatureControl: string;
+      energyRating: string;
+    };
+    fireSuppressionSystem: {
+      fireDetection: string;
+      sprinklerSystem: string;
+      emergencyExits: string;
+      compliance: string;
+    };
+  }>(),
+  
+  // Compliance and Standards
+  complianceChecklist: json("compliance_checklist").$type<{
+    buildingCodes: { compliant: boolean; details: string };
+    fireNOC: { status: string; validUntil: string };
+    environmentalClearance: { status: string; details: string };
+    structuralCertificate: { available: boolean; issuer: string };
+    electricalApproval: { status: string; authority: string };
+    plumbingApproval: { status: string; details: string };
+  }>(),
+  
+  // Snag Report
+  snagReport: json("snag_report").$type<{
+    criticalIssues: Array<{
+      category: string;
+      description: string;
+      severity: "high" | "medium" | "low";
+      location: string;
+      recommendedAction: string;
+      estimatedCost: number;
+    }>;
+    minorIssues: Array<{
+      category: string;
+      description: string;
+      location: string;
+      recommendedAction: string;
+    }>;
+    overallCondition: string;
+    immediateActions: string[];
+    futureMaintenanceSchedule: Array<{
+      task: string;
+      frequency: string;
+      estimatedCost: number;
+    }>;
+  }>(),
+  
+  // Executive Summary
+  executiveSummary: text("executive_summary"),
+  overallScore: decimal("overall_score", { precision: 3, scale: 1 }).default("0.0"), // 1-10
+  investmentRecommendation: varchar("investment_recommendation", { 
+    enum: ["highly-recommended", "recommended", "conditional", "not-recommended"] 
+  }),
+  estimatedMaintenanceCost: decimal("estimated_maintenance_cost", { precision: 10, scale: 2 }),
+  
+  // Report Files
+  reportPdfUrl: text("report_pdf_url"), // Generated PDF report
+  supportingDocuments: json("supporting_documents").$type<string[]>().default([]),
+  
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Payment tracking for CIVIL+MEP reports
+export const reportPayments = pgTable("report_payments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  reportId: varchar("report_id").notNull().references(() => civilMepReports.id),
+  propertyId: varchar("property_id").notNull().references(() => properties.id),
+  
+  // Customer Information
+  customerName: text("customer_name").notNull(),
+  customerEmail: text("customer_email").notNull(),
+  customerPhone: text("customer_phone"),
+  
+  // Payment Details
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: text("currency").default("INR"),
+  paymentMethod: varchar("payment_method", { enum: ["card", "upi", "net-banking", "pay-later"] }).notNull(),
+  paymentStatus: varchar("payment_status", { 
+    enum: ["pending", "processing", "completed", "failed", "refunded", "pay-later-pending"] 
+  }).default("pending"),
+  
+  // Stripe Integration
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  stripeCustomerId: text("stripe_customer_id"),
+  
+  // Pay Later System
+  payLaterDueDate: timestamp("pay_later_due_date"), // 7 days from access
+  payLaterRemindersSent: integer("pay_later_reminders_sent").default(0),
+  accessGrantedAt: timestamp("access_granted_at"), // When user got access
   
   // Timestamps
   createdAt: timestamp("created_at").defaultNow(),
@@ -184,8 +353,24 @@ export const insertBookingSchema = createInsertSchema(bookings).omit({
   updatedAt: true,
 });
 
+export const insertCivilMepReportSchema = createInsertSchema(civilMepReports).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertReportPaymentSchema = createInsertSchema(reportPayments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type InsertBooking = z.infer<typeof insertBookingSchema>;
 export type Booking = typeof bookings.$inferSelect;
+export type CivilMepReport = typeof civilMepReports.$inferSelect;
+export type InsertCivilMepReport = z.infer<typeof insertCivilMepReportSchema>;
+export type ReportPayment = typeof reportPayments.$inferSelect;
+export type InsertReportPayment = z.infer<typeof insertReportPaymentSchema>;
 
 // Lead management tables for processing customer submissions
 export const leads = pgTable("leads", {

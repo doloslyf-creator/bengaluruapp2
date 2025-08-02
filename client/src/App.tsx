@@ -8,6 +8,7 @@ import AdminAnalytics from "@/pages/admin/analytics";
 import AdminZones from "@/pages/admin/zones";
 import AdminDevelopers from "@/pages/admin/developers";
 import BlogManagement from "@/pages/admin/blog";
+import CivilMepReports from "@/pages/admin/civil-mep-reports";
 import PropertyEdit from "@/pages/property-edit";
 import PropertyDetail from "@/pages/property-detail";
 import FindProperty from "@/pages/find-property";
@@ -29,6 +30,7 @@ function Router() {
       <Route path="/admin-panel/developers" component={AdminDevelopers} />
       <Route path="/admin-panel/zones" component={AdminZones} />
       <Route path="/admin-panel/blog" component={BlogManagement} />
+      <Route path="/admin-panel/civil-mep-reports" component={CivilMepReports} />
       <Route path="/admin-panel/property/:id/edit" component={PropertyEdit} />
       <Route path="/admin-panel/leads" component={LeadsPage} />
       

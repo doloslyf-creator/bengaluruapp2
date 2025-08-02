@@ -573,6 +573,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/blog/:id", updateBlogPost);
   app.delete("/api/blog/:id", deleteBlogPost);
 
+  // CIVIL+MEP Report routes
+  app.get("/api/properties/with-reports", async (req, res) => {
+    try {
+      const { status } = req.query;
+      const properties = await storage.getPropertiesWithReports(status as string);
+      res.json(properties);
+    } catch (error) {
+      console.error("Error fetching properties with reports:", error);
+      res.status(500).json({ error: "Failed to fetch properties with reports" });
+    }
+  });
+
+  app.get("/api/civil-mep-reports/stats", async (req, res) => {
+    try {
+      const stats = await storage.getCivilMepReportStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching report stats:", error);
+      res.status(500).json({ error: "Failed to fetch report statistics" });
+    }
+  });
+
+  app.post("/api/properties/:id/enable-civil-mep-report", async (req, res) => {
+    try {
+      const property = await storage.enableCivilMepReport(req.params.id);
+      if (!property) {
+        return res.status(404).json({ error: "Property not found" });
+      }
+      res.json(property);
+    } catch (error) {
+      console.error("Error enabling CIVIL+MEP report:", error);
+      res.status(500).json({ error: "Failed to enable CIVIL+MEP report" });
+    }
+  });
+
+  app.post("/api/civil-mep-reports/pay-later", async (req, res) => {
+    try {
+      const { reportId, customerName, customerEmail, customerPhone, propertyId } = req.body;
+      
+      const paymentData = {
+        reportId,
+        propertyId,
+        customerName,
+        customerEmail,
+        customerPhone,
+        amount: "2999.00",
+        paymentMethod: "pay-later" as const,
+        paymentStatus: "pay-later-pending" as const,
+        payLaterDueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        accessGrantedAt: new Date()
+      };
+
+      const payment = await storage.createReportPayment(paymentData);
+      res.json({ 
+        success: true, 
+        paymentId: payment.id,
+        message: "Access granted for 7 days. Payment due within 7 days." 
+      });
+    } catch (error) {
+      console.error("Error processing pay-later request:", error);
+      res.status(500).json({ error: "Failed to process pay-later request" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

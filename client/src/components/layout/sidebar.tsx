@@ -1,12 +1,13 @@
 import { useLocation } from "wouter";
 import { Link } from "wouter";
-import { Home, BarChart3, Users, MapPin } from "lucide-react";
+import { Home, BarChart3, Users, MapPin, FileText } from "lucide-react";
 
 const navigation = [
   { name: "Properties", href: "/", icon: Home },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Developers", href: "/developers", icon: Users },
   { name: "Zones", href: "/zones", icon: MapPin },
+  { name: "CIVIL+MEP Reports", href: "/civil-mep-reports", icon: FileText },
 ];
 
 export function Sidebar() {

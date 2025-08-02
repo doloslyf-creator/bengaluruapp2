@@ -87,6 +87,9 @@ export default function Header() {
               <DropdownMenuItem asChild>
                 <Link href="/admin-panel/blog">Blog Management</Link>
               </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/admin-panel/civil-mep-reports">CIVIL+MEP Reports</Link>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
