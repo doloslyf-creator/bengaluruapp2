@@ -11,6 +11,7 @@ import AdminDevelopers from "@/pages/admin/developers";
 import BlogManagement from "@/pages/admin/blog";
 import CivilMepReports from "@/pages/admin/civil-mep-reports";
 import CreateCivilMepReport from "@/pages/admin/create-civil-mep-report";
+import Orders from "@/pages/admin/orders";
 import PropertyEdit from "@/pages/property-edit";
 import PropertyDetail from "@/pages/property-detail";
 import FindProperty from "@/pages/find-property";
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/admin-panel/blog" component={BlogManagement} />
       <Route path="/admin-panel/civil-mep-reports" component={CivilMepReports} />
       <Route path="/admin-panel/create-civil-mep-report" component={CreateCivilMepReport} />
+      <Route path="/admin-panel/orders" component={Orders} />
       <Route path="/admin-panel/property/:id/edit" component={PropertyEdit} />
       <Route path="/admin-panel/leads" component={LeadsPage} />
       

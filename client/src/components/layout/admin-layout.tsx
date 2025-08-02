@@ -10,7 +10,8 @@ import {
   UserCheck,
   PenTool,
   Settings,
-  ArrowLeft
+  ArrowLeft,
+  ShoppingCart
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -59,6 +60,12 @@ const navigation = [
     href: "/admin-panel/civil-mep-reports", 
     icon: FileText,
     description: "Engineering Reports"
+  },
+  { 
+    name: "Orders", 
+    href: "/admin-panel/orders", 
+    icon: ShoppingCart,
+    description: "Order Management"
   },
   { 
     name: "Developers", 

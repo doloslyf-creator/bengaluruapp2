@@ -1231,6 +1231,47 @@ export class DatabaseStorage implements IStorage {
       pendingPayments: allPayments.filter(p => p.paymentStatus === 'pay-later-pending').length
     };
   }
+
+  // Orders management methods
+  async getAllOrdersWithDetails(): Promise<any[]> {
+    const payments = await db.select().from(reportPayments);
+    const result = [];
+    
+    for (const payment of payments) {
+      const [property] = await db.select().from(properties)
+        .where(eq(properties.id, payment.propertyId));
+      
+      const [report] = await db.select().from(civilMepReports)
+        .where(eq(civilMepReports.id, payment.reportId));
+      
+      result.push({
+        ...payment,
+        propertyName: property?.name || "Unknown Property",
+        reportTitle: report?.reportTitle || "CIVIL+MEP Report"
+      });
+    }
+    
+    return result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async getOrderStats(): Promise<any> {
+    const allPayments = await db.select().from(reportPayments);
+    const now = new Date();
+    
+    const overduePayments = allPayments.filter(p => 
+      p.paymentStatus === 'pay-later-pending' && 
+      p.payLaterDueDate && 
+      new Date(p.payLaterDueDate) < now
+    );
+    
+    return {
+      totalOrders: allPayments.length,
+      pendingPayments: allPayments.filter(p => p.paymentStatus === 'pay-later-pending').length,
+      completedPayments: allPayments.filter(p => p.paymentStatus === 'completed').length,
+      totalRevenue: allPayments.filter(p => p.paymentStatus === 'completed').reduce((sum, p) => sum + Number(p.amount), 0),
+      overduePayments: overduePayments.length
+    };
+  }
 }
 
 export const storage = new DatabaseStorage();

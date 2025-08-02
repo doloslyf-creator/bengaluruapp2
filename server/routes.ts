@@ -706,6 +706,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Orders API - Get all orders with property details
+  app.get("/api/orders", async (req, res) => {
+    try {
+      const orders = await storage.getAllOrdersWithDetails();
+      res.json(orders);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      res.status(500).json({ error: "Failed to fetch orders" });
+    }
+  });
+
+  // Orders API - Get order statistics
+  app.get("/api/orders/stats", async (req, res) => {
+    try {
+      const stats = await storage.getOrderStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching order stats:", error);
+      res.status(500).json({ error: "Failed to fetch order statistics" });
+    }
+  });
+
+  // Orders API - Update payment status
+  app.patch("/api/orders/:orderId/status", async (req, res) => {
+    try {
+      const { orderId } = req.params;
+      const { status } = req.body;
+      
+      const updatedPayment = await storage.updatePaymentStatus(orderId, status);
+      if (!updatedPayment) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+      
+      res.json(updatedPayment);
+    } catch (error) {
+      console.error("Error updating payment status:", error);
+      res.status(500).json({ error: "Failed to update payment status" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
