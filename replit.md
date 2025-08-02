@@ -17,6 +17,7 @@ This is a comprehensive full-stack property management and customer discovery pl
 - **Combined Media Slider**: Unified video and image display with navigation arrows, thumbnails, and media indicators
 - **Image Upload System**: Added drag-and-drop image upload functionality to admin panel with preview and delete options
 - **Functional Share Button**: Implemented native sharing with Web Share API fallback to clipboard copy
+- **WhatsApp Direct Sharing**: Added dedicated WhatsApp share button with formatted message including property details
 
 **Authentication Removal (Completed - August 2025)**
 - Completely removed Firebase and all authentication systems from the application

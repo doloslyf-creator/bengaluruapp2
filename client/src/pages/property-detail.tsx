@@ -73,9 +73,11 @@ export default function PropertyDetail() {
 
   const handleShare = async () => {
     const propertyUrl = window.location.href;
+    const shareText = `🏠 *${property.name}*\n📍 ${property.area}, ${property.zone} Bengaluru\n🏗️ By ${property.developer}\n💰 ${getPriceRange()}\n\nView details: ${propertyUrl}`;
+    
     const shareData = {
       title: `${property.name} - Property in ${property.area}, ${property.zone} Bengaluru`,
-      text: `Check out this ${property.type} by ${property.developer} in ${property.area}. ${getPriceRange()}`,
+      text: shareText,
       url: propertyUrl
     };
 
@@ -88,8 +90,6 @@ export default function PropertyDetail() {
       
       // Fallback: Copy to clipboard
       await navigator.clipboard.writeText(propertyUrl);
-      
-      // Show success message (you could use a toast here)
       alert('Property link copied to clipboard!');
     } catch (error) {
       // Final fallback: Manual copy
@@ -101,6 +101,13 @@ export default function PropertyDetail() {
       document.body.removeChild(textArea);
       alert('Property link copied to clipboard!');
     }
+  };
+
+  const handleWhatsAppShare = () => {
+    const propertyUrl = window.location.href;
+    const whatsappText = `🏠 *${property.name}*\n📍 ${property.area}, ${property.zone} Bengaluru\n🏗️ By ${property.developer}\n💰 ${getPriceRange()}\n\nView details: ${propertyUrl}`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   const getPriceRange = () => {
@@ -212,6 +219,10 @@ export default function PropertyDetail() {
               <Button variant="outline" size="sm" onClick={toggleFavorite}>
                 <Heart className={`h-4 w-4 mr-2 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
                 {isFavorite ? 'Saved' : 'Save'}
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleWhatsAppShare} className="bg-green-50 hover:bg-green-100 text-green-700 border-green-200">
+                <MessageCircle className="h-4 w-4 mr-2" />
+                WhatsApp
               </Button>
               <Button variant="outline" size="sm" onClick={handleShare}>
                 <Share2 className="h-4 w-4 mr-2" />
