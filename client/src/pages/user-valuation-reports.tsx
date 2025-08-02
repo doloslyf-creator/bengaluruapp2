@@ -191,15 +191,15 @@ export default function UserValuationReports() {
             <div className="grid grid-cols-3 gap-6 bg-gray-50 p-4 rounded-lg">
               <div>
                 <p className="text-sm text-gray-600">Land Area</p>
-                <p className="text-lg font-semibold">{report.costBreakdown.landAreaSqft.toLocaleString()} sq ft</p>
+                <p className="text-lg font-semibold">{(report.costBreakdown?.landAreaSqft || 0).toLocaleString()} sq ft</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Built-up Area</p>
-                <p className="text-lg font-semibold">{report.costBreakdown.builtUpAreaSqft.toLocaleString()} sq ft</p>
+                <p className="text-lg font-semibold">{(report.costBreakdown?.builtUpAreaSqft || 0).toLocaleString()} sq ft</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Property Age</p>
-                <p className="text-lg font-semibold">{report.propertyAssessment.propertyAge} years</p>
+                <p className="text-lg font-semibold">{report.propertyAssessment?.propertyAge || 0} years</p>
               </div>
             </div>
           </div>
@@ -210,25 +210,25 @@ export default function UserValuationReports() {
             <div className="bg-green-50 border border-green-200 p-6 rounded-lg">
               <div className="text-center mb-4">
                 <h4 className="text-2xl font-bold text-green-800">
-                  Fair Market Value: {formatCurrency(report.costBreakdown.totalEstimatedCost)}
+                  Fair Market Value: {formatCurrency(report.costBreakdown?.totalEstimatedCost || 0)}
                 </h4>
                 <p className="text-green-600">
-                  Rate per sq ft: {formatCurrency(Math.round(report.costBreakdown.totalEstimatedCost / report.costBreakdown.builtUpAreaSqft))}
+                  Rate per sq ft: {formatCurrency(Math.round((report.costBreakdown?.totalEstimatedCost || 0) / (report.costBreakdown?.builtUpAreaSqft || 1)))}
                 </p>
               </div>
               
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div className="bg-white p-3 rounded">
                   <p className="text-sm text-gray-600">Basic Cost</p>
-                  <p className="font-semibold">{formatCurrency(report.costBreakdown.basicCost)}</p>
+                  <p className="font-semibold">{formatCurrency(report.costBreakdown?.basicCost || 0)}</p>
                 </div>
                 <div className="bg-white p-3 rounded">
                   <p className="text-sm text-gray-600">Total Taxes</p>
-                  <p className="font-semibold">{formatCurrency(report.costBreakdown.totalTaxes)}</p>
+                  <p className="font-semibold">{formatCurrency(report.costBreakdown?.totalTaxes || 0)}</p>
                 </div>
                 <div className="bg-white p-3 rounded">
                   <p className="text-sm text-gray-600">Additional Costs</p>
-                  <p className="font-semibold">{formatCurrency(report.costBreakdown.totalAdditionalCost)}</p>
+                  <p className="font-semibold">{formatCurrency(report.costBreakdown?.totalAdditionalCost || 0)}</p>
                 </div>
               </div>
             </div>
@@ -250,43 +250,43 @@ export default function UserValuationReports() {
                   <tr>
                     <td className="border border-gray-300 px-4 py-2">Land Value</td>
                     <td className="border border-gray-300 px-4 py-2 text-right font-medium">
-                      {report.costBreakdown.landValue.toLocaleString()}
+                      {(report.costBreakdown?.landValue || 0).toLocaleString()}
                     </td>
                     <td className="border border-gray-300 px-4 py-2 text-right">
-                      {((report.costBreakdown.landValue / report.costBreakdown.totalEstimatedCost) * 100).toFixed(1)}%
+                      {(((report.costBreakdown?.landValue || 0) / (report.costBreakdown?.totalEstimatedCost || 1)) * 100).toFixed(1)}%
                     </td>
                   </tr>
                   <tr>
                     <td className="border border-gray-300 px-4 py-2">Construction Cost</td>
                     <td className="border border-gray-300 px-4 py-2 text-right font-medium">
-                      {report.costBreakdown.constructionCost.toLocaleString()}
+                      {(report.costBreakdown?.constructionCost || 0).toLocaleString()}
                     </td>
                     <td className="border border-gray-300 px-4 py-2 text-right">
-                      {((report.costBreakdown.constructionCost / report.costBreakdown.totalEstimatedCost) * 100).toFixed(1)}%
+                      {(((report.costBreakdown?.constructionCost || 0) / (report.costBreakdown?.totalEstimatedCost || 1)) * 100).toFixed(1)}%
                     </td>
                   </tr>
                   <tr>
                     <td className="border border-gray-300 px-4 py-2">GST on Construction</td>
                     <td className="border border-gray-300 px-4 py-2 text-right font-medium">
-                      {report.costBreakdown.gstOnConstruction.toLocaleString()}
+                      {(report.costBreakdown?.gstOnConstruction || 0).toLocaleString()}
                     </td>
                     <td className="border border-gray-300 px-4 py-2 text-right">
-                      {((report.costBreakdown.gstOnConstruction / report.costBreakdown.totalEstimatedCost) * 100).toFixed(1)}%
+                      {(((report.costBreakdown?.gstOnConstruction || 0) / (report.costBreakdown?.totalEstimatedCost || 1)) * 100).toFixed(1)}%
                     </td>
                   </tr>
                   <tr>
                     <td className="border border-gray-300 px-4 py-2">Registration & Stamp Duty</td>
                     <td className="border border-gray-300 px-4 py-2 text-right font-medium">
-                      {report.costBreakdown.registrationStampDuty.toLocaleString()}
+                      {(report.costBreakdown?.registrationStampDuty || 0).toLocaleString()}
                     </td>
                     <td className="border border-gray-300 px-4 py-2 text-right">
-                      {((report.costBreakdown.registrationStampDuty / report.costBreakdown.totalEstimatedCost) * 100).toFixed(1)}%
+                      {(((report.costBreakdown?.registrationStampDuty || 0) / (report.costBreakdown?.totalEstimatedCost || 1)) * 100).toFixed(1)}%
                     </td>
                   </tr>
                   <tr className="bg-blue-50 font-bold">
                     <td className="border border-gray-300 px-4 py-2">Total Estimated Cost</td>
                     <td className="border border-gray-300 px-4 py-2 text-right">
-                      {report.costBreakdown.totalEstimatedCost.toLocaleString()}
+                      {(report.costBreakdown?.totalEstimatedCost || 0).toLocaleString()}
                     </td>
                     <td className="border border-gray-300 px-4 py-2 text-right">100.0%</td>
                   </tr>
@@ -302,22 +302,22 @@ export default function UserValuationReports() {
               <div className="space-y-3">
                 <div>
                   <p className="text-sm text-gray-600">Average Market Rate</p>
-                  <p className="text-lg font-semibold">{formatCurrency(report.marketAnalysis.averagePricePerSqft)}/sq ft</p>
+                  <p className="text-lg font-semibold">{formatCurrency(report.marketAnalysis?.averagePricePerSqft || 0)}/sq ft</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Market Trend</p>
-                  <Badge variant={report.marketAnalysis.marketTrend === 'upward' ? 'default' : 'secondary'}>
-                    {report.marketAnalysis.marketTrend}
+                  <Badge variant={(report.marketAnalysis?.marketTrend || '') === 'upward' ? 'default' : 'secondary'}>
+                    {report.marketAnalysis?.marketTrend || 'stable'}
                   </Badge>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Price Appreciation</p>
-                  <p className="text-lg font-semibold text-green-600">+{report.marketAnalysis.priceAppreciation}%</p>
+                  <p className="text-lg font-semibold text-green-600">+{report.marketAnalysis?.priceAppreciation || 0}%</p>
                 </div>
               </div>
               <div>
                 <p className="text-sm text-gray-600 mb-2">Demand-Supply Analysis</p>
-                <p className="text-sm">{report.marketAnalysis.demandSupplyRatio}</p>
+                <p className="text-sm">{report.marketAnalysis?.demandSupplyRatio || 'Balanced market conditions'}</p>
               </div>
             </div>
           </div>
@@ -332,7 +332,7 @@ export default function UserValuationReports() {
               >
                 {report.investmentRecommendation.replace('-', ' ').toUpperCase()}
               </Badge>
-              <p className="text-sm text-gray-700">{report.executiveSummary}</p>
+              <p className="text-sm text-gray-700">{report.executiveSummary || 'Professional investment analysis available upon request.'}</p>
             </div>
           </div>
 
@@ -342,31 +342,31 @@ export default function UserValuationReports() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-600">Overall Risk</p>
-                <Badge variant={report.riskAssessment.overallRisk === 'low' ? 'default' : 'destructive'}>
-                  {report.riskAssessment.overallRisk} RISK
+                <Badge variant={(report.riskAssessment?.overallRisk || '') === 'low' ? 'default' : 'destructive'}>
+                  {report.riskAssessment?.overallRisk || 'medium'} RISK
                 </Badge>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Market Risk</p>
-                <Badge variant="secondary">{report.riskAssessment.marketRisk}</Badge>
+                <Badge variant="secondary">{report.riskAssessment?.marketRisk || 'low'}</Badge>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Legal Risk</p>
-                <Badge variant="secondary">{report.riskAssessment.legalRisk}</Badge>
+                <Badge variant="secondary">{report.riskAssessment?.legalRisk || 'low'}</Badge>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Liquidity Risk</p>
-                <Badge variant="secondary">{report.riskAssessment.liquidityRisk}</Badge>
+                <Badge variant="secondary">{report.riskAssessment?.liquidityRisk || 'medium'}</Badge>
               </div>
             </div>
           </div>
 
           {/* Key Highlights */}
-          {report.keyHighlights.length > 0 && (
+          {(report.keyHighlights || []).length > 0 && (
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Key Highlights</h3>
               <ul className="list-disc list-inside space-y-1">
-                {report.keyHighlights.map((highlight, index) => (
+                {(report.keyHighlights || []).map((highlight, index) => (
                   <li key={index} className="text-sm text-gray-700">{highlight}</li>
                 ))}
               </ul>
@@ -472,18 +472,18 @@ export default function UserValuationReports() {
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">Valuation</span>
                         <span className="font-semibold text-green-600">
-                          {formatCurrency(report.costBreakdown.totalEstimatedCost)}
+                          {formatCurrency(report.costBreakdown?.totalEstimatedCost || 0)}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">Rate/sq ft</span>
                         <span className="font-medium">
-                          {formatCurrency(Math.round(report.costBreakdown.totalEstimatedCost / report.costBreakdown.builtUpAreaSqft))}
+                          {formatCurrency(Math.round((report.costBreakdown?.totalEstimatedCost || 0) / (report.costBreakdown?.builtUpAreaSqft || 1)))}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">Area</span>
-                        <span className="font-medium">{report.costBreakdown.builtUpAreaSqft.toLocaleString()} sq ft</span>
+                        <span className="font-medium">{(report.costBreakdown?.builtUpAreaSqft || 0).toLocaleString()} sq ft</span>
                       </div>
                       <div className="flex items-center justify-between text-xs text-gray-500">
                         <span className="flex items-center">
