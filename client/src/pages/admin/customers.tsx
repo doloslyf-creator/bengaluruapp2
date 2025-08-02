@@ -564,22 +564,411 @@ export default function Customers() {
             </div>
           )}
 
-          {/* Other Tab Content Placeholders */}
+          {/* Lead Management Tab */}
           {activeTab === "leads" && (
             <div className="space-y-6">
+              {/* Lead Stats Overview */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Total Leads</p>
+                        <p className="text-2xl font-bold text-gray-900">
+                          {filteredCustomers.reduce((sum, c) => sum + c.leads.length, 0)}
+                        </p>
+                      </div>
+                      <Target className="h-8 w-8 text-blue-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Hot Leads</p>
+                        <p className="text-2xl font-bold text-red-600">{stats?.hotLeads || 0}</p>
+                      </div>
+                      <TrendingUp className="h-8 w-8 text-red-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Conversion Rate</p>
+                        <p className="text-2xl font-bold text-green-600">
+                          {stats?.totalCustomers ? Math.round((stats.convertedCustomers / stats.totalCustomers) * 100) : 0}%
+                        </p>
+                      </div>
+                      <CheckCircle className="h-8 w-8 text-green-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Avg Lead Score</p>
+                        <p className="text-2xl font-bold text-purple-600">
+                          {Math.round(filteredCustomers.reduce((sum, c) => sum + c.leadScore, 0) / (filteredCustomers.length || 1))}
+                        </p>
+                      </div>
+                      <Star className="h-8 w-8 text-purple-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Lead Funnel Visualization */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <Target className="h-5 w-5 mr-2" />
-                    Lead Management Dashboard
+                    <Activity className="h-5 w-5 mr-2" />
+                    Lead Conversion Funnel
                   </CardTitle>
                   <CardDescription>
-                    Manage lead scoring, qualification, and nurturing campaigns
+                    Visual representation of lead progression through qualification stages
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-12 text-gray-500">
-                    Lead management features coming soon...
+                  <div className="space-y-4">
+                    {[
+                      { stage: "Cold Leads", count: filteredCustomers.filter(c => c.status === "cold").length, color: "bg-blue-500" },
+                      { stage: "Warm Leads", count: filteredCustomers.filter(c => c.status === "warm").length, color: "bg-yellow-500" },
+                      { stage: "Hot Leads", count: filteredCustomers.filter(c => c.status === "hot").length, color: "bg-red-500" },
+                      { stage: "Converted", count: filteredCustomers.filter(c => c.status === "converted").length, color: "bg-green-500" },
+                    ].map((stage) => (
+                      <div key={stage.stage} className="flex items-center space-x-4">
+                        <div className="w-24 text-sm font-medium">{stage.stage}</div>
+                        <div className="flex-1 bg-gray-200 rounded-full h-3">
+                          <div 
+                            className={`h-3 rounded-full ${stage.color} transition-all duration-500`}
+                            style={{ 
+                              width: `${filteredCustomers.length ? (stage.count / filteredCustomers.length) * 100 : 0}%` 
+                            }}
+                          ></div>
+                        </div>
+                        <div className="w-16 text-sm font-medium text-right">{stage.count}</div>
+                        <div className="w-12 text-xs text-gray-500">
+                          {filteredCustomers.length ? Math.round((stage.count / filteredCustomers.length) * 100) : 0}%
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Lead Scoring & Qualification */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <Zap className="h-5 w-5 mr-2" />
+                      Lead Scoring Rules
+                    </CardTitle>
+                    <CardDescription>
+                      Configure automatic lead scoring criteria
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <div>
+                          <div className="font-medium">Property Interest</div>
+                          <div className="text-sm text-gray-600">Viewed 3+ properties</div>
+                        </div>
+                        <Badge variant="secondary">+15 points</Badge>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <div>
+                          <div className="font-medium">Site Visit Booked</div>
+                          <div className="text-sm text-gray-600">Scheduled property visit</div>
+                        </div>
+                        <Badge variant="secondary">+25 points</Badge>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <div>
+                          <div className="font-medium">Budget Confirmed</div>
+                          <div className="text-sm text-gray-600">Provided budget range</div>
+                        </div>
+                        <Badge variant="secondary">+20 points</Badge>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <div>
+                          <div className="font-medium">Report Ordered</div>
+                          <div className="text-sm text-gray-600">Requested valuation/MEP report</div>
+                        </div>
+                        <Badge variant="secondary">+30 points</Badge>
+                      </div>
+                    </div>
+                    <Button variant="outline" className="w-full">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Configure Scoring Rules
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <UserCheck className="h-5 w-5 mr-2" />
+                      Lead Qualification
+                    </CardTitle>
+                    <CardDescription>
+                      Qualification criteria and automation
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center p-3 border rounded-lg">
+                        <div>
+                          <div className="font-medium">Budget Qualification</div>
+                          <div className="text-sm text-gray-600">Min ₹50L budget confirmed</div>
+                        </div>
+                        <CheckCircle className="h-5 w-5 text-green-600" />
+                      </div>
+                      <div className="flex justify-between items-center p-3 border rounded-lg">
+                        <div>
+                          <div className="font-medium">Timeline Qualification</div>
+                          <div className="text-sm text-gray-600">Purchase timeline ≤ 6 months</div>
+                        </div>
+                        <CheckCircle className="h-5 w-5 text-green-600" />
+                      </div>
+                      <div className="flex justify-between items-center p-3 border rounded-lg">
+                        <div>
+                          <div className="font-medium">Authority Qualification</div>
+                          <div className="text-sm text-gray-600">Decision maker identified</div>
+                        </div>
+                        <AlertCircle className="h-5 w-5 text-yellow-600" />
+                      </div>
+                      <div className="flex justify-between items-center p-3 border rounded-lg">
+                        <div>
+                          <div className="font-medium">Need Qualification</div>
+                          <div className="text-sm text-gray-600">Specific requirements defined</div>
+                        </div>
+                        <CheckCircle className="h-5 w-5 text-green-600" />
+                      </div>
+                    </div>
+                    <Button variant="outline" className="w-full">
+                      <Target className="h-4 w-4 mr-2" />
+                      Update BANT Criteria
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Lead Management Table */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center">
+                        <Target className="h-5 w-5 mr-2" />
+                        Lead Pipeline Management
+                      </CardTitle>
+                      <CardDescription>
+                        Comprehensive lead tracking and nurturing workflow
+                      </CardDescription>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Button variant="outline" size="sm">
+                        <Download className="h-4 w-4 mr-2" />
+                        Export Leads
+                      </Button>
+                      <Button size="sm">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Lead
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Lead Details</TableHead>
+                        <TableHead>Score</TableHead>
+                        <TableHead>Stage</TableHead>
+                        <TableHead>Source</TableHead>
+                        <TableHead>Activities</TableHead>
+                        <TableHead>Next Action</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredCustomers.map((customer) => (
+                        <TableRow key={customer.id}>
+                          <TableCell>
+                            <div>
+                              <div className="font-medium">{customer.name}</div>
+                              <div className="text-sm text-gray-500">{customer.email}</div>
+                              <div className="text-sm text-gray-500">{customer.phone}</div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-2">
+                              <div className="w-12 bg-gray-200 rounded-full h-2">
+                                <div 
+                                  className={`h-2 rounded-full ${
+                                    customer.leadScore >= 80 ? 'bg-green-600' :
+                                    customer.leadScore >= 60 ? 'bg-yellow-600' :
+                                    customer.leadScore >= 40 ? 'bg-orange-600' : 'bg-red-600'
+                                  }`}
+                                  style={{ width: `${customer.leadScore}%` }}
+                                ></div>
+                              </div>
+                              <span className="text-sm font-medium">{customer.leadScore}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>{getStatusBadge(customer.status)}</TableCell>
+                          <TableCell>
+                            <span className="text-sm">{customer.source}</span>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-1">
+                              <Badge variant="outline" className="text-xs">
+                                {customer.leads.length} leads
+                              </Badge>
+                              <Badge variant="outline" className="text-xs">
+                                {customer.bookings.length} visits
+                              </Badge>
+                              <Badge variant="outline" className="text-xs">
+                                {customer.orders.length} orders
+                              </Badge>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-sm">
+                              {customer.status === "hot" ? "Schedule follow-up call" :
+                               customer.status === "warm" ? "Send property recommendations" :
+                               customer.status === "cold" ? "Nurture with content" :
+                               customer.status === "converted" ? "Post-sale support" :
+                               "Re-engagement campaign"}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center space-x-1">
+                              <Button variant="ghost" size="sm">
+                                <Phone className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="sm">
+                                <Mail className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="sm">
+                                <Calendar className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="sm">
+                                <MessageSquare className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+
+              {/* Lead Nurturing Campaigns */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Heart className="h-5 w-5 mr-2" />
+                    Lead Nurturing Campaigns
+                  </CardTitle>
+                  <CardDescription>
+                    Automated nurturing sequences and campaign performance
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="p-4 border rounded-lg">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium">Property Discovery Series</h4>
+                        <Badge variant="default">Active</Badge>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span>Enrolled:</span>
+                          <span className="font-medium">24 leads</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Open Rate:</span>
+                          <span className="font-medium">68%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Click Rate:</span>
+                          <span className="font-medium">24%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Conversions:</span>
+                          <span className="font-medium text-green-600">3</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 border rounded-lg">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium">Re-engagement Campaign</h4>
+                        <Badge variant="secondary">Scheduled</Badge>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span>Target:</span>
+                          <span className="font-medium">18 cold leads</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Start Date:</span>
+                          <span className="font-medium">Next Week</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Duration:</span>
+                          <span className="font-medium">4 weeks</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Expected ROI:</span>
+                          <span className="font-medium text-blue-600">15%</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 border rounded-lg">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium">VIP Customer Journey</h4>
+                        <Badge variant="default">Active</Badge>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span>Enrolled:</span>
+                          <span className="font-medium">8 leads</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Avg Score:</span>
+                          <span className="font-medium">85</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Conversion:</span>
+                          <span className="font-medium">62%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Revenue:</span>
+                          <span className="font-medium text-green-600">₹18L</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-6 flex justify-between items-center">
+                    <Button variant="outline">
+                      <Briefcase className="h-4 w-4 mr-2" />
+                      Campaign Analytics
+                    </Button>
+                    <Button>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Campaign
+                    </Button>
                   </div>
                 </CardContent>
               </Card>

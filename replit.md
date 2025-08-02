@@ -32,7 +32,7 @@ The API follows RESTful principles, providing standard CRUD operations for entit
 - **Legal Due Diligence**: A 12-step tracker for legal verification, with admin and user panel interfaces, document management, and progress visualization.
 - **Professional Property Valuation Reports**: User-facing valuation reports with detailed property specifications, cost breakdowns, market analysis, and risk assessment.
 - **CIVIL+MEP Report System**: Engineering report ordering with "pay later" functionality and comprehensive order management. Features a compact table-based admin interface for efficient property and report management.
-- **Lead Management System**: Automatic lead generation from customer interactions, with scoring, activity tracking, and analytics.
+- **Lead Management System**: Comprehensive lead management with automated scoring (15-30 points per activity), qualification criteria (BANT methodology), conversion funnel visualization, pipeline management, and nurturing campaigns with performance analytics.
 - **Blog Management System**: Admin panel for full CRUD operations on blog posts, content categories, and SEO metadata.
 - **Branding**: "OwnItRight" brand update across the application with a custom wordmark logo.
 
