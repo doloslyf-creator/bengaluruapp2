@@ -30,6 +30,9 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import AdminLayout from "@/components/layout/admin-layout";
 import { insertAppSettingsSchema, type AppSettings, type InsertAppSettings } from "@shared/schema";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ApiKeysSettings } from "@/components/settings/api-keys-settings";
+import { Key } from "lucide-react";
 
 export default function AdminSettings() {
   const { toast } = useToast();
@@ -119,6 +122,7 @@ export default function AdminSettings() {
 
   const tabs = [
     { id: "general", label: "General", icon: Building },
+    { id: "api-keys", label: "API Keys", icon: Key },
     { id: "contact", label: "Contact Info", icon: Mail },
     { id: "localization", label: "Localization", icon: Globe },
     { id: "appearance", label: "Appearance", icon: Palette },
@@ -299,6 +303,24 @@ export default function AdminSettings() {
                           )}
                         />
                       )}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* API Keys Settings */}
+                {activeTab === "api-keys" && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <Key className="h-5 w-5" />
+                        <span>API Keys & Integrations</span>
+                      </CardTitle>
+                      <CardDescription>
+                        Configure third-party API keys for payments, maps, analytics, and more
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <ApiKeysSettings />
                     </CardContent>
                   </Card>
                 )}

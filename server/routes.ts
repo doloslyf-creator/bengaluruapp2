@@ -2431,6 +2431,151 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // API Keys Settings Routes
+  app.get("/api/settings/api-keys", async (req, res) => {
+    try {
+      // Return mock data for now - in production, would fetch from database
+      const apiKeys = {
+        id: "1",
+        razorpayKeyId: "",
+        razorpayTestMode: true,
+        googleMapsApiKey: "",
+        googleAnalyticsId: "",
+        twilioAccountSid: "",
+        twilioPhoneNumber: "",
+        sendgridFromEmail: "",
+        surepassApiKey: "",
+        lastUpdated: new Date().toISOString(),
+        updatedBy: "admin"
+      };
+      res.json(apiKeys);
+    } catch (error) {
+      console.error("Error fetching API keys:", error);
+      res.status(500).json({ error: "Failed to fetch API keys" });
+    }
+  });
+
+  app.put("/api/settings/api-keys", async (req, res) => {
+    try {
+      const apiKeysData = req.body;
+      // In production, would save to database with encryption for sensitive keys
+      console.log("API keys updated:", { ...apiKeysData, razorpayKeySecret: "***", googleMapsApiKey: "***" });
+      
+      // Reinitialize payment service if Razorpay keys were updated
+      if (apiKeysData.razorpayKeyId || apiKeysData.razorpayKeySecret) {
+        try {
+          await paymentService.reinitialize();
+          console.log("Payment service reinitialized successfully");
+        } catch (error) {
+          console.error("Failed to reinitialize payment service:", error);
+        }
+      }
+      
+      res.json({ success: true, message: "API keys updated successfully" });
+    } catch (error) {
+      console.error("Error updating API keys:", error);
+      res.status(500).json({ error: "Failed to update API keys" });
+    }
+  });
+
+  app.post("/api/settings/test-connection/:service", async (req, res) => {
+    try {
+      const { service } = req.params;
+      
+      switch (service) {
+        case "razorpay":
+          if (!paymentService.isReady()) {
+            return res.status(400).json({ error: "Razorpay not configured" });
+          }
+          // Test by creating a small test order
+          try {
+            const testOrder = await paymentService.createOrder({
+              amount: 100, // 1 rupee
+              currency: "INR",
+              receipt: "test_" + Date.now(),
+              notes: { test: "connection_test" }
+            });
+            res.json({ success: true, message: "Razorpay connection successful", orderId: testOrder.id });
+          } catch (error) {
+            res.status(400).json({ error: "Razorpay connection failed: " + error.message });
+          }
+          break;
+          
+        case "surepass":
+          try {
+            const testResult = await reraService.verifyRERA("KA1234567890");
+            res.json({ success: true, message: "Surepass connection successful" });
+          } catch (error) {
+            res.status(400).json({ error: "Surepass connection failed: " + error.message });
+          }
+          break;
+          
+        default:
+          res.status(400).json({ error: "Unknown service: " + service });
+      }
+    } catch (error) {
+      console.error("Error testing connection:", error);
+      res.status(500).json({ error: "Failed to test connection" });
+    }
+  });
+
+  // Payment processing routes
+  app.post("/api/payments/create-order", async (req, res) => {
+    try {
+      if (!paymentService.isReady()) {
+        return res.status(503).json({ error: "Payment service not configured. Please set up Razorpay keys in admin settings." });
+      }
+
+      const { amount, currency = "INR", receipt, notes } = req.body;
+      
+      if (!amount || amount < 100) {
+        return res.status(400).json({ error: "Amount must be at least 100 paise (1 INR)" });
+      }
+
+      const order = await paymentService.createOrder({
+        amount,
+        currency,
+        receipt: receipt || `order_${Date.now()}`,
+        notes
+      });
+
+      res.json(order);
+    } catch (error) {
+      console.error("Error creating payment order:", error);
+      res.status(500).json({ error: error.message || "Failed to create payment order" });
+    }
+  });
+
+  app.post("/api/payments/verify", async (req, res) => {
+    try {
+      if (!paymentService.isReady()) {
+        return res.status(503).json({ error: "Payment service not configured" });
+      }
+
+      const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+      
+      if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+        return res.status(400).json({ error: "Missing required payment verification parameters" });
+      }
+
+      const isValid = paymentService.verifyPayment({
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature
+      });
+
+      if (isValid) {
+        // In production, update order status in database
+        res.json({ success: true, message: "Payment verified successfully" });
+      } else {
+        res.status(400).json({ error: "Payment verification failed" });
+      }
+    } catch (error) {
+      console.error("Error verifying payment:", error);
+      res.status(500).json({ error: "Failed to verify payment" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

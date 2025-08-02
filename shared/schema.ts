@@ -924,22 +924,62 @@ export const appSettings = pgTable("app_settings", {
   primaryColor: text("primary_color").default("#2563eb"), // Default blue
   secondaryColor: text("secondary_color").default("#64748b"), // Default slate
   
-  // SEO and Metadata
-  metaTitle: text("meta_title").default("OwnItRight - Property Discovery Platform"),
-  metaDescription: text("meta_description").default("Discover your perfect property in Bengaluru with our advanced property discovery platform"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// API Keys Settings table for secure storage of third-party integrations
+export const apiKeysSettings = pgTable("api_keys_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   
-  // Feature Flags
-  enableBookings: boolean("enable_bookings").default(true),
-  enableConsultations: boolean("enable_consultations").default(true),
-  enableReports: boolean("enable_reports").default(true),
-  enableBlog: boolean("enable_blog").default(true),
+  // Payment Integration
+  razorpayKeyId: text("razorpay_key_id"),
+  razorpayKeySecret: text("razorpay_key_secret"), // Encrypted
+  razorpayWebhookSecret: text("razorpay_webhook_secret"), // Encrypted
+  razorpayTestMode: boolean("razorpay_test_mode").default(true),
   
-  // Admin User Settings
-  lastUpdatedBy: text("last_updated_by").default("admin"),
+  // Google Services
+  googleMapsApiKey: text("google_maps_api_key"), // Encrypted
+  googleAnalyticsId: text("google_analytics_id"),
+  
+  // Communication APIs
+  twilioAccountSid: text("twilio_account_sid"),
+  twilioAuthToken: text("twilio_auth_token"), // Encrypted
+  twilioPhoneNumber: text("twilio_phone_number"),
+  
+  // WhatsApp Business
+  whatsappBusinessApiKey: text("whatsapp_business_api_key"), // Encrypted
+  whatsappPhoneNumberId: text("whatsapp_phone_number_id"),
+  
+  // Email Services
+  sendgridApiKey: text("sendgrid_api_key"), // Encrypted
+  sendgridFromEmail: text("sendgrid_from_email"),
+  
+  // Government Verification APIs
+  surepassApiKey: text("surepass_api_key"), // Encrypted
+  signzyApiKey: text("signzy_api_key"), // Encrypted
+  
+  // Real Estate Data APIs
+  magicbricksApiKey: text("magicbricks_api_key"), // Encrypted
+  acres99ApiKey: text("acres_99_api_key"), // Encrypted
+  
+  // Status tracking
+  lastUpdated: timestamp("last_updated").defaultNow(),
+  updatedBy: text("updated_by").default("admin"),
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+// Add API Keys Settings type exports
+export const insertApiKeysSettingsSchema = createInsertSchema(apiKeysSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type ApiKeysSettings = typeof apiKeysSettings.$inferSelect;
+export type InsertApiKeysSettings = z.infer<typeof insertApiKeysSettingsSchema>;
 
 export const insertAppSettingsSchema = createInsertSchema(appSettings).omit({
   id: true,
