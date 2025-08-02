@@ -6,7 +6,7 @@ import {
   Star, Heart, Share2, Phone, MessageCircle, CheckCircle, 
   Info, Award, Shield, TrendingUp, Clock, Eye, Camera,
   Bed, Bath, Car, TreePine, Dumbbell, ShoppingCart, Wifi,
-  Waves, Zap, Home, ExternalLink, Download, ChevronLeft, ChevronRight, Play
+  Waves, Zap, Home, ExternalLink, Download, ChevronLeft, ChevronRight, Play, BarChart3
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -715,37 +715,289 @@ export default function PropertyDetail() {
               </CardContent>
             </Card>
 
-            {/* Investment Metrics */}
-            <Card>
+            {/* Investment Metrics - Enhanced */}
+            <Card className="card-stripe">
               <CardHeader>
-                <CardTitle className="text-lg flex items-center">
-                  <TrendingUp className="h-5 w-5 mr-2" />
+                <CardTitle className="text-heading-3 text-foreground flex items-center">
+                  <TrendingUp className="h-5 w-5 mr-2 text-success" />
                   Investment Insights
                 </CardTitle>
               </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <div className="flex justify-between text-body-small mb-2">
+                    <span className="text-muted-foreground">Area Appreciation</span>
+                    <span className="text-success font-semibold">+12% YoY</span>
+                  </div>
+                  <Progress value={75} className="h-3 rounded-full" />
+                </div>
+                
+                <div>
+                  <div className="flex justify-between text-body-small mb-2">
+                    <span className="text-muted-foreground">Rental Yield</span>
+                    <span className="text-primary font-semibold">3.2%</span>
+                  </div>
+                  <Progress value={65} className="h-3 rounded-full" />
+                </div>
+                
+                <div>
+                  <div className="flex justify-between text-body-small mb-2">
+                    <span className="text-muted-foreground">Infrastructure Score</span>
+                    <span className="text-warning font-semibold">8.5/10</span>
+                  </div>
+                  <Progress value={85} className="h-3 rounded-full" />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Market Insights Widget */}
+            <Card className="card-stripe">
+              <CardHeader>
+                <CardTitle className="text-heading-3 text-foreground flex items-center">
+                  <BarChart3 className="h-5 w-5 mr-2 text-primary" />
+                  Market Insights
+                </CardTitle>
+              </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span>Area Appreciation</span>
-                    <span className="text-green-600 font-medium">+12% YoY</span>
+                <div className="grid grid-cols-1 gap-3">
+                  <div className="text-center p-4 bg-muted/30 rounded-xl">
+                    <div className="text-heading-3 text-success font-semibold">₹12,500</div>
+                    <div className="text-caption text-muted-foreground">Avg. Price/sqft in {property.zone}</div>
                   </div>
-                  <Progress value={75} className="h-2" />
+                  <div className="text-center p-4 bg-muted/30 rounded-xl">
+                    <div className="text-heading-3 text-primary font-semibold">18 months</div>
+                    <div className="text-caption text-muted-foreground">Average Selling Time</div>
+                  </div>
                 </div>
-                
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span>Rental Yield</span>
-                    <span className="text-blue-600 font-medium">3.2%</span>
+                <div className="p-3 bg-success/10 rounded-xl border border-success/20">
+                  <div className="flex items-center text-success text-body-small font-medium">
+                    <TrendingUp className="h-4 w-4 mr-2" />
+                    Property values increased by 15% this year
                   </div>
-                  <Progress value={65} className="h-2" />
                 </div>
-                
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span>Infrastructure Score</span>
-                    <span className="text-purple-600 font-medium">8.5/10</span>
+              </CardContent>
+            </Card>
+
+            {/* Mortgage Calculator Widget */}
+            <Card className="card-stripe">
+              <CardHeader>
+                <CardTitle className="text-heading-3 text-foreground flex items-center">
+                  <IndianRupee className="h-5 w-5 mr-2 text-primary" />
+                  EMI Calculator
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-body-small text-muted-foreground font-medium">Estimated Loan Amount</label>
+                    <div className="text-heading-3 text-foreground">₹75,00,000</div>
                   </div>
-                  <Progress value={85} className="h-2" />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="text-center p-3 bg-muted/30 rounded-lg">
+                      <div className="text-body font-medium">8.5%</div>
+                      <div className="text-caption text-muted-foreground">Interest Rate</div>
+                    </div>
+                    <div className="text-center p-3 bg-muted/30 rounded-lg">
+                      <div className="text-body font-medium">20 years</div>
+                      <div className="text-caption text-muted-foreground">Loan Tenure</div>
+                    </div>
+                  </div>
+                  <div className="p-4 bg-primary/10 rounded-xl border border-primary/20">
+                    <div className="text-center">
+                      <div className="text-caption text-muted-foreground">Monthly EMI</div>
+                      <div className="text-heading-3 text-primary font-semibold">₹63,742</div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Location Highlights Widget */}
+            <Card className="card-stripe">
+              <CardHeader>
+                <CardTitle className="text-heading-3 text-foreground flex items-center">
+                  <MapPin className="h-5 w-5 mr-2 text-warning" />
+                  Nearby Amenities
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 bg-success/10 rounded-lg flex items-center justify-center mr-3">
+                        <Car className="h-4 w-4 text-success" />
+                      </div>
+                      <span className="text-body-small font-medium">Metro Station</span>
+                    </div>
+                    <span className="text-body-small text-success font-semibold">0.8 km</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
+                        <Building className="h-4 w-4 text-primary" />
+                      </div>
+                      <span className="text-body-small font-medium">IT Hub</span>
+                    </div>
+                    <span className="text-body-small text-primary font-semibold">2.5 km</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 bg-warning/10 rounded-lg flex items-center justify-center mr-3">
+                        <ShoppingCart className="h-4 w-4 text-warning" />
+                      </div>
+                      <span className="text-body-small font-medium">Shopping Mall</span>
+                    </div>
+                    <span className="text-body-small text-warning font-semibold">1.2 km</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Construction Timeline Widget */}
+            <Card className="card-stripe">
+              <CardHeader>
+                <CardTitle className="text-heading-3 text-foreground flex items-center">
+                  <Clock className="h-5 w-5 mr-2 text-primary" />
+                  Construction Timeline
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-4">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 bg-success rounded-full mr-4"></div>
+                    <div className="flex-1">
+                      <div className="text-body-small font-medium">Foundation Complete</div>
+                      <div className="text-caption text-muted-foreground">Mar 2024</div>
+                    </div>
+                    <CheckCircle className="h-4 w-4 text-success" />
+                  </div>
+                  <div className="border-l-2 border-dashed border-muted ml-1.5 pl-6 pb-2">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-primary rounded-full mr-4 -ml-8"></div>
+                      <div className="flex-1">
+                        <div className="text-body-small font-medium">Structure Complete</div>
+                        <div className="text-caption text-muted-foreground">Dec 2024</div>
+                      </div>
+                      <div className="w-4 h-4 border-2 border-primary rounded-full"></div>
+                    </div>
+                  </div>
+                  <div className="border-l-2 border-dashed border-muted ml-1.5 pl-6 pb-2">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-muted-foreground rounded-full mr-4 -ml-8"></div>
+                      <div className="flex-1">
+                        <div className="text-body-small font-medium">Interior Work</div>
+                        <div className="text-caption text-muted-foreground">Jun 2025</div>
+                      </div>
+                      <div className="w-4 h-4 border-2 border-muted-foreground rounded-full"></div>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 bg-muted-foreground rounded-full mr-4"></div>
+                    <div className="flex-1">
+                      <div className="text-body-small font-medium">Possession Ready</div>
+                      <div className="text-caption text-muted-foreground">Sep 2025</div>
+                    </div>
+                    <div className="w-4 h-4 border-2 border-muted-foreground rounded-full"></div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Actions Widget */}
+            <Card className="card-stripe">
+              <CardHeader>
+                <CardTitle className="text-heading-3 text-foreground">Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button variant="outline" className="w-full justify-start rounded-xl focus-stripe transition-stripe">
+                  <Download className="h-4 w-4 mr-3" />
+                  Download Brochure
+                </Button>
+                <Button variant="outline" className="w-full justify-start rounded-xl focus-stripe transition-stripe">
+                  <ExternalLink className="h-4 w-4 mr-3" />
+                  Virtual Tour
+                </Button>
+                <Button variant="outline" className="w-full justify-start rounded-xl focus-stripe transition-stripe">
+                  <Calendar className="h-4 w-4 mr-3" />
+                  Check Availability
+                </Button>
+                <Button variant="outline" className="w-full justify-start rounded-xl focus-stripe transition-stripe">
+                  <Star className="h-4 w-4 mr-3" />
+                  Add to Wishlist
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Property Score Widget */}
+            <Card className="card-stripe">
+              <CardHeader>
+                <CardTitle className="text-heading-3 text-foreground flex items-center">
+                  <Award className="h-5 w-5 mr-2 text-warning" />
+                  Property Score
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-center mb-4">
+                  <div className="text-display text-warning font-bold">8.5</div>
+                  <div className="text-caption text-muted-foreground">Overall Rating</div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-body-small text-muted-foreground">Location</span>
+                    <div className="flex">
+                      {[1,2,3,4,5].map((star) => (
+                        <Star key={star} className={`h-4 w-4 ${star <= 4 ? 'text-warning fill-current' : 'text-muted'}`} />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-body-small text-muted-foreground">Amenities</span>
+                    <div className="flex">
+                      {[1,2,3,4,5].map((star) => (
+                        <Star key={star} className={`h-4 w-4 ${star <= 5 ? 'text-warning fill-current' : 'text-muted'}`} />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-body-small text-muted-foreground">Value for Money</span>
+                    <div className="flex">
+                      {[1,2,3,4,5].map((star) => (
+                        <Star key={star} className={`h-4 w-4 ${star <= 4 ? 'text-warning fill-current' : 'text-muted'}`} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Price Comparison Widget */}
+            <Card className="card-stripe">
+              <CardHeader>
+                <CardTitle className="text-heading-3 text-foreground flex items-center">
+                  <BarChart3 className="h-5 w-5 mr-2 text-primary" />
+                  Price Comparison
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-center p-4 bg-primary/5 rounded-xl border border-primary/20">
+                  <div className="text-caption text-muted-foreground">This Property</div>
+                  <div className="text-heading-3 text-primary font-semibold">{getPriceRange()}</div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
+                    <span className="text-body-small text-muted-foreground">Area Average</span>
+                    <span className="text-body-small font-medium text-muted-foreground">₹95L - ₹1.2Cr</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
+                    <span className="text-body-small text-muted-foreground">City Average</span>
+                    <span className="text-body-small font-medium text-muted-foreground">₹85L - ₹1.1Cr</span>
+                  </div>
+                </div>
+                <div className="p-3 bg-success/10 rounded-xl border border-success/20">
+                  <div className="flex items-center text-success text-body-small font-medium">
+                    <TrendingUp className="h-4 w-4 mr-2" />
+                    12% below area average - Great value!
+                  </div>
                 </div>
               </CardContent>
             </Card>
