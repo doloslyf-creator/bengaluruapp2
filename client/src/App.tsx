@@ -8,6 +8,7 @@ import AdminAnalytics from "@/pages/admin/analytics";
 import AdminZones from "@/pages/admin/zones";
 import AdminDevelopers from "@/pages/admin/developers";
 import PropertyEdit from "@/pages/property-edit";
+import PropertyDetail from "@/pages/property-detail";
 import FindProperty from "@/pages/find-property";
 import PropertyResults from "@/pages/property-results";
 import BookVisit from "@/pages/book-visit";
@@ -32,6 +33,7 @@ function Router() {
       {/* Customer-facing routes */}
       <Route path="/find-property" component={FindProperty} />
       <Route path="/find-property/results" component={PropertyResults} />
+      <Route path="/property/:id" component={PropertyDetail} />
       <Route path="/book-visit" component={BookVisit} />
       <Route path="/consultation" component={Consultation} />
       

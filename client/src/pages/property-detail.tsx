@@ -1,0 +1,572 @@
+import { useState, useEffect } from "react";
+import { useLocation, useRoute } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import { 
+  ArrowLeft, MapPin, Calendar, IndianRupee, Building, Users, 
+  Star, Heart, Share2, Phone, MessageCircle, CheckCircle, 
+  Info, Award, Shield, TrendingUp, Clock, Eye, Camera,
+  Bed, Bath, Car, TreePine, Dumbbell, ShoppingCart, Wifi,
+  Waves, Zap, Home, ExternalLink, Download
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress";
+import { formatPriceDisplay } from "@/lib/utils";
+import { type Property, type PropertyConfiguration } from "@shared/schema";
+
+interface PropertyWithConfigurations extends Property {
+  configurations: PropertyConfiguration[];
+}
+
+export default function PropertyDetail() {
+  const [, navigate] = useLocation();
+  const [match, params] = useRoute("/property/:id");
+  const [selectedConfig, setSelectedConfig] = useState<PropertyConfiguration | null>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  const propertyId = params?.id;
+
+  // Fetch property with configurations
+  const { data: property, isLoading } = useQuery<PropertyWithConfigurations>({
+    queryKey: ["/api/properties", propertyId, "with-configurations"],
+    queryFn: async () => {
+      const response = await fetch(`/api/properties/${propertyId}/with-configurations`);
+      if (!response.ok) {
+        throw new Error("Property not found");
+      }
+      return response.json();
+    },
+    enabled: !!propertyId,
+  });
+
+  // Set default selected configuration
+  useEffect(() => {
+    if (property?.configurations.length && !selectedConfig) {
+      setSelectedConfig(property.configurations[0]);
+    }
+  }, [property, selectedConfig]);
+
+  const handleBookVisit = () => {
+    navigate('/book-visit', { state: { property, configuration: selectedConfig } });
+  };
+
+  const handleConsult = () => {
+    navigate('/consultation', { state: { property, configuration: selectedConfig } });
+  };
+
+  const toggleFavorite = () => {
+    setIsFavorite(!isFavorite);
+    // In a real app, this would save to user preferences
+  };
+
+  const getPriceRange = () => {
+    if (!property?.configurations.length) return "Price on request";
+    const prices = property.configurations.map(c => c.price);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    
+    if (minPrice === maxPrice) {
+      return formatPriceDisplay(minPrice);
+    }
+    return `${formatPriceDisplay(minPrice)} - ${formatPriceDisplay(maxPrice)}`;
+  };
+
+  const getStatusColor = (status: string) => {
+    const colors = {
+      "pre-launch": "bg-yellow-100 text-yellow-800 border-yellow-200",
+      "active": "bg-green-100 text-green-800 border-green-200",
+      "under-construction": "bg-blue-100 text-blue-800 border-blue-200",
+      "completed": "bg-green-100 text-green-800 border-green-200",
+      "sold-out": "bg-red-100 text-red-800 border-red-200",
+    };
+    return colors[status as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200";
+  };
+
+  const getTagIcon = (tag: string) => {
+    const icons = {
+      "rera-approved": Shield,
+      "gated-community": Home,
+      "premium": Star,
+      "golf-course": TreePine,
+      "eco-friendly": TreePine,
+      "metro-connectivity": Car,
+      "it-hub-proximity": Building,
+      "swimming-pool": Waves,
+      "gym": Dumbbell,
+      "club-house": Users,
+      "parking": Car,
+      "power-backup": Zap,
+      "wifi": Wifi,
+    };
+    return icons[tag as keyof typeof icons] || Info;
+  };
+
+  const amenityIcons = {
+    "Swimming Pool": Waves,
+    "Gymnasium": Dumbbell,
+    "Club House": Users,
+    "Children's Play Area": Users,
+    "Landscaped Gardens": TreePine,
+    "24/7 Security": Shield,
+    "Power Backup": Zap,
+    "Covered Parking": Car,
+    "Wi-Fi": Wifi,
+    "Shopping Center": ShoppingCart,
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-lg text-gray-600">Loading property details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!property) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Property Not Found</h2>
+          <p className="text-gray-600 mb-4">The property you're looking for doesn't exist.</p>
+          <Button onClick={() => navigate('/find-property')}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Search
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Button 
+                variant="ghost" 
+                onClick={() => window.history.back()}
+                className="flex items-center space-x-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                <span>Back</span>
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">{property.name}</h1>
+                <p className="text-sm text-gray-600 flex items-center">
+                  <MapPin className="h-4 w-4 mr-1" />
+                  {property.area}, {property.zone} Bengaluru
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-3">
+              <Button variant="outline" size="sm" onClick={toggleFavorite}>
+                <Heart className={`h-4 w-4 mr-2 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
+                {isFavorite ? 'Saved' : 'Save'}
+              </Button>
+              <Button variant="outline" size="sm">
+                <Share2 className="h-4 w-4 mr-2" />
+                Share
+              </Button>
+              <Button size="sm" onClick={handleBookVisit}>
+                <Eye className="h-4 w-4 mr-2" />
+                Book Visit
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Section with Image Gallery */}
+      <section className="bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Main Image */}
+            <div className="lg:col-span-2">
+              <div className="relative aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden">
+                <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                  <div className="text-center">
+                    <Camera className="h-16 w-16 mx-auto mb-4" />
+                    <p className="text-xl font-medium">Property Gallery</p>
+                    <p className="text-sm">Professional photography coming soon</p>
+                  </div>
+                </div>
+                {/* Image navigation dots */}
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+                  <div className="flex space-x-2">
+                    {[1, 2, 3, 4, 5].map((_, index) => (
+                      <button
+                        key={index}
+                        className={`w-2 h-2 rounded-full ${
+                          index === activeImageIndex ? 'bg-white' : 'bg-white/50'
+                        }`}
+                        onClick={() => setActiveImageIndex(index)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Property Quick Info */}
+            <div className="space-y-4">
+              <Card>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg">Quick Info</CardTitle>
+                    <Badge className={getStatusColor(property.status)}>
+                      {property.status.replace('-', ' ').toUpperCase()}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Price Range</span>
+                    <span className="font-medium text-primary">{getPriceRange()}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Developer</span>
+                    <span className="font-medium">{property.developer}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">Property Type</span>
+                    <span className="font-medium capitalize">{property.type}</span>
+                  </div>
+                  {property.possessionDate && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Possession</span>
+                      <span className="font-medium">{property.possessionDate}</span>
+                    </div>
+                  )}
+                  {property.reraApproved && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">RERA</span>
+                      <div className="flex items-center">
+                        <Shield className="h-4 w-4 text-green-600 mr-1" />
+                        <span className="text-sm text-green-600 font-medium">Approved</span>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <Button onClick={handleBookVisit} className="w-full">
+                      <Eye className="h-4 w-4 mr-2" />
+                      Book Visit
+                    </Button>
+                    <Button variant="outline" onClick={handleConsult} className="w-full">
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      Consult
+                    </Button>
+                  </div>
+                  <Button variant="outline" className="w-full mt-3">
+                    <Phone className="h-4 w-4 mr-2" />
+                    Call Now: +91 98765 43210
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Configuration Selector */}
+            {property.configurations.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Building className="h-5 w-5 mr-2" />
+                    Available Configurations
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {property.configurations.map((config) => (
+                      <button
+                        key={config.id}
+                        onClick={() => setSelectedConfig(config)}
+                        className={`p-4 rounded-lg border-2 text-left transition-all ${
+                          selectedConfig?.id === config.id
+                            ? 'border-primary bg-primary/5'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <div className="font-medium text-lg">{config.configuration}</div>
+                        <div className="text-sm text-gray-600">{config.builtUpArea.toLocaleString()} sq ft</div>
+                        <div className="text-primary font-bold">{formatPriceDisplay(config.price)}</div>
+                        <Badge variant="outline" className="mt-2">
+                          {config.availabilityStatus}
+                        </Badge>
+                      </button>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Selected Configuration Details */}
+            {selectedConfig && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Configuration Details - {selectedConfig.configuration}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center p-4 bg-gray-50 rounded-lg">
+                      <Building className="h-8 w-8 mx-auto mb-2 text-primary" />
+                      <div className="font-medium">{selectedConfig.builtUpArea.toLocaleString()}</div>
+                      <div className="text-sm text-gray-600">Built-up Area</div>
+                    </div>
+                    {selectedConfig.plotSize && (
+                      <div className="text-center p-4 bg-gray-50 rounded-lg">
+                        <Home className="h-8 w-8 mx-auto mb-2 text-primary" />
+                        <div className="font-medium">{selectedConfig.plotSize.toLocaleString()}</div>
+                        <div className="text-sm text-gray-600">Plot Size</div>
+                      </div>
+                    )}
+                    <div className="text-center p-4 bg-gray-50 rounded-lg">
+                      <IndianRupee className="h-8 w-8 mx-auto mb-2 text-primary" />
+                      <div className="font-medium">₹{selectedConfig.pricePerSqft}</div>
+                      <div className="text-sm text-gray-600">Per Sq Ft</div>
+                    </div>
+                    <div className="text-center p-4 bg-gray-50 rounded-lg">
+                      <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
+                      <div className="font-medium">{selectedConfig.availableUnits || 'N/A'}</div>
+                      <div className="text-sm text-gray-600">Available Units</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Property Details Tabs */}
+            <Card>
+              <CardContent className="p-0">
+                <Tabs defaultValue="overview" className="w-full">
+                  <TabsList className="grid w-full grid-cols-4 rounded-none border-b">
+                    <TabsTrigger value="overview">Overview</TabsTrigger>
+                    <TabsTrigger value="amenities">Amenities</TabsTrigger>
+                    <TabsTrigger value="location">Location</TabsTrigger>
+                    <TabsTrigger value="legal">Legal</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="overview" className="p-6 space-y-4">
+                    <div>
+                      <h3 className="font-semibold mb-2">About {property.name}</h3>
+                      <p className="text-gray-600 leading-relaxed">
+                        {property.name} is a premium {property.type} project by {property.developer} 
+                        located in the heart of {property.area}, {property.zone} Bengaluru. 
+                        This {property.status} project offers modern living with world-class amenities 
+                        and excellent connectivity to major IT hubs and commercial centers.
+                      </p>
+                    </div>
+                    
+                    {property.infrastructureVerdict && (
+                      <div>
+                        <h4 className="font-medium mb-2">Infrastructure Assessment</h4>
+                        <p className="text-gray-600">{property.infrastructureVerdict}</p>
+                      </div>
+                    )}
+
+                    {property.tags.length > 0 && (
+                      <div>
+                        <h4 className="font-medium mb-3">Key Features</h4>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                          {property.tags.map((tag) => {
+                            const IconComponent = getTagIcon(tag);
+                            return (
+                              <div key={tag} className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg">
+                                <IconComponent className="h-4 w-4 text-primary" />
+                                <span className="text-sm capitalize">{tag.replace('-', ' ')}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </TabsContent>
+                  
+                  <TabsContent value="amenities" className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {Object.entries(amenityIcons).map(([amenity, IconComponent]) => (
+                        <div key={amenity} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                          <IconComponent className="h-5 w-5 text-primary" />
+                          <span>{amenity}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="location" className="p-6 space-y-4">
+                    <div>
+                      <h4 className="font-medium mb-2">Address</h4>
+                      <p className="text-gray-600">{property.address}</p>
+                    </div>
+                    
+                    {property.zoningInfo && (
+                      <div>
+                        <h4 className="font-medium mb-2">Zoning Information</h4>
+                        <p className="text-gray-600">{property.zoningInfo}</p>
+                      </div>
+                    )}
+
+                    <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
+                      <div className="text-center text-gray-500">
+                        <MapPin className="h-12 w-12 mx-auto mb-2" />
+                        <p>Interactive Map Coming Soon</p>
+                      </div>
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="legal" className="p-6 space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <h4 className="font-medium mb-3">RERA Compliance</h4>
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-600">RERA Approved</span>
+                            <div className="flex items-center">
+                              <CheckCircle className={`h-4 w-4 mr-1 ${property.reraApproved ? 'text-green-600' : 'text-gray-400'}`} />
+                              <span className={property.reraApproved ? 'text-green-600' : 'text-gray-400'}>
+                                {property.reraApproved ? 'Yes' : 'Pending'}
+                              </span>
+                            </div>
+                          </div>
+                          {property.reraNumber && (
+                            <div className="flex items-center justify-between">
+                              <span className="text-gray-600">RERA Number</span>
+                              <span className="font-mono text-sm">{property.reraNumber}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h4 className="font-medium mb-3">Documentation</h4>
+                        <div className="space-y-2">
+                          <Button variant="outline" size="sm" className="w-full justify-start">
+                            <Download className="h-4 w-4 mr-2" />
+                            Project Brochure
+                          </Button>
+                          <Button variant="outline" size="sm" className="w-full justify-start">
+                            <Download className="h-4 w-4 mr-2" />
+                            Floor Plans
+                          </Button>
+                          <Button variant="outline" size="sm" className="w-full justify-start">
+                            <Download className="h-4 w-4 mr-2" />
+                            Price List
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Sidebar */}
+          <div className="space-y-6">
+            {/* Contact Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Get in Touch</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button className="w-full" onClick={handleBookVisit}>
+                  <Eye className="h-4 w-4 mr-2" />
+                  Schedule Site Visit
+                </Button>
+                <Button variant="outline" className="w-full" onClick={handleConsult}>
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  Expert Consultation
+                </Button>
+                <Separator />
+                <div className="text-center">
+                  <p className="text-sm text-gray-600 mb-2">Speak to our property consultant</p>
+                  <Button variant="outline" className="w-full">
+                    <Phone className="h-4 w-4 mr-2" />
+                    +91 98765 43210
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Investment Metrics */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center">
+                  <TrendingUp className="h-5 w-5 mr-2" />
+                  Investment Insights
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Area Appreciation</span>
+                    <span className="text-green-600 font-medium">+12% YoY</span>
+                  </div>
+                  <Progress value={75} className="h-2" />
+                </div>
+                
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Rental Yield</span>
+                    <span className="text-blue-600 font-medium">3.2%</span>
+                  </div>
+                  <Progress value={65} className="h-2" />
+                </div>
+                
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span>Infrastructure Score</span>
+                    <span className="text-purple-600 font-medium">8.5/10</span>
+                  </div>
+                  <Progress value={85} className="h-2" />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Similar Properties */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Similar Properties</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {[1, 2].map((item) => (
+                    <div key={item} className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <h4 className="font-medium text-sm">Property Name {item}</h4>
+                      <p className="text-xs text-gray-600">Similar area • 2-3 BHK</p>
+                      <p className="text-sm font-medium text-primary">₹85L - ₹1.2Cr</p>
+                    </div>
+                  ))}
+                  <Button variant="outline" size="sm" className="w-full">
+                    View All Similar Properties
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

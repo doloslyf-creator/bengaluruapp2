@@ -208,6 +208,10 @@ export default function PropertyResults() {
     navigate('/consultation', { state: { property, preferences } });
   };
 
+  const handleViewProperty = (property: PropertyWithConfigurations) => {
+    navigate(`/property/${property.id}`);
+  };
+
   const getPriceRange = (configurations: PropertyConfiguration[]) => {
     if (!configurations.length) return "Price on request";
     const prices = configurations.map(c => c.price);
@@ -375,114 +379,141 @@ export default function PropertyResults() {
                 const matchInfo = getMatchLabel(property.matchScore);
                 
                 return (
-                  <Card key={property.id} className="hover:shadow-lg transition-shadow">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <CardTitle className="text-lg">{property.name}</CardTitle>
-                          <p className="text-sm text-gray-600 flex items-center mt-1">
-                            <MapPin className="h-3 w-3 mr-1" />
-                            {property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)}
-                          </p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Badge className={matchInfo.color}>
-                            {matchInfo.label}
-                          </Badge>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => toggleFavorite(property.id)}
-                          >
-                            <Heart 
-                              className={`h-4 w-4 ${
-                                favorites.has(property.id) 
-                                  ? 'fill-red-500 text-red-500' 
-                                  : 'text-gray-400'
-                              }`} 
-                            />
-                          </Button>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    
-                    <CardContent className="pt-0">
-                      <div className="space-y-4">
-                        {/* Property Image Placeholder */}
-                        <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center">
-                          <div className="text-gray-400 text-center">
-                            <div className="text-2xl mb-1">🏢</div>
-                            <p className="text-xs">Property Image</p>
+                  <Card key={property.id} className="hover:shadow-lg transition-shadow cursor-pointer group">
+                    <div onClick={() => handleViewProperty(property)}>
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                              {property.name}
+                            </CardTitle>
+                            <p className="text-sm text-gray-600 flex items-center mt-1">
+                              <MapPin className="h-3 w-3 mr-1" />
+                              {property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)}
+                            </p>
                           </div>
-                        </div>
-
-                        {/* Price and Configuration */}
-                        <div className="space-y-2">
-                          <div className="text-lg font-semibold text-primary">
-                            {getPriceRange(property.configurations)}
-                          </div>
-                          
-                          {property.configurations.length > 0 && (
-                            <div className="flex flex-wrap gap-1">
-                              {property.configurations.slice(0, 3).map((config, index) => (
-                                <Badge key={index} variant="outline" className="text-xs">
-                                  {config.configuration}
-                                </Badge>
-                              ))}
-                              {property.configurations.length > 3 && (
-                                <Badge variant="outline" className="text-xs">
-                                  +{property.configurations.length - 3} more
-                                </Badge>
-                              )}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Tags */}
-                        <div className="flex flex-wrap gap-1">
-                          {property.tags.slice(0, 3).map(tag => (
-                            <Badge key={tag} variant="secondary" className="text-xs">
-                              {tag.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          <div className="flex items-center space-x-2">
+                            <Badge className={matchInfo.color}>
+                              {matchInfo.label}
                             </Badge>
-                          ))}
-                        </div>
-
-                        {/* Match Score */}
-                        <div className="flex items-center space-x-2">
-                          <div className="flex items-center">
-                            <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                            <span className="text-sm font-medium ml-1">{property.matchScore}% Match</span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleFavorite(property.id);
+                              }}
+                            >
+                              <Heart 
+                                className={`h-4 w-4 ${
+                                  favorites.has(property.id) 
+                                    ? 'fill-red-500 text-red-500' 
+                                    : 'text-gray-400'
+                                }`} 
+                              />
+                            </Button>
                           </div>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <span className="text-gray-400 cursor-help">ⓘ</span>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Match percentage based on your preferences</p>
-                            </TooltipContent>
-                          </Tooltip>
                         </div>
+                      </CardHeader>
+                      
+                      <CardContent className="pt-0">
+                        <div className="space-y-4">
+                          {/* Property Image Placeholder */}
+                          <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+                            <div className="text-gray-400 text-center">
+                              <div className="text-2xl mb-1">🏢</div>
+                              <p className="text-xs">Property Image</p>
+                            </div>
+                          </div>
 
-                        {/* Action Buttons */}
-                        <div className="flex space-x-2 pt-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleBookVisit(property)}
-                            className="flex-1 flex items-center justify-center space-x-1"
-                          >
-                            <Calendar className="h-3 w-3" />
-                            <span>Book Visit</span>
-                          </Button>
-                          <Button 
-                            size="sm"
-                            onClick={() => handleConsult(property)}
-                            className="flex-1 flex items-center justify-center space-x-1"
-                          >
-                            <Phone className="h-3 w-3" />
-                            <span>Consult</span>
-                          </Button>
+                          {/* Price and Configuration */}
+                          <div className="space-y-2">
+                            <div className="text-lg font-semibold text-primary">
+                              {getPriceRange(property.configurations)}
+                            </div>
+                            
+                            {property.configurations.length > 0 && (
+                              <div className="flex flex-wrap gap-1">
+                                {property.configurations.slice(0, 3).map((config, index) => (
+                                  <Badge key={index} variant="outline" className="text-xs">
+                                    {config.configuration}
+                                  </Badge>
+                                ))}
+                                {property.configurations.length > 3 && (
+                                  <Badge variant="outline" className="text-xs">
+                                    +{property.configurations.length - 3} more
+                                  </Badge>
+                                )}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Tags */}
+                          <div className="flex flex-wrap gap-1">
+                            {property.tags.slice(0, 3).map(tag => (
+                              <Badge key={tag} variant="secondary" className="text-xs">
+                                {tag.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                              </Badge>
+                            ))}
+                          </div>
+
+                          {/* Match Score */}
+                          <div className="flex items-center space-x-2">
+                            <div className="flex items-center">
+                              <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                              <span className="text-sm font-medium ml-1">{property.matchScore}% Match</span>
+                            </div>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <span className="text-gray-400 cursor-help">ⓘ</span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Match percentage based on your preferences</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
                         </div>
+                      </CardContent>
+                    </div>
+                    
+                    {/* Action Buttons - Outside the clickable div */}
+                    <CardContent className="pt-0 pb-4">
+                      <div className="flex space-x-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewProperty(property);
+                          }}
+                          className="flex-1 flex items-center justify-center space-x-1"
+                        >
+                          <Eye className="h-3 w-3" />
+                          <span>View Details</span>
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleBookVisit(property);
+                          }}
+                          className="flex-1 flex items-center justify-center space-x-1"
+                        >
+                          <Calendar className="h-3 w-3" />
+                          <span>Book Visit</span>
+                        </Button>
+                        <Button 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleConsult(property);
+                          }}
+                          className="flex-1 flex items-center justify-center space-x-1"
+                        >
+                          <Phone className="h-3 w-3" />
+                          <span>Consult</span>
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
