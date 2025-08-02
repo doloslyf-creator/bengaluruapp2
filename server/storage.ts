@@ -14,8 +14,16 @@ import {
   type InsertLeadNote,
   type LeadStats,
   type Booking,
-  type InsertBooking
+  type InsertBooking,
+  properties, 
+  propertyConfigurations, 
+  leads, 
+  leadActivities, 
+  leadNotes, 
+  bookings
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, ilike, gte, lte, desc, sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -822,4 +830,296 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  // Property CRUD operations
+  async getProperty(id: string): Promise<Property | undefined> {
+    const [property] = await db.select().from(properties).where(eq(properties.id, id));
+    return property || undefined;
+  }
+
+  async getAllProperties(): Promise<Property[]> {
+    return await db.select().from(properties).orderBy(desc(properties.createdAt));
+  }
+
+  async getPropertyWithConfigurations(id: string): Promise<PropertyWithConfigurations | undefined> {
+    const property = await this.getProperty(id);
+    if (!property) return undefined;
+    
+    const configs = await db.select().from(propertyConfigurations)
+      .where(eq(propertyConfigurations.propertyId, id));
+    
+    return {
+      ...property,
+      configurations: configs
+    };
+  }
+
+  async createProperty(insertProperty: InsertProperty): Promise<Property> {
+    const [property] = await db.insert(properties)
+      .values(insertProperty)
+      .returning();
+    return property;
+  }
+
+  async updateProperty(id: string, updates: Partial<InsertProperty>): Promise<Property | undefined> {
+    const [property] = await db.update(properties)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(properties.id, id))
+      .returning();
+    return property || undefined;
+  }
+
+  async deleteProperty(id: string): Promise<boolean> {
+    // Delete associated configurations first
+    await db.delete(propertyConfigurations).where(eq(propertyConfigurations.propertyId, id));
+    
+    const result = await db.delete(properties).where(eq(properties.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Property Configuration CRUD operations
+  async getPropertyConfigurations(propertyId: string): Promise<PropertyConfiguration[]> {
+    return await db.select().from(propertyConfigurations)
+      .where(eq(propertyConfigurations.propertyId, propertyId));
+  }
+
+  async createPropertyConfiguration(config: InsertPropertyConfiguration): Promise<PropertyConfiguration> {
+    const [configuration] = await db.insert(propertyConfigurations)
+      .values(config)
+      .returning();
+    return configuration;
+  }
+
+  async updatePropertyConfiguration(id: string, updates: Partial<InsertPropertyConfiguration>): Promise<PropertyConfiguration | undefined> {
+    const [configuration] = await db.update(propertyConfigurations)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(propertyConfigurations.id, id))
+      .returning();
+    return configuration || undefined;
+  }
+
+  async deletePropertyConfiguration(id: string): Promise<boolean> {
+    const result = await db.delete(propertyConfigurations).where(eq(propertyConfigurations.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Search and filter operations
+  async searchProperties(query: string): Promise<Property[]> {
+    return await db.select().from(properties)
+      .where(
+        sql`${properties.name} ILIKE ${`%${query}%`} OR 
+            ${properties.developer} ILIKE ${`%${query}%`} OR 
+            ${properties.area} ILIKE ${`%${query}%`} OR 
+            ${properties.address} ILIKE ${`%${query}%`}`
+      )
+      .orderBy(desc(properties.createdAt));
+  }
+
+  async filterProperties(filters: {
+    type?: string;
+    status?: string;
+    zone?: string;
+    reraApproved?: boolean;
+    minPrice?: number;
+    maxPrice?: number;
+  }): Promise<Property[]> {
+    let query = db.select().from(properties);
+    const conditions = [];
+
+    if (filters.type) conditions.push(eq(properties.type, filters.type));
+    if (filters.status) conditions.push(eq(properties.status, filters.status));
+    if (filters.zone) conditions.push(eq(properties.zone, filters.zone));
+    if (filters.reraApproved !== undefined) conditions.push(eq(properties.reraApproved, filters.reraApproved));
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+
+    return await query.orderBy(desc(properties.createdAt));
+  }
+
+  // Statistics
+  async getPropertyStats(): Promise<PropertyStats> {
+    const allProperties = await this.getAllProperties();
+    const totalProperties = allProperties.length;
+    const activeProjects = allProperties.filter(p => p.status === 'active').length;
+    const completedProjects = allProperties.filter(p => p.status === 'completed').length;
+    const reraApprovedCount = allProperties.filter(p => p.reraApproved).length;
+
+    return {
+      totalProperties,
+      activeProjects,
+      completedProjects,
+      reraApprovedCount
+    };
+  }
+
+  // Booking operations
+  async createBooking(insertBooking: InsertBooking): Promise<Booking> {
+    const [booking] = await db.insert(bookings)
+      .values(insertBooking)
+      .returning();
+    return booking;
+  }
+
+  async getBooking(bookingId: string): Promise<Booking | undefined> {
+    const [booking] = await db.select().from(bookings).where(eq(bookings.id, bookingId));
+    return booking || undefined;
+  }
+
+  async getAllBookings(): Promise<Booking[]> {
+    return await db.select().from(bookings).orderBy(desc(bookings.createdAt));
+  }
+
+  async updateBookingStatus(bookingId: string, status: string): Promise<Booking | undefined> {
+    const [booking] = await db.update(bookings)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(bookings.id, bookingId))
+      .returning();
+    return booking || undefined;
+  }
+
+  // Lead management operations
+  async createLead(insertLead: InsertLead): Promise<Lead> {
+    const [lead] = await db.insert(leads)
+      .values(insertLead)
+      .returning();
+    return lead;
+  }
+
+  async getLead(leadId: string): Promise<Lead | undefined> {
+    const [lead] = await db.select().from(leads).where(eq(leads.id, leadId));
+    return lead || undefined;
+  }
+
+  async getLeadWithDetails(leadId: string): Promise<LeadWithDetails | undefined> {
+    const lead = await this.getLead(leadId);
+    if (!lead) return undefined;
+
+    const activities = await this.getLeadActivities(leadId);
+    const notes = await this.getLeadNotes(leadId);
+
+    return {
+      ...lead,
+      activities,
+      notes
+    };
+  }
+
+  async getAllLeads(): Promise<Lead[]> {
+    return await db.select().from(leads).orderBy(desc(leads.createdAt));
+  }
+
+  async updateLead(leadId: string, updates: Partial<InsertLead>): Promise<Lead | undefined> {
+    const [lead] = await db.update(leads)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(leads.id, leadId))
+      .returning();
+    return lead || undefined;
+  }
+
+  // Lead activities
+  async addLeadActivity(insertActivity: InsertLeadActivity): Promise<LeadActivity> {
+    const [activity] = await db.insert(leadActivities)
+      .values(insertActivity)
+      .returning();
+    return activity;
+  }
+
+  async getLeadActivities(leadId: string): Promise<LeadActivity[]> {
+    return await db.select().from(leadActivities)
+      .where(eq(leadActivities.leadId, leadId))
+      .orderBy(desc(leadActivities.createdAt));
+  }
+
+  // Lead notes
+  async addLeadNote(insertNote: InsertLeadNote): Promise<LeadNote> {
+    const [note] = await db.insert(leadNotes)
+      .values(insertNote)
+      .returning();
+    return note;
+  }
+
+  async getLeadNotes(leadId: string): Promise<LeadNote[]> {
+    return await db.select().from(leadNotes)
+      .where(eq(leadNotes.leadId, leadId))
+      .orderBy(desc(leadNotes.createdAt));
+  }
+
+  // Lead statistics and filtering
+  async getLeadStats(): Promise<LeadStats> {
+    const allLeads = await this.getAllLeads();
+    const totalLeads = allLeads.length;
+    const qualifiedLeads = allLeads.filter(l => l.qualified).length;
+    const hotLeads = allLeads.filter(l => l.priority === 'high').length;
+    const conversionRate = totalLeads > 0 ? Math.round((qualifiedLeads / totalLeads) * 100) : 0;
+
+    return {
+      totalLeads,
+      qualifiedLeads,
+      hotLeads,
+      conversionRate
+    };
+  }
+
+  async filterLeads(filters: {
+    status?: string;
+    leadType?: string;
+    priority?: string;
+    assignedTo?: string;
+    source?: string;
+    dateFrom?: string;
+    dateTo?: string;
+  }): Promise<Lead[]> {
+    let query = db.select().from(leads);
+    const conditions = [];
+
+    if (filters.status) conditions.push(eq(leads.status, filters.status));
+    if (filters.leadType) conditions.push(eq(leads.leadType, filters.leadType));
+    if (filters.priority) conditions.push(eq(leads.priority, filters.priority));
+    if (filters.assignedTo) conditions.push(eq(leads.assignedTo, filters.assignedTo));
+    if (filters.source) conditions.push(eq(leads.source, filters.source));
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+
+    return await query.orderBy(desc(leads.createdAt));
+  }
+
+  // Lead scoring and qualification
+  async updateLeadScore(leadId: string, score: number, notes?: string): Promise<Lead | undefined> {
+    const updates: Partial<InsertLead> = { score, updatedAt: new Date() };
+    if (notes) updates.notes = notes;
+
+    const [lead] = await db.update(leads)
+      .set(updates)
+      .where(eq(leads.id, leadId))
+      .returning();
+    return lead || undefined;
+  }
+
+  async qualifyLead(leadId: string, qualified: boolean, notes: string): Promise<Lead | undefined> {
+    const [lead] = await db.update(leads)
+      .set({ qualified, notes, updatedAt: new Date() })
+      .where(eq(leads.id, leadId))
+      .returning();
+    return lead || undefined;
+  }
+
+  // User operations (basic stub implementation - no users table in current schema)
+  async getUser(id: string): Promise<any> {
+    return undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<any> {
+    return undefined;
+  }
+
+  async createUser(insertUser: any): Promise<any> {
+    const id = randomUUID();
+    return { ...insertUser, id };
+  }
+}
+
+export const storage = new DatabaseStorage();
