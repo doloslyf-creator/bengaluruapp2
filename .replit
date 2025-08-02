@@ -4,6 +4,7 @@ hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 
 [nix]
 channel = "stable-24_05"
+packages = ["lsof"]
 
 [deployment]
 deploymentTarget = "autoscale"
@@ -11,8 +12,12 @@ build = ["npm", "run", "build"]
 run = ["npm", "run", "start"]
 
 [[ports]]
-localPort = 5000
+localPort = 3000
 externalPort = 80
+
+[[ports]]
+localPort = 5000
+externalPort = 8080
 
 [env]
 PORT = "5000"
