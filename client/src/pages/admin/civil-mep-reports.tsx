@@ -12,7 +12,8 @@ import { useToast } from "@/hooks/use-toast";
 import { 
   FileText, Plus, Search, Filter, IndianRupee, 
   Calendar, Clock, CheckCircle, AlertCircle, 
-  Building, MapPin, BarChart3, Settings, Eye, Briefcase
+  Building, MapPin, BarChart3, Settings, Eye, Briefcase,
+  Zap, Wrench, Shield, Home
 } from "lucide-react";
 import { StatsCardSkeleton, TableSkeleton } from "@/components/ui/skeleton";
 // Note: Using simple navigation structure instead of complex layout components
