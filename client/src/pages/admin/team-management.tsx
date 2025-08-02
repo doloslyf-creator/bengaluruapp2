@@ -17,40 +17,31 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { insertTeamMemberSchema, type TeamMember, type InsertTeamMember } from "@shared/schema";
 
-const teamMemberSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Valid email is required"),
-  phone: z.string().optional(),
-  role: z.enum(["admin", "manager", "agent", "analyst", "intern"]),
-  department: z.enum(["sales", "legal", "technical", "finance", "operations"]),
-  status: z.enum(["active", "inactive", "suspended"]).default("active"),
-  bio: z.string().optional(),
-  specializations: z.array(z.string()).default([]),
-  performanceScore: z.number().min(0).max(100).default(0),
+const formSchema = insertTeamMemberSchema.extend({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
 });
 
-type TeamMemberFormData = z.infer<typeof teamMemberSchema>;
-
 export default function TeamManagement() {
-  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
-  const [filterDepartment, setFilterDepartment] = useState<string>("all");
-  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [filterDepartment, setFilterDepartment] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const form = useForm<TeamMemberFormData>({
-    resolver: zodResolver(teamMemberSchema),
+  const form = useForm<InsertTeamMember>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       email: "",
       phone: "",
-      role: "agent",
+      role: "intern",
       department: "sales",
       status: "active",
       bio: "",
-      specializations: [],
+      specializations: "",
+      permissions: "",
       performanceScore: 0,
     },
   });
@@ -75,13 +66,6 @@ export default function TeamManagement() {
         description: "Team member added successfully",
       });
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
   });
 
   const updateMutation = useMutation({
@@ -101,13 +85,6 @@ export default function TeamManagement() {
         description: "Team member updated successfully",
       });
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
   });
 
   const deleteMutation = useMutation({
@@ -122,16 +99,9 @@ export default function TeamManagement() {
         description: "Team member deleted successfully",
       });
     },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
   });
 
-  const onSubmit = (data: TeamMemberFormData) => {
+  const onSubmit = (data: InsertTeamMember) => {
     if (editingMember) {
       updateMutation.mutate({ id: editingMember.id, data });
     } else {
@@ -149,7 +119,8 @@ export default function TeamManagement() {
       department: member.department,
       status: member.status,
       bio: member.bio || "",
-      specializations: (member.specializations as string[]) || [],
+      specializations: member.specializations || "",
+      permissions: member.permissions || "",
       performanceScore: member.performanceScore || 0,
     });
     setIsDialogOpen(true);
@@ -199,452 +170,457 @@ export default function TeamManagement() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">Loading team members...</p>
-          </div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading team members...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl">
-      <div className="mb-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <Users className="h-8 w-8 text-blue-600" />
-              Team Management
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Manage team members, roles, and permissions
-            </p>
-          </div>
-          
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex">
+        {/* Universal Sidebar */}
+        <div className="w-64 bg-white dark:bg-gray-800 shadow-lg h-screen sticky top-0">
+          <div className="p-6">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Team Management</h2>
+            
+            {/* Quick Actions */}
+            <div className="space-y-3 mb-8">
               <Button 
                 onClick={() => {
                   setEditingMember(null);
                   form.reset();
+                  setIsDialogOpen(true);
                 }}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="w-full justify-start"
+                size="sm"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Team Member
               </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>
-                  {editingMember ? "Edit Team Member" : "Add New Team Member"}
-                </DialogTitle>
-                <DialogDescription>
-                  {editingMember ? "Update team member information" : "Add a new member to your team"}
-                </DialogDescription>
-              </DialogHeader>
-              
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Full Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter full name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email Address</FormLabel>
-                        <FormControl>
-                          <Input type="email" placeholder="Enter email address" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter phone number" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="role"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Role</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select role" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="admin">Admin</SelectItem>
-                              <SelectItem value="manager">Manager</SelectItem>
-                              <SelectItem value="agent">Agent</SelectItem>
-                              <SelectItem value="analyst">Analyst</SelectItem>
-                              <SelectItem value="intern">Intern</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="department"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Department</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select department" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="sales">Sales</SelectItem>
-                              <SelectItem value="legal">Legal</SelectItem>
-                              <SelectItem value="technical">Technical</SelectItem>
-                              <SelectItem value="finance">Finance</SelectItem>
-                              <SelectItem value="operations">Operations</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  
-                  <FormField
-                    control={form.control}
-                    name="status"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Status</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select status" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="active">Active</SelectItem>
-                            <SelectItem value="inactive">Inactive</SelectItem>
-                            <SelectItem value="suspended">Suspended</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="bio"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Bio</FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="Brief description about the team member" 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="performanceScore"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Performance Score (0-100)</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="number" 
-                            min="0" 
-                            max="100" 
-                            placeholder="Enter performance score" 
-                            {...field} 
-                            onChange={(e) => field.onChange(Number(e.target.value))}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <div className="flex justify-end gap-3 pt-4">
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={() => setIsDialogOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button 
-                      type="submit" 
-                      disabled={createMutation.isPending || updateMutation.isPending}
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                      {createMutation.isPending || updateMutation.isPending ? (
-                        <div className="flex items-center gap-2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                          {editingMember ? "Updating..." : "Adding..."}
-                        </div>
-                      ) : (
-                        editingMember ? "Update Member" : "Add Member"
-                      )}
-                    </Button>
-                  </div>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
-        </div>
+              <Button 
+                variant="outline"
+                className="w-full justify-start"
+                size="sm"
+                onClick={() => {
+                  setFilterDepartment("all");
+                  setFilterStatus("all");
+                }}
+              >
+                <Users className="h-4 w-4 mr-2" />
+                View All Members
+              </Button>
+            </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Users className="h-8 w-8 text-blue-600" />
-                <div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {teamMembers.length}
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Total Members</p>
+            {/* Department Filter */}
+            <div className="mb-6">
+              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                Filter by Department
+              </Label>
+              <Select value={filterDepartment} onValueChange={setFilterDepartment}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Departments</SelectItem>
+                  <SelectItem value="sales">Sales</SelectItem>
+                  <SelectItem value="marketing">Marketing</SelectItem>
+                  <SelectItem value="operations">Operations</SelectItem>
+                  <SelectItem value="legal">Legal</SelectItem>
+                  <SelectItem value="finance">Finance</SelectItem>
+                  <SelectItem value="hr">HR</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Status Filter */}
+            <div className="mb-6">
+              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                Filter by Status
+              </Label>
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="suspended">Suspended</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="space-y-3">
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-blue-700 dark:text-blue-300">Total Members</span>
+                  <span className="font-semibold text-blue-900 dark:text-blue-100">{teamMembers.length}</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <UserCheck className="h-8 w-8 text-green-600" />
-                <div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {statusStats.active || 0}
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Active Members</p>
+              <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-green-700 dark:text-green-300">Active</span>
+                  <span className="font-semibold text-green-900 dark:text-green-100">{statusStats.active || 0}</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Building className="h-8 w-8 text-purple-600" />
-                <div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {Object.keys(departmentStats).length}
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Departments</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Star className="h-8 w-8 text-yellow-600" />
-                <div>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-yellow-700 dark:text-yellow-300">Avg Performance</span>
+                  <span className="font-semibold text-yellow-900 dark:text-yellow-100">
                     {teamMembers.length > 0 
                       ? Math.round(teamMembers.reduce((sum, member) => sum + (member.performanceScore || 0), 0) / teamMembers.length)
                       : 0
                     }
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Avg Performance</p>
+                  </span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex-1">
-            <Label htmlFor="department-filter">Filter by Department</Label>
-            <Select value={filterDepartment} onValueChange={setFilterDepartment}>
-              <SelectTrigger>
-                <SelectValue placeholder="All Departments" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Departments</SelectItem>
-                <SelectItem value="sales">Sales</SelectItem>
-                <SelectItem value="legal">Legal</SelectItem>
-                <SelectItem value="technical">Technical</SelectItem>
-                <SelectItem value="finance">Finance</SelectItem>
-                <SelectItem value="operations">Operations</SelectItem>
-              </SelectContent>
-            </Select>
+        {/* Main Content */}
+        <div className="flex-1 px-8 py-8">
+          <div className="mb-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Users className="h-8 w-8 text-blue-600" />
+                  Team Management
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">
+                  Manage team members, roles, and permissions
+                </p>
+              </div>
+            </div>
           </div>
-          
-          <div className="flex-1">
-            <Label htmlFor="status-filter">Filter by Status</Label>
-            <Select value={filterStatus} onValueChange={setFilterStatus}>
-              <SelectTrigger>
-                <SelectValue placeholder="All Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-                <SelectItem value="suspended">Suspended</SelectItem>
-              </SelectContent>
-            </Select>
+
+          {/* Team Members Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredMembers.map((member) => (
+              <Card key={member.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader className="pb-4">
+                  <div className="flex items-start gap-3">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={member.profileImage || undefined} />
+                      <AvatarFallback className="bg-blue-100 text-blue-600 font-semibold">
+                        {member.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                        {member.name}
+                      </CardTitle>
+                      <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
+                        {member.email}
+                      </CardDescription>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2 mt-3">
+                    <Badge className={getRoleColor(member.role)}>
+                      {member.role}
+                    </Badge>
+                    <Badge className={getStatusColor(member.status)}>
+                      {member.status}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                
+                <CardContent className="pt-0">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <Building className="h-4 w-4" />
+                      <span className="capitalize">{member.department}</span>
+                    </div>
+                    
+                    {member.phone && (
+                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                        <Phone className="h-4 w-4" />
+                        <span>{member.phone}</span>
+                      </div>
+                    )}
+                    
+                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <Calendar className="h-4 w-4" />
+                      <span>Joined {member.joinDate ? new Date(member.joinDate).toLocaleDateString() : 'Unknown'}</span>
+                    </div>
+                    
+                    {member.performanceScore && (
+                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                        <Star className="h-4 w-4" />
+                        <span>Performance: {member.performanceScore}/100</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex gap-2 mt-4">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleEdit(member)}
+                      className="flex-1"
+                    >
+                      <Edit className="h-4 w-4 mr-1" />
+                      Edit
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleDelete(member.id)}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
+
+          {filteredMembers.length === 0 && (
+            <Card className="p-8">
+              <div className="text-center">
+                <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  No team members found
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  {teamMembers.length === 0 
+                    ? "Get started by adding your first team member"
+                    : "No members match your current filters"
+                  }
+                </p>
+                {teamMembers.length === 0 && (
+                  <Button 
+                    onClick={() => setIsDialogOpen(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add First Team Member
+                  </Button>
+                )}
+              </div>
+            </Card>
+          )}
         </div>
       </div>
 
-      {/* Team Members Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredMembers.map((member) => (
-          <Card key={member.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-4">
-              <div className="flex items-start gap-3">
-                <Avatar className="h-12 w-12">
-                  <AvatarImage src={member.profileImage || undefined} />
-                  <AvatarFallback className="bg-blue-100 text-blue-600 font-semibold">
-                    {member.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                    {member.name}
-                  </CardTitle>
-                  <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
-                    {member.email}
-                  </CardDescription>
-                </div>
+      {/* Add/Edit Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {editingMember ? "Edit Team Member" : "Add New Team Member"}
+            </DialogTitle>
+            <DialogDescription>
+              {editingMember ? "Update team member information" : "Add a new member to your team"}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter full name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email Address</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="Enter email address" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter phone number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="role"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Role</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select role" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="manager">Manager</SelectItem>
+                          <SelectItem value="agent">Agent</SelectItem>
+                          <SelectItem value="analyst">Analyst</SelectItem>
+                          <SelectItem value="intern">Intern</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="department"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Department</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select department" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="sales">Sales</SelectItem>
+                          <SelectItem value="marketing">Marketing</SelectItem>
+                          <SelectItem value="operations">Operations</SelectItem>
+                          <SelectItem value="legal">Legal</SelectItem>
+                          <SelectItem value="finance">Finance</SelectItem>
+                          <SelectItem value="hr">HR</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
               
-              <div className="flex gap-2 mt-3">
-                <Badge className={getRoleColor(member.role)}>
-                  {member.role}
-                </Badge>
-                <Badge className={getStatusColor(member.status)}>
-                  {member.status}
-                </Badge>
-              </div>
-            </CardHeader>
-            
-            <CardContent className="pt-0">
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                  <Building className="h-4 w-4" />
-                  <span className="capitalize">{member.department}</span>
-                </div>
-                
-                {member.phone && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <Phone className="h-4 w-4" />
-                    <span>{member.phone}</span>
-                  </div>
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                        <SelectItem value="suspended">Suspended</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
                 )}
-                
-                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                  <Calendar className="h-4 w-4" />
-                  <span>Joined {member.joinDate ? new Date(member.joinDate).toLocaleDateString() : 'Unknown'}</span>
-                </div>
-                
-                {member.performanceScore !== undefined && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <Star className="h-4 w-4" />
-                    <span>Performance: {member.performanceScore}/100</span>
-                  </div>
-                )}
-                
-                {member.bio && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                    {member.bio}
-                  </p>
-                )}
-              </div>
+              />
               
-              <div className="flex gap-2 mt-4">
+              <FormField
+                control={form.control}
+                name="performanceScore"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Performance Score (0-100)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        min="0" 
+                        max="100" 
+                        placeholder="Enter performance score" 
+                        {...field} 
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="specializations"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Specializations</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., Commercial Properties, Residential Sales" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="bio"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Bio</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Brief description about the team member" 
+                        className="min-h-[80px]"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="flex gap-3 pt-4">
                 <Button
-                  size="sm"
+                  type="button"
                   variant="outline"
-                  onClick={() => handleEdit(member)}
+                  onClick={() => setIsDialogOpen(false)}
                   className="flex-1"
                 >
-                  <Edit className="h-4 w-4 mr-1" />
-                  Edit
+                  Cancel
                 </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleDelete(member.id)}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900"
+                <Button 
+                  type="submit" 
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                  disabled={createMutation.isPending || updateMutation.isPending}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  {createMutation.isPending || updateMutation.isPending 
+                    ? "Saving..." 
+                    : editingMember 
+                      ? "Update Member" 
+                      : "Add Member"
+                  }
                 </Button>
               </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {filteredMembers.length === 0 && (
-        <Card className="p-8">
-          <div className="text-center">
-            <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              No team members found
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              {teamMembers.length === 0 
-                ? "Get started by adding your first team member"
-                : "No members match your current filters"
-              }
-            </p>
-            {teamMembers.length === 0 && (
-              <Button 
-                onClick={() => setIsDialogOpen(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add First Team Member
-              </Button>
-            )}
-          </div>
-        </Card>
-      )}
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
