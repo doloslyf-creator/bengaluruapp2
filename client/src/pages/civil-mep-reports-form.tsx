@@ -86,9 +86,28 @@ export default function CivilMepReportsForm() {
 
   const submitCivilMepRequest = useMutation({
     mutationFn: async (requestData: CivilMepRequest) => {
-      return await apiRequest("/api/civil-mep-requests", {
+      // Calculate amount based on report type and urgency
+      let baseAmount = 8999; // Basic report
+      if (requestData.reportType === "comprehensive") baseAmount = 13999;
+      if (requestData.reportType === "premium") baseAmount = 18999;
+      
+      // Add urgency surcharge
+      if (requestData.urgencyLevel === "expedited") baseAmount += 2000;
+      if (requestData.urgencyLevel === "priority") baseAmount += 5000;
+
+      // Create service order via new API
+      return await apiRequest("/api/orders/service", {
         method: "POST",
-        body: JSON.stringify(requestData)
+        body: JSON.stringify({
+          serviceType: 'civil-mep-reports',
+          customerName: requestData.contactName,
+          customerEmail: requestData.contactEmail,
+          customerPhone: requestData.contactPhone,
+          propertyId: requestData.propertyId,
+          propertyName: selectedProperty?.name || 'Selected Property',
+          amount: baseAmount,
+          requirements: `Report Type: ${requestData.reportType}, Urgency: ${requestData.urgencyLevel}, Reason: ${requestData.requestReason}, Additional Requirements: ${requestData.additionalRequirements || 'None'}`
+        })
       });
     },
     onSuccess: () => {

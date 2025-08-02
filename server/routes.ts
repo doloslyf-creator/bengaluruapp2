@@ -18,6 +18,36 @@ const bookingTable = bookings;
 import { z } from "zod";
 import { getBlogPosts, getBlogPost, createBlogPost, updateBlogPost, deleteBlogPost } from "./blog";
 
+// Helper function to calculate lead score from contact form
+function calculateContactLeadScore(contactData: any): number {
+  let score = 40; // Base score for contact form submission
+
+  // Timeline scoring (20 points)
+  if (contactData.timeline === "immediate") score += 20;
+  else if (contactData.timeline === "1-3months") score += 15;
+  else if (contactData.timeline === "3-6months") score += 10;
+  else if (contactData.timeline === "6months+") score += 5;
+
+  // Current stage scoring (15 points) 
+  if (contactData.currentStage === "ready-to-buy") score += 15;
+  else if (contactData.currentStage === "researching") score += 10;
+  else if (contactData.currentStage === "exploring") score += 5;
+
+  // Budget scoring (10 points)
+  if (contactData.budget && contactData.budget !== "not-decided") score += 10;
+
+  // Property type specificity (5 points)
+  if (contactData.propertyType && contactData.propertyType !== "any") score += 5;
+
+  // Location specificity (5 points)
+  if (contactData.locations && contactData.locations.length > 0) score += 5;
+
+  // Contact preference (5 points for phone/whatsapp - higher engagement)
+  if (contactData.preferredContact === "phone" || contactData.preferredContact === "whatsapp") score += 5;
+
+  return Math.min(score, 100); // Cap at 100
+}
+
 // PDF Generation functions
 function generateReportPDF(report: CivilMepReport): Buffer {
   // Generate comprehensive HTML content for PDF
@@ -663,6 +693,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching leads:", error);
       res.status(500).json({ error: "Failed to fetch leads" });
+    }
+  });
+
+  // Create lead from contact form
+  app.post("/api/leads/contact", async (req, res) => {
+    try {
+      const leadData = {
+        leadId: `LD${Date.now()}${Math.floor(Math.random() * 1000)}`,
+        source: "property-inquiry",
+        customerName: req.body.name,
+        phone: req.body.phone,
+        email: req.body.email,
+        propertyName: req.body.lookingFor || "General Property Inquiry",
+        propertyId: null, // No specific property selected
+        budgetRange: req.body.budget,
+        leadDetails: {
+          lookingFor: req.body.lookingFor,
+          propertyType: req.body.propertyType,
+          bhkPreference: req.body.bhkPreference,
+          timeline: req.body.timeline,
+          locations: req.body.locations,
+          specialRequirements: req.body.specialRequirements,
+          currentStage: req.body.currentStage,
+          hasCurrentProperty: req.body.hasCurrentProperty,
+          preferredContact: req.body.preferredContact,
+          message: req.body.message
+        },
+        leadType: req.body.timeline === "immediate" ? "hot" : req.body.timeline === "1-3months" ? "warm" : "cold",
+        priority: req.body.currentStage === "ready-to-buy" ? "high" : "medium",
+        leadScore: calculateContactLeadScore(req.body),
+        status: "new",
+        communicationPreference: req.body.preferredContact === "whatsapp" ? "whatsapp" : req.body.preferredContact === "email" ? "email" : "phone"
+      };
+
+      const validatedData = insertLeadSchema.parse(leadData);
+      const lead = await storage.createLead(validatedData);
+
+      // Add initial activity
+      await storage.addLeadActivity({
+        leadId: lead.id,
+        activityType: "note",
+        subject: `Contact form submission from ${req.body.name}`,
+        description: `Customer submitted contact form with interest in ${req.body.lookingFor}. Budget: ${req.body.budget}, Timeline: ${req.body.timeline}`,
+        outcome: "positive",
+        nextAction: `Call customer within 2 hours as promised`,
+        performedBy: "system",
+      });
+
+      console.log(`📞 New contact lead created: ${lead.leadId} from ${req.body.name}`);
+      
+      res.status(201).json({ 
+        success: true,
+        leadId: lead.leadId,
+        message: "Contact submitted successfully, lead created" 
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid contact data", details: error.errors });
+      }
+      console.error("Error creating contact lead:", error);
+      res.status(500).json({ error: "Failed to create contact lead" });
     }
   });
 
@@ -2076,6 +2167,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating app settings:", error);
       res.status(500).json({ error: "Failed to update app settings" });
+    }
+  });
+
+  // Create order from service page submissions
+  app.post("/api/orders/service", async (req, res) => {
+    try {
+      const { serviceType, customerName, customerEmail, customerPhone, propertyId, propertyName, amount, requirements } = req.body;
+      
+      // Determine report type based on service
+      let reportType: "civil-mep" | "valuation" | "legal-due-diligence" = "civil-mep";
+      if (serviceType === "property-valuation") reportType = "valuation";
+      if (serviceType === "legal-due-diligence") reportType = "legal-due-diligence";
+      
+      const orderData = {
+        reportId: null,
+        reportType,
+        propertyId: propertyId || null,
+        customerName,
+        customerEmail,
+        customerPhone,
+        amount: amount.toString(),
+        paymentMethod: "pay-later" as const,
+        paymentStatus: "pay-later-pending" as const,
+        payLaterDueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+        accessGrantedAt: new Date()
+      };
+      
+      const order = await storage.createReportPayment(orderData);
+      
+      console.log(`💼 New service order created: ${serviceType} for ${customerName}`);
+      
+      res.status(201).json({ 
+        success: true,
+        orderId: order.id,
+        message: `Order created successfully for ${serviceType}` 
+      });
+    } catch (error) {
+      console.error("Error creating service order:", error);
+      res.status(500).json({ error: "Failed to create service order" });
     }
   });
 

@@ -113,9 +113,19 @@ export default function PropertyValuationForm() {
 
   const submitValuationRequest = useMutation({
     mutationFn: async (data: ValuationRequest) => {
-      return await apiRequest('/api/valuation-requests', {
+      // Create service order via new API
+      return await apiRequest('/api/orders/service', {
         method: 'POST',
-        body: JSON.stringify(data)
+        body: JSON.stringify({
+          serviceType: 'property-valuation',
+          customerName: data.contactName,
+          customerEmail: data.contactEmail,
+          customerPhone: data.contactPhone,
+          propertyId: null, // No specific property selected
+          propertyName: `${data.propertyType} in ${data.location}`,
+          amount: 4999, // Base price for property valuation
+          requirements: `${data.propertyType}, ${data.area} sq ft, ${data.bedrooms}, Age: ${data.age} years, Amenities: ${data.amenities.join(', ')}, Additional: ${data.additionalInfo || 'None'}`
+        })
       });
     },
     onSuccess: () => {

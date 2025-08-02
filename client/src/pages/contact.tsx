@@ -116,6 +116,32 @@ export default function Contact() {
     }));
   };
 
+  const handleSubmitContact = async () => {
+    try {
+      const response = await fetch('/api/leads/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(form),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Lead created:', result.leadId);
+        setLocation("/contact/thank-you");
+      } else {
+        console.error('Failed to create lead');
+        // Still proceed to thank you page even if lead creation fails
+        setLocation("/contact/thank-you");
+      }
+    } catch (error) {
+      console.error('Error submitting contact form:', error);
+      // Still proceed to thank you page even if there's an error
+      setLocation("/contact/thank-you");
+    }
+  };
+
   const renderStepContent = () => {
     switch (currentStep) {
       case 0:
@@ -556,7 +582,7 @@ export default function Contact() {
                 </Button>
               ) : (
                 <Button
-                  onClick={() => setLocation("/contact/thank-you")}
+                  onClick={handleSubmitContact}
                   className="bg-gradient-to-r from-green-600 to-blue-600 hover:shadow-lg flex items-center space-x-2"
                 >
                   <span>Submit & Continue</span>

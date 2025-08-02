@@ -89,9 +89,28 @@ export default function LegalDueDiligenceForm() {
 
   const submitLegalDueDiligenceRequest = useMutation({
     mutationFn: async (requestData: LegalDueDiligenceRequest) => {
-      return await apiRequest("/api/legal-due-diligence-requests", {
+      // Calculate amount based on buyer type and urgency
+      let baseAmount = 4999; // Individual residential
+      if (requestData.buyerType === "company") baseAmount = 7999; // Commercial
+      if (requestData.buyerType === "nri") baseAmount = 9999; // Premium NRI
+
+      // Add urgency surcharge
+      if (requestData.urgencyLevel === "expedited") baseAmount += 1500;
+      if (requestData.urgencyLevel === "priority") baseAmount += 3000;
+
+      // Create service order via new API
+      return await apiRequest("/api/orders/service", {
         method: "POST",
-        body: JSON.stringify(requestData)
+        body: JSON.stringify({
+          serviceType: 'legal-due-diligence',
+          customerName: requestData.contactName,
+          customerEmail: requestData.contactEmail,
+          customerPhone: requestData.contactPhone,
+          propertyId: requestData.propertyId,
+          propertyName: selectedProperty?.name || 'Selected Property',
+          amount: baseAmount,
+          requirements: `Buyer Type: ${requestData.buyerType}, Urgency: ${requestData.urgencyLevel}, Reason: ${requestData.requestReason}, Concerns: ${requestData.specificConcerns.join(', ')}, Notes: ${requestData.additionalNotes || 'None'}`
+        })
       });
     },
     onSuccess: () => {

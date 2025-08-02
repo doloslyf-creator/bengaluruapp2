@@ -442,7 +442,7 @@ export const propertyValuationReports = pgTable("property_valuation_reports", {
 export const reportPayments = pgTable("report_payments", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   reportId: varchar("report_id"), // Can be null for general service orders
-  reportType: varchar("report_type", { enum: ["civil-mep", "valuation"] }).notNull().default("civil-mep"),
+  reportType: varchar("report_type", { enum: ["civil-mep", "valuation", "legal-due-diligence"] }).notNull().default("civil-mep"),
   propertyId: varchar("property_id").notNull().references(() => properties.id),
   
   // Customer Information
