@@ -64,70 +64,82 @@ export function PropertyCard({ property, onClick, onDelete }: PropertyCardProps)
 
   return (
     <div
-      className="bg-white rounded-lg border border-border hover:shadow-lg transition-shadow cursor-pointer"
+      className="card-stripe group hover:shadow-lg transition-stripe cursor-pointer"
       onClick={onClick}
     >
-      <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-t-lg flex items-center justify-center">
-        <div className="text-gray-400 text-center">
-          <div className="text-2xl mb-2">🏢</div>
-          <p className="text-sm">Property Image</p>
+      <div className="aspect-video bg-gradient-to-br from-muted to-muted/50 rounded-t-xl flex items-center justify-center relative overflow-hidden">
+        <div className="text-muted-foreground text-center group-hover:scale-110 transition-stripe">
+          <div className="text-3xl mb-2">🏢</div>
+          <p className="text-body-small font-medium">Property Image</p>
         </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-stripe"></div>
       </div>
       
       <div className="p-6">
-        <div className="flex items-start justify-between mb-3">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">{property.name}</h3>
-            <p className="text-sm text-gray-600 flex items-center">
-              <MapPin className="h-3 w-3 mr-1" />
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1">
+            <h3 className="text-heading-3 text-foreground mb-2 group-hover:text-primary transition-stripe">{property.name}</h3>
+            <p className="text-body-small text-muted-foreground flex items-center">
+              <MapPin className="h-4 w-4 mr-2" />
               {property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)} Bengaluru
             </p>
           </div>
-          <Badge className={statusColors[property.status]}>
+          <Badge className={`${statusColors[property.status]} font-medium px-3 py-1 rounded-lg`}>
             {property.status.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
           </Badge>
         </div>
         
-        <div className="flex flex-wrap gap-2 mb-4">
-          {property.tags.map((tag) => (
+        <div className="flex flex-wrap gap-2 mb-6">
+          {property.tags.slice(0, 3).map((tag) => (
             <Badge
               key={tag}
               variant="secondary"
-              className={tagColors[tag as keyof typeof tagColors] || "bg-gray-100 text-gray-800"}
+              className={`${tagColors[tag as keyof typeof tagColors] || "bg-muted text-muted-foreground"} text-xs font-medium px-2 py-1 rounded-md`}
             >
               {tag.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
             </Badge>
           ))}
+          {property.tags.length > 3 && (
+            <Badge variant="secondary" className="text-xs font-medium px-2 py-1 rounded-md bg-muted text-muted-foreground">
+              +{property.tags.length - 3}
+            </Badge>
+          )}
         </div>
         
-        <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
-          <div>
-            <span className="text-gray-600">Type:</span>
-            <span className="ml-1 font-medium capitalize">{property.type}</span>
+        <div className="grid grid-cols-2 gap-4 mb-6 text-body-small">
+          <div className="space-y-2">
+            <div>
+              <span className="text-muted-foreground">Type:</span>
+              <span className="ml-2 font-medium text-foreground capitalize">{property.type}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Zone:</span>
+              <span className="ml-2 font-medium text-foreground capitalize">{property.zone}</span>
+            </div>
           </div>
-          <div>
-            <span className="text-gray-600">Developer:</span>
-            <span className="ml-1 font-medium">{property.developer}</span>
-          </div>
-          <div>
-            <span className="text-gray-600">Zone:</span>
-            <span className="ml-1 font-medium capitalize">{property.zone} Bengaluru</span>
-          </div>
-          <div>
-            <span className="text-gray-600">Possession:</span>
-            <span className="ml-1 font-medium">
-              {property.possessionDate === "immediate" ? "Ready" : property.possessionDate}
-            </span>
+          <div className="space-y-2">
+            <div>
+              <span className="text-muted-foreground">Developer:</span>
+              <span className="ml-2 font-medium text-foreground">{property.developer}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Possession:</span>
+              <span className="ml-2 font-medium text-foreground">
+                {property.possessionDate === "immediate" ? "Ready" : property.possessionDate}
+              </span>
+            </div>
           </div>
         </div>
         
         {/* Price Range Display */}
-        <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 rounded-lg">
+        <div className="flex items-center justify-between mb-6 p-4 bg-muted/50 rounded-xl border border-border/50">
           <div className="flex items-center">
-            <IndianRupee className="h-4 w-4 text-primary mr-2" />
-            <span className="text-sm text-gray-600">Price Range:</span>
+            <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
+              <IndianRupee className="h-4 w-4 text-primary" />
+            </div>
+            <span className="text-body-small text-muted-foreground font-medium">Price Range</span>
           </div>
-          <span className="font-semibold text-primary">
+          <span className="text-body font-semibold text-primary">
             {getPriceRange()}
           </span>
         </div>

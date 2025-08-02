@@ -5,10 +5,35 @@ export default {
   content: ["./client/index.html", "./client/src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+      },
+      fontSize: {
+        'display': ['3.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
+        'heading-1': ['2.25rem', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
+        'heading-2': ['1.875rem', { lineHeight: '1.3', letterSpacing: '-0.01em' }],
+        'heading-3': ['1.5rem', { lineHeight: '1.4', letterSpacing: '-0.01em' }],
+        'body-large': ['1.125rem', { lineHeight: '1.6' }],
+        'body': ['1rem', { lineHeight: '1.6' }],
+        'body-small': ['0.875rem', { lineHeight: '1.5' }],
+        'caption': ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.05em' }],
+      },
+      spacing: {
+        'xs': 'var(--spacing-xs)',
+        'sm': 'var(--spacing-sm)', 
+        'md': 'var(--spacing-md)',
+        'lg': 'var(--spacing-lg)',
+        'xl': 'var(--spacing-xl)',
+        '2xl': 'var(--spacing-2xl)',
+        '3xl': 'var(--spacing-3xl)',
+      },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        'xs': '0.25rem',
+        'sm': '0.375rem',
+        'md': '0.5rem',
+        'lg': 'var(--radius)',
+        'xl': '1rem',
+        '2xl': '1.5rem',
       },
       colors: {
         background: "var(--background)",
@@ -40,6 +65,14 @@ export default {
         destructive: {
           DEFAULT: "var(--destructive)",
           foreground: "var(--destructive-foreground)",
+        },
+        success: {
+          DEFAULT: "var(--success)",
+          foreground: "var(--success-foreground)",
+        },
+        warning: {
+          DEFAULT: "var(--warning)",
+          foreground: "var(--warning-foreground)",
         },
         border: "var(--border)",
         input: "var(--input)",

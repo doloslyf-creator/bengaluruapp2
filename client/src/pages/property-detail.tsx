@@ -250,24 +250,24 @@ export default function PropertyDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div className="min-h-screen bg-background">
+      {/* Header - Stripe Style */}
+      <header className="bg-card shadow-sm border-b border-border sticky top-0 z-40 backdrop-blur-sm bg-card/95">
+        <div className="container-stripe py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
               <Button 
                 variant="ghost" 
                 onClick={() => window.history.back()}
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-2 rounded-xl focus-stripe transition-stripe hover:bg-muted"
               >
                 <ArrowLeft className="h-4 w-4" />
-                <span>Back</span>
+                <span className="text-body font-medium">Back</span>
               </Button>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">{property.name}</h1>
-                <p className="text-sm text-gray-600 flex items-center">
-                  <MapPin className="h-4 w-4 mr-1" />
+                <h1 className="text-heading-2 text-foreground mb-1">{property.name}</h1>
+                <p className="text-body-small text-muted-foreground flex items-center">
+                  <MapPin className="h-4 w-4 mr-2" />
                   {property.area}, {property.zone} Bengaluru
                 </p>
               </div>
