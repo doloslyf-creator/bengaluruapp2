@@ -69,6 +69,14 @@ export default function PropertyEdit() {
     enabled: !!id,
   });
 
+  const { data: zones = [] } = useQuery<any[]>({
+    queryKey: ["/api/zones"],
+  });
+
+  const { data: developers = [] } = useQuery<any[]>({
+    queryKey: ["/api/developers"],
+  });
+
   const form = useForm<PropertyEditForm>({
     resolver: zodResolver(propertyEditSchema),
     defaultValues: {
@@ -339,9 +347,20 @@ export default function PropertyEdit() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Developer</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Enter developer name" />
-                        </FormControl>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select developer" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {developers.map((developer) => (
+                              <SelectItem key={developer.id} value={developer.name}>
+                                {developer.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -422,11 +441,11 @@ export default function PropertyEdit() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="north">North Bengaluru</SelectItem>
-                            <SelectItem value="south">South Bengaluru</SelectItem>
-                            <SelectItem value="east">East Bengaluru</SelectItem>
-                            <SelectItem value="west">West Bengaluru</SelectItem>
-                            <SelectItem value="central">Central Bengaluru</SelectItem>
+                            {zones.map((zone) => (
+                              <SelectItem key={zone.id} value={zone.name}>
+                                {zone.name}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />

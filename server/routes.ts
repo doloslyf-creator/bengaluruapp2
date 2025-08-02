@@ -1145,6 +1145,129 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Zones API - Simple zones management
+  app.get("/api/zones", async (req, res) => {
+    try {
+      // Return hardcoded zones for now - in production, would come from database
+      const zones = [
+        { id: "1", name: "North Bengaluru", description: "Areas like Hebbal, Yelahanka, Devanahalli" },
+        { id: "2", name: "South Bengaluru", description: "Areas like Bannerghatta, Jayanagar, Koramangala" },
+        { id: "3", name: "East Bengaluru", description: "Areas like Whitefield, Marathahalli, Sarjapur" },
+        { id: "4", name: "West Bengaluru", description: "Areas like Rajajinagar, Vijayanagar, Kengeri" },
+        { id: "5", name: "Central Bengaluru", description: "Areas like MG Road, Brigade Road, Commercial Street" }
+      ];
+      res.json(zones);
+    } catch (error) {
+      console.error("Error fetching zones:", error);
+      res.status(500).json({ error: "Failed to fetch zones" });
+    }
+  });
+
+  app.post("/api/zones", async (req, res) => {
+    try {
+      const zoneData = req.body;
+      // In production, would save to database
+      const newZone = {
+        id: Date.now().toString(),
+        ...zoneData,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      console.log("Zone created:", newZone);
+      res.json(newZone);
+    } catch (error) {
+      console.error("Error creating zone:", error);
+      res.status(500).json({ error: "Failed to create zone" });
+    }
+  });
+
+  app.delete("/api/zones/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      // In production, would delete from database
+      console.log("Zone deleted:", id);
+      res.json({ success: true, message: "Zone deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting zone:", error);
+      res.status(500).json({ error: "Failed to delete zone" });
+    }
+  });
+
+  // Developers API - Simple developers management  
+  app.get("/api/developers", async (req, res) => {
+    try {
+      // Return hardcoded developers for now - in production, would come from database
+      const developers = [
+        { 
+          id: "1", 
+          name: "Prestige Estates", 
+          description: "Premium residential and commercial developments",
+          phone: "+91 80 4933 0000",
+          email: "info@prestigeconstructions.com",
+          specialization: "Luxury Apartments & Villas"
+        },
+        { 
+          id: "2", 
+          name: "Brigade Group", 
+          description: "Diversified real estate conglomerate",
+          phone: "+91 80 4655 5000", 
+          email: "contact@brigade.co.in",
+          specialization: "Mixed-use Developments"
+        },
+        { 
+          id: "3", 
+          name: "Sobha Limited", 
+          description: "Backward integrated real estate player",
+          phone: "+91 80 4932 4050",
+          email: "enquiry@sobha.com", 
+          specialization: "Premium Residential"
+        },
+        { 
+          id: "4", 
+          name: "Embassy Group", 
+          description: "Real estate and hospitality conglomerate",
+          phone: "+91 80 4277 4000",
+          email: "info@embassygroup.in",
+          specialization: "Commercial & Residential"
+        }
+      ];
+      res.json(developers);
+    } catch (error) {
+      console.error("Error fetching developers:", error);
+      res.status(500).json({ error: "Failed to fetch developers" });
+    }
+  });
+
+  app.post("/api/developers", async (req, res) => {
+    try {
+      const developerData = req.body;
+      // In production, would save to database
+      const newDeveloper = {
+        id: Date.now().toString(),
+        ...developerData,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      console.log("Developer created:", newDeveloper);
+      res.json(newDeveloper);
+    } catch (error) {
+      console.error("Error creating developer:", error);
+      res.status(500).json({ error: "Failed to create developer" });
+    }
+  });
+
+  app.delete("/api/developers/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      // In production, would delete from database
+      console.log("Developer deleted:", id);
+      res.json({ success: true, message: "Developer deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting developer:", error);
+      res.status(500).json({ error: "Failed to delete developer" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

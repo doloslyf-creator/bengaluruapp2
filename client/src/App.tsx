@@ -9,7 +9,11 @@ import PropertiesView from "@/pages/admin/properties-view";
 import PropertiesAdd from "@/pages/admin/properties-add";
 import AdminAnalytics from "@/pages/admin/analytics";
 import AdminZones from "@/pages/admin/zones";
+import ZonesView from "@/pages/admin/zones-view";
+import ZonesAdd from "@/pages/admin/zones-add";
 import AdminDevelopers from "@/pages/admin/developers";
+import DevelopersView from "@/pages/admin/developers-view";
+import DevelopersAdd from "@/pages/admin/developers-add";
 import BlogManagement from "@/pages/admin/blog";
 import CivilMepReports from "@/pages/admin/civil-mep-reports";
 import CreateCivilMepReport from "@/pages/admin/create-civil-mep-report";
@@ -42,7 +46,11 @@ function Router() {
       <Route path="/admin-panel/properties/add" component={PropertiesAdd} />
       <Route path="/admin-panel/analytics" component={AdminAnalytics} />
       <Route path="/admin-panel/developers" component={AdminDevelopers} />
+      <Route path="/admin-panel/developers/view" component={DevelopersView} />
+      <Route path="/admin-panel/developers/add" component={DevelopersAdd} />
       <Route path="/admin-panel/zones" component={AdminZones} />
+      <Route path="/admin-panel/zones/view" component={ZonesView} />
+      <Route path="/admin-panel/zones/add" component={ZonesAdd} />
       <Route path="/admin-panel/blog" component={BlogManagement} />
       <Route path="/admin-panel/civil-mep-reports" component={CivilMepReports} />
       <Route path="/admin-panel/create-civil-mep-report" component={CreateCivilMepReport} />

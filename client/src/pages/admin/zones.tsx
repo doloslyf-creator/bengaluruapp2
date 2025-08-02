@@ -1,234 +1,175 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { LogOut, MapPin, Building, TrendingUp, Target } from "lucide-react";
+import { 
+  Plus, MapPin, Eye, Edit2, List, BarChart3, 
+  ChevronRight, Building, Users
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import AdminLayout from "@/components/layout/admin-layout";
 import { type Property } from "@shared/schema";
 
 export default function AdminZones() {
-
   const { data: properties = [] } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
   });
 
-  // Group properties by zone
-  const zoneStats = properties.reduce((acc, property) => {
-    if (!acc[property.zone]) {
-      acc[property.zone] = {
-        name: property.zone,
-        properties: [],
-        developers: new Set(),
-        types: new Set(),
-        statuses: new Set(),
-        areas: new Set(),
-      };
-    }
-    acc[property.zone].properties.push(property);
-    acc[property.zone].developers.add(property.developer);
-    acc[property.zone].types.add(property.type);
-    acc[property.zone].statuses.add(property.status);
-    acc[property.zone].areas.add(property.area);
-    return acc;
-  }, {} as Record<string, {
-    name: string;
-    properties: Property[];
-    developers: Set<string>;
-    types: Set<string>;
-    statuses: Set<string>;
-    areas: Set<string>;
-  }>);
-
-  const zones = Object.values(zoneStats).sort((a, b) => 
-    b.properties.length - a.properties.length
-  );
-
-  const getZoneDisplayName = (zone: string) => {
-    return zone.charAt(0).toUpperCase() + zone.slice(1) + " Bengaluru";
-  };
-
-  const getZoneColor = (zone: string) => {
-    const colors = {
-      north: "bg-blue-100 text-blue-800 border-blue-200",
-      south: "bg-green-100 text-green-800 border-green-200", 
-      east: "bg-orange-100 text-orange-800 border-orange-200",
-      west: "bg-purple-100 text-purple-800 border-purple-200",
-      central: "bg-red-100 text-red-800 border-red-200",
-    };
-    return colors[zone as keyof typeof colors] || "bg-gray-100 text-gray-800 border-gray-200";
-  };
-
-
+  const { data: zones = [] } = useQuery({
+    queryKey: ["/api/zones"],
+    queryFn: async () => {
+      const response = await fetch("/api/zones");
+      if (!response.ok) throw new Error("Failed to fetch zones");
+      return response.json();
+    },
+  });
 
   return (
-    <AdminLayout title="Zone Analysis" subtitle="Bengaluru property market by zones">
-      <div className="p-6">
-        {/* Summary Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Zones</CardTitle>
-              <MapPin className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{zones.length}</div>
-              <p className="text-xs text-muted-foreground">Coverage areas</p>
-            </CardContent>
-          </Card>
+    <AdminLayout title="Zone Management">
+      <div className="flex flex-col h-full">
+        {/* Header */}
+        <header className="border-b border-gray-200 bg-white px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-medium text-gray-900">Zone Management</h2>
+              <p className="text-sm text-gray-600">Manage Bengaluru zones and locations</p>
+            </div>
+          </div>
+        </header>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Average Properties</CardTitle>
-              <Building className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {zones.length > 0 ? Math.round(properties.length / zones.length) : 0}
-              </div>
-              <p className="text-xs text-muted-foreground">Per zone</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Most Active</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {zones.length > 0 ? zones[0].properties.length : 0}
-              </div>
-              <p className="text-xs text-muted-foreground capitalize">
-                {zones.length > 0 ? getZoneDisplayName(zones[0].name) : "No zones"}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Areas</CardTitle>
-              <Target className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {zones.reduce((acc, zone) => acc + zone.areas.size, 0)}
-              </div>
-              <p className="text-xs text-muted-foreground">Unique localities</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Zone Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {zones.map((zone) => (
-            <Card key={zone.name} className="hover:shadow-md transition-shadow">
-              <CardHeader>
-                <div className="flex justify-between items-start">
+        {/* Stats Overview */}
+        <div className="px-6 py-6 bg-gray-50">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <Badge className={getZoneColor(zone.name)}>
-                        {getZoneDisplayName(zone.name)}
-                      </Badge>
-                    </CardTitle>
-                    <CardDescription className="mt-2">
-                      {zone.properties.length} properties • {zone.developers.size} developers
-                    </CardDescription>
+                    <p className="text-sm font-medium text-gray-600">Total Zones</p>
+                    <p className="text-3xl font-bold text-primary">{zones.length}</p>
                   </div>
-                </div>
-              </CardHeader>
-              
-              <CardContent>
-                <div className="space-y-4">
-                  {/* Property Types */}
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Property Types</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {Array.from(zone.types).map((type) => (
-                        <Badge key={type} variant="outline" className="text-xs capitalize">
-                          {type}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Top Developers */}
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Active Developers</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {Array.from(zone.developers).slice(0, 3).map((developer) => (
-                        <Badge key={developer} variant="outline" className="text-xs">
-                          {developer}
-                        </Badge>
-                      ))}
-                      {zone.developers.size > 3 && (
-                        <Badge variant="outline" className="text-xs text-gray-500">
-                          +{zone.developers.size - 3} more
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Popular Areas */}
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Popular Areas</h4>
-                    <div className="grid grid-cols-2 gap-1 text-sm text-gray-600">
-                      {Array.from(zone.areas).slice(0, 6).map((area) => (
-                        <div key={area} className="truncate">{area}</div>
-                      ))}
-                      {zone.areas.size > 6 && (
-                        <div className="text-xs text-gray-500 col-span-2">
-                          +{zone.areas.size - 6} more areas
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Status Distribution */}
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Project Status</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {Array.from(zone.statuses).map((status) => (
-                        <Badge 
-                          key={status} 
-                          variant="outline" 
-                          className={`text-xs ${
-                            status === 'active' ? 'border-green-300 text-green-700' :
-                            status === 'pre-launch' ? 'border-yellow-300 text-yellow-700' :
-                            status === 'under-construction' ? 'border-blue-300 text-blue-700' :
-                            status === 'completed' ? 'border-purple-300 text-purple-700' :
-                            'border-gray-300 text-gray-700'
-                          }`}
-                        >
-                          {status.replace('-', ' ')}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Market Activity */}
-                  <div className="pt-2 border-t border-gray-100">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Market Activity</span>
-                      <span className="font-medium">
-                        {zone.properties.length > 10 ? 'High' : 
-                         zone.properties.length > 5 ? 'Medium' : 'Low'}
-                      </span>
-                    </div>
-                  </div>
+                  <MapPin className="h-8 w-8 text-primary" />
                 </div>
               </CardContent>
             </Card>
-          ))}
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Active Properties</p>
+                    <p className="text-3xl font-bold text-green-600">{properties.length}</p>
+                  </div>
+                  <Building className="h-8 w-8 text-green-600" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Coverage</p>
+                    <p className="text-3xl font-bold text-blue-600">100%</p>
+                  </div>
+                  <BarChart3 className="h-8 w-8 text-blue-600" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
-        {zones.length === 0 && (
-          <div className="text-center py-12">
-            <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No zones found</h3>
-            <p className="text-gray-600">Add some properties to see zone analytics</p>
+        {/* Sub-Menu Navigation */}
+        <div className="flex-1 px-6 py-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
+            {/* View Zones */}
+            <Link href="/admin-panel/zones/view">
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer group">
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="bg-primary/10 rounded-lg p-3">
+                        <List className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">View Zones</h3>
+                        <p className="text-sm text-gray-600">Browse and manage all zones</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-primary transition-colors" />
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                      <Eye className="h-4 w-4" />
+                      <span>Table view with zone details</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                      <Edit2 className="h-4 w-4" />
+                      <span>Edit and delete zone information</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                      <Building className="h-4 w-4" />
+                      <span>View properties in each zone</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                      <BarChart3 className="h-4 w-4" />
+                      <span>Zone statistics and analytics</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t">
+                    <Badge variant="outline">
+                      {zones.length} zones
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            {/* Add New Zone */}
+            <Link href="/admin-panel/zones/add">
+              <Card className="hover:shadow-lg transition-shadow cursor-pointer group">
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="bg-green-100 rounded-lg p-3">
+                        <Plus className="h-6 w-6 text-green-600" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">Add New Zone</h3>
+                        <p className="text-sm text-gray-600">Create a new zone location</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-green-600 transition-colors" />
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                      <MapPin className="h-4 w-4" />
+                      <span>Zone name and description</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                      <Building className="h-4 w-4" />
+                      <span>Location details and coverage</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                      <Users className="h-4 w-4" />
+                      <span>Market information and demographics</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                      <Plus className="h-4 w-4" />
+                      <span>Quick zone setup</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t">
+                    <Badge variant="outline" className="bg-green-50 text-green-700">
+                      Quick Setup
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
-        )}
+        </div>
       </div>
     </AdminLayout>
   );
