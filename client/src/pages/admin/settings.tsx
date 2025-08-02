@@ -214,7 +214,7 @@ export default function AdminSettings() {
                           <FormItem>
                             <FormLabel>Business Name</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Enter business name" />
+                              <Input {...field} value={field.value || ""} placeholder="Enter business name" />
                             </FormControl>
                             <FormDescription>
                               This will appear in the navbar and reports
@@ -273,7 +273,7 @@ export default function AdminSettings() {
                             </div>
                             <FormControl>
                               <Switch
-                                checked={field.value}
+                                checked={field.value || false}
                                 onCheckedChange={field.onChange}
                               />
                             </FormControl>
@@ -289,7 +289,7 @@ export default function AdminSettings() {
                             <FormItem>
                               <FormLabel>Maintenance Message</FormLabel>
                               <FormControl>
-                                <Textarea {...field} placeholder="Enter maintenance message" />
+                                <Textarea {...field} value={field.value || ""} placeholder="Enter maintenance message" />
                               </FormControl>
                               <FormDescription>
                                 This message will be shown to users during maintenance
@@ -323,7 +323,7 @@ export default function AdminSettings() {
                           <FormItem>
                             <FormLabel>Contact Email</FormLabel>
                             <FormControl>
-                              <Input {...field} type="email" placeholder="contact@company.com" />
+                              <Input {...field} value={field.value || ""} type="email" placeholder="contact@company.com" />
                             </FormControl>
                             <FormDescription>
                               Primary email for customer inquiries
@@ -341,7 +341,7 @@ export default function AdminSettings() {
                             <FormItem>
                               <FormLabel>Phone Number</FormLabel>
                               <FormControl>
-                                <Input {...field} placeholder="+91 98765 43210" />
+                                <Input {...field} value={field.value || ""} placeholder="+91 98765 43210" />
                               </FormControl>
                               <FormDescription>
                                 Primary contact number
@@ -358,7 +358,7 @@ export default function AdminSettings() {
                             <FormItem>
                               <FormLabel>WhatsApp Number</FormLabel>
                               <FormControl>
-                                <Input {...field} placeholder="+91 98765 43210" />
+                                <Input {...field} value={field.value || ""} placeholder="+91 98765 43210" />
                               </FormControl>
                               <FormDescription>
                                 WhatsApp contact number
@@ -376,7 +376,7 @@ export default function AdminSettings() {
                           <FormItem>
                             <FormLabel>Office Address</FormLabel>
                             <FormControl>
-                              <Textarea {...field} placeholder="Enter office address" />
+                              <Textarea {...field} value={field.value || ""} placeholder="Enter office address" />
                             </FormControl>
                             <FormDescription>
                               Office address for footer and contact pages
@@ -409,7 +409,7 @@ export default function AdminSettings() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Default Currency</FormLabel>
-                              <Select onValueChange={field.onChange} value={field.value}>
+                              <Select onValueChange={field.onChange} value={field.value || ""}>
                                 <FormControl>
                                   <SelectTrigger>
                                     <SelectValue placeholder="Select currency" />
@@ -433,7 +433,7 @@ export default function AdminSettings() {
                             <FormItem>
                               <FormLabel>Currency Symbol</FormLabel>
                               <FormControl>
-                                <Input {...field} placeholder="₹" />
+                                <Input {...field} value={field.value || ""} placeholder="₹" />
                               </FormControl>
                               <FormDescription>
                                 Symbol to display with prices
@@ -451,7 +451,7 @@ export default function AdminSettings() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Timezone</FormLabel>
-                              <Select onValueChange={field.onChange} value={field.value}>
+                              <Select onValueChange={field.onChange} value={field.value || ""}>
                                 <FormControl>
                                   <SelectTrigger>
                                     <SelectValue placeholder="Select timezone" />
@@ -475,7 +475,7 @@ export default function AdminSettings() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Date Format</FormLabel>
-                              <Select onValueChange={field.onChange} value={field.value}>
+                              <Select onValueChange={field.onChange} value={field.value || ""}>
                                 <FormControl>
                                   <SelectTrigger>
                                     <SelectValue placeholder="Select date format" />
@@ -518,10 +518,10 @@ export default function AdminSettings() {
                               <FormLabel>Primary Color</FormLabel>
                               <FormControl>
                                 <div className="flex space-x-2">
-                                  <Input {...field} placeholder="#2563eb" />
+                                  <Input {...field} value={field.value || ""} placeholder="#2563eb" />
                                   <div
                                     className="w-10 h-10 rounded border-2 border-gray-300"
-                                    style={{ backgroundColor: field.value }}
+                                    style={{ backgroundColor: field.value || "#2563eb" }}
                                   />
                                 </div>
                               </FormControl>
@@ -541,10 +541,10 @@ export default function AdminSettings() {
                               <FormLabel>Secondary Color</FormLabel>
                               <FormControl>
                                 <div className="flex space-x-2">
-                                  <Input {...field} placeholder="#64748b" />
+                                  <Input {...field} value={field.value || ""} placeholder="#64748b" />
                                   <div
                                     className="w-10 h-10 rounded border-2 border-gray-300"
-                                    style={{ backgroundColor: field.value }}
+                                    style={{ backgroundColor: field.value || "#64748b" }}
                                   />
                                 </div>
                               </FormControl>
@@ -569,7 +569,7 @@ export default function AdminSettings() {
                             <FormItem>
                               <FormLabel>Meta Title</FormLabel>
                               <FormControl>
-                                <Input {...field} placeholder="Enter meta title" />
+                                <Input {...field} value={field.value || ""} placeholder="Enter meta title" />
                               </FormControl>
                               <FormDescription>
                                 Default title for search engines and browser tabs
@@ -586,7 +586,7 @@ export default function AdminSettings() {
                             <FormItem>
                               <FormLabel>Meta Description</FormLabel>
                               <FormControl>
-                                <Textarea {...field} placeholder="Enter meta description" />
+                                <Textarea {...field} value={field.value || ""} placeholder="Enter meta description" />
                               </FormControl>
                               <FormDescription>
                                 Default description for search engines (max 160 characters)
@@ -605,7 +605,7 @@ export default function AdminSettings() {
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center space-x-2">
-                        <Toggle className="h-5 w-5" />
+                        <ToggleLeft className="h-5 w-5" />
                         <span>Feature Toggles</span>
                       </CardTitle>
                       <CardDescription>
@@ -627,7 +627,7 @@ export default function AdminSettings() {
                               </div>
                               <FormControl>
                                 <Switch
-                                  checked={field.value}
+                                  checked={field.value || false}
                                   onCheckedChange={field.onChange}
                                 />
                               </FormControl>
@@ -648,7 +648,7 @@ export default function AdminSettings() {
                               </div>
                               <FormControl>
                                 <Switch
-                                  checked={field.value}
+                                  checked={field.value || false}
                                   onCheckedChange={field.onChange}
                                 />
                               </FormControl>
@@ -669,7 +669,7 @@ export default function AdminSettings() {
                               </div>
                               <FormControl>
                                 <Switch
-                                  checked={field.value}
+                                  checked={field.value || false}
                                   onCheckedChange={field.onChange}
                                 />
                               </FormControl>
@@ -690,7 +690,7 @@ export default function AdminSettings() {
                               </div>
                               <FormControl>
                                 <Switch
-                                  checked={field.value}
+                                  checked={field.value || false}
                                   onCheckedChange={field.onChange}
                                 />
                               </FormControl>
