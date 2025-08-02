@@ -134,22 +134,22 @@ export default function CustomerHome() {
   const testimonials = [
     {
       name: "Priya Sharma",
-      role: "Software Engineer",
-      content: "OwnItRight helped me find the perfect 2BHK in Whitefield. Their property reports were incredibly detailed and saved me from making costly mistakes.",
+      role: "Software Engineer at TCS",
+      content: "I was completely lost in the property market until I found these guys. They literally held my hand through the entire process - from finding options to ensuring everything was legally sound. Got my perfect 2BHK in Whitefield!",
       rating: 5,
       image: "PS"
     },
     {
       name: "Rajesh Kumar",
-      role: "Business Owner",
-      content: "The legal due diligence service was exceptional. They identified potential issues that other consultants missed. Highly recommended!",
+      role: "Small Business Owner",
+      content: "As someone who's been burnt before by property deals, I was skeptical. But their legal due diligence caught issues that could have cost me lakhs. These people genuinely care about protecting your investment.",
       rating: 5,
       image: "RK"
     },
     {
       name: "Anitha Reddy",
-      role: "Marketing Manager",
-      content: "Found my dream villa in JP Nagar through their platform. The entire process was transparent and hassle-free.",
+      role: "Working Mom",
+      content: "Finding a home while managing work and kids seemed impossible. They understood my constraints and found me a beautiful villa in JP Nagar that ticked all my boxes. So grateful!",
       rating: 5,
       image: "AR"
     }
@@ -160,35 +160,36 @@ export default function CustomerHome() {
       <Header />
 
       {/* Hero Section */}
-      <section className="pt-24 pb-16 bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden">
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+      <section className="pt-24 pb-16 bg-gradient-to-br from-orange-50 via-blue-50 to-purple-100 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-orange-100/20 via-blue-100/30 to-purple-200/20"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(68,107,158,0.05)_50%,transparent_75%)]"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center max-w-4xl mx-auto">
-            <Badge variant="secondary" className="mb-4 bg-primary/10 text-primary border-0">
+            <Badge variant="secondary" className="mb-4 bg-orange-100 text-orange-700 border-0 shadow-sm">
               <Sparkles className="h-3 w-3 mr-1" />
-              Bengaluru's Most Trusted Property Advisors
+              We're here to help you find home
             </Badge>
             
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-              Find Your Perfect
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-600">
-                Property Match
+              Your Dream Home is
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-blue-600 to-purple-600">
+                Closer Than You Think
               </span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
-              Expert property advisory with professional valuation reports, legal due diligence, 
-              and engineering analysis. Your trusted partner in Bengaluru real estate.
+            <p className="text-xl md:text-2xl text-gray-700 mb-10 max-w-3xl mx-auto leading-relaxed">
+              We understand how overwhelming property hunting can be. That's why we're here to guide you 
+              every step of the way - from finding the right property to ensuring it's legally sound and worth your investment.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
               <Button 
                 size="lg" 
                 onClick={() => navigate('/find-property')}
-                className="text-lg px-8 py-4 h-auto rounded-xl bg-primary hover:bg-primary/90 transform hover:scale-105 transition-all duration-200 shadow-lg"
+                className="text-lg px-8 py-4 h-auto rounded-xl bg-gradient-to-r from-orange-500 to-blue-600 hover:from-orange-600 hover:to-blue-700 text-white transform hover:scale-105 transition-all duration-200 shadow-lg"
               >
                 <Search className="h-5 w-5 mr-2" />
-                Start Property Search
+                Let's Find Your Home
                 <ArrowRight className="h-5 w-5 ml-2" />
               </Button>
               
@@ -196,30 +197,30 @@ export default function CustomerHome() {
                 size="lg" 
                 variant="outline"
                 onClick={() => navigate('/consultation')}
-                className="text-lg px-8 py-4 h-auto rounded-xl border-2 hover:bg-gray-50 transition-all duration-200"
+                className="text-lg px-8 py-4 h-auto rounded-xl border-2 border-gray-300 hover:bg-white hover:shadow-md transition-all duration-200"
               >
                 <Phone className="h-5 w-5 mr-2" />
-                Expert Consultation
+                Talk to Us First
               </Button>
             </div>
 
-            {/* Stats */}
+            {/* Personal Touch Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto">
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-primary">{stats.totalProperties}+</div>
-                <div className="text-sm text-gray-600">Properties Listed</div>
+              <div className="text-center bg-white/60 backdrop-blur rounded-lg p-3 border border-white/40">
+                <div className="text-2xl md:text-3xl font-bold text-orange-600">{stats.totalProperties}+</div>
+                <div className="text-sm text-gray-700">Homes we've helped find</div>
               </div>
-              <div className="text-center">
+              <div className="text-center bg-white/60 backdrop-blur rounded-lg p-3 border border-white/40">
                 <div className="text-2xl md:text-3xl font-bold text-green-600">500+</div>
-                <div className="text-sm text-gray-600">Happy Customers</div>
+                <div className="text-sm text-gray-700">Families settled</div>
               </div>
-              <div className="text-center">
+              <div className="text-center bg-white/60 backdrop-blur rounded-lg p-3 border border-white/40">
                 <div className="text-2xl md:text-3xl font-bold text-purple-600">{stats.averageRating}</div>
-                <div className="text-sm text-gray-600">Average Rating</div>
+                <div className="text-sm text-gray-700">Trust rating</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-orange-600">100%</div>
-                <div className="text-sm text-gray-600">RERA Verified</div>
+              <div className="text-center bg-white/60 backdrop-blur rounded-lg p-3 border border-white/40">
+                <div className="text-2xl md:text-3xl font-bold text-blue-600">3+</div>
+                <div className="text-sm text-gray-700">Years of care</div>
               </div>
             </div>
           </div>
@@ -383,14 +384,15 @@ export default function CustomerHome() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary to-blue-600 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/10"></div>
+      <section className="py-20 bg-gradient-to-r from-orange-400 via-blue-500 to-purple-600 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/20"></div>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready to Find Your Dream Property?
+            Let's Find Your Perfect Home Together
           </h2>
-          <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-            Start your property search today with expert guidance and comprehensive advisory services
+          <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto">
+            You don't have to navigate this journey alone. We're here to guide you every step of the way, 
+            from your first search to holding your new keys.
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -398,19 +400,19 @@ export default function CustomerHome() {
               size="lg" 
               variant="secondary"
               onClick={() => navigate('/find-property')}
-              className="text-lg px-8 py-4 h-auto rounded-xl bg-white text-primary hover:bg-gray-100 transform hover:scale-105 transition-all duration-200"
+              className="text-lg px-8 py-4 h-auto rounded-xl bg-white text-gray-900 hover:bg-gray-100 transform hover:scale-105 transition-all duration-200 shadow-lg"
             >
               <Search className="h-5 w-5 mr-2" />
-              Start Property Search
+              I'm Ready to Start
             </Button>
             <Button 
               size="lg" 
               variant="outline"
               onClick={() => navigate('/consultation')}
-              className="text-lg px-8 py-4 h-auto rounded-xl bg-transparent border-white text-white hover:bg-white hover:text-primary transition-all duration-200"
+              className="text-lg px-8 py-4 h-auto rounded-xl bg-transparent border-white text-white hover:bg-white hover:text-gray-900 transition-all duration-200"
             >
               <Phone className="h-5 w-5 mr-2" />
-              Schedule Consultation
+              Let's Talk First
             </Button>
           </div>
         </div>

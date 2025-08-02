@@ -90,35 +90,37 @@ export default function Home() {
       <Header />
 
       {/* Hero Section */}
-      <section className="pt-24 pb-16 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
+      <section className="pt-24 pb-16 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-100/30 via-blue-100/20 to-indigo-200/30"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_25%,rgba(30,64,175,0.03)_50%,transparent_75%)]"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center max-w-4xl mx-auto">
-            <Badge variant="secondary" className="mb-4 bg-primary/10 text-primary border-0">
+            <Badge variant="secondary" className="mb-4 bg-slate-100 text-slate-700 border-0 shadow-sm">
               <Settings className="h-3 w-3 mr-1" />
-              Administrative Dashboard
+              Your management hub awaits
             </Badge>
             
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Property Management
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-600">
-                Control Center
+              Manage Properties
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-slate-600 via-blue-600 to-indigo-600">
+                Like a Pro
               </span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
-              Comprehensive administrative tools for managing properties, leads, reports, and revenue. 
-              Advanced analytics and reporting for data-driven decision making.
+            <p className="text-xl md:text-2xl text-gray-700 mb-10 max-w-3xl mx-auto leading-relaxed">
+              Everything you need to efficiently manage your property business is right here. 
+              From tracking leads to generating reports - we've built tools that actually work for you.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
               <Button 
                 asChild 
                 size="lg" 
-                className="text-lg px-8 py-4 h-auto rounded-xl bg-primary hover:bg-primary/90 transform hover:scale-105 transition-all duration-200 shadow-lg"
+                className="text-lg px-8 py-4 h-auto rounded-xl bg-gradient-to-r from-slate-600 to-blue-600 hover:from-slate-700 hover:to-blue-700 text-white transform hover:scale-105 transition-all duration-200 shadow-lg"
               >
                 <Link href="/admin-panel">
                   <Database className="h-5 w-5 mr-2" />
-                  Access Admin Panel
+                  Let's Get Started
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
@@ -127,32 +129,32 @@ export default function Home() {
                 asChild 
                 variant="outline" 
                 size="lg" 
-                className="text-lg px-8 py-4 h-auto rounded-xl border-2 hover:bg-gray-50 transition-all duration-200"
+                className="text-lg px-8 py-4 h-auto rounded-xl border-2 border-gray-300 hover:bg-white hover:shadow-md transition-all duration-200"
               >
                 <a href="#features">
                   <Activity className="h-5 w-5 mr-2" />
-                  Learn More
+                  Explore Features
                 </a>
               </Button>
             </div>
 
-            {/* Admin Stats */}
+            {/* Personal Admin Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto">
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-primary">{propertiesStats?.totalProperties || 0}</div>
-                <div className="text-sm text-gray-600">Properties</div>
+              <div className="text-center bg-white/60 backdrop-blur rounded-lg p-3 border border-white/40">
+                <div className="text-2xl md:text-3xl font-bold text-slate-600">{propertiesStats?.totalProperties || 0}</div>
+                <div className="text-sm text-gray-700">Properties managed</div>
               </div>
-              <div className="text-center">
+              <div className="text-center bg-white/60 backdrop-blur rounded-lg p-3 border border-white/40">
                 <div className="text-2xl md:text-3xl font-bold text-green-600">{leadsData?.length || 0}</div>
-                <div className="text-sm text-gray-600">Active Leads</div>
+                <div className="text-sm text-gray-700">Leads to follow up</div>
               </div>
-              <div className="text-center">
+              <div className="text-center bg-white/60 backdrop-blur rounded-lg p-3 border border-white/40">
                 <div className="text-2xl md:text-3xl font-bold text-purple-600">{ordersData?.length || 0}</div>
-                <div className="text-sm text-gray-600">Orders</div>
+                <div className="text-sm text-gray-700">Orders processed</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-orange-600">4</div>
-                <div className="text-sm text-gray-600">Active Zones</div>
+              <div className="text-center bg-white/60 backdrop-blur rounded-lg p-3 border border-white/40">
+                <div className="text-2xl md:text-3xl font-bold text-indigo-600">4</div>
+                <div className="text-sm text-gray-700">Zones covered</div>
               </div>
             </div>
           </div>

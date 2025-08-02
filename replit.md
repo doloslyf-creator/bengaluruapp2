@@ -8,6 +8,7 @@ Preferred communication style: Simple, everyday language.
 Project approach: User appreciates comprehensive solutions that integrate real data with sophisticated customer experience.
 Focus areas: Customer-facing features, real data integration, and seamless user workflows.
 UI Design preferences: Clean, minimal design without unnecessary panels or borders. Prefer simple layouts that encourage clicking to view details rather than multiple action buttons. Match labels should be displayed in brackets at the top of cards. Strongly prefers compact, table-based interfaces over verbose card layouts for admin panels - values data density and efficiency.
+Messaging preference: Personalized messaging that makes customers "feel us, our message" rather than sounding like an organization. Content should be human-centered and relatable.
 
 ## System Architecture
 
