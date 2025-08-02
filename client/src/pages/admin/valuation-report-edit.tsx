@@ -20,18 +20,68 @@ interface ValuationReportForm {
   
   // Cost Analysis
   costBreakdown: {
+    // Land Details
     landValue: number;
+    landAreaSqft: number;
+    landCostPerSqft: number;
+    
+    // Construction Details
+    builtUpAreaSqft: number;
+    constructionCostPerSqft: number;
     constructionCost: number;
+    
+    // Development & Infrastructure
     developmentCharges: number;
-    registrationStampDuty: number;
-    gstOnConstruction: number;
+    infrastructureCost: number;
+    elevatorCharges: number;
+    powerBackupCharges: number;
+    waterConnectionCharges: number;
+    sewerageCharges: number;
+    
+    // Parking & Amenities
     parkingCharges: number;
+    parkingSpaces: number;
     clubhouseMaintenance: number;
+    amenityCharges: number;
+    
+    // Legal & Documentation
+    registrationPercent: number;
+    stampDutyPercent: number;
+    registrationStampDuty: number;
+    
+    // Tax Calculations
+    gstPercent: number;
+    gstOnConstruction: number;
+    gstApplicableAmount: number;
+    
+    // Additional Costs
     interiorFittings: number;
     movingCosts: number;
     legalCharges: number;
+    brokerage: number;
+    miscellaneousCost: number;
+    
+    // Calculated Totals
+    basicCost: number;
+    totalTaxes: number;
+    totalAdditionalCost: number;
     totalEstimatedCost: number;
-    hiddenCosts: Array<{ item: string; amount: number; description: string }>;
+    
+    // Detailed Breakdowns
+    constructionBreakdown: Array<{
+      component: string;
+      specification: string;
+      rate: number;
+      quantity: number;
+      unit: string;
+      amount: number;
+    }>;
+    hiddenCosts: Array<{ 
+      item: string; 
+      amount: number; 
+      description: string;
+      category: string;
+    }>;
   };
   
   // Market Intelligence
@@ -114,17 +164,55 @@ export default function ValuationReportEdit() {
     reportVersion: "1.0",
     generatedBy: "",
     costBreakdown: {
+      // Land Details
       landValue: 0,
+      landAreaSqft: 0,
+      landCostPerSqft: 0,
+      
+      // Construction Details
+      builtUpAreaSqft: 0,
+      constructionCostPerSqft: 0,
       constructionCost: 0,
+      
+      // Development & Infrastructure
       developmentCharges: 0,
-      registrationStampDuty: 0,
-      gstOnConstruction: 0,
+      infrastructureCost: 0,
+      elevatorCharges: 0,
+      powerBackupCharges: 0,
+      waterConnectionCharges: 0,
+      sewerageCharges: 0,
+      
+      // Parking & Amenities
       parkingCharges: 0,
+      parkingSpaces: 1,
       clubhouseMaintenance: 0,
+      amenityCharges: 0,
+      
+      // Legal & Documentation
+      registrationPercent: 1,
+      stampDutyPercent: 5,
+      registrationStampDuty: 0,
+      
+      // Tax Calculations
+      gstPercent: 5,
+      gstOnConstruction: 0,
+      gstApplicableAmount: 0,
+      
+      // Additional Costs
       interiorFittings: 0,
       movingCosts: 0,
       legalCharges: 0,
+      brokerage: 0,
+      miscellaneousCost: 0,
+      
+      // Calculated Totals
+      basicCost: 0,
+      totalTaxes: 0,
+      totalAdditionalCost: 0,
       totalEstimatedCost: 0,
+      
+      // Detailed Breakdowns
+      constructionBreakdown: [],
       hiddenCosts: []
     },
     marketAnalysis: {
@@ -172,66 +260,151 @@ export default function ValuationReportEdit() {
   // Load existing report data if editing
   const { data: existingReport } = useQuery({
     queryKey: ["/api/valuation-reports", params?.id],
-    enabled: isEditMode,
+    enabled: !!isEditMode,
   });
 
-  const { data: properties = [] } = useQuery({
+  const { data: properties = [] } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
   });
 
   useEffect(() => {
     if (existingReport && isEditMode) {
       setFormData({
-        propertyId: existingReport.propertyId,
-        reportVersion: existingReport.reportVersion || "1.0",
-        generatedBy: existingReport.generatedBy || "",
-        costBreakdown: existingReport.costBreakdown || formData.costBreakdown,
-        marketAnalysis: existingReport.marketAnalysis || formData.marketAnalysis,
-        financialAnalysis: existingReport.financialAnalysis || formData.financialAnalysis,
-        propertyAssessment: existingReport.propertyAssessment || formData.propertyAssessment,
-        investmentRecommendation: existingReport.investmentRecommendation || "good-buy",
-        riskAssessment: existingReport.riskAssessment || formData.riskAssessment,
-        executiveSummary: existingReport.executiveSummary || "",
-        overallScore: parseFloat(existingReport.overallScore) || 0,
-        keyHighlights: existingReport.keyHighlights || []
+        propertyId: (existingReport as any).propertyId,
+        reportVersion: (existingReport as any).reportVersion || "1.0",
+        generatedBy: (existingReport as any).generatedBy || "",
+        costBreakdown: (existingReport as any).costBreakdown || formData.costBreakdown,
+        marketAnalysis: (existingReport as any).marketAnalysis || formData.marketAnalysis,
+        financialAnalysis: (existingReport as any).financialAnalysis || formData.financialAnalysis,
+        propertyAssessment: (existingReport as any).propertyAssessment || formData.propertyAssessment,
+        investmentRecommendation: (existingReport as any).investmentRecommendation || "good-buy",
+        riskAssessment: (existingReport as any).riskAssessment || formData.riskAssessment,
+        executiveSummary: (existingReport as any).executiveSummary || "",
+        overallScore: parseFloat((existingReport as any).overallScore) || 0,
+        keyHighlights: (existingReport as any).keyHighlights || []
       });
     }
   }, [existingReport, isEditMode]);
 
+  // Calculate land value automatically
+  useEffect(() => {
+    const landValue = formData.costBreakdown.landAreaSqft * formData.costBreakdown.landCostPerSqft;
+    setFormData(prev => ({
+      ...prev,
+      costBreakdown: {
+        ...prev.costBreakdown,
+        landValue
+      }
+    }));
+  }, [formData.costBreakdown.landAreaSqft, formData.costBreakdown.landCostPerSqft]);
+
+  // Calculate construction cost automatically
+  useEffect(() => {
+    const constructionCost = formData.costBreakdown.builtUpAreaSqft * formData.costBreakdown.constructionCostPerSqft;
+    setFormData(prev => ({
+      ...prev,
+      costBreakdown: {
+        ...prev.costBreakdown,
+        constructionCost
+      }
+    }));
+  }, [formData.costBreakdown.builtUpAreaSqft, formData.costBreakdown.constructionCostPerSqft]);
+
+  // Calculate GST automatically
+  useEffect(() => {
+    const gstApplicableAmount = formData.costBreakdown.constructionCost;
+    const gstOnConstruction = (gstApplicableAmount * formData.costBreakdown.gstPercent) / 100;
+    
+    setFormData(prev => ({
+      ...prev,
+      costBreakdown: {
+        ...prev.costBreakdown,
+        gstApplicableAmount,
+        gstOnConstruction
+      }
+    }));
+  }, [formData.costBreakdown.constructionCost, formData.costBreakdown.gstPercent]);
+
+  // Calculate registration and stamp duty automatically
+  useEffect(() => {
+    const baseAmount = formData.costBreakdown.landValue + formData.costBreakdown.constructionCost;
+    const registrationStampDuty = ((formData.costBreakdown.registrationPercent + formData.costBreakdown.stampDutyPercent) * baseAmount) / 100;
+    
+    setFormData(prev => ({
+      ...prev,
+      costBreakdown: {
+        ...prev.costBreakdown,
+        registrationStampDuty
+      }
+    }));
+  }, [
+    formData.costBreakdown.landValue,
+    formData.costBreakdown.constructionCost,
+    formData.costBreakdown.registrationPercent,
+    formData.costBreakdown.stampDutyPercent
+  ]);
+
   // Calculate total cost automatically
   useEffect(() => {
-    const total = 
+    const basicCost = 
       formData.costBreakdown.landValue +
       formData.costBreakdown.constructionCost +
       formData.costBreakdown.developmentCharges +
-      formData.costBreakdown.registrationStampDuty +
-      formData.costBreakdown.gstOnConstruction +
+      formData.costBreakdown.infrastructureCost +
+      formData.costBreakdown.elevatorCharges +
+      formData.costBreakdown.powerBackupCharges +
+      formData.costBreakdown.waterConnectionCharges +
+      formData.costBreakdown.sewerageCharges +
       formData.costBreakdown.parkingCharges +
       formData.costBreakdown.clubhouseMaintenance +
+      formData.costBreakdown.amenityCharges;
+
+    const totalTaxes = 
+      formData.costBreakdown.registrationStampDuty +
+      formData.costBreakdown.gstOnConstruction;
+
+    const totalAdditionalCost = 
       formData.costBreakdown.interiorFittings +
       formData.costBreakdown.movingCosts +
       formData.costBreakdown.legalCharges +
-      formData.costBreakdown.hiddenCosts.reduce((sum, cost) => sum + cost.amount, 0);
+      formData.costBreakdown.brokerage +
+      formData.costBreakdown.miscellaneousCost +
+      formData.costBreakdown.hiddenCosts.reduce((sum, cost) => sum + cost.amount, 0) +
+      formData.costBreakdown.constructionBreakdown.reduce((sum, item) => sum + item.amount, 0);
+
+    const totalEstimatedCost = basicCost + totalTaxes + totalAdditionalCost;
 
     setFormData(prev => ({
       ...prev,
       costBreakdown: {
         ...prev.costBreakdown,
-        totalEstimatedCost: total
+        basicCost,
+        totalTaxes,
+        totalAdditionalCost,
+        totalEstimatedCost
       }
     }));
   }, [
     formData.costBreakdown.landValue,
     formData.costBreakdown.constructionCost,
     formData.costBreakdown.developmentCharges,
-    formData.costBreakdown.registrationStampDuty,
-    formData.costBreakdown.gstOnConstruction,
+    formData.costBreakdown.infrastructureCost,
+    formData.costBreakdown.elevatorCharges,
+    formData.costBreakdown.powerBackupCharges,
+    formData.costBreakdown.waterConnectionCharges,
+    formData.costBreakdown.sewerageCharges,
     formData.costBreakdown.parkingCharges,
     formData.costBreakdown.clubhouseMaintenance,
+    formData.costBreakdown.amenityCharges,
+    formData.costBreakdown.registrationStampDuty,
+    formData.costBreakdown.gstOnConstruction,
     formData.costBreakdown.interiorFittings,
     formData.costBreakdown.movingCosts,
     formData.costBreakdown.legalCharges,
-    formData.costBreakdown.hiddenCosts
+    formData.costBreakdown.brokerage,
+    formData.costBreakdown.miscellaneousCost,
+    formData.costBreakdown.hiddenCosts,
+    formData.costBreakdown.constructionBreakdown
   ]);
 
   const saveReportMutation = useMutation({
@@ -270,7 +443,20 @@ export default function ValuationReportEdit() {
         ...prev.costBreakdown,
         hiddenCosts: [
           ...prev.costBreakdown.hiddenCosts,
-          { item: "", amount: 0, description: "" }
+          { item: "", amount: 0, description: "", category: "Other" }
+        ]
+      }
+    }));
+  };
+
+  const addConstructionBreakdown = () => {
+    setFormData(prev => ({
+      ...prev,
+      costBreakdown: {
+        ...prev.costBreakdown,
+        constructionBreakdown: [
+          ...prev.costBreakdown.constructionBreakdown,
+          { component: "", specification: "", rate: 0, quantity: 0, unit: "sqft", amount: 0 }
         ]
       }
     }));
@@ -282,6 +468,16 @@ export default function ValuationReportEdit() {
       costBreakdown: {
         ...prev.costBreakdown,
         hiddenCosts: prev.costBreakdown.hiddenCosts.filter((_, i) => i !== index)
+      }
+    }));
+  };
+
+  const removeConstructionBreakdown = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      costBreakdown: {
+        ...prev.costBreakdown,
+        constructionBreakdown: prev.costBreakdown.constructionBreakdown.filter((_, i) => i !== index)
       }
     }));
   };
@@ -323,7 +519,7 @@ export default function ValuationReportEdit() {
     }));
   };
 
-  const selectedProperty = properties.find(p => p.id === formData.propertyId);
+  const selectedProperty = properties.find((p: Property) => p.id === formData.propertyId);
 
   return (
     <AdminLayout title={`${isEditMode ? "Edit" : "Create"} Valuation Report`}>
@@ -382,7 +578,7 @@ export default function ValuationReportEdit() {
                             <SelectValue placeholder="Select property..." />
                           </SelectTrigger>
                           <SelectContent>
-                            {properties.map((property) => (
+                            {properties.map((property: Property) => (
                               <SelectItem key={property.id} value={property.id}>
                                 {property.name} - {property.developer}
                               </SelectItem>
@@ -421,200 +617,624 @@ export default function ValuationReportEdit() {
                       <Calculator className="h-5 w-5 mr-2" />
                       Cost Breakdown Analysis
                     </CardTitle>
-                    <CardDescription>Detailed cost components and hidden charges</CardDescription>
+                    <CardDescription>Detailed cost components with automatic calculations</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-6">
-                    {/* Main Cost Components */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="landValue">Land Value (₹)</Label>
-                        <Input
-                          id="landValue"
-                          type="number"
-                          value={formData.costBreakdown.landValue}
-                          onChange={(e) => setFormData(prev => ({
-                            ...prev,
-                            costBreakdown: { ...prev.costBreakdown, landValue: Number(e.target.value) }
-                          }))}
-                        />
+                  <CardContent className="space-y-8">
+                    {/* Land Cost Section */}
+                    <div>
+                      <h4 className="text-lg font-medium mb-4 text-gray-800">Land Cost Details</h4>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div>
+                          <Label htmlFor="landAreaSqft">Land Area (sq ft)</Label>
+                          <Input
+                            id="landAreaSqft"
+                            type="number"
+                            value={formData.costBreakdown.landAreaSqft}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, landAreaSqft: Number(e.target.value) }
+                            }))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="landCostPerSqft">Rate per sq ft (₹)</Label>
+                          <Input
+                            id="landCostPerSqft"
+                            type="number"
+                            value={formData.costBreakdown.landCostPerSqft}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, landCostPerSqft: Number(e.target.value) }
+                            }))}
+                          />
+                        </div>
+                        <div>
+                          <Label>Land Value (₹)</Label>
+                          <Input
+                            type="number"
+                            value={formData.costBreakdown.landValue}
+                            readOnly
+                            className="bg-gray-50"
+                          />
+                          <span className="text-xs text-gray-500">Auto-calculated</span>
+                        </div>
                       </div>
-                      <div>
-                        <Label htmlFor="constructionCost">Construction Cost (₹)</Label>
-                        <Input
-                          id="constructionCost"
-                          type="number"
-                          value={formData.costBreakdown.constructionCost}
-                          onChange={(e) => setFormData(prev => ({
-                            ...prev,
-                            costBreakdown: { ...prev.costBreakdown, constructionCost: Number(e.target.value) }
-                          }))}
-                        />
+                    </div>
+
+                    {/* Construction Cost Section */}
+                    <div>
+                      <h4 className="text-lg font-medium mb-4 text-gray-800">Construction Cost Details</h4>
+                      <div className="grid grid-cols-3 gap-4 mb-4">
+                        <div>
+                          <Label htmlFor="builtUpAreaSqft">Built-up Area (sq ft)</Label>
+                          <Input
+                            id="builtUpAreaSqft"
+                            type="number"
+                            value={formData.costBreakdown.builtUpAreaSqft}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, builtUpAreaSqft: Number(e.target.value) }
+                            }))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="constructionCostPerSqft">Construction Rate per sq ft (₹)</Label>
+                          <Input
+                            id="constructionCostPerSqft"
+                            type="number"
+                            value={formData.costBreakdown.constructionCostPerSqft}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, constructionCostPerSqft: Number(e.target.value) }
+                            }))}
+                          />
+                        </div>
+                        <div>
+                          <Label>Construction Cost (₹)</Label>
+                          <Input
+                            type="number"
+                            value={formData.costBreakdown.constructionCost}
+                            readOnly
+                            className="bg-gray-50"
+                          />
+                          <span className="text-xs text-gray-500">Auto-calculated</span>
+                        </div>
                       </div>
+
+                      {/* Construction Breakdown Table */}
                       <div>
-                        <Label htmlFor="developmentCharges">Development Charges (₹)</Label>
-                        <Input
-                          id="developmentCharges"
-                          type="number"
-                          value={formData.costBreakdown.developmentCharges}
-                          onChange={(e) => setFormData(prev => ({
-                            ...prev,
-                            costBreakdown: { ...prev.costBreakdown, developmentCharges: Number(e.target.value) }
-                          }))}
-                        />
+                        <div className="flex items-center justify-between mb-4">
+                          <Label className="text-base">Detailed Construction Breakdown</Label>
+                          <Button type="button" variant="outline" size="sm" onClick={addConstructionBreakdown}>
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Component
+                          </Button>
+                        </div>
+                        {formData.costBreakdown.constructionBreakdown.length > 0 && (
+                          <div className="border rounded-lg overflow-hidden">
+                            <table className="w-full">
+                              <thead className="bg-gray-50">
+                                <tr>
+                                  <th className="px-3 py-2 text-left text-sm font-medium">Component</th>
+                                  <th className="px-3 py-2 text-left text-sm font-medium">Specification</th>
+                                  <th className="px-3 py-2 text-left text-sm font-medium">Rate (₹)</th>
+                                  <th className="px-3 py-2 text-left text-sm font-medium">Quantity</th>
+                                  <th className="px-3 py-2 text-left text-sm font-medium">Unit</th>
+                                  <th className="px-3 py-2 text-left text-sm font-medium">Amount (₹)</th>
+                                  <th className="px-3 py-2 text-left text-sm font-medium">Action</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {formData.costBreakdown.constructionBreakdown.map((item, index) => (
+                                  <tr key={index} className="border-t">
+                                    <td className="px-3 py-2">
+                                      <Input
+                                        placeholder="e.g., RCC Work"
+                                        value={item.component}
+                                        onChange={(e) => {
+                                          const newBreakdown = [...formData.costBreakdown.constructionBreakdown];
+                                          newBreakdown[index].component = e.target.value;
+                                          setFormData(prev => ({
+                                            ...prev,
+                                            costBreakdown: { ...prev.costBreakdown, constructionBreakdown: newBreakdown }
+                                          }));
+                                        }}
+                                      />
+                                    </td>
+                                    <td className="px-3 py-2">
+                                      <Input
+                                        placeholder="Specification"
+                                        value={item.specification}
+                                        onChange={(e) => {
+                                          const newBreakdown = [...formData.costBreakdown.constructionBreakdown];
+                                          newBreakdown[index].specification = e.target.value;
+                                          setFormData(prev => ({
+                                            ...prev,
+                                            costBreakdown: { ...prev.costBreakdown, constructionBreakdown: newBreakdown }
+                                          }));
+                                        }}
+                                      />
+                                    </td>
+                                    <td className="px-3 py-2">
+                                      <Input
+                                        type="number"
+                                        value={item.rate}
+                                        onChange={(e) => {
+                                          const newBreakdown = [...formData.costBreakdown.constructionBreakdown];
+                                          newBreakdown[index].rate = Number(e.target.value);
+                                          newBreakdown[index].amount = Number(e.target.value) * newBreakdown[index].quantity;
+                                          setFormData(prev => ({
+                                            ...prev,
+                                            costBreakdown: { ...prev.costBreakdown, constructionBreakdown: newBreakdown }
+                                          }));
+                                        }}
+                                      />
+                                    </td>
+                                    <td className="px-3 py-2">
+                                      <Input
+                                        type="number"
+                                        value={item.quantity}
+                                        onChange={(e) => {
+                                          const newBreakdown = [...formData.costBreakdown.constructionBreakdown];
+                                          newBreakdown[index].quantity = Number(e.target.value);
+                                          newBreakdown[index].amount = newBreakdown[index].rate * Number(e.target.value);
+                                          setFormData(prev => ({
+                                            ...prev,
+                                            costBreakdown: { ...prev.costBreakdown, constructionBreakdown: newBreakdown }
+                                          }));
+                                        }}
+                                      />
+                                    </td>
+                                    <td className="px-3 py-2">
+                                      <select 
+                                        value={item.unit}
+                                        onChange={(e) => {
+                                          const newBreakdown = [...formData.costBreakdown.constructionBreakdown];
+                                          newBreakdown[index].unit = e.target.value;
+                                          setFormData(prev => ({
+                                            ...prev,
+                                            costBreakdown: { ...prev.costBreakdown, constructionBreakdown: newBreakdown }
+                                          }));
+                                        }}
+                                        className="w-full p-1 border rounded"
+                                      >
+                                        <option value="sqft">sq ft</option>
+                                        <option value="cubic_feet">cu ft</option>
+                                        <option value="nos">Nos</option>
+                                        <option value="running_feet">Rft</option>
+                                        <option value="lump_sum">LS</option>
+                                      </select>
+                                    </td>
+                                    <td className="px-3 py-2">
+                                      <Input
+                                        type="number"
+                                        value={item.amount}
+                                        readOnly
+                                        className="bg-gray-50"
+                                      />
+                                    </td>
+                                    <td className="px-3 py-2">
+                                      <Button variant="ghost" size="sm" onClick={() => removeConstructionBreakdown(index)}>
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
                       </div>
-                      <div>
-                        <Label htmlFor="registrationStampDuty">Registration & Stamp Duty (₹)</Label>
-                        <Input
-                          id="registrationStampDuty"
-                          type="number"
-                          value={formData.costBreakdown.registrationStampDuty}
-                          onChange={(e) => setFormData(prev => ({
-                            ...prev,
-                            costBreakdown: { ...prev.costBreakdown, registrationStampDuty: Number(e.target.value) }
-                          }))}
-                        />
+                    </div>
+
+                    {/* Infrastructure & Development */}
+                    <div>
+                      <h4 className="text-lg font-medium mb-4 text-gray-800">Infrastructure & Development Charges</h4>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div>
+                          <Label htmlFor="developmentCharges">Development Charges (₹)</Label>
+                          <Input
+                            id="developmentCharges"
+                            type="number"
+                            value={formData.costBreakdown.developmentCharges}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, developmentCharges: Number(e.target.value) }
+                            }))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="infrastructureCost">Infrastructure Cost (₹)</Label>
+                          <Input
+                            id="infrastructureCost"
+                            type="number"
+                            value={formData.costBreakdown.infrastructureCost}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, infrastructureCost: Number(e.target.value) }
+                            }))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="elevatorCharges">Elevator Charges (₹)</Label>
+                          <Input
+                            id="elevatorCharges"
+                            type="number"
+                            value={formData.costBreakdown.elevatorCharges}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, elevatorCharges: Number(e.target.value) }
+                            }))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="powerBackupCharges">Power Backup Charges (₹)</Label>
+                          <Input
+                            id="powerBackupCharges"
+                            type="number"
+                            value={formData.costBreakdown.powerBackupCharges}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, powerBackupCharges: Number(e.target.value) }
+                            }))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="waterConnectionCharges">Water Connection (₹)</Label>
+                          <Input
+                            id="waterConnectionCharges"
+                            type="number"
+                            value={formData.costBreakdown.waterConnectionCharges}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, waterConnectionCharges: Number(e.target.value) }
+                            }))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="sewerageCharges">Sewerage Charges (₹)</Label>
+                          <Input
+                            id="sewerageCharges"
+                            type="number"
+                            value={formData.costBreakdown.sewerageCharges}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, sewerageCharges: Number(e.target.value) }
+                            }))}
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <Label htmlFor="gstOnConstruction">GST on Construction (₹)</Label>
-                        <Input
-                          id="gstOnConstruction"
-                          type="number"
-                          value={formData.costBreakdown.gstOnConstruction}
-                          onChange={(e) => setFormData(prev => ({
-                            ...prev,
-                            costBreakdown: { ...prev.costBreakdown, gstOnConstruction: Number(e.target.value) }
-                          }))}
-                        />
+                    </div>
+
+                    {/* Parking & Amenities */}
+                    <div>
+                      <h4 className="text-lg font-medium mb-4 text-gray-800">Parking & Amenities</h4>
+                      <div className="grid grid-cols-4 gap-4">
+                        <div>
+                          <Label htmlFor="parkingSpaces">Parking Spaces</Label>
+                          <Input
+                            id="parkingSpaces"
+                            type="number"
+                            value={formData.costBreakdown.parkingSpaces}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, parkingSpaces: Number(e.target.value) }
+                            }))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="parkingCharges">Parking Charges (₹)</Label>
+                          <Input
+                            id="parkingCharges"
+                            type="number"
+                            value={formData.costBreakdown.parkingCharges}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, parkingCharges: Number(e.target.value) }
+                            }))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="clubhouseMaintenance">Clubhouse Maintenance (₹)</Label>
+                          <Input
+                            id="clubhouseMaintenance"
+                            type="number"
+                            value={formData.costBreakdown.clubhouseMaintenance}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, clubhouseMaintenance: Number(e.target.value) }
+                            }))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="amenityCharges">Amenity Charges (₹)</Label>
+                          <Input
+                            id="amenityCharges"
+                            type="number"
+                            value={formData.costBreakdown.amenityCharges}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, amenityCharges: Number(e.target.value) }
+                            }))}
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <Label htmlFor="parkingCharges">Parking Charges (₹)</Label>
-                        <Input
-                          id="parkingCharges"
-                          type="number"
-                          value={formData.costBreakdown.parkingCharges}
-                          onChange={(e) => setFormData(prev => ({
-                            ...prev,
-                            costBreakdown: { ...prev.costBreakdown, parkingCharges: Number(e.target.value) }
-                          }))}
-                        />
+                    </div>
+
+                    {/* Tax Calculations */}
+                    <div>
+                      <h4 className="text-lg font-medium mb-4 text-gray-800">Tax & Legal Charges</h4>
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                          <h5 className="font-medium text-gray-700">GST Calculation</h5>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <Label htmlFor="gstPercent">GST Rate (%)</Label>
+                              <Input
+                                id="gstPercent"
+                                type="number"
+                                step="0.1"
+                                value={formData.costBreakdown.gstPercent}
+                                onChange={(e) => setFormData(prev => ({
+                                  ...prev,
+                                  costBreakdown: { ...prev.costBreakdown, gstPercent: Number(e.target.value) }
+                                }))}
+                              />
+                            </div>
+                            <div>
+                              <Label>GST Amount (₹)</Label>
+                              <Input
+                                type="number"
+                                value={formData.costBreakdown.gstOnConstruction}
+                                readOnly
+                                className="bg-gray-50"
+                              />
+                              <span className="text-xs text-gray-500">Auto-calculated on construction cost</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="space-y-4">
+                          <h5 className="font-medium text-gray-700">Registration & Stamp Duty</h5>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <Label htmlFor="registrationPercent">Registration (%)</Label>
+                              <Input
+                                id="registrationPercent"
+                                type="number"
+                                step="0.1"
+                                value={formData.costBreakdown.registrationPercent}
+                                onChange={(e) => setFormData(prev => ({
+                                  ...prev,
+                                  costBreakdown: { ...prev.costBreakdown, registrationPercent: Number(e.target.value) }
+                                }))}
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="stampDutyPercent">Stamp Duty (%)</Label>
+                              <Input
+                                id="stampDutyPercent"
+                                type="number"
+                                step="0.1"
+                                value={formData.costBreakdown.stampDutyPercent}
+                                onChange={(e) => setFormData(prev => ({
+                                  ...prev,
+                                  costBreakdown: { ...prev.costBreakdown, stampDutyPercent: Number(e.target.value) }
+                                }))}
+                              />
+                            </div>
+                            <div className="col-span-2">
+                              <Label>Total Registration & Stamp Duty (₹)</Label>
+                              <Input
+                                type="number"
+                                value={formData.costBreakdown.registrationStampDuty}
+                                readOnly
+                                className="bg-gray-50"
+                              />
+                              <span className="text-xs text-gray-500">Auto-calculated on land + construction value</span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
                     {/* Additional Costs */}
-                    <div className="grid grid-cols-3 gap-4">
-                      <div>
-                        <Label htmlFor="clubhouseMaintenance">Clubhouse Maintenance (₹)</Label>
-                        <Input
-                          id="clubhouseMaintenance"
-                          type="number"
-                          value={formData.costBreakdown.clubhouseMaintenance}
-                          onChange={(e) => setFormData(prev => ({
-                            ...prev,
-                            costBreakdown: { ...prev.costBreakdown, clubhouseMaintenance: Number(e.target.value) }
-                          }))}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="interiorFittings">Interior Fittings (₹)</Label>
-                        <Input
-                          id="interiorFittings"
-                          type="number"
-                          value={formData.costBreakdown.interiorFittings}
-                          onChange={(e) => setFormData(prev => ({
-                            ...prev,
-                            costBreakdown: { ...prev.costBreakdown, interiorFittings: Number(e.target.value) }
-                          }))}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="movingCosts">Moving Costs (₹)</Label>
-                        <Input
-                          id="movingCosts"
-                          type="number"
-                          value={formData.costBreakdown.movingCosts}
-                          onChange={(e) => setFormData(prev => ({
-                            ...prev,
-                            costBreakdown: { ...prev.costBreakdown, movingCosts: Number(e.target.value) }
-                          }))}
-                        />
-                      </div>
-                    </div>
-
                     <div>
-                      <Label htmlFor="legalCharges">Legal Charges (₹)</Label>
-                      <Input
-                        id="legalCharges"
-                        type="number"
-                        value={formData.costBreakdown.legalCharges}
-                        onChange={(e) => setFormData(prev => ({
-                          ...prev,
-                          costBreakdown: { ...prev.costBreakdown, legalCharges: Number(e.target.value) }
-                        }))}
-                      />
+                      <h4 className="text-lg font-medium mb-4 text-gray-800">Additional Costs</h4>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div>
+                          <Label htmlFor="interiorFittings">Interior Fittings (₹)</Label>
+                          <Input
+                            id="interiorFittings"
+                            type="number"
+                            value={formData.costBreakdown.interiorFittings}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, interiorFittings: Number(e.target.value) }
+                            }))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="movingCosts">Moving Costs (₹)</Label>
+                          <Input
+                            id="movingCosts"
+                            type="number"
+                            value={formData.costBreakdown.movingCosts}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, movingCosts: Number(e.target.value) }
+                            }))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="legalCharges">Legal Charges (₹)</Label>
+                          <Input
+                            id="legalCharges"
+                            type="number"
+                            value={formData.costBreakdown.legalCharges}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, legalCharges: Number(e.target.value) }
+                            }))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="brokerage">Brokerage (₹)</Label>
+                          <Input
+                            id="brokerage"
+                            type="number"
+                            value={formData.costBreakdown.brokerage}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, brokerage: Number(e.target.value) }
+                            }))}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="miscellaneousCost">Miscellaneous (₹)</Label>
+                          <Input
+                            id="miscellaneousCost"
+                            type="number"
+                            value={formData.costBreakdown.miscellaneousCost}
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              costBreakdown: { ...prev.costBreakdown, miscellaneousCost: Number(e.target.value) }
+                            }))}
+                          />
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Hidden Costs */}
+                    {/* Hidden Costs Table */}
                     <div>
                       <div className="flex items-center justify-between mb-4">
-                        <Label>Hidden Costs</Label>
+                        <Label className="text-base">Hidden/Additional Costs</Label>
                         <Button type="button" variant="outline" size="sm" onClick={addHiddenCost}>
                           <Plus className="h-4 w-4 mr-2" />
                           Add Hidden Cost
                         </Button>
                       </div>
-                      {formData.costBreakdown.hiddenCosts.map((cost, index) => (
-                        <div key={index} className="grid grid-cols-4 gap-2 mb-2">
-                          <Input
-                            placeholder="Cost item"
-                            value={cost.item}
-                            onChange={(e) => {
-                              const newHiddenCosts = [...formData.costBreakdown.hiddenCosts];
-                              newHiddenCosts[index].item = e.target.value;
-                              setFormData(prev => ({
-                                ...prev,
-                                costBreakdown: { ...prev.costBreakdown, hiddenCosts: newHiddenCosts }
-                              }));
-                            }}
-                          />
-                          <Input
-                            type="number"
-                            placeholder="Amount"
-                            value={cost.amount}
-                            onChange={(e) => {
-                              const newHiddenCosts = [...formData.costBreakdown.hiddenCosts];
-                              newHiddenCosts[index].amount = Number(e.target.value);
-                              setFormData(prev => ({
-                                ...prev,
-                                costBreakdown: { ...prev.costBreakdown, hiddenCosts: newHiddenCosts }
-                              }));
-                            }}
-                          />
-                          <Input
-                            placeholder="Description"
-                            value={cost.description}
-                            onChange={(e) => {
-                              const newHiddenCosts = [...formData.costBreakdown.hiddenCosts];
-                              newHiddenCosts[index].description = e.target.value;
-                              setFormData(prev => ({
-                                ...prev,
-                                costBreakdown: { ...prev.costBreakdown, hiddenCosts: newHiddenCosts }
-                              }));
-                            }}
-                          />
-                          <Button variant="ghost" size="sm" onClick={() => removeHiddenCost(index)}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                      {formData.costBreakdown.hiddenCosts.length > 0 && (
+                        <div className="border rounded-lg overflow-hidden">
+                          <table className="w-full">
+                            <thead className="bg-gray-50">
+                              <tr>
+                                <th className="px-3 py-2 text-left text-sm font-medium">Cost Item</th>
+                                <th className="px-3 py-2 text-left text-sm font-medium">Category</th>
+                                <th className="px-3 py-2 text-left text-sm font-medium">Amount (₹)</th>
+                                <th className="px-3 py-2 text-left text-sm font-medium">Description</th>
+                                <th className="px-3 py-2 text-left text-sm font-medium">Action</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {formData.costBreakdown.hiddenCosts.map((cost, index) => (
+                                <tr key={index} className="border-t">
+                                  <td className="px-3 py-2">
+                                    <Input
+                                      placeholder="e.g., Society Formation"
+                                      value={cost.item}
+                                      onChange={(e) => {
+                                        const newHiddenCosts = [...formData.costBreakdown.hiddenCosts];
+                                        newHiddenCosts[index].item = e.target.value;
+                                        setFormData(prev => ({
+                                          ...prev,
+                                          costBreakdown: { ...prev.costBreakdown, hiddenCosts: newHiddenCosts }
+                                        }));
+                                      }}
+                                    />
+                                  </td>
+                                  <td className="px-3 py-2">
+                                    <select 
+                                      value={cost.category}
+                                      onChange={(e) => {
+                                        const newHiddenCosts = [...formData.costBreakdown.hiddenCosts];
+                                        newHiddenCosts[index].category = e.target.value;
+                                        setFormData(prev => ({
+                                          ...prev,
+                                          costBreakdown: { ...prev.costBreakdown, hiddenCosts: newHiddenCosts }
+                                        }));
+                                      }}
+                                      className="w-full p-1 border rounded"
+                                    >
+                                      <option value="Legal">Legal</option>
+                                      <option value="Society">Society</option>
+                                      <option value="Utility">Utility</option>
+                                      <option value="Maintenance">Maintenance</option>
+                                      <option value="Other">Other</option>
+                                    </select>
+                                  </td>
+                                  <td className="px-3 py-2">
+                                    <Input
+                                      type="number"
+                                      placeholder="Amount"
+                                      value={cost.amount}
+                                      onChange={(e) => {
+                                        const newHiddenCosts = [...formData.costBreakdown.hiddenCosts];
+                                        newHiddenCosts[index].amount = Number(e.target.value);
+                                        setFormData(prev => ({
+                                          ...prev,
+                                          costBreakdown: { ...prev.costBreakdown, hiddenCosts: newHiddenCosts }
+                                        }));
+                                      }}
+                                    />
+                                  </td>
+                                  <td className="px-3 py-2">
+                                    <Input
+                                      placeholder="Description"
+                                      value={cost.description}
+                                      onChange={(e) => {
+                                        const newHiddenCosts = [...formData.costBreakdown.hiddenCosts];
+                                        newHiddenCosts[index].description = e.target.value;
+                                        setFormData(prev => ({
+                                          ...prev,
+                                          costBreakdown: { ...prev.costBreakdown, hiddenCosts: newHiddenCosts }
+                                        }));
+                                      }}
+                                    />
+                                  </td>
+                                  <td className="px-3 py-2">
+                                    <Button variant="ghost" size="sm" onClick={() => removeHiddenCost(index)}>
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
-                      ))}
+                      )}
                     </div>
 
-                    {/* Total Cost Display */}
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                      <div className="text-lg font-semibold text-blue-900">
-                        Total Estimated Cost: ₹{formData.costBreakdown.totalEstimatedCost.toLocaleString()}
-                      </div>
-                      <div className="text-sm text-blue-600 mt-1">
-                        This includes all components and hidden costs
+                    {/* Cost Summary */}
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200">
+                      <h4 className="text-lg font-semibold text-blue-900 mb-4">Cost Summary</h4>
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-3">
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Basic Cost:</span>
+                            <span className="font-medium">₹{formData.costBreakdown.basicCost.toLocaleString()}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Total Taxes:</span>
+                            <span className="font-medium">₹{formData.costBreakdown.totalTaxes.toLocaleString()}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Additional Costs:</span>
+                            <span className="font-medium">₹{formData.costBreakdown.totalAdditionalCost.toLocaleString()}</span>
+                          </div>
+                        </div>
+                        <div className="border-l border-blue-300 pl-6">
+                          <div className="text-2xl font-bold text-blue-900">
+                            ₹{formData.costBreakdown.totalEstimatedCost.toLocaleString()}
+                          </div>
+                          <div className="text-sm text-blue-600 mt-1">
+                            Total Estimated Cost
+                          </div>
+                          {formData.costBreakdown.builtUpAreaSqft > 0 && (
+                            <div className="text-sm text-blue-600 mt-2">
+                              ₹{Math.round(formData.costBreakdown.totalEstimatedCost / formData.costBreakdown.builtUpAreaSqft).toLocaleString()} per sq ft
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </CardContent>
