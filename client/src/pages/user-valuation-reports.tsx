@@ -424,7 +424,7 @@ export default function UserValuationReports() {
               <p className="text-sm text-gray-500">Personalized valuation reports for your property investments</p>
             </div>
             <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-              {mockReports.length} Reports Available
+              {filteredReports.length} Reports Available
             </Badge>
           </div>
           
@@ -439,7 +439,7 @@ export default function UserValuationReports() {
               />
             </div>
             <div className="text-sm text-gray-500">
-              Total Portfolio Value: <span className="font-semibold text-green-600">₹{(mockReports.reduce((sum, report) => sum + (report.costBreakdown?.totalEstimatedCost || 0), 0) / 100000).toFixed(1)}L</span>
+              Total Portfolio Value: <span className="font-semibold text-green-600">₹{(filteredReports.reduce((sum, report) => sum + (report.costBreakdown?.totalEstimatedCost || 0), 0) / 100000).toFixed(1)}L</span>
             </div>
           </div>
         </div>
