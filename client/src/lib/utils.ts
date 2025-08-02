@@ -11,8 +11,8 @@ export function formatPrice(price: number): string {
   return `₹${(price / 100).toFixed(2)} Cr`;
 }
 
-// Format price for display with appropriate precision
-export function formatPriceDisplay(price: number): string {
+// Format price for display with appropriate precision  
+export function formatPriceCrores(price: number): string {
   if (price === 0) return "₹0 Cr";
   const crores = price / 100;
   return `₹${crores.toFixed(1)} Cr`;
@@ -28,4 +28,15 @@ export function formatPriceInCrores(price: number): string {
     const lakhs = price / 100000; // Convert to lakhs (1 lakh = 100,000)
     return `₹${lakhs.toFixed(2)} L`;
   }
+}
+
+// Format price range display for properties
+export function formatPriceDisplay(startingPrice: number, maxPrice?: number): string {
+  const formatLakhs = (price: number) => `₹${price}L`;
+  
+  if (!maxPrice || maxPrice === startingPrice) {
+    return formatLakhs(startingPrice);
+  }
+  
+  return `${formatLakhs(startingPrice)} - ${formatLakhs(maxPrice)}`;
 }

@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminProperties from "@/pages/admin/properties";
+import PropertiesView from "@/pages/admin/properties-view";
+import PropertiesAdd from "@/pages/admin/properties-add";
 import AdminAnalytics from "@/pages/admin/analytics";
 import AdminZones from "@/pages/admin/zones";
 import AdminDevelopers from "@/pages/admin/developers";
@@ -36,6 +38,8 @@ function Router() {
       <Route path="/admin" component={Home} />
       <Route path="/admin-panel" component={AdminDashboard} />
       <Route path="/admin-panel/properties" component={AdminProperties} />
+      <Route path="/admin-panel/properties/view" component={PropertiesView} />
+      <Route path="/admin-panel/properties/add" component={PropertiesAdd} />
       <Route path="/admin-panel/analytics" component={AdminAnalytics} />
       <Route path="/admin-panel/developers" component={AdminDevelopers} />
       <Route path="/admin-panel/zones" component={AdminZones} />
