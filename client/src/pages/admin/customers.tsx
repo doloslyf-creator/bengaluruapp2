@@ -18,7 +18,25 @@ import {
   Filter,
   Star,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Users,
+  Target,
+  BookOpen,
+  ShoppingCart,
+  Send,
+  BarChart3,
+  Plus,
+  Download,
+  Upload,
+  Settings,
+  RefreshCw,
+  CalendarDays,
+  PieChart,
+  Activity,
+  UserCheck,
+  Zap,
+  Heart,
+  Briefcase
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -70,6 +88,7 @@ export default function Customers() {
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerProfile | null>(null);
   const [showCustomerDialog, setShowCustomerDialog] = useState(false);
   const [newNote, setNewNote] = useState("");
+  const [activeTab, setActiveTab] = useState("overview");
 
   const { data: customers = [], isLoading } = useQuery<CustomerProfile[]>({
     queryKey: ["/api/customers"],
@@ -159,350 +178,498 @@ export default function Customers() {
     updateCustomerStatusMutation.mutate({ customerId, status: newStatus });
   };
 
+  // Sub-menu items for customer management
+  const customerMenuItems = [
+    {
+      id: "overview",
+      title: "Overview",
+      icon: Users,
+      description: "Customer dashboard & analytics",
+      badge: stats?.totalCustomers || 0
+    },
+    {
+      id: "leads",
+      title: "Lead Management",
+      icon: Target,
+      description: "Lead scoring & qualification",
+      badge: stats?.hotLeads || 0
+    },
+    {
+      id: "bookings",
+      title: "Bookings & Visits",
+      icon: CalendarDays,
+      description: "Site visits & scheduling",
+      badge: filteredCustomers.reduce((sum, c) => sum + c.bookings.length, 0)
+    },
+    {
+      id: "orders",
+      title: "Orders & Revenue",
+      icon: ShoppingCart,
+      description: "Orders & payment tracking",
+      badge: stats?.convertedCustomers || 0
+    },
+    {
+      id: "communications",
+      title: "Communications",
+      icon: Send,
+      description: "Email campaigns & history",
+      badge: "New"
+    },
+    {
+      id: "analytics",
+      title: "Analytics & Reports",
+      icon: BarChart3,
+      description: "Performance insights",
+      badge: `₹${Math.round((stats?.totalRevenue || 0) / 1000)}K`
+    }
+  ];
+
   return (
     <AdminLayout title="Customer Management">
       <div className="flex flex-col h-full">
-        {/* Header */}
+        {/* Enhanced Header with Actions */}
         <header className="border-b border-gray-200 bg-white px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-medium text-gray-900">Customer CRM</h2>
-              <p className="text-sm text-gray-600">Manage customer relationships and track interactions</p>
+              <h2 className="text-xl font-semibold text-gray-900">Customer Management</h2>
+              <p className="text-sm text-gray-600">Comprehensive CRM for property advisory services</p>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  type="text"
-                  placeholder="Search customers..."
-                  className="w-80 pl-10 pr-4 py-2"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-40">
-                  <Filter className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="hot">Hot Leads</SelectItem>
-                  <SelectItem value="warm">Warm</SelectItem>
-                  <SelectItem value="cold">Cold</SelectItem>
-                  <SelectItem value="converted">Converted</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="flex items-center space-x-3">
+              <Button variant="outline" size="sm">
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+              <Button variant="outline" size="sm">
+                <Upload className="h-4 w-4 mr-2" />
+                Import
+              </Button>
+              <Button size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Customer
+              </Button>
             </div>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-6">
-          {/* Stats Cards */}
-          {stats && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+        {/* Sub-Menu Navigation */}
+        <div className="bg-gray-50 border-b border-gray-200 px-6 py-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+            {customerMenuItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`relative p-3 rounded-lg text-left transition-all duration-200 ${
+                  activeTab === item.id
+                    ? "bg-white shadow-md ring-1 ring-blue-200 text-blue-700"
+                    : "bg-white/50 hover:bg-white hover:shadow-sm text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <div className={`p-2 rounded-md ${
+                    activeTab === item.id ? "bg-blue-100" : "bg-gray-100"
+                  }`}>
+                    <item.icon className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{item.title}</p>
+                    <p className="text-xs opacity-75 truncate">{item.description}</p>
+                  </div>
+                </div>
+                {item.badge && (
+                  <div className="absolute -top-1 -right-1">
+                    <Badge 
+                      variant={typeof item.badge === 'number' ? "default" : "secondary"}
+                      className="text-xs"
+                    >
+                      {item.badge}
+                    </Badge>
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        <div className="flex-1 p-6">
+          {activeTab === "overview" && (
+            <div className="space-y-6">
+              {/* Stats Cards */}
+              {stats && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">Total Customers</p>
+                          <p className="text-2xl font-bold text-gray-900">{stats.totalCustomers}</p>
+                        </div>
+                        <Users className="h-8 w-8 text-blue-600" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">Hot Leads</p>
+                          <p className="text-2xl font-bold text-red-600">{stats.hotLeads}</p>
+                        </div>
+                        <TrendingUp className="h-8 w-8 text-red-600" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">Converted</p>
+                          <p className="text-2xl font-bold text-green-600">{stats.convertedCustomers}</p>
+                        </div>
+                        <CheckCircle className="h-8 w-8 text-green-600" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">Total Revenue</p>
+                          <p className="text-2xl font-bold text-purple-600">₹{Math.round(stats.totalRevenue / 1000)}K</p>
+                        </div>
+                        <DollarSign className="h-8 w-8 text-purple-600" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">Avg Order</p>
+                          <p className="text-2xl font-bold text-orange-600">₹{Math.round(stats.avgOrderValue / 1000)}K</p>
+                        </div>
+                        <Target className="h-8 w-8 text-orange-600" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+
+              {/* Search and Filters */}
+              <div className="flex items-center space-x-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    type="text"
+                    placeholder="Search customers..."
+                    className="w-80 pl-10 pr-4 py-2"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-40">
+                    <Filter className="h-4 w-4 mr-2" />
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="hot">Hot Leads</SelectItem>
+                    <SelectItem value="warm">Warm</SelectItem>
+                    <SelectItem value="cold">Cold</SelectItem>
+                    <SelectItem value="converted">Converted</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Customer Table */}
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Customers</CardTitle>
-                  <User className="h-4 w-4 text-muted-foreground" />
+                <CardHeader>
+                  <CardTitle>Customer Database</CardTitle>
+                  <CardDescription>
+                    Unified view of all customer interactions and touchpoints
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalCustomers}</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Hot Leads</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-red-600">{stats.hotLeads}</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Converted</CardTitle>
-                  <CheckCircle className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-green-600">{stats.convertedCustomers}</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">₹{stats.totalRevenue.toLocaleString()}</div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Avg Order Value</CardTitle>
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">₹{stats.avgOrderValue.toLocaleString()}</div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Customer</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Lead Score</TableHead>
+                        <TableHead>Orders</TableHead>
+                        <TableHead>Total Spent</TableHead>
+                        <TableHead>Last Activity</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredCustomers.map((customer) => (
+                        <TableRow key={customer.id}>
+                          <TableCell>
+                            <div>
+                              <div className="font-medium">{customer.name}</div>
+                              <div className="text-sm text-gray-500">{customer.email}</div>
+                              <div className="text-sm text-gray-500">{customer.phone}</div>
+                            </div>
+                          </TableCell>
+                          <TableCell>{getStatusBadge(customer.status)}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center">
+                              <span className="mr-2">{customer.leadScore}/100</span>
+                              <div className="w-16 bg-gray-200 rounded-full h-2">
+                                <div 
+                                  className="bg-blue-600 h-2 rounded-full" 
+                                  style={{ width: `${customer.leadScore}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <span className="font-medium">{customer.totalOrders}</span>
+                          </TableCell>
+                          <TableCell>
+                            <span className="font-medium">₹{customer.totalSpent.toLocaleString()}</span>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm">
+                              {format(new Date(customer.lastActivity), 'MMM dd, yyyy')}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => setSelectedCustomer(customer)}
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                                <DialogHeader>
+                                  <DialogTitle>Customer Profile: {customer.name}</DialogTitle>
+                                  <DialogDescription>
+                                    Comprehensive customer relationship data
+                                  </DialogDescription>
+                                </DialogHeader>
+                                {selectedCustomer && (
+                                  <Tabs defaultValue="overview" className="w-full">
+                                    <TabsList className="grid w-full grid-cols-4">
+                                      <TabsTrigger value="overview">Overview</TabsTrigger>
+                                      <TabsTrigger value="activities">Activities</TabsTrigger>
+                                      <TabsTrigger value="orders">Orders</TabsTrigger>
+                                      <TabsTrigger value="notes">Notes</TabsTrigger>
+                                    </TabsList>
+                                    <TabsContent value="overview" className="space-y-4">
+                                      <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                          <h4 className="font-medium">Contact Information</h4>
+                                          <div className="space-y-2 text-sm">
+                                            <div className="flex items-center"><Mail className="h-4 w-4 mr-2" />{selectedCustomer.email}</div>
+                                            <div className="flex items-center"><Phone className="h-4 w-4 mr-2" />{selectedCustomer.phone}</div>
+                                          </div>
+                                        </div>
+                                        <div>
+                                          <h4 className="font-medium">Status & Scoring</h4>
+                                          <div className="space-y-2">
+                                            {getStatusBadge(selectedCustomer.status)}
+                                            <div className="text-sm">Lead Score: {selectedCustomer.leadScore}/100</div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </TabsContent>
+                                    <TabsContent value="activities" className="space-y-4">
+                                      <div>
+                                        <h4 className="font-medium mb-3">Recent Activities</h4>
+                                        <div className="space-y-3">
+                                          {selectedCustomer.leads.length > 0 && (
+                                            <div>
+                                              <h5 className="text-sm font-medium">Leads ({selectedCustomer.leads.length})</h5>
+                                              {selectedCustomer.leads.slice(0, 3).map((lead, idx) => (
+                                                <div key={idx} className="text-sm text-gray-600 ml-4">
+                                                  • {lead.customerName} - {lead.source}
+                                                </div>
+                                              ))}
+                                            </div>
+                                          )}
+                                          {selectedCustomer.bookings.length > 0 && (
+                                            <div>
+                                              <h5 className="text-sm font-medium">Bookings ({selectedCustomer.bookings.length})</h5>
+                                              {selectedCustomer.bookings.slice(0, 3).map((booking, idx) => (
+                                                <div key={idx} className="text-sm text-gray-600 ml-4">
+                                                  • {booking.propertyName} - {format(new Date(booking.visitDate), 'MMM dd, yyyy')}
+                                                </div>
+                                              ))}
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </TabsContent>
+                                    <TabsContent value="orders" className="space-y-4">
+                                      <div>
+                                        <h4 className="font-medium mb-3">Order History ({selectedCustomer.orders.length})</h4>
+                                        <div className="space-y-2">
+                                          {selectedCustomer.orders.map((order, idx) => (
+                                            <div key={idx} className="flex justify-between items-center p-3 bg-gray-50 rounded">
+                                              <div>
+                                                <div className="font-medium">{order.reportType}</div>
+                                                <div className="text-sm text-gray-600">{format(new Date(order.createdAt), 'MMM dd, yyyy')}</div>
+                                              </div>
+                                              <div className="text-right">
+                                                <div className="font-medium">₹{order.amount}</div>
+                                                <div className="text-sm text-green-600">{order.status}</div>
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    </TabsContent>
+                                    <TabsContent value="notes" className="space-y-4">
+                                      <div>
+                                        <h4 className="font-medium mb-3">Customer Notes</h4>
+                                        <div className="space-y-3">
+                                          <div className="flex space-x-2">
+                                            <Textarea 
+                                              placeholder="Add a note about this customer..."
+                                              value={newNote}
+                                              onChange={(e) => setNewNote(e.target.value)}
+                                            />
+                                            <Button onClick={handleAddNote} disabled={!newNote.trim()}>
+                                              Add Note
+                                            </Button>
+                                          </div>
+                                          {selectedCustomer.notes && selectedCustomer.notes.map((note, idx) => (
+                                            <div key={idx} className="p-3 bg-gray-50 rounded">
+                                              <div className="text-sm">{note.content}</div>
+                                              <div className="text-xs text-gray-500 mt-1">{format(new Date(note.createdAt), 'MMM dd, yyyy HH:mm')}</div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    </TabsContent>
+                                  </Tabs>
+                                )}
+                              </DialogContent>
+                            </Dialog>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </CardContent>
               </Card>
             </div>
           )}
 
-          {/* Customers Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Customer Database</CardTitle>
-              <CardDescription>
-                Unified view of all customer interactions and touchpoints
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <div className="text-center py-8">
-                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-r-transparent"></div>
-                  <p className="mt-2 text-gray-600">Loading customers...</p>
-                </div>
-              ) : filteredCustomers.length === 0 ? (
-                <div className="text-center py-8">
-                  <div className="text-gray-400 mb-4">
-                    <User className="mx-auto h-12 w-12" />
+          {/* Other Tab Content Placeholders */}
+          {activeTab === "leads" && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Target className="h-5 w-5 mr-2" />
+                    Lead Management Dashboard
+                  </CardTitle>
+                  <CardDescription>
+                    Manage lead scoring, qualification, and nurturing campaigns
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-12 text-gray-500">
+                    Lead management features coming soon...
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No customers found</h3>
-                  <p className="text-gray-600">
-                    {searchQuery || statusFilter !== "all" ? "Try adjusting your search or filters" : "Customers will appear here as they interact with your properties"}
-                  </p>
-                </div>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Customer</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Lead Score</TableHead>
-                      <TableHead>Orders</TableHead>
-                      <TableHead>Total Spent</TableHead>
-                      <TableHead>Last Activity</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredCustomers.map((customer) => (
-                      <TableRow key={customer.id}>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">{customer.name}</div>
-                            <div className="text-sm text-gray-500">{customer.email}</div>
-                            <div className="text-sm text-gray-500">{customer.phone}</div>
-                          </div>
-                        </TableCell>
-                        <TableCell>{getStatusBadge(customer.status)}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center">
-                            <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                              <div 
-                                className="bg-primary h-2 rounded-full" 
-                                style={{ width: `${customer.leadScore}%` }}
-                              ></div>
-                            </div>
-                            <span className="text-sm">{customer.leadScore}/100</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>{customer.totalOrders}</TableCell>
-                        <TableCell>₹{customer.totalSpent.toLocaleString()}</TableCell>
-                        <TableCell>{format(new Date(customer.lastActivity), "MMM dd, yyyy")}</TableCell>
-                        <TableCell>
-                          <Dialog open={showCustomerDialog && selectedCustomer?.id === customer.id} onOpenChange={(open) => {
-                            setShowCustomerDialog(open);
-                            if (open) setSelectedCustomer(customer);
-                          }}>
-                            <DialogTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                              <DialogHeader>
-                                <DialogTitle className="flex items-center space-x-2">
-                                  <User className="h-5 w-5" />
-                                  <span>{customer.name}</span>
-                                  {getStatusBadge(customer.status)}
-                                </DialogTitle>
-                                <DialogDescription>
-                                  Complete customer profile and interaction history
-                                </DialogDescription>
-                              </DialogHeader>
-                              
-                              {selectedCustomer && (
-                                <Tabs defaultValue="overview" className="w-full">
-                                  <TabsList className="grid w-full grid-cols-5">
-                                    <TabsTrigger value="overview">Overview</TabsTrigger>
-                                    <TabsTrigger value="leads">Leads</TabsTrigger>
-                                    <TabsTrigger value="bookings">Bookings</TabsTrigger>
-                                    <TabsTrigger value="orders">Orders</TabsTrigger>
-                                    <TabsTrigger value="notes">Notes</TabsTrigger>
-                                  </TabsList>
-                                  
-                                  <TabsContent value="overview" className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                      <Card>
-                                        <CardHeader>
-                                          <CardTitle className="text-sm">Contact Information</CardTitle>
-                                        </CardHeader>
-                                        <CardContent className="space-y-2">
-                                          <div className="flex items-center space-x-2">
-                                            <Mail className="h-4 w-4 text-gray-400" />
-                                            <span>{selectedCustomer.email}</span>
-                                          </div>
-                                          <div className="flex items-center space-x-2">
-                                            <Phone className="h-4 w-4 text-gray-400" />
-                                            <span>{selectedCustomer.phone}</span>
-                                          </div>
-                                        </CardContent>
-                                      </Card>
-                                      
-                                      <Card>
-                                        <CardHeader>
-                                          <CardTitle className="text-sm">Customer Metrics</CardTitle>
-                                        </CardHeader>
-                                        <CardContent className="space-y-2">
-                                          <div>Lead Score: {selectedCustomer.leadScore}/100</div>
-                                          <div>Total Orders: {selectedCustomer.totalOrders}</div>
-                                          <div>Total Spent: ₹{selectedCustomer.totalSpent.toLocaleString()}</div>
-                                          <div>Source: {selectedCustomer.source}</div>
-                                        </CardContent>
-                                      </Card>
-                                    </div>
-                                    
-                                    <Card>
-                                      <CardHeader>
-                                        <CardTitle className="text-sm">Update Status</CardTitle>
-                                      </CardHeader>
-                                      <CardContent>
-                                        <Select 
-                                          value={selectedCustomer.status} 
-                                          onValueChange={(value) => handleStatusUpdate(selectedCustomer.id, value)}
-                                        >
-                                          <SelectTrigger className="w-48">
-                                            <SelectValue />
-                                          </SelectTrigger>
-                                          <SelectContent>
-                                            <SelectItem value="hot">Hot Lead</SelectItem>
-                                            <SelectItem value="warm">Warm</SelectItem>
-                                            <SelectItem value="cold">Cold</SelectItem>
-                                            <SelectItem value="converted">Converted</SelectItem>
-                                            <SelectItem value="inactive">Inactive</SelectItem>
-                                          </SelectContent>
-                                        </Select>
-                                      </CardContent>
-                                    </Card>
-                                  </TabsContent>
-                                  
-                                  <TabsContent value="leads">
-                                    <div className="space-y-2">
-                                      {selectedCustomer.leads.map((lead, index) => (
-                                        <Card key={index}>
-                                          <CardContent className="pt-4">
-                                            <div className="flex justify-between items-start">
-                                              <div>
-                                                <div className="font-medium">{lead.leadType} Lead</div>
-                                                <div className="text-sm text-gray-500">Source: {lead.source}</div>
-                                                <div className="text-sm text-gray-500">Score: {lead.leadScore}/100</div>
-                                              </div>
-                                              <div className="text-sm text-gray-500">
-                                                {format(new Date(lead.createdAt), "MMM dd, yyyy")}
-                                              </div>
-                                            </div>
-                                          </CardContent>
-                                        </Card>
-                                      ))}
-                                    </div>
-                                  </TabsContent>
-                                  
-                                  <TabsContent value="bookings">
-                                    <div className="space-y-2">
-                                      {selectedCustomer.bookings.map((booking, index) => (
-                                        <Card key={index}>
-                                          <CardContent className="pt-4">
-                                            <div className="flex justify-between items-start">
-                                              <div>
-                                                <div className="font-medium">{booking.bookingType}</div>
-                                                <div className="text-sm text-gray-500">Property: {booking.propertyName}</div>
-                                                <div className="text-sm text-gray-500">Status: {booking.status}</div>
-                                              </div>
-                                              <div className="text-sm text-gray-500">
-                                                {format(new Date(booking.createdAt), "MMM dd, yyyy")}
-                                              </div>
-                                            </div>
-                                          </CardContent>
-                                        </Card>
-                                      ))}
-                                    </div>
-                                  </TabsContent>
-                                  
-                                  <TabsContent value="orders">
-                                    <div className="space-y-2">
-                                      {selectedCustomer.orders.map((order, index) => (
-                                        <Card key={index}>
-                                          <CardContent className="pt-4">
-                                            <div className="flex justify-between items-start">
-                                              <div>
-                                                <div className="font-medium">CIVIL+MEP Report</div>
-                                                <div className="text-sm text-gray-500">Amount: ₹{parseFloat(order.amount).toLocaleString()}</div>
-                                                <div className="text-sm text-gray-500">Status: {order.paymentStatus}</div>
-                                              </div>
-                                              <div className="text-sm text-gray-500">
-                                                {format(new Date(order.createdAt), "MMM dd, yyyy")}
-                                              </div>
-                                            </div>
-                                          </CardContent>
-                                        </Card>
-                                      ))}
-                                    </div>
-                                  </TabsContent>
-                                  
-                                  <TabsContent value="notes">
-                                    <div className="space-y-4">
-                                      <div className="space-y-2">
-                                        <Textarea
-                                          placeholder="Add a note about this customer..."
-                                          value={newNote}
-                                          onChange={(e) => setNewNote(e.target.value)}
-                                        />
-                                        <Button onClick={handleAddNote} disabled={!newNote.trim()}>
-                                          <MessageSquare className="h-4 w-4 mr-2" />
-                                          Add Note
-                                        </Button>
-                                      </div>
-                                      
-                                      <div className="space-y-2">
-                                        {selectedCustomer.notes.map((note, index) => (
-                                          <Card key={index}>
-                                            <CardContent className="pt-4">
-                                              <div className="text-sm">{note.content}</div>
-                                              <div className="text-xs text-gray-500 mt-2">
-                                                {format(new Date(note.createdAt), "MMM dd, yyyy 'at' HH:mm")}
-                                              </div>
-                                            </CardContent>
-                                          </Card>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  </TabsContent>
-                                </Tabs>
-                              )}
-                            </DialogContent>
-                          </Dialog>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </CardContent>
-          </Card>
-        </main>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {activeTab === "bookings" && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <CalendarDays className="h-5 w-5 mr-2" />
+                    Bookings & Site Visits
+                  </CardTitle>
+                  <CardDescription>
+                    Manage property visits, scheduling, and follow-ups
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-12 text-gray-500">
+                    Booking management features coming soon...
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {activeTab === "orders" && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <ShoppingCart className="h-5 w-5 mr-2" />
+                    Orders & Revenue Analytics
+                  </CardTitle>
+                  <CardDescription>
+                    Track orders, payments, and revenue metrics
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-12 text-gray-500">
+                    Order analytics features coming soon...
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {activeTab === "communications" && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Send className="h-5 w-5 mr-2" />
+                    Communication Center
+                  </CardTitle>
+                  <CardDescription>
+                    Email campaigns, SMS, and communication history
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-12 text-gray-500">
+                    Communication features coming soon...
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {activeTab === "analytics" && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <BarChart3 className="h-5 w-5 mr-2" />
+                    Customer Analytics & Reports
+                  </CardTitle>
+                  <CardDescription>
+                    Advanced analytics, insights, and reporting
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-12 text-gray-500">
+                    Analytics dashboard coming soon...
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </div>
       </div>
     </AdminLayout>
   );

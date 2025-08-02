@@ -65,6 +65,7 @@ function Router() {
       <Route path="/admin-panel/create-civil-mep-report" component={CreateCivilMepReport} />
       <Route path="/admin-panel/orders" component={Orders} />
       <Route path="/admin-panel/customers" component={Customers} />
+      <Route path="/admin/customers" component={Customers} />
       <Route path="/admin-panel/valuation-reports" component={ValuationReports} />
       <Route path="/admin-panel/valuation-reports/:action/:id?" component={ValuationReportEdit} />
       <Route path="/admin-panel/property/:id/edit" component={PropertyEdit} />
