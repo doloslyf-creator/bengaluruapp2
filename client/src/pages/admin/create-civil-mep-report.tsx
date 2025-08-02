@@ -8,13 +8,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { 
   FileText, Save, ArrowLeft, Building, CheckCircle, AlertTriangle,
-  Wrench, Zap, Shield, Home, Upload, Eye, Plus, X, Camera, Image
+  Wrench, Zap, Shield, Home, Upload, Eye, Plus, X, Camera, Image, Download
 } from "lucide-react";
 import { FormSkeleton } from "@/components/ui/skeleton";
 import AdminLayout from "@/components/layout/admin-layout";
+import { ObjectUploader } from "@/components/ObjectUploader";
+import type { UploadResult } from '@uppy/core';
 
 interface Finding {
   id: string;
@@ -107,6 +110,8 @@ const CreateCivilMepReport = () => {
   ]);
 
   const [attachments, setAttachments] = useState<string[]>([]);
+  const [uploadedDocuments, setUploadedDocuments] = useState<Array<{id: string, name: string, url: string}>>([]);
+  const [showPreview, setShowPreview] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -119,6 +124,57 @@ const CreateCivilMepReport = () => {
       return response.json();
     }
   });
+
+  // Handle document upload
+  const handleGetUploadParameters = async () => {
+    const response = await fetch("/api/documents/upload", {
+      method: "POST",
+    });
+    if (!response.ok) throw new Error("Failed to get upload parameters");
+    const { uploadURL } = await response.json();
+    return {
+      method: "PUT" as const,
+      url: uploadURL,
+    };
+  };
+
+  const handleUploadComplete = (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
+    if (result.successful.length > 0) {
+      const newDocuments = result.successful.map((file) => ({
+        id: file.id || Math.random().toString(36).substr(2, 9),
+        name: file.name,
+        url: file.uploadURL || ""
+      }));
+      setUploadedDocuments(prev => [...prev, ...newDocuments]);
+      toast({
+        title: "Documents uploaded",
+        description: `${newDocuments.length} document(s) uploaded successfully`,
+      });
+    }
+  };
+
+  // Handle template loading
+  const handleLoadTemplate = () => {
+    const templateData = {
+      reportTitle: "Standard CIVIL+MEP Inspection Report",
+      engineerName: "Chief Inspector",
+      engineerLicense: "CE-2024-001",
+      inspectionDate: new Date().toISOString().split('T')[0],
+      reportDate: new Date().toISOString().split('T')[0],
+      executiveSummary: "Comprehensive inspection of civil and MEP systems conducted as per industry standards.",
+      overallScore: 8.5,
+      structuralScore: 8.5,
+      mepScore: 9.0,
+      complianceScore: 8.7,
+      recommendations: "Continue regular maintenance schedule for optimal performance.",
+      conclusions: "Property shows excellent structural integrity and MEP system performance."
+    };
+    setReportData(templateData);
+    toast({
+      title: "Template loaded",
+      description: "Standard template has been applied to the form",
+    });
+  };
 
   // Create report mutation
   const createReportMutation = useMutation({
@@ -694,20 +750,117 @@ const CreateCivilMepReport = () => {
                 <CardTitle className="text-base">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button variant="outline" className="w-full">
+                <ObjectUploader
+                  maxNumberOfFiles={10}
+                  maxFileSize={52428800}
+                  onGetUploadParameters={handleGetUploadParameters}
+                  onComplete={handleUploadComplete}
+                  buttonClassName="w-full"
+                >
                   <Upload className="h-4 w-4 mr-2" />
                   Upload Documents
-                </Button>
-                <Button variant="outline" className="w-full">
-                  <Eye className="h-4 w-4 mr-2" />
-                  Preview Report
-                </Button>
-                <Button variant="outline" className="w-full">
+                </ObjectUploader>
+                
+                <Dialog open={showPreview} onOpenChange={setShowPreview}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="w-full">
+                      <Eye className="h-4 w-4 mr-2" />
+                      Preview Report
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Report Preview</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-6 p-6 bg-gray-50 rounded-lg">
+                      <div className="text-center">
+                        <h1 className="text-2xl font-bold">{reportData.reportTitle || "Untitled Report"}</h1>
+                        <p className="text-sm text-gray-600 mt-2">CIVIL+MEP Engineering Report</p>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div><strong>Engineer:</strong> {reportData.engineerName}</div>
+                        <div><strong>License:</strong> {reportData.engineerLicense}</div>
+                        <div><strong>Inspection Date:</strong> {reportData.inspectionDate}</div>
+                        <div><strong>Report Date:</strong> {reportData.reportDate}</div>
+                      </div>
+
+                      <div>
+                        <h3 className="font-semibold mb-2">Executive Summary</h3>
+                        <p className="text-sm">{reportData.executiveSummary}</p>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="text-center p-3 bg-white rounded">
+                          <div className="text-2xl font-bold text-green-600">{reportData.overallScore}</div>
+                          <div className="text-xs text-gray-600">Overall Score</div>
+                        </div>
+                        <div className="text-center p-3 bg-white rounded">
+                          <div className="text-2xl font-bold text-blue-600">{reportData.structuralScore}</div>
+                          <div className="text-xs text-gray-600">Structural</div>
+                        </div>
+                        <div className="text-center p-3 bg-white rounded">
+                          <div className="text-2xl font-bold text-purple-600">{reportData.mepScore}</div>
+                          <div className="text-xs text-gray-600">MEP Systems</div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3 className="font-semibold mb-2">Sections Overview</h3>
+                        <div className="space-y-2">
+                          {reportSections.map((section) => (
+                            <div key={section.id} className="flex justify-between items-center p-2 bg-white rounded">
+                              <span className="text-sm">{section.title}</span>
+                              <Badge className={
+                                section.status === 'excellent' ? 'bg-green-100 text-green-800' :
+                                section.status === 'good' ? 'bg-blue-100 text-blue-800' :
+                                section.status === 'fair' ? 'bg-yellow-100 text-yellow-800' :
+                                'bg-red-100 text-red-800'
+                              }>
+                                {section.score}/10
+                              </Badge>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+
+                <Button variant="outline" className="w-full" onClick={handleLoadTemplate}>
                   <FileText className="h-4 w-4 mr-2" />
                   Load Template
                 </Button>
               </CardContent>
             </Card>
+
+            {/* Uploaded Documents */}
+            {uploadedDocuments.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Uploaded Documents</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {uploadedDocuments.map((doc) => (
+                      <div key={doc.id} className="flex items-center justify-between p-2 border rounded">
+                        <div className="flex items-center space-x-2">
+                          <FileText className="h-4 w-4 text-gray-500" />
+                          <span className="text-sm truncate">{doc.name}</span>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setUploadedDocuments(prev => prev.filter(d => d.id !== doc.id))}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </div>

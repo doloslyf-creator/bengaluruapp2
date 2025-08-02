@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertPropertyValuationReportSchema, insertAppSettingsSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
@@ -137,6 +138,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting property:", error);
       res.status(500).json({ error: "Failed to delete property" });
+    }
+  });
+
+  // Document upload endpoints
+  app.post("/api/documents/upload", async (req, res) => {
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getDocumentUploadURL();
+      res.json({ uploadURL });
+    } catch (error) {
+      console.error("Error getting upload URL:", error);
+      res.status(500).json({ error: "Failed to get upload URL" });
+    }
+  });
+
+  app.get("/documents/:documentPath(*)", async (req, res) => {
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const documentFile = await objectStorageService.getDocumentFile(req.path);
+      objectStorageService.downloadObject(documentFile, res);
+    } catch (error) {
+      console.error("Error downloading document:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
     }
   });
 
