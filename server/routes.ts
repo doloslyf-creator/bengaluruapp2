@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertPropertySchema, insertPropertyConfigurationSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema } from "@shared/schema";
 import { z } from "zod";
+import { getBlogPosts, getBlogPost, createBlogPost, updateBlogPost, deleteBlogPost } from "./blog";
 
 // Firebase authentication - all auth handled client-side
 // No server-side session management needed
@@ -564,6 +565,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch bookings" });
     }
   });
+
+  // Blog management routes
+  app.get("/api/blog", getBlogPosts);
+  app.get("/api/blog/:id", getBlogPost);
+  app.post("/api/blog", createBlogPost);
+  app.patch("/api/blog/:id", updateBlogPost);
+  app.delete("/api/blog/:id", deleteBlogPost);
 
   const httpServer = createServer(app);
   return httpServer;

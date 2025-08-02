@@ -3,6 +3,7 @@ import { Search, Home, Star, Phone, Mail, MapPin, ArrowRight, CheckCircle } from
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import Header from "@/components/layout/header";
 
 export default function CustomerHome() {
   const [, navigate] = useLocation();
@@ -34,22 +35,7 @@ export default function CustomerHome() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Home className="h-8 w-8 text-primary" />
-              <h1 className="text-2xl font-bold text-gray-900">PropertyFinder</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="outline" onClick={() => navigate('/admin-panel')}>
-                Admin Panel
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Hero Section */}
       <section className="py-20">

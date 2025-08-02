@@ -134,11 +134,12 @@ export default function LeadsPage() {
             
             <div className="flex items-center gap-4">
               <nav className="flex space-x-8">
-                <Link href="/" className="text-gray-600 hover:text-gray-900">Dashboard</Link>
-                <Link href="/analytics" className="text-gray-600 hover:text-gray-900">Analytics</Link>
-                <Link href="/leads" className="text-violet-600 font-medium">Leads</Link>
-                <Link href="/bookings" className="text-gray-600 hover:text-gray-900">Bookings</Link>
-                <Link href="/property-config" className="text-gray-600 hover:text-gray-900">Configuration</Link>
+                <Link href="/admin-panel" className="text-gray-600 hover:text-gray-900">Dashboard</Link>
+                <Link href="/admin-panel/analytics" className="text-gray-600 hover:text-gray-900">Analytics</Link>
+                <Link href="/admin-panel/leads" className="text-violet-600 font-medium">Leads</Link>
+                <Link href="/admin-panel/blog" className="text-gray-600 hover:text-gray-900">Blog</Link>
+                <Link href="/admin-panel/developers" className="text-gray-600 hover:text-gray-900">Developers</Link>
+                <Link href="/admin-panel/zones" className="text-gray-600 hover:text-gray-900">Zones</Link>
               </nav>
               
 
