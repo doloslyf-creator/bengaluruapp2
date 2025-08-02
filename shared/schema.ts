@@ -34,25 +34,7 @@ export const properties = pgTable("properties", {
   videos: json("videos").$type<string[]>().notNull().default([]),
   youtubeVideoUrl: text("youtube_video_url"), // YouTube video URL for property overview
   
-  // Widget Data - Market Insights
-  avgPricePerSqft: integer("avg_price_per_sqft"), // in rupees
-  avgSellingTime: integer("avg_selling_time"), // in months
-  marketTrend: text("market_trend"), // e.g., "15% increase this year"
-  
-  // Widget Data - Location Amenities
-  nearbyAmenities: json("nearby_amenities").$type<Array<{
-    name: string;
-    type: string;
-    distance: number; // in km
-    icon: string;
-  }>>().default([]),
-  
-  // Widget Data - Construction Timeline
-  constructionTimeline: json("construction_timeline").$type<Array<{
-    milestone: string;
-    date: string;
-    status: 'completed' | 'current' | 'upcoming';
-  }>>().default([]),
+
   
   // Widget Data - Property Scoring
   locationScore: integer("location_score").default(0), // 1-5

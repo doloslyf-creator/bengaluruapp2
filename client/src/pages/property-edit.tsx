@@ -28,10 +28,7 @@ const propertyEditSchema = insertPropertySchema.extend({
   configurations: z.array(insertPropertyConfigurationSchema.extend({
     id: z.string().optional(),
   })).min(1, "At least one configuration is required"),
-  // Widget data fields
-  avgPricePerSqft: z.number().optional(),
-  avgSellingTime: z.number().optional(), 
-  marketTrend: z.string().optional(),
+  // Widget data fields (only remaining widgets)
   locationScore: z.number().min(1).max(5).optional(),
   amenitiesScore: z.number().min(1).max(5).optional(),
   valueScore: z.number().min(1).max(5).optional(),
@@ -807,67 +804,6 @@ export default function PropertyEdit() {
                 </TabsContent>
 
                 <TabsContent value="widgets" className="space-y-6 mt-6">
-                  {/* Market Insights */}
-                  <Card className="card-stripe">
-                    <CardHeader>
-                      <CardTitle className="text-heading-3">Market Insights</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="avgPricePerSqft"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Average Price per Sqft (₹)</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="number" 
-                                  placeholder="12500" 
-                                  {...field} 
-                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                                  value={field.value || ""} 
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="avgSellingTime"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Average Selling Time (months)</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="number" 
-                                  placeholder="18" 
-                                  {...field} 
-                                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                                  value={field.value || ""} 
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                      <FormField
-                        control={form.control}
-                        name="marketTrend"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Market Trend</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Property values increased by 15% this year" {...field} value={field.value || ""} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </CardContent>
-                  </Card>
 
                   {/* Property Scoring */}
                   <Card className="card-stripe">

@@ -21,13 +21,8 @@ This is a comprehensive full-stack property management and customer discovery pl
 - **Dynamic Similar Properties**: Implemented intelligent property matching algorithm with weighted scoring based on zone, type, developer, status, and tags
 
 **Enhanced Property Detail Widgets (Completed - August 2025)**
-- **Market Insights Widget**: Shows average price per sqft, selling time, and market trends with visual indicators
-- **EMI Calculator Widget**: Interactive mortgage calculator with loan amount, interest rate, tenure, and monthly EMI display
-- **Nearby Amenities Widget**: Location highlights showing distance to metro, IT hubs, shopping malls with color-coded icons
-- **Construction Timeline Widget**: Visual progress tracker with completed and upcoming milestones using timeline design
-- **Quick Actions Widget**: One-click access to brochure download, virtual tour, availability check, and wishlist functionality
-- **Property Score Widget**: Overall rating system with detailed breakdowns for location, amenities, and value for money
-- **Price Comparison Widget**: Comparative analysis against area and city averages with value assessment indicators
+- **Property Score Widget**: Overall rating system with detailed breakdowns for location, amenities, and value for money with real database scoring
+- **Price Comparison Widget**: Comparative analysis against area and city averages with value assessment indicators and admin-managed data
 
 **Authentication Removal (Completed - August 2025)**
 - Completely removed Firebase and all authentication systems from the application
