@@ -51,6 +51,16 @@ export default function PropertyDetail() {
     enabled: !!propertyId,
   });
 
+  // Fetch all properties for similar properties logic
+  const { data: allProperties = [] } = useQuery<Property[]>({
+    queryKey: ["/api/properties"],
+    queryFn: async () => {
+      const response = await fetch('/api/properties');
+      if (!response.ok) throw new Error('Failed to fetch properties');
+      return response.json();
+    },
+  });
+
   // Set default selected configuration
   useEffect(() => {
     if (property?.configurations.length && !selectedConfig) {
@@ -109,6 +119,54 @@ export default function PropertyDetail() {
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`;
     window.open(whatsappUrl, '_blank');
   };
+
+  // Calculate similar properties with scoring algorithm
+  const getSimilarProperties = () => {
+    if (!property || !allProperties.length) return [];
+    
+    const currentProperty = property;
+    const otherProperties = allProperties.filter(p => p.id !== currentProperty.id);
+    
+    const scoredProperties = otherProperties.map(prop => {
+      let score = 0;
+      
+      // Zone match (highest priority - 40 points)
+      if (prop.zone === currentProperty.zone) score += 40;
+      
+      // Property type match (30 points)
+      if (prop.type === currentProperty.type) score += 30;
+      
+      // Developer match (20 points)
+      if (prop.developer === currentProperty.developer) score += 20;
+      
+      // Status match (15 points)
+      if (prop.status === currentProperty.status) score += 15;
+      
+      // Tag overlap (up to 25 points)
+      const commonTags = prop.tags.filter(tag => currentProperty.tags.includes(tag));
+      score += Math.min(commonTags.length * 5, 25);
+      
+      // Price range similarity (if configurations available - up to 20 points)
+      if (property.configurations.length > 0) {
+        const currentPrices = property.configurations.map(c => c.price);
+        const currentAvgPrice = currentPrices.reduce((a, b) => a + b, 0) / currentPrices.length;
+        
+        // This is a simplified scoring - in production you'd fetch all configurations
+        // For now, we'll give some points for being in same general area
+        if (prop.zone === currentProperty.zone) score += 10;
+      }
+      
+      return { property: prop, score };
+    });
+    
+    // Sort by score and return top 3
+    return scoredProperties
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3)
+      .map(item => item.property);
+  };
+
+  const similarProperties = getSimilarProperties();
 
   const getPriceRange = () => {
     if (!property?.configurations.length) return "Price on request";
@@ -692,22 +750,58 @@ export default function PropertyDetail() {
               </CardContent>
             </Card>
 
-            {/* Similar Properties */}
+            {/* Similar Properties - Dynamic */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Similar Properties</CardTitle>
+                <p className="text-sm text-gray-600">Based on location, type, and features</p>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {[1, 2].map((item) => (
-                    <div key={item} className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                      <h4 className="font-medium text-sm">Property Name {item}</h4>
-                      <p className="text-xs text-gray-600">Similar area • 2-3 BHK</p>
-                      <p className="text-sm font-medium text-primary">₹85L - ₹1.2Cr</p>
+                  {similarProperties.length > 0 ? (
+                    similarProperties.map((similarProperty) => (
+                      <div 
+                        key={similarProperty.id} 
+                        className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                        onClick={() => navigate(`/property/${similarProperty.id}`)}
+                      >
+                        <div className="flex items-start justify-between mb-1">
+                          <h4 className="font-medium text-sm line-clamp-1">{similarProperty.name}</h4>
+                          <Badge className={getStatusColor(similarProperty.status)} variant="outline">
+                            {similarProperty.status.replace('-', ' ').charAt(0).toUpperCase() + similarProperty.status.slice(1)}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-gray-600 flex items-center mb-2">
+                          <MapPin className="h-3 w-3 mr-1" />
+                          {similarProperty.area}, {similarProperty.zone.charAt(0).toUpperCase() + similarProperty.zone.slice(1)}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex gap-1">
+                            {similarProperty.tags.slice(0, 2).map((tag) => (
+                              <Badge key={tag} variant="secondary" className="text-xs">
+                                {tag.replace("-", " ").charAt(0).toUpperCase() + tag.slice(1)}
+                              </Badge>
+                            ))}
+                          </div>
+                          <p className="text-sm font-medium text-primary">
+                            {similarProperty.type.charAt(0).toUpperCase() + similarProperty.type.slice(1)}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-4 text-gray-500">
+                      <div className="text-2xl mb-2">🔍</div>
+                      <p className="text-sm">No similar properties found</p>
                     </div>
-                  ))}
-                  <Button variant="outline" size="sm" className="w-full">
-                    View All Similar Properties
+                  )}
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => navigate('/find-property')}
+                  >
+                    View All Properties
                   </Button>
                 </div>
               </CardContent>
