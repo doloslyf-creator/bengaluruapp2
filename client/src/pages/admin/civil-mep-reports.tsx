@@ -526,60 +526,163 @@ const CivilMepReports = () => {
                         <div className="text-sm text-yellow-800">Overall Rating</div>
                       </div>
                     </div>
+                    
+                    {/* Detailed Section Scores */}
                     <div className="space-y-3">
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
-                        <span className="text-sm font-medium">Foundation Quality</span>
-                        <Badge className="bg-green-100 text-green-800">Excellent</Badge>
+                        <span className="text-sm font-medium">Foundation & Structural</span>
+                        <div className="flex items-center space-x-2">
+                          <Badge className="bg-green-100 text-green-800">8.5/10</Badge>
+                          <Badge className="bg-green-100 text-green-800">Excellent</Badge>
+                        </div>
                       </div>
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
                         <span className="text-sm font-medium">Electrical Systems</span>
-                        <Badge className="bg-green-100 text-green-800">Approved</Badge>
+                        <div className="flex items-center space-x-2">
+                          <Badge className="bg-green-100 text-green-800">9.0/10</Badge>
+                          <Badge className="bg-green-100 text-green-800">Excellent</Badge>
+                        </div>
                       </div>
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
                         <span className="text-sm font-medium">Plumbing Infrastructure</span>
-                        <Badge className="bg-blue-100 text-blue-800">Good</Badge>
+                        <div className="flex items-center space-x-2">
+                          <Badge className="bg-blue-100 text-blue-800">8.0/10</Badge>
+                          <Badge className="bg-blue-100 text-blue-800">Good</Badge>
+                        </div>
                       </div>
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
-                        <span className="text-sm font-medium">Fire Safety Compliance</span>
-                        <Badge className="bg-green-100 text-green-800">Compliant</Badge>
+                        <span className="text-sm font-medium">HVAC Systems</span>
+                        <div className="flex items-center space-x-2">
+                          <Badge className="bg-green-100 text-green-800">8.7/10</Badge>
+                          <Badge className="bg-green-100 text-green-800">Excellent</Badge>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                        <span className="text-sm font-medium">Fire Safety Systems</span>
+                        <div className="flex items-center space-x-2">
+                          <Badge className="bg-green-100 text-green-800">9.2/10</Badge>
+                          <Badge className="bg-green-100 text-green-800">Excellent</Badge>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                {/* Key Findings */}
+                {/* Detailed Findings by Section */}
                 <Card>
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-base">Key Findings & Recommendations</CardTitle>
+                    <CardTitle className="text-base">Detailed Engineering Assessment</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      <div className="border-l-4 border-green-500 pl-4">
-                        <h4 className="font-medium text-green-800">Strengths</h4>
-                        <ul className="text-sm text-gray-600 mt-1 space-y-1">
-                          <li>• High-quality construction materials used throughout</li>
-                          <li>• Excellent foundation design and execution</li>
-                          <li>• Modern electrical infrastructure with proper earthing</li>
-                          <li>• Adequate ventilation and natural lighting</li>
-                        </ul>
-                      </div>
-                      
-                      <div className="border-l-4 border-yellow-500 pl-4">
-                        <h4 className="font-medium text-yellow-800">Areas for Improvement</h4>
-                        <ul className="text-sm text-gray-600 mt-1 space-y-1">
-                          <li>• Minor waterproofing improvements needed in basement</li>
-                          <li>• Upgrade to LED lighting for energy efficiency</li>
-                          <li>• Install additional fire extinguishers on common floors</li>
-                        </ul>
+                    <div className="space-y-6">
+                      {/* Foundation & Structural */}
+                      <div className="border rounded-lg p-4">
+                        <h4 className="font-medium text-lg mb-3 flex items-center">
+                          <Building className="h-5 w-5 mr-2 text-green-600" />
+                          Foundation & Structural Elements (8.5/10)
+                        </h4>
+                        <div className="space-y-3">
+                          <div className="bg-green-50 p-3 rounded border-l-4 border-green-500">
+                            <p className="text-sm font-medium">High-quality concrete used in foundation</p>
+                            <div className="mt-2 grid grid-cols-3 gap-2">
+                              <img src="https://images.unsplash.com/photo-1590736969955-71cc94901144?w=100&h=60&fit=crop" alt="Foundation" className="rounded border" />
+                              <img src="https://images.unsplash.com/photo-1619469617215-a6df3d8c5cb1?w=100&h=60&fit=crop" alt="Concrete" className="rounded border" />
+                            </div>
+                          </div>
+                          <div className="bg-green-50 p-3 rounded border-l-4 border-green-500">
+                            <p className="text-sm font-medium">Proper reinforcement placement verified</p>
+                          </div>
+                        </div>
+                        <div className="mt-3 p-2 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-600 font-medium">Recommendation:</p>
+                          <p className="text-sm">Continue regular maintenance schedule</p>
+                        </div>
                       </div>
 
-                      <div className="border-l-4 border-blue-500 pl-4">
-                        <h4 className="font-medium text-blue-800">Compliance Status</h4>
-                        <ul className="text-sm text-gray-600 mt-1 space-y-1">
-                          <li>• Building meets all local municipal requirements</li>
-                          <li>• Fire safety systems are up to code</li>
-                          <li>• Environmental clearances are valid</li>
-                        </ul>
+                      {/* Electrical Systems */}
+                      <div className="border rounded-lg p-4">
+                        <h4 className="font-medium text-lg mb-3 flex items-center">
+                          <Zap className="h-5 w-5 mr-2 text-blue-600" />
+                          Electrical Systems (9.0/10)
+                        </h4>
+                        <div className="space-y-3">
+                          <div className="bg-blue-50 p-3 rounded border-l-4 border-blue-500">
+                            <p className="text-sm font-medium">Modern wiring throughout</p>
+                            <div className="mt-2 grid grid-cols-2 gap-2">
+                              <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=100&h=60&fit=crop" alt="Wiring" className="rounded border" />
+                            </div>
+                          </div>
+                          <div className="bg-blue-50 p-3 rounded border-l-4 border-blue-500">
+                            <p className="text-sm font-medium">Proper earthing system in place</p>
+                          </div>
+                        </div>
+                        <div className="mt-3 p-2 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-600 font-medium">Recommendation:</p>
+                          <p className="text-sm">No immediate actions required</p>
+                        </div>
+                      </div>
+
+                      {/* Plumbing */}
+                      <div className="border rounded-lg p-4">
+                        <h4 className="font-medium text-lg mb-3 flex items-center">
+                          <Wrench className="h-5 w-5 mr-2 text-cyan-600" />
+                          Plumbing Infrastructure (8.0/10)
+                        </h4>
+                        <div className="space-y-3">
+                          <div className="bg-cyan-50 p-3 rounded border-l-4 border-cyan-500">
+                            <p className="text-sm font-medium">Quality pipes and fittings</p>
+                          </div>
+                          <div className="bg-cyan-50 p-3 rounded border-l-4 border-cyan-500">
+                            <p className="text-sm font-medium">Good water pressure throughout</p>
+                          </div>
+                        </div>
+                        <div className="mt-3 p-2 bg-yellow-50 rounded">
+                          <p className="text-xs text-yellow-700 font-medium">Recommendation:</p>
+                          <p className="text-sm">Minor leak repairs in basement area</p>
+                        </div>
+                      </div>
+
+                      {/* HVAC Systems */}
+                      <div className="border rounded-lg p-4">
+                        <h4 className="font-medium text-lg mb-3 flex items-center">
+                          <Home className="h-5 w-5 mr-2 text-purple-600" />
+                          HVAC Systems (8.7/10)
+                        </h4>
+                        <div className="space-y-3">
+                          <div className="bg-purple-50 p-3 rounded border-l-4 border-purple-500">
+                            <p className="text-sm font-medium">Efficient air circulation</p>
+                          </div>
+                          <div className="bg-purple-50 p-3 rounded border-l-4 border-purple-500">
+                            <p className="text-sm font-medium">Modern HVAC units installed</p>
+                          </div>
+                        </div>
+                        <div className="mt-3 p-2 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-600 font-medium">Recommendation:</p>
+                          <p className="text-sm">Regular filter maintenance</p>
+                        </div>
+                      </div>
+
+                      {/* Fire Safety */}
+                      <div className="border rounded-lg p-4">
+                        <h4 className="font-medium text-lg mb-3 flex items-center">
+                          <Shield className="h-5 w-5 mr-2 text-red-600" />
+                          Fire Safety Systems (9.2/10)
+                        </h4>
+                        <div className="space-y-3">
+                          <div className="bg-red-50 p-3 rounded border-l-4 border-red-500">
+                            <p className="text-sm font-medium">Comprehensive sprinkler system</p>
+                            <div className="mt-2 grid grid-cols-2 gap-2">
+                              <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=100&h=60&fit=crop" alt="Sprinkler" className="rounded border" />
+                            </div>
+                          </div>
+                          <div className="bg-red-50 p-3 rounded border-l-4 border-red-500">
+                            <p className="text-sm font-medium">Multiple emergency exits</p>
+                          </div>
+                        </div>
+                        <div className="mt-3 p-2 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-600 font-medium">Recommendation:</p>
+                          <p className="text-sm">Annual fire system inspection</p>
+                        </div>
                       </div>
                     </div>
                   </CardContent>

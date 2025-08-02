@@ -11,16 +11,22 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { 
   FileText, Save, ArrowLeft, Building, CheckCircle, AlertTriangle,
-  Wrench, Zap, Shield, Home, Upload, Eye, Plus, X
+  Wrench, Zap, Shield, Home, Upload, Eye, Plus, X, Camera, Image
 } from "lucide-react";
 import { FormSkeleton } from "@/components/ui/skeleton";
+
+interface Finding {
+  id: string;
+  text: string;
+  images: string[];
+}
 
 interface ReportSection {
   id: string;
   title: string;
   score: number;
   status: 'excellent' | 'good' | 'fair' | 'poor';
-  findings: string[];
+  findings: Finding[];
   recommendations: string[];
 }
 
@@ -47,7 +53,10 @@ const CreateCivilMepReport = () => {
       title: 'Foundation & Structural Elements',
       score: 8.5,
       status: 'excellent',
-      findings: ['High-quality concrete used in foundation', 'Proper reinforcement placement verified'],
+      findings: [
+        { id: '1', text: 'High-quality concrete used in foundation', images: [] },
+        { id: '2', text: 'Proper reinforcement placement verified', images: [] }
+      ],
       recommendations: ['Continue regular maintenance schedule']
     },
     {
@@ -55,7 +64,10 @@ const CreateCivilMepReport = () => {
       title: 'Electrical Systems',
       score: 9.0,
       status: 'excellent',
-      findings: ['Modern wiring throughout', 'Proper earthing system in place'],
+      findings: [
+        { id: '3', text: 'Modern wiring throughout', images: [] },
+        { id: '4', text: 'Proper earthing system in place', images: [] }
+      ],
       recommendations: ['No immediate actions required']
     },
     {
@@ -63,7 +75,10 @@ const CreateCivilMepReport = () => {
       title: 'Plumbing Infrastructure',
       score: 8.0,
       status: 'good',
-      findings: ['Quality pipes and fittings', 'Good water pressure throughout'],
+      findings: [
+        { id: '5', text: 'Quality pipes and fittings', images: [] },
+        { id: '6', text: 'Good water pressure throughout', images: [] }
+      ],
       recommendations: ['Minor leak repairs in basement area']
     },
     {
@@ -71,7 +86,10 @@ const CreateCivilMepReport = () => {
       title: 'HVAC Systems',
       score: 8.7,
       status: 'excellent',
-      findings: ['Efficient air circulation', 'Modern HVAC units installed'],
+      findings: [
+        { id: '7', text: 'Efficient air circulation', images: [] },
+        { id: '8', text: 'Modern HVAC units installed', images: [] }
+      ],
       recommendations: ['Regular filter maintenance']
     },
     {
@@ -79,7 +97,10 @@ const CreateCivilMepReport = () => {
       title: 'Fire Safety Systems',
       score: 9.2,
       status: 'excellent',
-      findings: ['Comprehensive sprinkler system', 'Multiple emergency exits'],
+      findings: [
+        { id: '9', text: 'Comprehensive sprinkler system', images: [] },
+        { id: '10', text: 'Multiple emergency exits', images: [] }
+      ],
       recommendations: ['Annual fire system inspection']
     }
   ]);
@@ -152,28 +173,72 @@ const CreateCivilMepReport = () => {
   const addFinding = (sectionId: string) => {
     setReportSections(prev => prev.map(section => 
       section.id === sectionId 
-        ? { ...section, findings: [...section.findings, ""] }
-        : section
-    ));
-  };
-
-  const updateFinding = (sectionId: string, index: number, value: string) => {
-    setReportSections(prev => prev.map(section => 
-      section.id === sectionId 
         ? { 
             ...section, 
-            findings: section.findings.map((finding, i) => i === index ? value : finding)
+            findings: [...section.findings, { id: Date.now().toString(), text: "", images: [] }]
           }
         : section
     ));
   };
 
-  const removeFinding = (sectionId: string, index: number) => {
+  const updateFinding = (sectionId: string, findingId: string, field: 'text' | 'images', value: string | string[]) => {
     setReportSections(prev => prev.map(section => 
       section.id === sectionId 
         ? { 
             ...section, 
-            findings: section.findings.filter((_, i) => i !== index)
+            findings: section.findings.map(finding => 
+              finding.id === findingId 
+                ? { ...finding, [field]: value }
+                : finding
+            )
+          }
+        : section
+    ));
+  };
+
+  const removeFinding = (sectionId: string, findingId: string) => {
+    setReportSections(prev => prev.map(section => 
+      section.id === sectionId 
+        ? { 
+            ...section, 
+            findings: section.findings.filter(finding => finding.id !== findingId)
+          }
+        : section
+    ));
+  };
+
+  const handleImageUpload = (sectionId: string, findingId: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files) return;
+
+    const imageUrls: string[] = [];
+    Array.from(files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          imageUrls.push(e.target.result as string);
+          if (imageUrls.length === files.length) {
+            updateFinding(sectionId, findingId, 'images', imageUrls);
+          }
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeImage = (sectionId: string, findingId: string, imageIndex: number) => {
+    setReportSections(prev => prev.map(section => 
+      section.id === sectionId 
+        ? { 
+            ...section, 
+            findings: section.findings.map(finding => 
+              finding.id === findingId 
+                ? { 
+                    ...finding, 
+                    images: finding.images.filter((_, i) => i !== imageIndex)
+                  }
+                : finding
+            )
           }
         : section
     ));
@@ -486,22 +551,70 @@ const CreateCivilMepReport = () => {
 
                     <div>
                       <Label>Key Findings</Label>
-                      <div className="space-y-2">
-                        {section.findings.map((finding, index) => (
-                          <div key={index} className="flex items-center space-x-2">
-                            <Input
-                              value={finding}
-                              onChange={(e) => updateFinding(section.id, index, e.target.value)}
-                              placeholder="Enter finding..."
-                              className="flex-1"
-                            />
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => removeFinding(section.id, index)}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
+                      <div className="space-y-4">
+                        {section.findings.map((finding) => (
+                          <div key={finding.id} className="border rounded-lg p-4 space-y-3">
+                            <div className="flex items-start space-x-2">
+                              <Input
+                                value={finding.text}
+                                onChange={(e) => updateFinding(section.id, finding.id, 'text', e.target.value)}
+                                placeholder="Enter finding..."
+                                className="flex-1"
+                              />
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => removeFinding(section.id, finding.id)}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                            
+                            {/* Image Upload Section */}
+                            <div className="space-y-2">
+                              <div className="flex items-center space-x-2">
+                                <Label className="text-sm">Supporting Images</Label>
+                                <input
+                                  type="file"
+                                  multiple
+                                  accept="image/*"
+                                  onChange={(e) => handleImageUpload(section.id, finding.id, e)}
+                                  className="hidden"
+                                  id={`image-upload-${section.id}-${finding.id}`}
+                                />
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => document.getElementById(`image-upload-${section.id}-${finding.id}`)?.click()}
+                                >
+                                  <Camera className="h-4 w-4 mr-1" />
+                                  Add Images
+                                </Button>
+                              </div>
+                              
+                              {/* Image Preview Grid */}
+                              {finding.images.length > 0 && (
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                  {finding.images.map((image, imageIndex) => (
+                                    <div key={imageIndex} className="relative group">
+                                      <img
+                                        src={image}
+                                        alt={`Finding evidence ${imageIndex + 1}`}
+                                        className="w-full h-20 object-cover rounded border"
+                                      />
+                                      <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        className="absolute -top-2 -right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                                        onClick={() => removeImage(section.id, finding.id, imageIndex)}
+                                      >
+                                        <X className="h-3 w-3" />
+                                      </Button>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         ))}
                         <Button
