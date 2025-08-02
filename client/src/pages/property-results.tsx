@@ -437,23 +437,14 @@ export default function PropertyResults() {
                   <Card key={property.id} className="hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer group border-0 shadow-md bg-gradient-to-br from-white to-gray-50/50">
                     <div onClick={() => handleViewProperty(property)}>
                       <CardHeader className="pb-3 relative">
-                        {/* Status Badge */}
-                        <div className="absolute top-4 right-4 z-10">
-                          <Badge 
-                            className={`
-                              ${property.status === 'active' ? 'bg-green-100 text-green-800 border-green-200' : ''}
-                              ${property.status === 'pre-launch' ? 'bg-blue-100 text-blue-800 border-blue-200' : ''}
-                              ${property.status === 'under-construction' ? 'bg-orange-100 text-orange-800 border-orange-200' : ''}
-                              ${property.status === 'completed' ? 'bg-green-100 text-green-800 border-green-200' : ''}
-                              ${property.status === 'sold-out' ? 'bg-red-100 text-red-800 border-red-200' : ''}
-                              text-xs font-medium px-2 py-1 rounded-md
-                            `}
-                          >
-                            {property.status.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                        {/* Match Label on top */}
+                        <div className="absolute top-4 left-4 z-10">
+                          <Badge className={matchInfo.color + " text-xs font-semibold"}>
+                            ({matchInfo.label})
                           </Badge>
                         </div>
                         
-                        <div className="flex items-start justify-between pr-20">
+                        <div className="flex items-start justify-between pt-8">
                           <div className="flex-1">
                             <CardTitle className="text-xl font-bold group-hover:text-primary transition-colors mb-2">
                               {property.name}
@@ -473,7 +464,7 @@ export default function PropertyResults() {
                               e.stopPropagation();
                               toggleFavorite(property.id);
                             }}
-                            className="absolute top-12 right-4"
+                            className="absolute top-4 right-4"
                           >
                             <Heart 
                               className={`h-5 w-5 ${
@@ -498,30 +489,9 @@ export default function PropertyResults() {
                             <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                           </div>
 
-                          {/* Price Section - Enhanced */}
-                          <div className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-xl p-4 border border-primary/20">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center">
-                                <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center mr-3">
-                                  <IndianRupee className="h-5 w-5 text-primary" />
-                                </div>
-                                <div>
-                                  <p className="text-xs text-gray-600 font-medium">Price Range</p>
-                                  <div className="text-xl font-bold text-primary">
-                                    {getPriceRange(property.configurations)}
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <Badge className={matchInfo.color + " text-xs font-semibold"}>
-                                  {matchInfo.label}
-                                </Badge>
-                                <div className="flex items-center mt-1">
-                                  <Star className="h-3 w-3 text-yellow-400 fill-current mr-1" />
-                                  <span className="text-xs text-gray-600">{property.matchScore}%</span>
-                                </div>
-                              </div>
-                            </div>
+                          {/* Price Section - Clean */}
+                          <div className="text-xl font-bold text-primary mb-3">
+                            {getPriceRange(property.configurations)}
                           </div>
                           
                           {/* Configuration Types */}
@@ -543,25 +513,7 @@ export default function PropertyResults() {
                             </div>
                           )}
 
-                          {/* Key Features */}
-                          <div className="grid grid-cols-2 gap-3 text-xs">
-                            <div className="flex items-center">
-                              <Building className="h-4 w-4 text-primary mr-2" />
-                              <span className="text-gray-600">{property.type.charAt(0).toUpperCase() + property.type.slice(1)}</span>
-                            </div>
-                            <div className="flex items-center">
-                              <Calendar className="h-4 w-4 text-primary mr-2" />
-                              <span className="text-gray-600">
-                                {property.possessionDate === "immediate" ? "Ready" : property.possessionDate}
-                              </span>
-                            </div>
-                            {property.reraApproved && (
-                              <div className="flex items-center col-span-2">
-                                <Shield className="h-4 w-4 text-green-600 mr-2" />
-                                <span className="text-green-600 font-medium">RERA Approved</span>
-                              </div>
-                            )}
-                          </div>
+
 
                           {/* Key Tags */}
                           {property.tags.length > 0 && (
@@ -582,45 +534,7 @@ export default function PropertyResults() {
                       </CardContent>
                     </div>
                     
-                    {/* Action Buttons - Outside the clickable div */}
-                    <CardContent className="pt-0 pb-4">
-                      <div className="flex space-x-3">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleBookVisit(property);
-                          }}
-                          className="flex-1 flex items-center justify-center space-x-2 hover:bg-primary hover:text-white transition-colors border-primary/30"
-                        >
-                          <Calendar className="h-4 w-4" />
-                          <span className="font-medium">Book Visit</span>
-                        </Button>
-                        <Button 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleConsult(property);
-                          }}
-                          className="flex-1 flex items-center justify-center space-x-2 bg-primary hover:bg-primary/90 transition-colors shadow-md"
-                        >
-                          <Phone className="h-4 w-4" />
-                          <span className="font-medium">Consult</span>
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleViewProperty(property);
-                          }}
-                          className="px-3 border-primary/30 hover:bg-primary/5"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </CardContent>
+
                   </Card>
                 );
               })}

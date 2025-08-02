@@ -7,6 +7,7 @@ OwnItRight is a comprehensive full-stack platform for property management and cu
 Preferred communication style: Simple, everyday language.
 Project approach: User appreciates comprehensive solutions that integrate real data with sophisticated customer experience.
 Focus areas: Customer-facing features, real data integration, and seamless user workflows.
+UI Design preferences: Clean, minimal design without unnecessary panels or borders. Prefer simple layouts that encourage clicking to view details rather than multiple action buttons. Match labels should be displayed in brackets at the top of cards.
 
 ## System Architecture
 
