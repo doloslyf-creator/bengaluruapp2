@@ -1279,14 +1279,14 @@ export class DatabaseStorage implements IStorage {
   // Customer CRM methods
   async getAllCustomersWithDetails(): Promise<any[]> {
     // Get unique customers from leads, bookings, and orders
-    const leads = await db.select().from(leads);
-    const bookings = await db.select().from(bookings);  
+    const allLeads = await db.select().from(this.leads);
+    const allBookings = await db.select().from(this.bookings);  
     const payments = await db.select().from(reportPayments);
     
     const customerMap = new Map();
     
     // Process leads
-    for (const lead of leads) {
+    for (const lead of allLeads) {
       const key = lead.email || lead.phone;
       if (!customerMap.has(key)) {
         customerMap.set(key, {
@@ -1310,7 +1310,7 @@ export class DatabaseStorage implements IStorage {
     }
     
     // Process bookings
-    for (const booking of bookings) {
+    for (const booking of allBookings) {
       const key = booking.email || booking.phone;
       if (!customerMap.has(key)) {
         customerMap.set(key, {
@@ -1408,9 +1408,9 @@ export class DatabaseStorage implements IStorage {
 
   async updateCustomerStatus(customerId: string, status: string): Promise<any> {
     // Update lead status if customer has leads
-    await db.update(leads)
+    await db.update(this.leads)
       .set({ leadType: status as any, updatedAt: new Date() })
-      .where(or(eq(leads.email, customerId), eq(leads.phone, customerId)));
+      .where(or(eq(this.leads.email, customerId), eq(this.leads.phone, customerId)));
     
     return { success: true, customerId, status };
   }

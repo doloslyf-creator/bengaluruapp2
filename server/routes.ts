@@ -1,7 +1,19 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertPropertySchema, insertPropertyConfigurationSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema } from "@shared/schema";
+import { insertPropertySchema, insertPropertyConfigurationSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, leads, bookings, reportPayments, customerNotes } from "@shared/schema";
+import { drizzle } from "drizzle-orm/node-postgres";
+import pkg from "pg";
+const { Pool } = pkg;
+import { or, eq } from "drizzle-orm";
+
+// Database connection
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const db = drizzle(pool);
+
+// Create aliases for cleaner code
+const leadTable = leads;
+const bookingTable = bookings;
 import { z } from "zod";
 import { getBlogPosts, getBlogPost, createBlogPost, updateBlogPost, deleteBlogPost } from "./blog";
 
@@ -749,7 +761,112 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Customer CRM API - Get all customers with unified data
   app.get("/api/customers", async (req, res) => {
     try {
-      const customers = await storage.getAllCustomersWithDetails();
+      // Get all leads
+      const leads = await db.select().from(leadTable);
+      
+      // Get all bookings 
+      const bookings = await db.select().from(bookingTable);
+      
+      // Get all orders/payments
+      const payments = await db.select().from(reportPayments);
+      
+      // Create unified customer profiles
+      const customerMap = new Map();
+      
+      // Process leads
+      for (const lead of leads) {
+        const key = lead.email || lead.phone;
+        if (key && !customerMap.has(key)) {
+          customerMap.set(key, {
+            id: key,
+            name: lead.customerName,
+            email: lead.email,
+            phone: lead.phone,
+            status: lead.leadType || "cold",
+            leadScore: lead.leadScore || 0,
+            source: lead.source || "website",
+            lastActivity: lead.updatedAt || lead.createdAt,
+            leads: [],
+            bookings: [],
+            orders: [],
+            notes: [],
+            totalOrders: 0,
+            totalSpent: 0,
+            interestedProperties: []
+          });
+        }
+        if (key) customerMap.get(key).leads.push(lead);
+      }
+      
+      // Process bookings
+      for (const booking of bookings) {
+        const key = booking.email || booking.phone;
+        if (key && !customerMap.has(key)) {
+          customerMap.set(key, {
+            id: key,
+            name: booking.name,
+            email: booking.email,
+            phone: booking.phone,
+            status: "warm",
+            leadScore: 40,
+            source: "booking",
+            lastActivity: booking.updatedAt || booking.createdAt,
+            leads: [],
+            bookings: [],
+            orders: [],
+            notes: [],
+            totalOrders: 0,
+            totalSpent: 0,
+            interestedProperties: []
+          });
+        }
+        if (key) {
+          customerMap.get(key).bookings.push(booking);
+          if (new Date(booking.updatedAt || booking.createdAt) > new Date(customerMap.get(key).lastActivity)) {
+            customerMap.get(key).lastActivity = booking.updatedAt || booking.createdAt;
+          }
+        }
+      }
+      
+      // Process orders/payments
+      for (const payment of payments) {
+        const key = payment.customerEmail || payment.customerPhone;
+        if (key && !customerMap.has(key)) {
+          customerMap.set(key, {
+            id: key,
+            name: payment.customerName,
+            email: payment.customerEmail,
+            phone: payment.customerPhone,
+            status: "converted",
+            leadScore: 85,
+            source: "order",
+            lastActivity: payment.updatedAt || payment.createdAt,
+            leads: [],
+            bookings: [],
+            orders: [],
+            notes: [],
+            totalOrders: 0,
+            totalSpent: 0,
+            interestedProperties: []
+          });
+        }
+        if (key) {
+          const customer = customerMap.get(key);
+          customer.orders.push(payment);
+          customer.totalOrders += 1;
+          customer.totalSpent += parseFloat(payment.amount);
+          customer.status = "converted";
+          customer.leadScore = Math.max(customer.leadScore, 85);
+          if (new Date(payment.updatedAt || payment.createdAt) > new Date(customer.lastActivity)) {
+            customer.lastActivity = payment.updatedAt || payment.createdAt;
+          }
+        }
+      }
+      
+      const customers = Array.from(customerMap.values()).sort((a, b) => 
+        new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime()
+      );
+      
       res.json(customers);
     } catch (error) {
       console.error("Error fetching customers:", error);
@@ -760,8 +877,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Customer CRM API - Get customer statistics
   app.get("/api/customers/stats", async (req, res) => {
     try {
-      const stats = await storage.getCustomerStats();
-      res.json(stats);
+      const leads = await db.select().from(leadTable);
+      const bookings = await db.select().from(bookingTable);
+      const payments = await db.select().from(reportPayments);
+      
+      const customerMap = new Map();
+      
+      // Process all data sources to get unique customers
+      [...leads, ...bookings].forEach(item => {
+        const key = item.email || item.phone;
+        if (key && !customerMap.has(key)) {
+          customerMap.set(key, { 
+            status: item.leadType || "cold", 
+            totalSpent: 0 
+          });
+        }
+      });
+      
+      payments.forEach(payment => {
+        const key = payment.customerEmail || payment.customerPhone;
+        if (key) {
+          if (!customerMap.has(key)) {
+            customerMap.set(key, { status: "converted", totalSpent: 0 });
+          }
+          customerMap.get(key).status = "converted";
+          customerMap.get(key).totalSpent += parseFloat(payment.amount);
+        }
+      });
+      
+      const customers = Array.from(customerMap.values());
+      const totalCustomers = customers.length;
+      const hotLeads = customers.filter(c => c.status === "hot").length;
+      const convertedCustomers = customers.filter(c => c.status === "converted").length;
+      const totalRevenue = customers.reduce((sum, c) => sum + c.totalSpent, 0);
+      const avgOrderValue = convertedCustomers > 0 ? totalRevenue / convertedCustomers : 0;
+      
+      res.json({
+        totalCustomers,
+        hotLeads,
+        convertedCustomers,
+        totalRevenue,
+        avgOrderValue
+      });
     } catch (error) {
       console.error("Error fetching customer stats:", error);
       res.status(500).json({ error: "Failed to fetch customer statistics" });
@@ -774,7 +931,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { customerId } = req.params;
       const { note } = req.body;
       
-      const newNote = await storage.addCustomerNote(customerId, note);
+      const [newNote] = await db.insert(customerNotes)
+        .values({ customerId, content: note })
+        .returning();
+      
       res.json(newNote);
     } catch (error) {
       console.error("Error adding customer note:", error);
@@ -788,12 +948,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { customerId } = req.params;
       const { status } = req.body;
       
-      const updatedCustomer = await storage.updateCustomerStatus(customerId, status);
-      if (!updatedCustomer) {
-        return res.status(404).json({ error: "Customer not found" });
-      }
+      // Update lead status if customer has leads
+      await db.update(leadTable)
+        .set({ leadType: status as any, updatedAt: new Date() })
+        .where(or(eq(leadTable.email, customerId), eq(leadTable.phone, customerId)));
       
-      res.json(updatedCustomer);
+      res.json({ success: true, customerId, status });
     } catch (error) {
       console.error("Error updating customer status:", error);
       res.status(500).json({ error: "Failed to update customer status" });
