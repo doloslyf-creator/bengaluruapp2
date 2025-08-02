@@ -274,7 +274,32 @@ export default function Customers() {
 
   const handleAddLead = () => {
     if (newLeadForm.customerName && newLeadForm.customerEmail && newLeadForm.source) {
-      addLeadMutation.mutate(newLeadForm);
+      // Transform form data to match schema requirements
+      const leadData = {
+        leadId: `LD${Date.now()}${Math.floor(Math.random() * 1000)}`,
+        source: newLeadForm.source === "website" ? "property-inquiry" : 
+                newLeadForm.source === "referral" ? "property-inquiry" :
+                newLeadForm.source === "social_media" ? "property-inquiry" :
+                newLeadForm.source === "advertisement" ? "property-inquiry" :
+                newLeadForm.source === "walk_in" ? "consultation" :
+                newLeadForm.source === "phone_call" ? "consultation" : "property-inquiry",
+        customerName: newLeadForm.customerName,
+        phone: newLeadForm.customerPhone,
+        email: newLeadForm.customerEmail,
+        propertyName: newLeadForm.location ? `${newLeadForm.propertyType} in ${newLeadForm.location}` : "General Property Interest",
+        budgetRange: newLeadForm.budget || "Not Specified",
+        leadType: "warm" as const,
+        priority: "medium" as const,
+        leadScore: 50,
+        status: "new" as const,
+        leadDetails: {
+          propertyType: newLeadForm.propertyType,
+          budgetRange: newLeadForm.budget,
+          preferredLocation: newLeadForm.location,
+          leadNotes: newLeadForm.notes
+        }
+      };
+      addLeadMutation.mutate(leadData);
     } else {
       toast({
         title: "Error",

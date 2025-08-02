@@ -1443,15 +1443,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create a lead for this customer since our system is lead-based
       const leadData = {
         leadId: `LD${Date.now()}${Math.floor(Math.random() * 1000)}`,
-        source: source || "manual",
+        source: "property-inquiry" as const, // Use valid enum value
         customerName: name,
         phone: phone,
         email: email,
+        propertyName: "General Inquiry", // Required field
         leadType: "warm" as const,
         priority: "medium" as const,
         leadScore: 40,
         status: "new" as const,
-        leadDetails: notes ? { customerNotes: notes } : undefined,
+        leadDetails: notes ? { customerNotes: notes } : {},
       };
       
       const validatedData = insertLeadSchema.parse(leadData);
