@@ -1,304 +1,325 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useAuth } from "@/components/auth/auth-provider";
-import { useLocation } from "wouter";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-// import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, Phone, Key } from "lucide-react";
-
-// Custom OTP Input Component
-function OTPInputField({ value, onChange, length }: { 
-  value: string; 
-  onChange: (value: string) => void; 
-  length: number; 
-}) {
-  const [otp, setOtp] = useState(Array(length).fill(""));
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-  useEffect(() => {
-    // Update internal state when value prop changes from external source (like form reset)
-    const currentValue = otp.join("");
-    if (value !== currentValue) {
-      const valueArray = value.split("").slice(0, length); // Limit to max length
-      const paddingLength = Math.max(0, length - valueArray.length); // Ensure non-negative
-      setOtp(valueArray.concat(Array(paddingLength).fill("")));
-    }
-  }, [value, length]); // Remove otp from dependencies to avoid infinite loop
-
-  const handleInputChange = (index: number, digit: string) => {
-    // Only allow single digits
-    if (digit.length > 1) return;
-    if (digit && !/^\d$/.test(digit)) return;
-
-    const newOtp = [...otp];
-    newOtp[index] = digit;
-    setOtp(newOtp);
-    
-    const otpString = newOtp.join("");
-    console.log("OTP Input Component - onChange called with:", otpString);
-    onChange(otpString);
-
-    // Auto-focus next input
-    if (digit && index < length - 1) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handlePaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const pastedData = e.clipboardData.getData("text");
-    const digits = pastedData.replace(/\D/g, "").slice(0, length);
-    const paddingLength = Math.max(0, length - digits.length);
-    const newOtp = digits.split("").concat(Array(paddingLength).fill(""));
-    setOtp(newOtp);
-    console.log("OTP Input Component - paste onChange called with:", digits);
-    onChange(digits);
-    
-    // Focus the next empty input or the last input
-    const nextIndex = Math.min(digits.length, length - 1);
-    inputRefs.current[nextIndex]?.focus();
-  };
-
-  return (
-    <div className="flex justify-center gap-3">
-      {Array(length).fill(0).map((_, index) => (
-        <input
-          key={index}
-          ref={(el) => (inputRefs.current[index] = el)}
-          type="text"
-          inputMode="numeric"
-          value={otp[index] || ""}
-          onChange={(e) => handleInputChange(index, e.target.value)}
-          onKeyDown={(e) => handleKeyDown(index, e)}
-          onPaste={handlePaste}
-          className="w-12 h-12 text-lg font-semibold border-2 border-violet-200 rounded-lg focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-all duration-200 hover:border-violet-300 text-center focus:outline-none"
-          maxLength={1}
-          autoComplete="off"
-          autoFocus={index === 0}
-        />
-      ))}
-    </div>
-  );
-}
-
-const phoneSchema = z.object({
-  phoneNumber: z.string()
-    .min(10, "Phone number must be at least 10 digits")
-    .regex(/^[6-9]\d{9}$/, "Please enter a valid Indian mobile number"),
-});
+import { useAuth } from "@/components/auth/auth-provider";
+import { useLocation } from "wouter";
+import { firebaseOTPService } from "@/lib/firebase";
+import { Loader2, Phone, Shield, RefreshCw } from "lucide-react";
 
 const otpSchema = z.object({
-  otp: z.string()
-    .min(6, "OTP must be exactly 6 digits")
-    .max(6, "OTP must be exactly 6 digits") 
-    .regex(/^\d{6}$/, "OTP must contain only 6 digits"),
+  otp: z.string().min(6, "OTP must be 6 digits").max(6, "OTP must be 6 digits")
 });
 
-type PhoneForm = z.infer<typeof phoneSchema>;
-type OtpForm = z.infer<typeof otpSchema>;
+type OTPFormData = z.infer<typeof otpSchema>;
 
 export default function AdminLogin() {
-  const [step, setStep] = useState<"phone" | "otp">("phone");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const { sendOtp, login } = useAuth();
-  const [, navigate] = useLocation();
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { refetch } = useAuth();
+  const [step, setStep] = useState<'phone' | 'otp'>('phone');
+  const [isLoading, setIsLoading] = useState(false);
+  const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
+  const [countdown, setCountdown] = useState(0);
 
-  const phoneForm = useForm<PhoneForm>({
-    resolver: zodResolver(phoneSchema),
-    defaultValues: {
-      phoneNumber: "",
-    },
-  });
-
-  const otpForm = useForm<OtpForm>({
+  const form = useForm<OTPFormData>({
     resolver: zodResolver(otpSchema),
     defaultValues: {
-      otp: "",
-    },
+      otp: ""
+    }
   });
 
-  const onPhoneSubmit = async (data: PhoneForm) => {
-    try {
-      await sendOtp(data.phoneNumber);
-      setPhoneNumber(data.phoneNumber);
-      setStep("otp");
-      // Clear OTP field after step change
-      setTimeout(() => {
-        otpForm.reset({ otp: "" });
-      }, 100);
-      toast({
-        title: "OTP Sent",
-        description: "OTP has been generated. Check server console in development mode.",
-      });
-    } catch (error: any) {
+  // Initialize reCAPTCHA on component mount
+  useEffect(() => {
+    const initRecaptcha = async () => {
+      try {
+        const success = await firebaseOTPService.initializeRecaptcha('recaptcha-container');
+        setRecaptchaLoaded(success);
+        if (!success) {
+          toast({
+            title: "Setup Error",
+            description: "Failed to initialize security verification",
+            variant: "destructive"
+          });
+        }
+      } catch (error) {
+        console.error('Failed to initialize reCAPTCHA:', error);
+        setRecaptchaLoaded(false);
+      }
+    };
+
+    initRecaptcha();
+
+    // Cleanup on unmount
+    return () => {
+      firebaseOTPService.cleanup();
+    };
+  }, [toast]);
+
+  // Countdown timer for resend OTP
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
+
+  const handleSendOTP = async () => {
+    if (!recaptchaLoaded) {
       toast({
         title: "Error",
-        description: error.message || "Failed to send OTP. Please try again.",
-        variant: "destructive",
+        description: "Security verification not ready. Please refresh the page.",
+        variant: "destructive"
       });
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      const result = await firebaseOTPService.sendOTP();
+      
+      if (result.success) {
+        setStep('otp');
+        setCountdown(60); // 60 second countdown
+        toast({
+          title: "OTP Sent",
+          description: "Verification code sent to admin phone number",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: result.message,
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send OTP. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Clear OTP field when step changes to otp
-  useEffect(() => {
-    if (step === "otp") {
-      otpForm.reset({ otp: "" });
-    }
-  }, [step, otpForm]);
-
-  const onOtpSubmit = async (data: OtpForm) => {
+  const handleVerifyOTP = async (data: OTPFormData) => {
+    setIsLoading(true);
+    
     try {
-      console.log("Form data:", data);
-      console.log("OTP value:", data.otp, "Length:", data.otp.length, "Type:", typeof data.otp);
-      console.log("Form errors:", otpForm.formState.errors);
+      const result = await firebaseOTPService.verifyOTP(data.otp);
       
-      await login(phoneNumber, data.otp);
-      toast({
-        title: "Login Successful",
-        description: "Welcome to the admin panel!",
-      });
-      navigate("/admin-panel");
-    } catch (error: any) {
-      console.error("Login error:", error);
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: "Admin authentication successful",
+        });
+        
+        // Refetch auth state and redirect
+        await refetch();
+        setLocation("/admin-panel");
+      } else {
+        toast({
+          title: "Error",
+          description: result.message,
+          variant: "destructive"
+        });
+        form.reset();
+      }
+    } catch (error) {
       toast({
         title: "Error",
-        description: error.message || "Invalid OTP. Please try again.",
-        variant: "destructive",
+        description: "Failed to verify OTP. Please try again.",
+        variant: "destructive"
       });
+      form.reset();
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleResendOTP = async () => {
+    if (countdown > 0) return;
+    
+    setIsLoading(true);
+    
+    try {
+      const result = await firebaseOTPService.sendOTP();
+      
+      if (result.success) {
+        setCountdown(60);
+        toast({
+          title: "OTP Resent",
+          description: "New verification code sent",
+        });
+      } else {
+        toast({
+          title: "Error", 
+          description: result.message,
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to resend OTP",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleBackToPhone = () => {
+    setStep('phone');
+    form.reset();
+    firebaseOTPService.cleanup();
+    setRecaptchaLoaded(false);
+    
+    // Re-initialize reCAPTCHA
+    setTimeout(async () => {
+      const success = await firebaseOTPService.initializeRecaptcha('recaptcha-container');
+      setRecaptchaLoaded(success);
+    }, 100);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 to-indigo-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Shield className="w-8 h-8 text-violet-600" />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-xl border-0 bg-white/95 backdrop-blur">
+        <CardHeader className="text-center space-y-2 pb-6">
+          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
+            <Shield className="w-8 h-8 text-white" />
           </div>
-          <CardTitle className="text-2xl">Admin Login</CardTitle>
-          <CardDescription>
-            {step === "phone" 
-              ? "Enter your registered admin phone number to receive an OTP"
-              : "Enter the 6-digit OTP (check server console in development)"
+          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            Admin Login
+          </CardTitle>
+          <CardDescription className="text-gray-600">
+            {step === 'phone' 
+              ? 'Secure Firebase OTP Authentication' 
+              : 'Enter the verification code sent to your phone'
             }
           </CardDescription>
         </CardHeader>
-        
-        <CardContent>
-          {step === "phone" ? (
-            <Form {...phoneForm}>
-              <form onSubmit={phoneForm.handleSubmit(onPhoneSubmit)} className="space-y-4">
-                <FormField
-                  control={phoneForm.control}
-                  name="phoneNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Phone className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                          <Input
-                            placeholder="9876543210"
-                            className="pl-10"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <Button type="submit" className="w-full bg-violet-600 hover:bg-violet-700">
-                  Send OTP
-                </Button>
-              </form>
-            </Form>
-          ) : (
-            <Form {...otpForm}>
-              <form onSubmit={otpForm.handleSubmit(onOtpSubmit)} className="space-y-4">
-                <FormField
-                  control={otpForm.control}
-                  name="otp"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2 justify-center">
-                        <Key className="w-4 h-4 text-violet-600" />
-                        Enter 6-Digit OTP
-                      </FormLabel>
-                      <FormControl>
-                        <OTPInputField 
-                          value={field.value || ""}
-                          onChange={(value) => {
-                            console.log("FormField onChange triggered with:", value);
-                            field.onChange(value);
-                          }}
-                          length={6}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <div className="text-sm text-center text-gray-600 mb-4 space-y-1">
-                  <p>OTP sent to +91 {phoneNumber}</p>
-                  <p className="text-xs text-violet-600">Check the server console for the OTP code</p>
+
+        <CardContent className="space-y-6">
+          {step === 'phone' ? (
+            <>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <Phone className="w-5 h-5 text-blue-600" />
+                  <div>
+                    <p className="text-sm font-medium text-blue-900">Admin Phone</p>
+                    <p className="text-xs text-blue-700">+91 95603 66601</p>
+                  </div>
                 </div>
-                
+
+                <div id="recaptcha-container" className="flex justify-center"></div>
+
                 <Button 
-                  type="submit" 
-                  className="w-full bg-violet-600 hover:bg-violet-700"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    
-                    // Development bypass - use the latest OTP from server for admin number
-                    if (phoneNumber === "9560366601") {
-                      console.log("Development mode: bypassing OTP validation for admin");
-                      onOtpSubmit({ otp: "824023" }); // Latest OTP from server logs
-                      return;
-                    }
-                    
-                    const currentValue = otpForm.getValues("otp");
-                    console.log("Button clicked - Current OTP value:", currentValue, "Length:", currentValue.length);
-                    
-                    if (currentValue && currentValue.length === 6) {
-                      onOtpSubmit({ otp: currentValue });
-                    } else {
-                      console.log("Invalid OTP length or empty value");
-                    }
-                  }}
+                  onClick={handleSendOTP}
+                  disabled={isLoading || !recaptchaLoaded}
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg"
+                  size="lg"
                 >
-                  Verify & Login
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Sending OTP...
+                    </>
+                  ) : (
+                    <>
+                      <Phone className="w-4 h-4 mr-2" />
+                      Send OTP
+                    </>
+                  )}
                 </Button>
-                
+              </div>
+            </>
+          ) : (
+            <>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(handleVerifyOTP)} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="otp"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-700">Verification Code</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            placeholder="Enter 6-digit OTP"
+                            className="text-center text-lg tracking-widest font-mono h-12 border-2 focus:border-blue-500"
+                            maxLength={6}
+                            autoComplete="one-time-code"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button 
+                    type="submit" 
+                    disabled={isLoading}
+                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg"
+                    size="lg"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Verifying...
+                      </>
+                    ) : (
+                      <>
+                        <Shield className="w-4 h-4 mr-2" />
+                        Verify & Login
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </Form>
+
+              <div className="flex flex-col gap-2">
                 <Button
-                  type="button"
-                  variant="ghost"
+                  variant="outline"
+                  onClick={handleResendOTP}
+                  disabled={countdown > 0 || isLoading}
                   className="w-full"
-                  onClick={() => {
-                    setStep("phone");
-                    otpForm.reset({ otp: "" }); // Explicitly clear OTP field
-                  }}
                 >
-                  Change phone number
+                  {countdown > 0 ? (
+                    `Resend OTP in ${countdown}s`
+                  ) : (
+                    <>
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Resend OTP
+                    </>
+                  )}
                 </Button>
-              </form>
-            </Form>
+
+                <Button
+                  variant="ghost"
+                  onClick={handleBackToPhone}
+                  disabled={isLoading}
+                  className="w-full"
+                >
+                  Back to Phone Verification
+                </Button>
+              </div>
+            </>
           )}
+
+          <div className="text-center">
+            <p className="text-xs text-gray-500">
+              Secured by Firebase Authentication
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>

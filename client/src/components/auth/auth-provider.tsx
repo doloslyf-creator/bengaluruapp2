@@ -1,10 +1,13 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { auth, firebaseOTPService } from "@/lib/firebase";
+import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 
 interface User {
   phoneNumber: string;
   isAdmin: boolean;
+  firebaseUser?: FirebaseUser;
 }
 
 interface AuthContextType {
@@ -13,78 +16,84 @@ interface AuthContextType {
   login: (phoneNumber: string, otp: string) => Promise<void>;
   sendOtp: (phoneNumber: string) => Promise<void>;
   logout: () => void;
+  firebaseUser: FirebaseUser | null;
+  refetch: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+const ADMIN_PHONE = "+919560366601";
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
+  const [firebaseLoading, setFirebaseLoading] = useState(true);
 
-  const { data: currentUser, isLoading } = useQuery({
-    queryKey: ["/api/auth/me"],
-    queryFn: async () => {
-      try {
-        const response = await fetch("/api/auth/me", {
-          credentials: "include",
-        });
-        if (response.ok) {
-          return await response.json();
-        }
-        return null;
-      } catch {
-        return null;
-      }
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-
+  // Listen to Firebase auth state changes
   useEffect(() => {
-    if (currentUser) {
-      setUser(currentUser);
-    }
-  }, [currentUser]);
+    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
+      setFirebaseUser(fbUser);
+      setFirebaseLoading(false);
+      
+      // Set user state based on Firebase user
+      if (fbUser && fbUser.phoneNumber === ADMIN_PHONE) {
+        setUser({
+          phoneNumber: fbUser.phoneNumber,
+          isAdmin: true,
+          firebaseUser: fbUser
+        });
+      } else {
+        setUser(null);
+      }
+    });
 
-  const sendOtpMutation = useMutation({
-    mutationFn: async (phoneNumber: string) => {
-      const response = await apiRequest("POST", "/api/auth/send-otp", { phoneNumber });
-      return response.json();
-    },
-  });
+    return () => unsubscribe();
+  }, []);
 
-  const loginMutation = useMutation({
-    mutationFn: async ({ phoneNumber, otp }: { phoneNumber: string; otp: string }) => {
-      const response = await apiRequest("POST", "/api/auth/login", { phoneNumber, otp });
-      return response.json();
-    },
-    onSuccess: (userData) => {
-      setUser(userData);
-    },
-  });
-
-  const sendOtp = async (phoneNumber: string) => {
-    await sendOtpMutation.mutateAsync(phoneNumber);
+  // Firebase-based authentication functions
+  const sendOtp = async (phoneNumber: string = ADMIN_PHONE) => {
+    // This is handled directly by Firebase in the login component
+    throw new Error("Use Firebase OTP service directly");
   };
 
   const login = async (phoneNumber: string, otp: string) => {
-    await loginMutation.mutateAsync({ phoneNumber, otp });
+    // This is handled directly by Firebase in the login component
+    throw new Error("Use Firebase OTP service directly");
   };
 
   const logout = async () => {
     try {
-      await apiRequest("POST", "/api/auth/logout");
+      await firebaseOTPService.signOut();
+      setUser(null);
+      setFirebaseUser(null);
     } catch (error) {
       console.error("Logout error:", error);
     }
-    setUser(null);
+  };
+
+  const refetch = () => {
+    // Refresh auth state - Firebase handles this automatically
+    const currentFirebaseUser = auth.currentUser;
+    if (currentFirebaseUser && currentFirebaseUser.phoneNumber === ADMIN_PHONE) {
+      setUser({
+        phoneNumber: currentFirebaseUser.phoneNumber,
+        isAdmin: true,
+        firebaseUser: currentFirebaseUser
+      });
+    } else {
+      setUser(null);
+    }
   };
 
   return (
     <AuthContext.Provider value={{
       user,
-      isLoading,
+      isLoading: firebaseLoading,
       login,
       sendOtp,
       logout,
+      firebaseUser,
+      refetch,
     }}>
       {children}
     </AuthContext.Provider>

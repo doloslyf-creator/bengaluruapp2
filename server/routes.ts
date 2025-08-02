@@ -4,142 +4,14 @@ import { storage } from "./storage";
 import { insertPropertySchema, insertPropertyConfigurationSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema } from "@shared/schema";
 import { z } from "zod";
 
-// In-memory session storage for demo (use Redis/database in production)
-const sessions = new Map<string, { phoneNumber: string; isAdmin: boolean; sessionId: string }>();
-const otpStore = new Map<string, { otp: string; expiresAt: number }>();
-
-// Admin phone numbers - add authorized numbers here
-const adminPhoneNumbers = new Set([
-  "9560366601", // Your number
-  "9876543210"  // Demo number
-]);
-
-// Helper function to generate OTP
-function generateOTP(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
-
-// Helper function to generate session ID
-function generateSessionId(): string {
-  return Math.random().toString(36).substring(2) + Date.now().toString(36);
-}
-
-// Middleware to check authentication
-function requireAuth(req: any, res: any, next: any) {
-  const sessionId = req.headers.authorization?.replace('Bearer ', '') || 
-                    req.session?.sessionId || 
-                    req.cookies?.sessionId;
-  
-  if (!sessionId || !sessions.has(sessionId)) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-  
-  req.user = sessions.get(sessionId);
-  next();
-}
+// Firebase authentication - all auth handled client-side
+// No server-side session management needed
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Authentication routes
-  app.post("/api/auth/send-otp", async (req, res) => {
-    try {
-      const { phoneNumber } = req.body;
-      
-      if (!phoneNumber || !/^[6-9]\d{9}$/.test(phoneNumber)) {
-        return res.status(400).json({ error: "Invalid phone number" });
-      }
+  // Firebase authentication - no server-side auth routes needed
+  // Authentication is handled entirely by Firebase
 
-      // Check if phone number is authorized admin
-      if (!adminPhoneNumbers.has(phoneNumber)) {
-        return res.status(403).json({ error: "Phone number not authorized for admin access" });
-      }
 
-      const otp = generateOTP();
-      const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
-      
-      otpStore.set(phoneNumber, { otp, expiresAt });
-      
-      // In production, integrate with SMS service like Twilio
-      // For development, OTP is logged to console
-      console.log(`🔐 Admin OTP for ${phoneNumber}: ${otp} (expires in 5 minutes)`);
-      
-      res.json({ 
-        message: "OTP sent successfully",
-        // Only in development - remove in production
-        developmentNote: process.env.NODE_ENV === "development" ? 
-          "OTP is logged to server console for development" : undefined
-      });
-    } catch (error) {
-      console.error("Error sending OTP:", error);
-      res.status(500).json({ error: "Failed to send OTP" });
-    }
-  });
-
-  app.post("/api/auth/login", async (req, res) => {
-    try {
-      const { phoneNumber, otp } = req.body;
-      
-      const otpData = otpStore.get(phoneNumber);
-      if (!otpData) {
-        return res.status(400).json({ error: "OTP not found or expired" });
-      }
-      
-      if (Date.now() > otpData.expiresAt) {
-        otpStore.delete(phoneNumber);
-        return res.status(400).json({ error: "OTP expired" });
-      }
-      
-      // Development bypass for admin number
-      if (phoneNumber === "9560366601" && process.env.NODE_ENV === "development") {
-        console.log(`🔓 Development bypass: Admin login successful for ${phoneNumber}`);
-      } else if (otpData.otp !== otp) {
-        return res.status(400).json({ error: "Invalid OTP" });
-      }
-      
-      // Clean up used OTP
-      otpStore.delete(phoneNumber);
-      
-      // Create session
-      const sessionId = generateSessionId();
-      const user = { phoneNumber, isAdmin: true, sessionId };
-      sessions.set(sessionId, user);
-      
-      // Set session cookie
-      res.cookie('sessionId', sessionId, { 
-        httpOnly: true, 
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
-      });
-      
-      res.json(user);
-    } catch (error) {
-      console.error("Error during login:", error);
-      res.status(500).json({ error: "Login failed" });
-    }
-  });
-
-  app.get("/api/auth/me", (req, res) => {
-    const sessionId = req.headers.authorization?.replace('Bearer ', '') || 
-                      req.cookies?.sessionId;
-    
-    if (!sessionId || !sessions.has(sessionId)) {
-      return res.status(401).json({ error: "Not authenticated" });
-    }
-    
-    const user = sessions.get(sessionId);
-    res.json(user);
-  });
-
-  app.post("/api/auth/logout", (req, res) => {
-    const sessionId = req.headers.authorization?.replace('Bearer ', '') || 
-                      req.cookies?.sessionId;
-    
-    if (sessionId) {
-      sessions.delete(sessionId);
-      res.clearCookie('sessionId');
-    }
-    
-    res.json({ message: "Logged out successfully" });
-  });
   // Get all properties
   app.get("/api/properties", async (req, res) => {
     try {
