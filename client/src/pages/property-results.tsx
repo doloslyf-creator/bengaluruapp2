@@ -523,18 +523,6 @@ export default function PropertyResults() {
                           size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleViewProperty(property);
-                          }}
-                          className="flex-1 flex items-center justify-center space-x-1"
-                        >
-                          <Eye className="h-3 w-3" />
-                          <span>View Details</span>
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
                             handleBookVisit(property);
                           }}
                           className="flex-1 flex items-center justify-center space-x-1"
