@@ -76,8 +76,8 @@ const navigation = [
     description: "Order Management"
   },
   { 
-    name: "Legal Tracker", 
-    href: "/admin-panel/legal-tracker", 
+    name: "Legal Management", 
+    href: "/admin-panel/legal-management", 
     icon: Scale,
     description: "Legal Due Diligence"
   },
