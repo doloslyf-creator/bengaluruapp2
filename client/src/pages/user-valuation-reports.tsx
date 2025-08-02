@@ -124,11 +124,28 @@ export default function UserValuationReports() {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0
-    }).format(amount);
+    if (amount === 0) return "₹0";
+    
+    const onecrore = 10000000; // 1 crore = 1,00,00,000
+    const onelakh = 100000;    // 1 lakh = 1,00,000
+    
+    if (amount >= onecrore) {
+      const crores = amount / onecrore;
+      // Remove unnecessary decimals for whole numbers
+      if (crores % 1 === 0) {
+        return `₹${crores} Cr`;
+      }
+      // Limit to 2 decimal places for precision
+      return `₹${parseFloat(crores.toFixed(2))} Cr`;
+    } else {
+      const lakhs = amount / onelakh;
+      // Remove unnecessary decimals for whole numbers
+      if (lakhs % 1 === 0) {
+        return `₹${lakhs} Lakh`;
+      }
+      // Limit to 1 decimal place for lakhs
+      return `₹${parseFloat(lakhs.toFixed(1))} Lakh`;
+    }
   };
 
   const formatDate = (dateString: string) => {
