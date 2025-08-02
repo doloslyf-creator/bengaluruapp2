@@ -1920,6 +1920,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // CIVIL+MEP Requests API
+  app.post("/api/civil-mep-requests", async (req, res) => {
+    try {
+      const requestData = req.body;
+      
+      // Create a new CIVIL+MEP request record
+      const newRequest = {
+        id: Date.now().toString(),
+        propertyId: requestData.propertyId,
+        urgencyLevel: requestData.urgencyLevel,
+        specificConcerns: requestData.specificConcerns,
+        additionalNotes: requestData.additionalNotes,
+        contactName: requestData.contactName,
+        contactPhone: requestData.contactPhone,
+        contactEmail: requestData.contactEmail,
+        requestReason: requestData.requestReason,
+        status: "pending",
+        createdAt: new Date().toISOString()
+      };
+      
+      console.log(`🏗️ New CIVIL+MEP request: ${newRequest.contactName} - Property ID: ${newRequest.propertyId}`);
+      res.status(201).json(newRequest);
+    } catch (error) {
+      console.error("Error creating CIVIL+MEP request:", error);
+      res.status(500).json({ error: "Failed to create CIVIL+MEP request" });
+    }
+  });
+
   // Valuation Requests API
   app.post("/api/valuation-requests", async (req, res) => {
     try {

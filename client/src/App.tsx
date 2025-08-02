@@ -19,6 +19,7 @@ import BlogManagement from "@/pages/admin/blog";
 import CivilMepReports from "@/pages/admin/civil-mep-reports";
 import CivilMepReportDetail from "@/pages/admin/civil-mep-report-detail";
 import CreateCivilMepReport from "@/pages/admin/create-civil-mep-report";
+import CivilMepReportsPage from "@/pages/civil-mep-reports";
 import Orders from "@/pages/admin/orders";
 import Customers from "@/pages/admin/customers";
 import ValuationReports from "@/pages/admin/valuation-reports";
@@ -83,6 +84,7 @@ function Router() {
       <Route path="/find-property/results" component={PropertyResults} />
       <Route path="/property/:id" component={PropertyDetail} />
       <Route path="/property-valuation" component={PropertyValuation} />
+      <Route path="/civil-mep-reports" component={CivilMepReportsPage} />
       <Route path="/book-visit" component={BookVisit} />
       <Route path="/consultation" component={Consultation} />
       <Route path="/user-panel" component={UserPanel} />
