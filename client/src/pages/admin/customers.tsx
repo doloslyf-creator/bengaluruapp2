@@ -794,7 +794,7 @@ export default function Customers() {
                                                       <div>
                                                         <h4 className="font-medium">{booking.propertyName}</h4>
                                                         <p className="text-sm text-gray-500">
-                                                          {booking.bookingType} • {format(new Date(booking.visitDate), 'MMM dd, yyyy')}
+                                                          {booking.bookingType} • {format(new Date(booking.createdAt), 'MMM dd, yyyy')}
                                                         </p>
                                                       </div>
                                                     </div>
