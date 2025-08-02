@@ -81,9 +81,10 @@ export default function LegalDueDiligenceForm() {
   });
 
   const filteredProperties = properties.filter((property: Property) => 
-    property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    property.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    property.projectName.toLowerCase().includes(searchTerm.toLowerCase())
+    property.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    property.area?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    property.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    property.developer?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const submitLegalDueDiligenceRequest = useMutation({
@@ -228,7 +229,7 @@ export default function LegalDueDiligenceForm() {
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-2">
-                            <h4 className="font-semibold text-gray-900">{property.title}</h4>
+                            <h4 className="font-semibold text-gray-900">{property.name}</h4>
                             {property.legallyVerified && (
                               <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">
                                 Verified
@@ -237,7 +238,7 @@ export default function LegalDueDiligenceForm() {
                           </div>
                           <div className="flex items-center text-gray-600 text-sm mb-2">
                             <MapPin className="h-4 w-4 mr-1" />
-                            {property.location}
+                            {property.address}
                           </div>
                           <div className="flex items-center space-x-4 text-sm text-gray-600">
                             <span className="font-medium">{property.bhkType}</span>
