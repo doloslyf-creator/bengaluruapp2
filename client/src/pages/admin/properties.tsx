@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { Plus, Search, Building } from "lucide-react";
+import { Plus, Search, Building, Grid3X3, List, Edit2, Eye, MapPin, Calendar, DollarSign, Tag, Users } from "lucide-react";
 import { PropertyCard } from "@/components/property/property-card";
 import { AddPropertyDialog } from "@/components/property/add-property-dialog";
 import { PropertyDetailsDialog } from "@/components/property/property-details-dialog";
@@ -9,6 +9,9 @@ import { PropertyFilters } from "@/components/property/property-filters";
 import { StatsCards } from "@/components/property/stats-cards";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import AdminLayout from "@/components/layout/admin-layout";
@@ -22,6 +25,7 @@ export default function AdminProperties() {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
   const [filters, setFilters] = useState({
     type: "all",
     status: "all",
@@ -98,6 +102,14 @@ export default function AdminProperties() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
+              <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as "cards" | "table")}>
+                <ToggleGroupItem value="cards" aria-label="Card view">
+                  <Grid3X3 className="h-4 w-4" />
+                </ToggleGroupItem>
+                <ToggleGroupItem value="table" aria-label="Table view">
+                  <List className="h-4 w-4" />
+                </ToggleGroupItem>
+              </ToggleGroup>
               <Button
                 onClick={() => setShowAddDialog(true)}
                 className="bg-primary text-white hover:bg-primary/90"
@@ -136,7 +148,7 @@ export default function AdminProperties() {
                 Add Property
               </Button>
             </div>
-          ) : (
+          ) : viewMode === "cards" ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {filteredProperties.map((property: Property) => (
                 <PropertyCard
@@ -146,6 +158,99 @@ export default function AdminProperties() {
                   onDelete={handleDeleteProperty}
                 />
               ))}
+            </div>
+          ) : (
+            <div className="bg-white rounded-lg border shadow-sm">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Property Name</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Developer</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Location</TableHead>
+                    <TableHead>Zone</TableHead>
+                    <TableHead>Price Range</TableHead>
+                    <TableHead>RERA</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredProperties.map((property: Property) => (
+                    <TableRow key={property.id} className="hover:bg-gray-50">
+                      <TableCell className="font-medium">
+                        <div className="flex items-center space-x-2">
+                          <Building className="h-4 w-4 text-gray-400" />
+                          <span>{property.name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="capitalize">
+                          {property.type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-gray-600">{property.developer}</TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant={property.status === 'active' ? 'default' : 
+                                 property.status === 'under-construction' ? 'secondary' :
+                                 property.status === 'completed' ? 'outline' : 'destructive'}
+                        >
+                          {property.status.replace('-', ' ')}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-1 text-gray-600">
+                          <MapPin className="h-3 w-3" />
+                          <span className="text-sm">{property.area}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="capitalize">
+                          {property.zone}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-1 text-gray-600">
+                          <DollarSign className="h-3 w-3" />
+                          <span className="text-sm">
+                            ₹{property.priceMin?.toFixed(1)}L - ₹{property.priceMax?.toFixed(1)}L
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant={property.reraApproved ? "default" : "destructive"}
+                          className="text-xs"
+                        >
+                          {property.reraApproved ? "Approved" : "Pending"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedProperty(property);
+                              setShowDetailsDialog(true);
+                            }}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handlePropertyClick(property)}
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           )}
         </main>
