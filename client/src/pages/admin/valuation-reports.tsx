@@ -99,6 +99,7 @@ function CreateReportForm({ properties, onCancel, onSuccess }: {
 export default function ValuationReports() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedReport, setSelectedReport] = useState<ValuationReport | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -372,7 +373,12 @@ export default function ValuationReports() {
                                 )}
                               </DialogContent>
                             </Dialog>
-                            <Button variant="ghost" size="sm">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => setLocation(`/admin-panel/valuation-reports/edit/${report.id}`)}
+                              title="Edit Report"
+                            >
                               <Edit className="h-4 w-4" />
                             </Button>
                             <Button variant="ghost" size="sm">
