@@ -577,7 +577,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/properties/with-reports", async (req, res) => {
     try {
       const { status } = req.query;
+      console.log("Fetching properties with reports, status filter:", status);
       const properties = await storage.getPropertiesWithReports(status as string);
+      console.log("Found properties:", properties.length);
       res.json(properties);
     } catch (error) {
       console.error("Error fetching properties with reports:", error);
