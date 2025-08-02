@@ -326,8 +326,7 @@ const CivilMepReports = () => {
                                   variant="ghost" 
                                   size="sm"
                                   onClick={() => {
-                                    setSelectedProperty(property);
-                                    setShowViewReportDialog(true);
+                                    window.location.href = `/admin-panel/civil-mep-reports/civ-mep-001`;
                                   }}
                                   className="h-8 px-2"
                                   title="View Report"

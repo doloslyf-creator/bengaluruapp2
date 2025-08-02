@@ -691,6 +691,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get specific CIVIL+MEP report by ID
+  app.get("/api/civil-mep-reports/:id", async (req, res) => {
+    try {
+      const reportId = req.params.id;
+      const report = await storage.getCivilMepReportById(reportId);
+      if (!report) {
+        return res.status(404).json({ error: "Report not found" });
+      }
+      res.json(report);
+    } catch (error) {
+      console.error("Error fetching CIVIL+MEP report:", error);
+      res.status(500).json({ error: "Failed to fetch report" });
+    }
+  });
+
   app.get("/api/civil-mep-reports/stats", async (req, res) => {
     try {
       const stats = await storage.getCivilMepReportStats();

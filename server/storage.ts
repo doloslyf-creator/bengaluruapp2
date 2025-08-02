@@ -125,6 +125,7 @@ export interface IStorage {
   // CIVIL+MEP Report operations
   enableCivilMepReport(propertyId: string): Promise<Property | undefined>;
   getCivilMepReport(propertyId: string): Promise<CivilMepReport | undefined>;
+  getCivilMepReportById(reportId: string): Promise<CivilMepReport | undefined>;
   createCivilMepReport(report: InsertCivilMepReport): Promise<CivilMepReport>;
   updateCivilMepReport(reportId: string, updates: Partial<InsertCivilMepReport>): Promise<CivilMepReport | undefined>;
   getPropertiesWithReports(statusFilter?: string): Promise<Array<Property & { civilMepReport?: CivilMepReport; reportStats?: any }>>;
@@ -1508,6 +1509,12 @@ export class DatabaseStorage implements IStorage {
   async getCivilMepReport(propertyId: string): Promise<CivilMepReport | undefined> {
     const [report] = await db.select().from(civilMepReports)
       .where(eq(civilMepReports.propertyId, propertyId));
+    return report || undefined;
+  }
+
+  async getCivilMepReportById(reportId: string): Promise<CivilMepReport | undefined> {
+    const [report] = await db.select().from(civilMepReports)
+      .where(eq(civilMepReports.id, reportId));
     return report || undefined;
   }
 
