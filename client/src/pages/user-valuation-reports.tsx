@@ -150,85 +150,145 @@ export default function UserValuationReports() {
     const property = getPropertyDetails(report.propertyId);
     
     return (
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-blue-900">
-            Property Valuation Report
-          </DialogTitle>
-          <DialogDescription>
-            Professional valuation assessment for {report.propertyName}
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-gray-50">
+        {/* Professional Header Box */}
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+          <DialogHeader>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <DialogTitle className="text-2xl font-bold text-gray-900 mb-2">
+                  Property Valuation Report
+                </DialogTitle>
+                <DialogDescription className="text-gray-600">
+                  Prepared exclusively for <span className="font-semibold text-blue-600">John Doe</span>
+                </DialogDescription>
+              </div>
+              <div className="text-right">
+                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 mb-2">
+                  v{report.reportVersion}
+                </Badge>
+                <div className="text-sm text-gray-500">Report ID: {report.id.slice(0, 8)}...</div>
+              </div>
+            </div>
+            
+            <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-gray-900">{report.propertyName}</h3>
+                  <div className="flex items-center text-sm text-gray-600 mt-1">
+                    <MapPin className="h-3 w-3 mr-1" />
+                    {property?.zone || 'Premium Location'} • Generated on {formatDate(report.createdAt)}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-green-700">
+                    {formatCurrency(report.costBreakdown?.totalEstimatedCost || 0)}
+                  </div>
+                  <div className="text-xs text-gray-500">Fair Market Value</div>
+                </div>
+              </div>
+            </div>
+          </DialogHeader>
+        </div>
 
-        <div className="space-y-8 p-6">
-          {/* Header Section */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200">
+        <div className="space-y-6">
+          {/* Property Information Box */}
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Property Information</h3>
             <div className="grid grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold text-blue-900 mb-2">Property Information</h3>
-                <div className="space-y-1 text-sm">
-                  <p><span className="font-medium">Property Name:</span> {report.propertyName}</p>
-                  <p><span className="font-medium">Developer:</span> {property?.developer}</p>
-                  <p><span className="font-medium">Location:</span> {property?.zone}</p>
-                  <p><span className="font-medium">Property Type:</span> {property?.propertyType}</p>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-medium text-gray-700 mb-3">Property Details</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Property Name:</span>
+                    <span className="font-medium">{report.propertyName}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Developer:</span>
+                    <span className="font-medium">{property?.developer || 'Premium Developer'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Location:</span>
+                    <span className="font-medium">{property?.zone || 'Premium Location'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Property Type:</span>
+                    <span className="font-medium">{property?.propertyType || 'Residential'}</span>
+                  </div>
                 </div>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold text-blue-900 mb-2">Report Details</h3>
-                <div className="space-y-1 text-sm">
-                  <p><span className="font-medium">Report Date:</span> {formatDate(report.createdAt)}</p>
-                  <p><span className="font-medium">Report Version:</span> {report.reportVersion}</p>
-                  <p><span className="font-medium">Generated By:</span> {report.generatedBy}</p>
-                  <p><span className="font-medium">Purpose:</span> Fair Market Value Assessment</p>
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <h4 className="font-medium text-blue-700 mb-3">Report Details</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-blue-600">Report Date:</span>
+                    <span className="font-medium">{formatDate(report.createdAt)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-blue-600">Report Version:</span>
+                    <span className="font-medium">v{report.reportVersion}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-blue-600">Generated By:</span>
+                    <span className="font-medium">{report.generatedBy}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-blue-600">Purpose:</span>
+                    <span className="font-medium">Fair Market Value</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Property Specifications */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Property Specifications</h3>
-            <div className="grid grid-cols-3 gap-6 bg-gray-50 p-4 rounded-lg">
-              <div>
-                <p className="text-sm text-gray-600">Land Area</p>
-                <p className="text-lg font-semibold">{(report.costBreakdown?.landAreaSqft || 0).toLocaleString()} sq ft</p>
+          {/* Property Specifications Box */}
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Property Specifications</h3>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-gray-50 p-4 rounded-lg text-center">
+                <div className="text-2xl font-bold text-gray-900">{(report.costBreakdown?.landAreaSqft || 0).toLocaleString()}</div>
+                <div className="text-sm text-gray-600 mt-1">Land Area (sq ft)</div>
               </div>
-              <div>
-                <p className="text-sm text-gray-600">Built-up Area</p>
-                <p className="text-lg font-semibold">{(report.costBreakdown?.builtUpAreaSqft || 0).toLocaleString()} sq ft</p>
+              <div className="bg-green-50 p-4 rounded-lg text-center border border-green-200">
+                <div className="text-2xl font-bold text-green-700">{(report.costBreakdown?.builtUpAreaSqft || 0).toLocaleString()}</div>
+                <div className="text-sm text-green-600 mt-1">Built-up Area (sq ft)</div>
               </div>
-              <div>
-                <p className="text-sm text-gray-600">Property Age</p>
-                <p className="text-lg font-semibold">{report.propertyAssessment?.propertyAge || 0} years</p>
+              <div className="bg-blue-50 p-4 rounded-lg text-center border border-blue-200">
+                <div className="text-2xl font-bold text-blue-700">{report.propertyAssessment?.propertyAge || 0}</div>
+                <div className="text-sm text-blue-600 mt-1">Property Age (years)</div>
               </div>
             </div>
           </div>
 
-          {/* Valuation Summary */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Valuation Summary</h3>
-            <div className="bg-green-50 border border-green-200 p-6 rounded-lg">
-              <div className="text-center mb-4">
-                <h4 className="text-2xl font-bold text-green-800">
-                  Fair Market Value: {formatCurrency(report.costBreakdown?.totalEstimatedCost || 0)}
-                </h4>
-                <p className="text-green-600">
-                  Rate per sq ft: {formatCurrency(Math.round((report.costBreakdown?.totalEstimatedCost || 0) / (report.costBreakdown?.builtUpAreaSqft || 1)))}
-                </p>
+          {/* Valuation Summary Box */}
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Valuation Summary</h3>
+            <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 p-6 rounded-lg">
+              <div className="text-center mb-6">
+                <div className="text-3xl font-bold text-green-800 mb-2">
+                  {formatCurrency(report.costBreakdown?.totalEstimatedCost || 0)}
+                </div>
+                <div className="text-lg text-green-600 mb-1">Fair Market Value</div>
+                <div className="text-sm text-gray-600">
+                  Rate per sq ft: <span className="font-semibold">{formatCurrency(Math.round((report.costBreakdown?.totalEstimatedCost || 0) / (report.costBreakdown?.builtUpAreaSqft || 1)))}</span>
+                </div>
               </div>
               
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div className="bg-white p-3 rounded">
-                  <p className="text-sm text-gray-600">Basic Cost</p>
-                  <p className="font-semibold">{formatCurrency(report.costBreakdown?.basicCost || 0)}</p>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
+                  <div className="text-xl font-bold text-gray-900">{formatCurrency(report.costBreakdown?.basicCost || 0)}</div>
+                  <div className="text-sm text-gray-600 mt-1">Basic Cost</div>
+                  <div className="text-xs text-gray-500 mt-1">{((report.costBreakdown?.basicCost || 0) / (report.costBreakdown?.totalEstimatedCost || 1) * 100).toFixed(1)}%</div>
                 </div>
-                <div className="bg-white p-3 rounded">
-                  <p className="text-sm text-gray-600">Total Taxes</p>
-                  <p className="font-semibold">{formatCurrency(report.costBreakdown?.totalTaxes || 0)}</p>
+                <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
+                  <div className="text-xl font-bold text-orange-600">{formatCurrency(report.costBreakdown?.totalTaxes || 0)}</div>
+                  <div className="text-sm text-gray-600 mt-1">Total Taxes</div>
+                  <div className="text-xs text-gray-500 mt-1">{((report.costBreakdown?.totalTaxes || 0) / (report.costBreakdown?.totalEstimatedCost || 1) * 100).toFixed(1)}%</div>
                 </div>
-                <div className="bg-white p-3 rounded">
-                  <p className="text-sm text-gray-600">Additional Costs</p>
-                  <p className="font-semibold">{formatCurrency(report.costBreakdown?.totalAdditionalCost || 0)}</p>
+                <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
+                  <div className="text-xl font-bold text-blue-600">{formatCurrency(report.costBreakdown?.totalAdditionalCost || 0)}</div>
+                  <div className="text-sm text-gray-600 mt-1">Additional Costs</div>
+                  <div className="text-xs text-gray-500 mt-1">{((report.costBreakdown?.totalAdditionalCost || 0) / (report.costBreakdown?.totalEstimatedCost || 1) * 100).toFixed(1)}%</div>
                 </div>
               </div>
             </div>
