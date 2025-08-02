@@ -1920,6 +1920,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Legal Due Diligence Requests API
+  app.post("/api/legal-due-diligence-requests", async (req, res) => {
+    try {
+      const requestData = req.body;
+      
+      // Create a new legal due diligence request record
+      const newRequest = {
+        id: Date.now().toString(),
+        propertyId: requestData.propertyId,
+        urgencyLevel: requestData.urgencyLevel,
+        specificConcerns: requestData.specificConcerns,
+        additionalNotes: requestData.additionalNotes,
+        contactName: requestData.contactName,
+        contactPhone: requestData.contactPhone,
+        contactEmail: requestData.contactEmail,
+        requestReason: requestData.requestReason,
+        buyerType: requestData.buyerType,
+        status: "pending",
+        createdAt: new Date().toISOString()
+      };
+      
+      console.log(`⚖️ New legal due diligence request: ${newRequest.contactName} - Property ID: ${newRequest.propertyId}`);
+      res.status(201).json(newRequest);
+    } catch (error) {
+      console.error("Error creating legal due diligence request:", error);
+      res.status(500).json({ error: "Failed to create legal due diligence request" });
+    }
+  });
+
   // CIVIL+MEP Requests API
   app.post("/api/civil-mep-requests", async (req, res) => {
     try {
