@@ -587,53 +587,33 @@ export default function LegalDueDiligence() {
       <Header />
       
       {/* Hero Section */}
-      <div className="bg-white/80 backdrop-blur border-b">
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <div className="text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex justify-center mb-4"
-            >
-              <div className="p-3 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-white">
-                <Scale className="h-8 w-8" />
+      <div className="bg-white/95 backdrop-blur border-b border-blue-200">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-white shadow-lg">
+                <Scale className="h-7 w-7" />
               </div>
-            </motion.div>
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Legal Due Diligence
-            </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">
-              Don't let legal issues turn your property investment into a costly mistake. 
-              Get complete legal verification before you buy.
-            </p>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Legal Due Diligence</h1>
+                <p className="text-gray-600 mt-1">Complete legal verification before you buy - protect your investment</p>
+              </div>
+            </div>
             
-            <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                className="bg-white/60 backdrop-blur rounded-lg p-4 border border-red-200"
-              >
-                <XCircle className="h-6 w-6 text-red-600 mb-2 mx-auto" />
-                <h3 className="font-medium text-gray-900 mb-1">85% Face Legal Issues</h3>
-                <p className="text-sm text-gray-600">Property buyers discover legal problems after purchase</p>
-              </motion.div>
-              
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                className="bg-white/60 backdrop-blur rounded-lg p-4 border border-orange-200"
-              >
-                <IndianRupee className="h-6 w-6 text-orange-600 mb-2 mx-auto" />
-                <h3 className="font-medium text-gray-900 mb-1">₹5-50L Legal Costs</h3>
-                <p className="text-sm text-gray-600">Average cost to resolve property legal disputes</p>
-              </motion.div>
-              
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                className="bg-white/60 backdrop-blur rounded-lg p-4 border border-green-200"
-              >
-                <Shield className="h-6 w-6 text-green-600 mb-2 mx-auto" />
-                <h3 className="font-medium text-gray-900 mb-1">100% Legal Clarity</h3>
-                <p className="text-sm text-gray-600">Complete verification before you invest</p>
-              </motion.div>
+            {/* Key Stats - Compact */}
+            <div className="hidden lg:flex items-center space-x-6">
+              <div className="text-center">
+                <div className="text-lg font-bold text-red-600">85%</div>
+                <div className="text-xs text-gray-500">Legal Issues</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-blue-600">12-Step</div>
+                <div className="text-xs text-gray-500">Verification</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-green-600">RERA</div>
+                <div className="text-xs text-gray-500">Compliant</div>
+              </div>
             </div>
           </div>
         </div>

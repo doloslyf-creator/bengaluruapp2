@@ -542,53 +542,33 @@ export default function CivilMepReports() {
       <Header />
       
       {/* Hero Section */}
-      <div className="bg-white/80 backdrop-blur border-b">
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <div className="text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex justify-center mb-4"
-            >
-              <div className="p-3 bg-gradient-to-r from-red-600 to-orange-600 rounded-xl text-white">
-                <AlertTriangle className="h-8 w-8" />
+      <div className="bg-white/95 backdrop-blur border-b border-red-200">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-gradient-to-r from-red-600 to-orange-600 rounded-xl text-white shadow-lg">
+                <AlertTriangle className="h-7 w-7" />
               </div>
-            </motion.div>
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              CIVIL+MEP Engineering Report
-            </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">
-              Don't gamble with your investment. Get a professional engineering analysis 
-              before you buy. I've seen too many buyers regret not doing this step.
-            </p>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">CIVIL+MEP Engineering Report</h1>
+                <p className="text-gray-600 mt-1">Professional engineering analysis before you buy - protect your investment</p>
+              </div>
+            </div>
             
-            <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                className="bg-white/60 backdrop-blur rounded-lg p-4 border border-red-200"
-              >
-                <XCircle className="h-6 w-6 text-red-600 mb-2 mx-auto" />
-                <h3 className="font-medium text-gray-900 mb-1">70% Miss Critical Issues</h3>
-                <p className="text-sm text-gray-600">Buyers discover structural problems after purchase</p>
-              </motion.div>
-              
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                className="bg-white/60 backdrop-blur rounded-lg p-4 border border-orange-200"
-              >
-                <IndianRupee className="h-6 w-6 text-orange-600 mb-2 mx-auto" />
-                <h3 className="font-medium text-gray-900 mb-1">₹3-8L Average Repair</h3>
-                <p className="text-sm text-gray-600">Cost to fix undiscovered structural issues</p>
-              </motion.div>
-              
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                className="bg-white/60 backdrop-blur rounded-lg p-4 border border-green-200"
-              >
-                <Shield className="h-6 w-6 text-green-600 mb-2 mx-auto" />
-                <h3 className="font-medium text-gray-900 mb-1">100% Peace of Mind</h3>
-                <p className="text-sm text-gray-600">Know exactly what you're buying</p>
-              </motion.div>
+            {/* Key Stats - Compact */}
+            <div className="hidden lg:flex items-center space-x-6">
+              <div className="text-center">
+                <div className="text-lg font-bold text-red-600">200+</div>
+                <div className="text-xs text-gray-500">Issues Found</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-orange-600">24-48h</div>
+                <div className="text-xs text-gray-500">Emergency</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-green-600">₹5L</div>
+                <div className="text-xs text-gray-500">Coverage</div>
+              </div>
             </div>
           </div>
         </div>
