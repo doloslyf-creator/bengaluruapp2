@@ -93,14 +93,32 @@ export default function EnhancedUserPanel() {
     staleTime: 2 * 60 * 1000,
   });
 
+  // Fetch valuation reports
+  const { data: valuationReports = [] } = useQuery({
+    queryKey: ["/api/valuation-reports"],
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Fetch CIVIL+MEP reports stats
+  const { data: civilMepStats } = useQuery({
+    queryKey: ["/api/civil-mep-reports/stats"],
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Fetch legal trackers
+  const { data: legalTrackers = [] } = useQuery({
+    queryKey: ["/api/legal-trackers"],
+    staleTime: 5 * 60 * 1000,
+  });
+
   // Calculate user statistics
   const userStats: UserStats = {
     totalViewed: viewedProperties.length,
     totalBookings: userBookings.length,
     totalConsultations: userConsultations.filter(lead => lead.source === 'consultation').length,
     totalOrders: userOrders.length,
-    totalSpent: userOrders.reduce((sum, order) => sum + (order.amount || 0), 0),
-    recentActivity: 8 // Mock recent activity count
+    totalSpent: userOrders.reduce((sum, order) => sum + (parseFloat(order.amount || '0')), 0),
+    recentActivity: (userBookings.length + userConsultations.length + userOrders.length)
   };
 
   const quickActions: QuickAction[] = [
@@ -120,7 +138,7 @@ export default function EnhancedUserPanel() {
       icon: Calculator,
       href: "/user-valuation-reports",
       color: "bg-green-500",
-      count: userStats.totalOrders
+      count: valuationReports.length
     },
     {
       id: "civil-mep",
@@ -129,7 +147,7 @@ export default function EnhancedUserPanel() {
       icon: Building,
       href: "/user-civil-mep-reports",
       color: "bg-purple-500",
-      count: 3
+      count: civilMepStats?.totalReports || 0
     },
     {
       id: "legal",
@@ -138,7 +156,7 @@ export default function EnhancedUserPanel() {
       icon: Scale,
       href: "/user-legal-tracker-enhanced",
       color: "bg-orange-500",
-      count: 2
+      count: legalTrackers.length
     }
   ];
 
@@ -585,19 +603,26 @@ export default function EnhancedUserPanel() {
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <div className="text-2xl font-bold text-green-600">2</div>
+                            <div className="text-2xl font-bold text-green-600">{valuationReports.length}</div>
                             <div className="text-sm text-gray-600">Reports Available</div>
                           </div>
-                          <Badge className="bg-green-50 text-green-700 border-green-200">Active</Badge>
+                          <Badge className="bg-green-50 text-green-700 border-green-200">
+                            {valuationReports.length > 0 ? 'Active' : 'No Reports'}
+                          </Badge>
                         </div>
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
                             <span className="text-gray-600">Latest Report</span>
-                            <span className="font-medium">15 Dec 2024</span>
+                            <span className="font-medium">
+                              {valuationReports.length > 0 
+                                ? new Date(valuationReports[0]?.reportDate || Date.now()).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+                                : 'No reports yet'
+                              }
+                            </span>
                           </div>
                           <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">Average Value</span>
-                            <span className="font-medium text-green-600">₹1.4Cr</span>
+                            <span className="text-gray-600">Total Reports</span>
+                            <span className="font-medium text-green-600">{valuationReports.length} Generated</span>
                           </div>
                         </div>
                         <Link href="/user-valuation-reports" className="block">
@@ -627,19 +652,21 @@ export default function EnhancedUserPanel() {
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <div className="text-2xl font-bold text-purple-600">1</div>
-                            <div className="text-sm text-gray-600">Engineering Report</div>
+                            <div className="text-2xl font-bold text-purple-600">{civilMepStats?.totalReports || 0}</div>
+                            <div className="text-sm text-gray-600">Engineering Report{(civilMepStats?.totalReports || 0) !== 1 ? 's' : ''}</div>
                           </div>
-                          <Badge className="bg-purple-50 text-purple-700 border-purple-200">Completed</Badge>
+                          <Badge className="bg-purple-50 text-purple-700 border-purple-200">
+                            {(civilMepStats?.totalReports || 0) > 0 ? 'Available' : 'No Reports'}
+                          </Badge>
                         </div>
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">Latest Report</span>
-                            <span className="font-medium">12 Dec 2024</span>
+                            <span className="text-gray-600">Properties Covered</span>
+                            <span className="font-medium">{civilMepStats?.totalReports || 0} Properties</span>
                           </div>
                           <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">Report Cost</span>
-                            <span className="font-medium text-purple-600">₹25,000</span>
+                            <span className="text-gray-600">Total Orders</span>
+                            <span className="font-medium text-purple-600">{userOrders.filter(order => order.reportType === 'civil-mep').length} Orders</span>
                           </div>
                         </div>
                         <Link href="/user-civil-mep-reports" className="block">
@@ -669,19 +696,26 @@ export default function EnhancedUserPanel() {
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <div className="text-2xl font-bold text-orange-600">85%</div>
-                            <div className="text-sm text-gray-600">Verification Complete</div>
+                            <div className="text-2xl font-bold text-orange-600">
+                              {legalTrackers.length > 0 
+                                ? Math.round((legalTrackers.reduce((acc: number, tracker: any) => 
+                                    acc + (tracker.completedSteps || 0), 0) / (legalTrackers.length * 12)) * 100)
+                                : 0}%
+                              </div>
+                            <div className="text-sm text-gray-600">Average Progress</div>
                           </div>
-                          <Badge className="bg-orange-50 text-orange-700 border-orange-200">In Progress</Badge>
+                          <Badge className="bg-orange-50 text-orange-700 border-orange-200">
+                            {legalTrackers.length > 0 ? 'In Progress' : 'No Trackers'}
+                          </Badge>
                         </div>
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
                             <span className="text-gray-600">Active Properties</span>
-                            <span className="font-medium">2 Properties</span>
+                            <span className="font-medium">{legalTrackers.length} Properties</span>
                           </div>
                           <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">Pending Steps</span>
-                            <span className="font-medium text-orange-600">3 Steps</span>
+                            <span className="text-gray-600">Total Steps</span>
+                            <span className="font-medium text-orange-600">{legalTrackers.length * 12} Steps</span>
                           </div>
                         </div>
                         <Link href="/user-legal-tracker-enhanced" className="block">
@@ -706,19 +740,24 @@ export default function EnhancedUserPanel() {
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                       <div className="text-center">
-                        <div className="text-3xl font-bold text-blue-600 mb-1">5</div>
+                        <div className="text-3xl font-bold text-blue-600 mb-1">{valuationReports.length + (civilMepStats?.totalReports || 0)}</div>
                         <div className="text-sm text-gray-600">Total Reports</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-3xl font-bold text-green-600 mb-1">₹45K</div>
+                        <div className="text-3xl font-bold text-green-600 mb-1">₹{Math.round(userStats.totalSpent / 1000)}K</div>
                         <div className="text-sm text-gray-600">Total Investment</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-3xl font-bold text-purple-600 mb-1">92%</div>
+                        <div className="text-3xl font-bold text-purple-600 mb-1">
+                          {legalTrackers.length > 0 
+                            ? Math.round((legalTrackers.reduce((acc: number, tracker: any) => 
+                                acc + (tracker.completedSteps || 0), 0) / (legalTrackers.length * 12)) * 100)
+                            : 0}%
+                        </div>
                         <div className="text-sm text-gray-600">Avg Completion</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-3xl font-bold text-orange-600 mb-1">3</div>
+                        <div className="text-3xl font-bold text-orange-600 mb-1">{legalTrackers.length}</div>
                         <div className="text-sm text-gray-600">Active Trackers</div>
                       </div>
                     </div>
