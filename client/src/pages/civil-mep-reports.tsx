@@ -45,6 +45,7 @@ interface CivilMepRequest {
 
 export default function CivilMepReports() {
   const { toast } = useToast();
+  const [showForm, setShowForm] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -591,97 +592,191 @@ export default function CivilMepReports() {
         </div>
       </div>
 
-      {/* Progress Bar */}
-      <div className="bg-white/60 backdrop-blur border-b">
-        <div className="max-w-4xl mx-auto px-4 py-3">
-          <div className="flex items-center space-x-3">
-            <span className="text-sm text-gray-600 font-medium">Step {currentStep + 1} of {totalSteps}</span>
-            <div className="flex-1 bg-gray-200/60 rounded-full h-2">
-              <motion.div 
-                className="bg-gradient-to-r from-red-600 to-orange-600 h-2 rounded-full"
-                initial={{ width: "0%" }}
-                animate={{ width: `${getStepProgress()}%` }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-              />
+      {showForm && (
+        <>
+          {/* Progress Bar */}
+          <div className="bg-white/60 backdrop-blur border-b">
+            <div className="max-w-4xl mx-auto px-4 py-3">
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-gray-600 font-medium">Step {currentStep + 1} of {totalSteps}</span>
+                <div className="flex-1 bg-gray-200/60 rounded-full h-2">
+                  <motion.div 
+                    className="bg-gradient-to-r from-red-600 to-orange-600 h-2 rounded-full"
+                    initial={{ width: "0%" }}
+                    animate={{ width: `${getStepProgress()}%` }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                  />
+                </div>
+                <span className="text-sm text-gray-500">{steps[currentStep]?.subtitle}</span>
+              </div>
             </div>
-            <span className="text-sm text-gray-500">{steps[currentStep]?.subtitle}</span>
           </div>
-        </div>
-      </div>
+        </>
+      )}
 
       {/* Main Content */}
-      <main className="max-w-3xl mx-auto px-4 py-6">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentStep}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="mb-6"
-          >
-            <div className="text-center mb-6">
-              <motion.div 
-                className="flex justify-center mb-3"
-                whileHover={{ scale: 1.05 }}
-              >
-                <div className="p-3 bg-gradient-to-r from-red-600 to-orange-600 rounded-xl text-white">
-                  {steps[currentStep]?.icon}
+      <main className={`${showForm ? 'max-w-3xl' : 'max-w-6xl'} mx-auto px-4 py-6`}>
+        {!showForm ? (
+          /* Problem vs Solution Section */
+          <div className="space-y-12">
+            {/* Why This Matters Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center space-y-8"
+            >
+              <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-4xl mx-auto">
+                <div className="flex items-start space-x-4">
+                  <AlertTriangle className="h-8 w-8 text-red-600 mt-1 flex-shrink-0" />
+                  <div className="text-left">
+                    <h2 className="text-2xl font-bold text-red-800 mb-3">The Hidden Dangers in Your Dream Property</h2>
+                    <div className="grid md:grid-cols-2 gap-4 text-red-700">
+                      <div className="space-y-2">
+                        <p className="font-medium">🚨 What 70% of buyers discover too late:</p>
+                        <ul className="text-sm space-y-1">
+                          <li>• Structural cracks in foundation</li>
+                          <li>• Electrical wiring fire hazards</li>
+                          <li>• Water seepage and drainage issues</li>
+                          <li>• Non-compliant building codes</li>
+                        </ul>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="font-medium">💰 The real cost of ignorance:</p>
+                        <ul className="text-sm space-y-1">
+                          <li>• ₹3-8 lakhs in emergency repairs</li>
+                          <li>• Legal penalties for code violations</li>
+                          <li>• Insurance claim rejections</li>
+                          <li>• Decreased property value</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+              </div>
+
+              <div className="bg-green-50 border border-green-200 rounded-lg p-6 max-w-4xl mx-auto">
+                <div className="flex items-start space-x-4">
+                  <Shield className="h-8 w-8 text-green-600 mt-1 flex-shrink-0" />
+                  <div className="text-left">
+                    <h2 className="text-2xl font-bold text-green-800 mb-3">The Solution: Professional Engineering Analysis</h2>
+                    <div className="grid md:grid-cols-2 gap-4 text-green-700">
+                      <div className="space-y-2">
+                        <p className="font-medium">✅ What our certified engineers check:</p>
+                        <ul className="text-sm space-y-1">
+                          <li>• Complete structural integrity assessment</li>
+                          <li>• Electrical safety and load capacity</li>
+                          <li>• Plumbing and drainage evaluation</li>
+                          <li>• Fire safety compliance verification</li>
+                        </ul>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="font-medium">🛡️ Your protection guarantee:</p>
+                        <ul className="text-sm space-y-1">
+                          <li>• ₹5 lakh repair cost coverage</li>
+                          <li>• 15+ years engineering experience</li>
+                          <li>• Professional engineer certification</li>
+                          <li>• Detailed remediation recommendations</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                className="inline-block"
+              >
+                <Button
+                  onClick={() => setShowForm(true)}
+                  className="bg-gradient-to-r from-red-600 to-orange-600 hover:shadow-lg text-white px-8 py-4 text-lg font-semibold rounded-xl"
+                >
+                  Get My Engineering Report Now
+                  <ChevronRight className="h-5 w-5 ml-2" />
+                </Button>
               </motion.div>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-                {steps[currentStep]?.title}
-              </h2>
-            </div>
 
-            <Card className="bg-white/80 backdrop-blur border-0 shadow-lg">
-              <CardContent className="p-6">
-                {renderStepContent()}
-              </CardContent>
-            </Card>
-          </motion.div>
-        </AnimatePresence>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Choose from our verified property listings and get a comprehensive engineering analysis 
+                that could save you lakhs in future repair costs.
+              </p>
+            </motion.div>
+          </div>
+        ) : (
+          /* Form Section */
+          <>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentStep}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="mb-6"
+              >
+                <div className="text-center mb-6">
+                  <motion.div 
+                    className="flex justify-center mb-3"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <div className="p-3 bg-gradient-to-r from-red-600 to-orange-600 rounded-xl text-white">
+                      {steps[currentStep]?.icon}
+                    </div>
+                  </motion.div>
+                  <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+                    {steps[currentStep]?.title}
+                  </h2>
+                </div>
 
-        {/* Navigation */}
-        <motion.div 
-          className="flex justify-between items-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
-          <Button 
-            variant="outline" 
-            onClick={handleBack}
-            disabled={currentStep === 0}
-            className="bg-white/80 backdrop-blur"
-          >
-            Previous
-          </Button>
-          
-          <Button 
-            onClick={handleNext}
-            disabled={!isStepValid() || submitCivilMepRequest.isPending}
-            className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
-              isStepValid() && !submitCivilMepRequest.isPending
-                ? 'bg-gradient-to-r from-red-600 to-orange-600 hover:shadow-lg text-white'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            {submitCivilMepRequest.isPending ? (
-              'Submitting...'
-            ) : currentStep === totalSteps - 1 ? (
-              <>
-                <span>Get My Engineering Report</span>
-                <FileText className="h-4 w-4 ml-2" />
-              </>
-            ) : (
-              <>
-                <span>Continue</span>
-                <ChevronRight className="h-4 w-4 ml-2" />
-              </>
-            )}
-          </Button>
-        </motion.div>
+                <Card className="bg-white/80 backdrop-blur border-0 shadow-lg">
+                  <CardContent className="p-6">
+                    {renderStepContent()}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Navigation */}
+            <motion.div 
+              className="flex justify-between items-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <Button 
+                variant="outline" 
+                onClick={currentStep === 0 ? () => setShowForm(false) : handleBack}
+                className="bg-white/80 backdrop-blur"
+              >
+                {currentStep === 0 ? 'Back to Overview' : 'Previous'}
+              </Button>
+              
+              <Button 
+                onClick={handleNext}
+                disabled={!isStepValid() || submitCivilMepRequest.isPending}
+                className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  isStepValid() && !submitCivilMepRequest.isPending
+                    ? 'bg-gradient-to-r from-red-600 to-orange-600 hover:shadow-lg text-white'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                {submitCivilMepRequest.isPending ? (
+                  'Submitting...'
+                ) : currentStep === totalSteps - 1 ? (
+                  <>
+                    <span>Get My Engineering Report</span>
+                    <FileText className="h-4 w-4 ml-2" />
+                  </>
+                ) : (
+                  <>
+                    <span>Continue</span>
+                    <ChevronRight className="h-4 w-4 ml-2" />
+                  </>
+                )}
+              </Button>
+            </motion.div>
+          </>
+        )}
       </main>
 
       {/* Trust Section */}
