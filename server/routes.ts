@@ -746,6 +746,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Customer CRM API - Get all customers with unified data
+  app.get("/api/customers", async (req, res) => {
+    try {
+      const customers = await storage.getAllCustomersWithDetails();
+      res.json(customers);
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+      res.status(500).json({ error: "Failed to fetch customers" });
+    }
+  });
+
+  // Customer CRM API - Get customer statistics
+  app.get("/api/customers/stats", async (req, res) => {
+    try {
+      const stats = await storage.getCustomerStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching customer stats:", error);
+      res.status(500).json({ error: "Failed to fetch customer statistics" });
+    }
+  });
+
+  // Customer CRM API - Add customer note
+  app.post("/api/customers/:customerId/notes", async (req, res) => {
+    try {
+      const { customerId } = req.params;
+      const { note } = req.body;
+      
+      const newNote = await storage.addCustomerNote(customerId, note);
+      res.json(newNote);
+    } catch (error) {
+      console.error("Error adding customer note:", error);
+      res.status(500).json({ error: "Failed to add customer note" });
+    }
+  });
+
+  // Customer CRM API - Update customer status
+  app.patch("/api/customers/:customerId/status", async (req, res) => {
+    try {
+      const { customerId } = req.params;
+      const { status } = req.body;
+      
+      const updatedCustomer = await storage.updateCustomerStatus(customerId, status);
+      if (!updatedCustomer) {
+        return res.status(404).json({ error: "Customer not found" });
+      }
+      
+      res.json(updatedCustomer);
+    } catch (error) {
+      console.error("Error updating customer status:", error);
+      res.status(500).json({ error: "Failed to update customer status" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

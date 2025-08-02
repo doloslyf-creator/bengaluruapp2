@@ -68,6 +68,12 @@ const navigation = [
     description: "Order Management"
   },
   { 
+    name: "Customers", 
+    href: "/admin-panel/customers", 
+    icon: Users2,
+    description: "Customer CRM"
+  },
+  { 
     name: "Developers", 
     href: "/admin-panel/developers", 
     icon: Users2,

@@ -529,3 +529,17 @@ export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
 
 export type BlogPost = typeof blogPosts.$inferSelect;
 export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
+
+// Customer notes for CRM
+export const customerNotes = pgTable("customer_notes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  customerId: varchar("customer_id").notNull(),
+  content: text("content").notNull(),
+  createdBy: text("created_by").default("admin"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertCustomerNoteSchema = createInsertSchema(customerNotes);
+export type InsertCustomerNote = z.infer<typeof insertCustomerNoteSchema>;
+export type CustomerNote = typeof customerNotes.$inferSelect;

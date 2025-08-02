@@ -19,6 +19,8 @@ import {
   type InsertCivilMepReport,
   type ReportPayment,
   type InsertReportPayment,
+  type CustomerNote,
+  type InsertCustomerNote,
   properties, 
   propertyConfigurations, 
   leads, 
@@ -26,7 +28,8 @@ import {
   leadNotes, 
   bookings,
   civilMepReports,
-  reportPayments
+  reportPayments,
+  customerNotes
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, ilike, gte, lte, desc, sql } from "drizzle-orm";
@@ -1271,6 +1274,145 @@ export class DatabaseStorage implements IStorage {
       totalRevenue: allPayments.filter(p => p.paymentStatus === 'completed').reduce((sum, p) => sum + Number(p.amount), 0),
       overduePayments: overduePayments.length
     };
+  }
+
+  // Customer CRM methods
+  async getAllCustomersWithDetails(): Promise<any[]> {
+    // Get unique customers from leads, bookings, and orders
+    const leads = await db.select().from(leads);
+    const bookings = await db.select().from(bookings);  
+    const payments = await db.select().from(reportPayments);
+    
+    const customerMap = new Map();
+    
+    // Process leads
+    for (const lead of leads) {
+      const key = lead.email || lead.phone;
+      if (!customerMap.has(key)) {
+        customerMap.set(key, {
+          id: key,
+          name: lead.customerName,
+          email: lead.email,
+          phone: lead.phone,
+          status: lead.leadType || "cold",
+          leadScore: lead.leadScore || 0,
+          source: lead.source,
+          lastActivity: lead.updatedAt || lead.createdAt,
+          leads: [],
+          bookings: [],
+          orders: [],
+          notes: [],
+          totalOrders: 0,
+          totalSpent: 0
+        });
+      }
+      customerMap.get(key).leads.push(lead);
+    }
+    
+    // Process bookings
+    for (const booking of bookings) {
+      const key = booking.email || booking.phone;
+      if (!customerMap.has(key)) {
+        customerMap.set(key, {
+          id: key,
+          name: booking.name,
+          email: booking.email,
+          phone: booking.phone,
+          status: "warm",
+          leadScore: 40,
+          source: "booking",
+          lastActivity: booking.updatedAt || booking.createdAt,
+          leads: [],
+          bookings: [],
+          orders: [],
+          notes: [],
+          totalOrders: 0,
+          totalSpent: 0
+        });
+      }
+      customerMap.get(key).bookings.push(booking);
+      if (new Date(booking.updatedAt || booking.createdAt) > new Date(customerMap.get(key).lastActivity)) {
+        customerMap.get(key).lastActivity = booking.updatedAt || booking.createdAt;
+      }
+    }
+    
+    // Process orders/payments
+    for (const payment of payments) {
+      const key = payment.customerEmail || payment.customerPhone;
+      if (!customerMap.has(key)) {
+        customerMap.set(key, {
+          id: key,
+          name: payment.customerName,
+          email: payment.customerEmail,
+          phone: payment.customerPhone,
+          status: "converted",
+          leadScore: 85,
+          source: "order",
+          lastActivity: payment.updatedAt || payment.createdAt,
+          leads: [],
+          bookings: [],
+          orders: [],
+          notes: [],
+          totalOrders: 0,
+          totalSpent: 0
+        });
+      }
+      const customer = customerMap.get(key);
+      customer.orders.push(payment);
+      customer.totalOrders += 1;
+      customer.totalSpent += parseFloat(payment.amount);
+      customer.status = "converted";
+      customer.leadScore = Math.max(customer.leadScore, 85);
+      if (new Date(payment.updatedAt || payment.createdAt) > new Date(customer.lastActivity)) {
+        customer.lastActivity = payment.updatedAt || payment.createdAt;
+      }
+    }
+    
+    // Get notes for each customer
+    const notes = await db.select().from(customerNotes);
+    for (const note of notes) {
+      if (customerMap.has(note.customerId)) {
+        customerMap.get(note.customerId).notes.push(note);
+      }
+    }
+    
+    return Array.from(customerMap.values()).sort((a, b) => 
+      new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime()
+    );
+  }
+
+  async getCustomerStats(): Promise<any> {
+    const customers = await this.getAllCustomersWithDetails();
+    
+    const totalCustomers = customers.length;
+    const hotLeads = customers.filter(c => c.status === "hot").length;
+    const convertedCustomers = customers.filter(c => c.status === "converted").length;
+    const totalRevenue = customers.reduce((sum, c) => sum + c.totalSpent, 0);
+    const avgOrderValue = convertedCustomers > 0 ? totalRevenue / convertedCustomers : 0;
+    
+    return {
+      totalCustomers,
+      hotLeads,
+      convertedCustomers,
+      totalRevenue,
+      avgOrderValue
+    };
+  }
+
+  async addCustomerNote(customerId: string, content: string): Promise<CustomerNote> {
+    const [note] = await db.insert(customerNotes)
+      .values({ customerId, content })
+      .returning();
+    return note;
+  }
+
+  async updateCustomerStatus(customerId: string, status: string): Promise<any> {
+    // Update lead status if customer has leads
+    await db.update(leads)
+      .set({ leadType: status as any, updatedAt: new Date() })
+      .where(or(eq(leads.email, customerId), eq(leads.phone, customerId)));
+    
+    return { success: true, customerId, status };
   }
 }
 
