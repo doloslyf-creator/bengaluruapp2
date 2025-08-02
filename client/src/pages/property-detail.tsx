@@ -41,10 +41,15 @@ function PropertyMatchAnalysis({ property }: PropertyMatchAnalysisProps) {
 
   useEffect(() => {
     // Get customer search preferences from localStorage
-    const searchPrefs = localStorage.getItem('searchPreferences');
+    const searchPrefs = localStorage.getItem('propertyPreferences');
     if (searchPrefs) {
       try {
-        setCustomerPreferences(JSON.parse(searchPrefs));
+        const prefs = JSON.parse(searchPrefs);
+        // Add timestamp if not present
+        if (!prefs.timestamp) {
+          prefs.timestamp = Date.now();
+        }
+        setCustomerPreferences(prefs);
       } catch (error) {
         console.error('Error parsing search preferences:', error);
       }
@@ -71,12 +76,12 @@ function PropertyMatchAnalysis({ property }: PropertyMatchAnalysisProps) {
     }
 
     // Zone Match (25% weight)
-    if (customerPreferences.zones && customerPreferences.zones.length > 0) {
-      if (customerPreferences.zones.includes(property.zone)) {
+    if (customerPreferences.zone && customerPreferences.zone !== '') {
+      if (property.zone === customerPreferences.zone) {
         score += 25;
         criteria.push({ name: 'Location Zone', status: 'perfect', points: 25, reason: `Perfect zone match: ${property.zone}` });
       } else {
-        criteria.push({ name: 'Location Zone', status: 'mismatch', points: 0, reason: `Preferred zones: ${customerPreferences.zones.join(', ')}, found: ${property.zone}` });
+        criteria.push({ name: 'Location Zone', status: 'mismatch', points: 0, reason: `Preferred zone: ${customerPreferences.zone}, found: ${property.zone}` });
       }
     }
 
@@ -118,19 +123,21 @@ function PropertyMatchAnalysis({ property }: PropertyMatchAnalysisProps) {
       }
     }
 
-    // BHK Match (5% weight)
-    if (customerPreferences.bhk && customerPreferences.bhk !== 'any') {
+    // BHK Match (5% weight) 
+    if (customerPreferences.bhkType && customerPreferences.bhkType.length > 0) {
       // Check if any configuration matches the BHK preference
       const configurations = property.configurations || [];
-      const hasMatchingBHK = configurations.some((config: any) => 
-        config.configuration.toLowerCase().includes(customerPreferences.bhk.toLowerCase())
+      const matchingConfigs = configurations.filter((config: any) => 
+        customerPreferences.bhkType.some((bhk: string) => 
+          config.configuration.toLowerCase().includes(bhk.toLowerCase())
+        )
       );
       
-      if (hasMatchingBHK) {
+      if (matchingConfigs.length > 0) {
         score += 5;
-        criteria.push({ name: 'Configuration', status: 'perfect', points: 5, reason: `${customerPreferences.bhk} configuration available` });
+        criteria.push({ name: 'Configuration', status: 'perfect', points: 5, reason: `${customerPreferences.bhkType.join(', ')} configurations available` });
       } else {
-        criteria.push({ name: 'Configuration', status: 'mismatch', points: 0, reason: `Looking for ${customerPreferences.bhk}, other configurations available` });
+        criteria.push({ name: 'Configuration', status: 'mismatch', points: 0, reason: `Looking for ${customerPreferences.bhkType.join(', ')}, other configurations available` });
       }
     }
 
@@ -189,14 +196,14 @@ function PropertyMatchAnalysis({ property }: PropertyMatchAnalysisProps) {
               {customerPreferences.propertyType && customerPreferences.propertyType !== 'any' && (
                 <Badge variant="outline">Type: {customerPreferences.propertyType}</Badge>
               )}
-              {customerPreferences.zones && customerPreferences.zones.length > 0 && (
-                <Badge variant="outline">Zones: {customerPreferences.zones.join(', ')}</Badge>
+              {customerPreferences.zone && (
+                <Badge variant="outline">Zone: {customerPreferences.zone}</Badge>
               )}
               {customerPreferences.budgetRange && (
                 <Badge variant="outline">Budget: ₹{customerPreferences.budgetRange[0]}L - ₹{customerPreferences.budgetRange[1]}L</Badge>
               )}
-              {customerPreferences.bhk && customerPreferences.bhk !== 'any' && (
-                <Badge variant="outline">Config: {customerPreferences.bhk}</Badge>
+              {customerPreferences.bhkType && customerPreferences.bhkType.length > 0 && (
+                <Badge variant="outline">Config: {customerPreferences.bhkType.join(', ')}</Badge>
               )}
               {customerPreferences.tags && customerPreferences.tags.length > 0 && (
                 <Badge variant="outline">Features: {customerPreferences.tags.length} selected</Badge>
