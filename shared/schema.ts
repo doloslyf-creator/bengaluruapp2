@@ -1204,7 +1204,12 @@ export const civilMepReports = pgTable("civil_mep_reports", {
   }>(),
   
   plumbingSystems: json("plumbing_systems").$type<{
-    waterSupply?: string;
+    waterSupply?: string | {
+      source?: string;
+      storage?: string;
+      distribution?: string;
+      quality?: string;
+    };
     pipeMaterialDiameter?: string;
     undergroundTankSpecs?: string;
     stpLayout?: string;

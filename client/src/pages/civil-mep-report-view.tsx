@@ -626,7 +626,24 @@ export function CivilMepReportView() {
             <CardContent className="space-y-3">
               <div>
                 <p className="text-sm font-medium text-gray-500">Water Supply</p>
-                <p className="text-sm">{report.plumbingSystems?.waterSupply || 'Not specified'}</p>
+                {report.plumbingSystems?.waterSupply && typeof report.plumbingSystems.waterSupply === 'object' ? (
+                  <div className="text-sm space-y-1">
+                    {typeof report.plumbingSystems.waterSupply === 'object' && 'source' in report.plumbingSystems.waterSupply && (
+                      <div><span className="font-medium">Source:</span> {report.plumbingSystems.waterSupply.source}</div>
+                    )}
+                    {typeof report.plumbingSystems.waterSupply === 'object' && 'storage' in report.plumbingSystems.waterSupply && (
+                      <div><span className="font-medium">Storage:</span> {report.plumbingSystems.waterSupply.storage}</div>
+                    )}
+                    {typeof report.plumbingSystems.waterSupply === 'object' && 'distribution' in report.plumbingSystems.waterSupply && (
+                      <div><span className="font-medium">Distribution:</span> {report.plumbingSystems.waterSupply.distribution}</div>
+                    )}
+                    {typeof report.plumbingSystems.waterSupply === 'object' && 'quality' in report.plumbingSystems.waterSupply && (
+                      <div><span className="font-medium">Quality:</span> {report.plumbingSystems.waterSupply.quality}</div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm">{report.plumbingSystems?.waterSupply || 'Not specified'}</p>
+                )}
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">Pipe Material & Diameter</p>
