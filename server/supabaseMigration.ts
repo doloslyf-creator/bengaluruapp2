@@ -27,6 +27,63 @@ export class SupabaseMigration {
     }
   }
 
+  // Transform camelCase property data to snake_case for Supabase
+  private transformPropertyData(property: any) {
+    return {
+      id: property.id,
+      name: property.name,
+      type: property.type,
+      developer: property.developer,
+      status: property.status,
+      area: property.area,
+      zone: property.zone,
+      address: property.address,
+      possession_date: property.possessionDate,
+      rera_number: property.reraNumber,
+      rera_approved: property.reraApproved,
+      infrastructure_verdict: property.infrastructureVerdict,
+      zoning_info: property.zoningInfo,
+      tags: property.tags,
+      images: property.images,
+      videos: property.videos,
+      youtube_video_url: property.youtubeVideoUrl,
+      property_score_id: property.propertyScoreId,
+      location_score: property.locationScore || property.amenitiesScore || 0,
+      amenities_score: property.amenitiesScore || 0,
+      value_score: property.valueScore || 0,
+      overall_score: property.overallScore || 0,
+      area_avg_price_min: property.areaAvgPriceMin,
+      area_avg_price_max: property.areaAvgPriceMax,
+      city_avg_price_min: property.cityAvgPriceMin,
+      city_avg_price_max: property.cityAvgPriceMax,
+      price_comparison: property.priceComparison,
+      title_clearance_status: property.titleClearanceStatus,
+      ownership_type: property.ownershipType,
+      legal_opinion_provided_by: property.legalOpinionProvidedBy,
+      title_flow_summary: property.titleFlowSummary,
+      encumbrance_status: property.encumbranceStatus,
+      ec_extract_link: property.ecExtractLink,
+      mutation_status: property.mutationStatus,
+      conversion_certificate: property.conversionCertificate,
+      rera_registered: property.reraRegistered,
+      rera_id: property.reraId,
+      rera_link: property.reraLink,
+      litigation_status: property.litigationStatus,
+      approving_authorities: property.approvingAuthorities,
+      layout_sanction_copy_link: property.layoutSanctionCopyLink,
+      legal_comments: property.legalComments,
+      legal_verdict_badge: property.legalVerdictBadge,
+      has_civil_mep_report: property.hasCivilMepReport,
+      civil_mep_report_price: property.civilMepReportPrice,
+      civil_mep_report_status: property.civilMepReportStatus,
+      has_valuation_report: property.hasValuationReport,
+      valuation_report_price: property.valuationReportPrice,
+      valuation_report_status: property.valuationReportStatus,
+      created_at: property.createdAt,
+      updated_at: property.updatedAt
+    }
+  }
+
   async migrateProperties() {
     console.log('Starting properties migration...')
     
@@ -45,9 +102,12 @@ export class SupabaseMigration {
       for (let i = 0; i < properties.length; i += batchSize) {
         const batch = properties.slice(i, i + batchSize)
         
+        // Transform data to match Supabase schema
+        const transformedBatch = batch.map(prop => this.transformPropertyData(prop))
+        
         const { data, error } = await supabaseAdmin!
           .from('properties')
-          .upsert(batch, { onConflict: 'id' })
+          .upsert(transformedBatch, { onConflict: 'id' })
 
         if (error) {
           console.error(`Error migrating properties batch ${i}-${i + batch.length}:`, error)
@@ -61,6 +121,34 @@ export class SupabaseMigration {
     } catch (error) {
       console.error('Properties migration failed:', error)
       throw error
+    }
+  }
+
+  // Transform camelCase leads data to snake_case for Supabase
+  private transformLeadData(lead: any) {
+    return {
+      id: lead.id,
+      source: lead.source,
+      lead_type: lead.leadType,
+      priority: lead.priority,
+      customer_name: lead.customerName,
+      phone: lead.phone,
+      email: lead.email,
+      budget_min: lead.budgetMin,
+      budget_max: lead.budgetMax,
+      preferred_locations: lead.preferredLocations,
+      property_type: lead.propertyType,
+      area_of_interest: lead.areaOfInterest,
+      specific_requirements: lead.specificRequirements,
+      qualification_status: lead.qualificationStatus,
+      lead_score: lead.leadScore,
+      notes: lead.notes,
+      assigned_to: lead.assignedTo,
+      follow_up_date: lead.followUpDate,
+      last_contact_date: lead.lastContactDate,
+      status: lead.status,
+      created_at: lead.createdAt,
+      updated_at: lead.updatedAt
     }
   }
 
@@ -80,9 +168,12 @@ export class SupabaseMigration {
       for (let i = 0; i < leads.length; i += batchSize) {
         const batch = leads.slice(i, i + batchSize)
         
+        // Transform data to match Supabase schema
+        const transformedBatch = batch.map(lead => this.transformLeadData(lead))
+        
         const { error } = await supabaseAdmin!
           .from('leads')
-          .upsert(batch, { onConflict: 'id' })
+          .upsert(transformedBatch, { onConflict: 'id' })
 
         if (error) {
           console.error(`Error migrating leads batch ${i}-${i + batch.length}:`, error)
@@ -96,6 +187,27 @@ export class SupabaseMigration {
     } catch (error) {
       console.error('Leads migration failed:', error)
       throw error
+    }
+  }
+
+  // Transform camelCase bookings data to snake_case for Supabase
+  private transformBookingData(booking: any) {
+    return {
+      id: booking.id,
+      booking_id: booking.bookingId,
+      property_id: booking.propertyId,
+      property_name: booking.propertyName,
+      booking_type: booking.bookingType,
+      name: booking.name,
+      phone: booking.phone,
+      email: booking.email,
+      preferred_date: booking.preferredDate,
+      preferred_time: booking.preferredTime,
+      message: booking.message,
+      status: booking.status,
+      admin_notes: booking.adminNotes,
+      created_at: booking.createdAt,
+      updated_at: booking.updatedAt
     }
   }
 
@@ -115,9 +227,12 @@ export class SupabaseMigration {
       for (let i = 0; i < bookings.length; i += batchSize) {
         const batch = bookings.slice(i, i + batchSize)
         
+        // Transform data to match Supabase schema
+        const transformedBatch = batch.map(booking => this.transformBookingData(booking))
+        
         const { error } = await supabaseAdmin!
           .from('bookings')
-          .upsert(batch, { onConflict: 'id' })
+          .upsert(transformedBatch, { onConflict: 'id' })
 
         if (error) {
           console.error(`Error migrating bookings batch ${i}-${i + batch.length}:`, error)
@@ -160,6 +275,28 @@ export class SupabaseMigration {
     }
   }
 
+  // Transform camelCase team member data to snake_case for Supabase
+  private transformTeamMemberData(member: any) {
+    return {
+      id: member.id,
+      name: member.name,
+      email: member.email,
+      phone: member.phone,
+      role: member.role,
+      department: member.department,
+      joining_date: member.joiningDate,
+      experience_years: member.experienceYears,
+      specializations: member.specializations,
+      performance_score: member.performanceScore,
+      active: member.active,
+      profile_image: member.profileImage,
+      bio: member.bio,
+      achievements: member.achievements,
+      created_at: member.createdAt,
+      updated_at: member.updatedAt
+    }
+  }
+
   async migrateTeamMembers() {
     console.log('Starting team members migration...')
     
@@ -176,9 +313,12 @@ export class SupabaseMigration {
       for (let i = 0; i < teamMembers.length; i += batchSize) {
         const batch = teamMembers.slice(i, i + batchSize)
         
+        // Transform data to match Supabase schema
+        const transformedBatch = batch.map(member => this.transformTeamMemberData(member))
+        
         const { error } = await supabaseAdmin!
           .from('team_members')
-          .upsert(batch, { onConflict: 'id' })
+          .upsert(transformedBatch, { onConflict: 'id' })
 
         if (error) {
           console.error(`Error migrating team members batch ${i}-${i + batch.length}:`, error)
