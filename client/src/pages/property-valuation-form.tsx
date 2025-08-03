@@ -114,8 +114,11 @@ export default function PropertyValuationForm() {
   const submitValuationRequest = useMutation({
     mutationFn: async (data: ValuationRequest) => {
       // Create service order via new API
-      return await apiRequest('/api/orders/service', {
+      const response = await fetch('/api/orders/service', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           serviceType: 'property-valuation',
           customerName: data.contactName,
@@ -127,6 +130,12 @@ export default function PropertyValuationForm() {
           requirements: `${data.propertyType}, ${data.area} sq ft, ${data.bedrooms}, Age: ${data.age} years, Amenities: ${data.amenities.join(', ')}, Additional: ${data.additionalInfo || 'None'}`
         })
       });
+      
+      if (!response.ok) {
+        throw new Error('Failed to submit valuation request');
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       toast({

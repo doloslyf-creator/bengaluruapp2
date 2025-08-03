@@ -134,11 +134,11 @@ function ProtectedRouter() {
       <Route path="/find-property/results" component={PropertyResults} />
       <Route path="/property/:id" component={PropertyDetail} />
       <Route path="/property-valuation" component={PropertyValuation} />
-      <Route path="/property-valuation/form" component={PropertyValuationForm} />
+      <Route path="/property-valuation-form" component={PropertyValuationForm} />
       <Route path="/civil-mep-reports" component={CivilMepReportsPage} />
-      <Route path="/civil-mep-reports/form" component={CivilMepReportsForm} />
+      <Route path="/civil-mep-reports-form" component={CivilMepReportsForm} />
       <Route path="/legal-due-diligence" component={LegalDueDiligencePage} />
-      <Route path="/legal-due-diligence/form" component={LegalDueDiligenceForm} />
+      <Route path="/legal-due-diligence-form" component={LegalDueDiligenceForm} />
       <Route path="/contact" component={Contact} />
       <Route path="/contact/thank-you" component={ContactThankYou} />
       <Route path="/book-visit" component={BookVisit} />
