@@ -18,6 +18,7 @@ const bookingTable = bookings;
 import { z } from "zod";
 import { getBlogPosts, getBlogPost, createBlogPost, updateBlogPost, deleteBlogPost } from "./blog";
 import { reraService } from "./reraService";
+import { paymentService, apiKeysManager } from "./paymentService";
 
 // Helper function to calculate lead score from contact form
 function calculateContactLeadScore(contactData: any): number {
@@ -2458,16 +2459,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/settings/api-keys", async (req, res) => {
     try {
       const apiKeysData = req.body;
-      // In production, would save to database with encryption for sensitive keys
-      console.log("API keys updated:", { ...apiKeysData, razorpayKeySecret: "***", googleMapsApiKey: "***" });
+      console.log("API keys update request received");
       
-      // Reinitialize payment service if Razorpay keys were updated
-      if (apiKeysData.razorpayKeyId || apiKeysData.razorpayKeySecret) {
+      // Update API keys in memory storage
+      if (apiKeysData.razorpayKeyId && apiKeysData.razorpayKeySecret) {
         try {
-          await paymentService.reinitialize();
-          console.log("Payment service reinitialized successfully");
+          paymentService.updateKeys(apiKeysData.razorpayKeyId, apiKeysData.razorpayKeySecret);
+          console.log("Razorpay payment service updated successfully");
         } catch (error) {
-          console.error("Failed to reinitialize payment service:", error);
+          console.error("Failed to update payment service:", error);
+          return res.status(500).json({ error: "Failed to initialize Razorpay with provided keys" });
         }
       }
       
