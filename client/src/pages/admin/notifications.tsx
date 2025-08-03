@@ -804,7 +804,7 @@ function EditTemplateForm({ template, onSubmit, isLoading, onCancel }: {
                 placeholder="HTML email body with {{variables}}"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Supports HTML formatting. Use {{variables}} for dynamic content.
+                Supports HTML formatting. Use {`{{variables}}`} for dynamic content.
               </p>
             </div>
           </div>
