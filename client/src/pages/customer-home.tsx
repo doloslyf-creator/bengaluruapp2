@@ -546,7 +546,7 @@ export default function CustomerHome() {
               <div className="text-gray-600">Success Rate</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-primary mb-2">{stats.totalProperties}+</div>
+              <div className="text-3xl font-bold text-primary mb-2">{stats.totalProperties || 5}+</div>
               <div className="text-gray-600">Properties Analyzed</div>
             </div>
           </div>

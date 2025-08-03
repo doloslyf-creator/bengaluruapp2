@@ -22,7 +22,8 @@ import {
   Users,
   Sparkles,
   Wrench,
-  Search
+  Search,
+  Star
 } from "lucide-react";
 import Header from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
