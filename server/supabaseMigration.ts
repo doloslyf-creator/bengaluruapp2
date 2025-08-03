@@ -249,6 +249,26 @@ export class SupabaseMigration {
     }
   }
 
+  // Transform camelCase app settings data to snake_case for Supabase
+  private transformAppSettingsData(settings: any) {
+    return {
+      id: settings.id,
+      business_name: settings.businessName || 'OwnItRight – Curated Property Advisors',
+      contact_email: settings.contactEmail || 'contact@ownitright.com',
+      contact_phone: settings.contactPhone,
+      razorpay_key_id: settings.razorpayKeyId,
+      razorpay_key_secret: settings.razorpayKeySecret,
+      google_analytics_id: settings.googleAnalyticsId,
+      google_maps_api_key: settings.googleMapsApiKey,
+      twilio_account_sid: settings.twilioAccountSid,
+      twilio_auth_token: settings.twilioAuthToken,
+      twilio_phone_number: settings.twilioPhoneNumber,
+      sendgrid_api_key: settings.sendgridApiKey,
+      created_at: settings.createdAt,
+      updated_at: settings.updatedAt
+    }
+  }
+
   async migrateAppSettings() {
     console.log('Starting app settings migration...')
     
@@ -259,9 +279,12 @@ export class SupabaseMigration {
         return
       }
 
+      // Transform data to match Supabase schema
+      const transformedSettings = this.transformAppSettingsData(settings)
+
       const { error } = await supabaseAdmin!
         .from('app_settings')
-        .upsert(settings, { onConflict: 'id' })
+        .upsert(transformedSettings, { onConflict: 'id' })
 
       if (error) {
         console.error('Error migrating app settings:', error)

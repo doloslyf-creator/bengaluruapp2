@@ -401,3 +401,21 @@ CREATE TABLE notification_preferences (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(user_id, category)
 );
+
+-- App Settings table
+CREATE TABLE app_settings (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
+  business_name TEXT DEFAULT 'OwnItRight – Curated Property Advisors',
+  contact_email TEXT DEFAULT 'contact@ownitright.com',
+  contact_phone TEXT,
+  razorpay_key_id TEXT,
+  razorpay_key_secret TEXT,
+  google_analytics_id TEXT,
+  google_maps_api_key TEXT,
+  twilio_account_sid TEXT,
+  twilio_auth_token TEXT,
+  twilio_phone_number TEXT,
+  sendgrid_api_key TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
