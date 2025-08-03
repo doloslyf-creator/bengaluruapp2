@@ -3,6 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useAnalyticsInit, useAnalytics } from "@/hooks/use-analytics";
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminProperties from "@/pages/admin/properties";
 import PropertiesView from "@/pages/admin/properties-view";
@@ -53,6 +54,12 @@ import ReraManagement from "@/pages/admin/rera-management";
 import NotFound from "@/pages/not-found";
 
 function Router() {
+  // Initialize Google Analytics with stored measurement ID
+  useAnalyticsInit();
+  
+  // Track page views when routes change
+  useAnalytics();
+  
   return (
     <Switch>
       <Route path="/" component={CustomerHome} />
