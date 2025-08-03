@@ -48,6 +48,7 @@ import UserValuationReports from "@/pages/user-valuation-reports";
 import UserCivilMepReports from "@/pages/user-civil-mep-reports";
 import CustomerHome from "@/pages/customer-home";
 import Home from "@/pages/home";
+import About from "@/pages/about";
 import LeadsPage from "@/pages/leads";
 import LegalTracker from "@/pages/admin/legal-tracker-enhanced";
 import LegalManagement from "@/pages/admin/legal-management";
@@ -127,6 +128,7 @@ function ProtectedRouter() {
       <Route path="/admin-panel/supabase-status" component={SupabaseStatus} />
       
       {/* Customer-facing routes */}
+      <Route path="/about" component={About} />
       <Route path="/find-property" component={FindProperty} />
       <Route path="/find-property/results" component={PropertyResults} />
       <Route path="/property/:id" component={PropertyDetail} />
