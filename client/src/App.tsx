@@ -57,6 +57,7 @@ import TeamManagement from "@/pages/admin/team-management";
 import ReraManagement from "@/pages/admin/rera-management";
 import SupabaseMigration from "@/pages/admin/supabase-migration";
 import SupabaseStatus from "@/pages/admin/supabase-status";
+import AdminNotifications from "@/pages/admin/notifications";
 import UserNotifications from "@/pages/user-notifications";
 import NotFound from "@/pages/not-found";
 
@@ -119,6 +120,7 @@ function ProtectedRouter() {
       <Route path="/admin-panel/settings" component={AdminSettings} />
       <Route path="/admin-panel/team-management" component={TeamManagement} />
       <Route path="/admin-panel/rera-management" component={ReraManagement} />
+      <Route path="/admin-panel/notifications" component={AdminNotifications} />
       <Route path="/admin-panel/supabase-migration" component={SupabaseMigration} />
       <Route path="/admin-panel/supabase-status" component={SupabaseStatus} />
       

@@ -15,7 +15,8 @@ import {
   Calculator,
   Scale,
   Star,
-  Shield
+  Shield,
+  Bell
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -84,6 +85,12 @@ const navigation = [
     href: "/admin-panel/legal-management", 
     icon: Scale,
     description: "Legal Due Diligence"
+  },
+  { 
+    name: "Notifications", 
+    href: "/admin-panel/notifications", 
+    icon: Bell,
+    description: "Notification Management"
   },
   { 
     name: "Customers", 
