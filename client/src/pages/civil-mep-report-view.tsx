@@ -246,427 +246,560 @@ export function CivilMepReportView() {
           </Card>
         )}
 
-        {/* Technical Details Grid */}
+        {/* Section 1: Site Information */}
+        {report.siteInformation && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <MapPin className="h-5 w-5 text-blue-600" />
+                <span>1. Site Information</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Project Name</p>
+                  <p className="text-sm">{report.siteInformation.projectName || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Location</p>
+                  <p className="text-sm">{report.siteInformation.location || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Plot Area</p>
+                  <p className="text-sm">{report.siteInformation.plotArea || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Survey Number</p>
+                  <p className="text-sm">{report.siteInformation.surveyNumber || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Zoning Classification</p>
+                  <p className="text-sm">{report.siteInformation.zoningClassification || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Soil Test Report</p>
+                  <p className="text-sm">{report.siteInformation.soilTestReport || 'Not specified'}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Section 2 & 3: Foundation & Superstructure */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Foundation Details */}
+          {/* Section 2: Foundation Details */}
           {report.foundationDetails && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Construction className="h-5 w-5 text-orange-600" />
-                  <span>Foundation System</span>
+                  <span>2. Foundation Details</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Foundation Type</p>
-                    <p className="font-semibold text-lg">{report.foundationDetails.type || 'Not specified'}</p>
-                  </div>
-                  <Separator />
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Depth & Footing</p>
-                    <p className="text-sm">{report.foundationDetails.depthAndFooting || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Soil Bearing Capacity</p>
-                    <p className="text-sm">{report.foundationDetails.soilBearingCapacity || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Anti-Termite Treatment</p>
-                    <p className="text-sm">{report.foundationDetails.antiTermiteTreatment || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Waterproofing</p>
-                    <p className="text-sm">{report.foundationDetails.waterproofingMethod || 'Not specified'}</p>
-                  </div>
+              <CardContent className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Foundation Type</p>
+                  <p className="text-sm">{report.foundationDetails.type || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Depth & Footing</p>
+                  <p className="text-sm">{report.foundationDetails.depthAndFooting || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Soil Bearing Capacity</p>
+                  <p className="text-sm">{report.foundationDetails.soilBearingCapacity || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Anti-Termite Treatment</p>
+                  <p className="text-sm">{report.foundationDetails.antiTermiteTreatment || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Waterproofing Method</p>
+                  <p className="text-sm">{report.foundationDetails.waterproofingMethod || 'Not specified'}</p>
                 </div>
               </CardContent>
             </Card>
           )}
 
-          {/* Structural Details */}
-          {report.structuralDetails && (
+          {/* Section 3: Superstructure Details */}
+          {report.superstructureDetails && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Building2 className="h-5 w-5 text-blue-600" />
-                  <span>Structural System</span>
+                  <span>3. Superstructure Details</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Structural Type</p>
-                    <p className="font-semibold text-lg">{report.structuralDetails.structuralType || 'Not specified'}</p>
-                  </div>
-                  <Separator />
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Concrete Grade</p>
-                    <p className="text-sm">{report.structuralDetails.concreteGrade || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Steel Grade</p>
-                    <p className="text-sm">{report.structuralDetails.steelGrade || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Column Spacing</p>
-                    <p className="text-sm">{report.structuralDetails.columnSpacing || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Slab Thickness</p>
-                    <p className="text-sm">{report.structuralDetails.slabThickness || 'Not specified'}</p>
-                  </div>
+              <CardContent className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Structural System</p>
+                  <p className="text-sm">{report.superstructureDetails.structuralSystem || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Column Beam Slab</p>
+                  <p className="text-sm">{report.superstructureDetails.columnBeamSlab || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Floor to Floor Height</p>
+                  <p className="text-sm">{report.superstructureDetails.floorToFloorHeight || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Load Calculations</p>
+                  <p className="text-sm">{report.superstructureDetails.loadCalculations || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Seismic Design Code</p>
+                  <p className="text-sm">{report.superstructureDetails.seismicDesignCode || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Concrete Grade & Reinforcement</p>
+                  <p className="text-sm">{report.superstructureDetails.concreteGradeReinforcement || 'Not specified'}</p>
                 </div>
               </CardContent>
             </Card>
           )}
         </div>
 
-        {/* MEP Systems Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Electrical Systems */}
+        {/* Sections 4, 5, 6: Walls, Roofing, Doors & Windows */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Section 4: Walls & Finishes */}
+          {report.wallsFinishes && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Home className="h-5 w-5 text-green-600" />
+                  <span>4. Walls & Finishes</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Wall Type</p>
+                  <p className="text-sm">{report.wallsFinishes.type || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Plastering Type</p>
+                  <p className="text-sm">{report.wallsFinishes.plasteringType || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Wall Insulation</p>
+                  <p className="text-sm">{report.wallsFinishes.wallInsulation || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Interior/Exterior Finishes</p>
+                  <p className="text-sm">{report.wallsFinishes.interiorExteriorFinishes || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Paint Specifications</p>
+                  <p className="text-sm">{report.wallsFinishes.paintSpecs || 'Not specified'}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Section 5: Roofing Details */}
+          {report.roofingDetails && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Home className="h-5 w-5 text-blue-600" />
+                  <span>5. Roofing Details</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Roof Type</p>
+                  <p className="text-sm">{report.roofingDetails.type || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Roof Treatment</p>
+                  <p className="text-sm">{report.roofingDetails.roofTreatment || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Drainage Provisions</p>
+                  <p className="text-sm">{report.roofingDetails.drainageProvisions || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Parapet & Handrail</p>
+                  <p className="text-sm">{report.roofingDetails.parapetHandrail || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Thermal Coating</p>
+                  <p className="text-sm">{report.roofingDetails.thermalCoating || 'Not specified'}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Section 6: Doors & Windows */}
+          {report.doorsWindows && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Home className="h-5 w-5 text-purple-600" />
+                  <span>6. Doors & Windows</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {report.doorsWindows.entries && report.doorsWindows.entries.length > 0 ? (
+                  report.doorsWindows.entries.map((entry, index) => (
+                    <div key={index} className="border-b border-gray-200 pb-2 last:border-b-0">
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">Type</p>
+                        <p className="text-sm">{entry.type || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">Size</p>
+                        <p className="text-sm">{entry.size || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">Material</p>
+                        <p className="text-sm">{entry.material || 'Not specified'}</p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500">No door/window entries available</p>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* Sections 7, 8, 9: Flooring, Staircases, External Works */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Section 7: Flooring Details */}
+          {report.flooringDetails && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Home className="h-5 w-5 text-indigo-600" />
+                  <span>7. Flooring Details</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Finish Type</p>
+                  <p className="text-sm">{report.flooringDetails.finishType || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Skirting Height</p>
+                  <p className="text-sm">{report.flooringDetails.skirtingHeight || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Expansion Joints</p>
+                  <p className="text-sm">{report.flooringDetails.expansionJoints || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Slope & Drainage</p>
+                  <p className="text-sm">{report.flooringDetails.slopeDrainage || 'Not specified'}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Section 8: Staircases & Elevators */}
+          {report.staircasesElevators && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Building2 className="h-5 w-5 text-orange-600" />
+                  <span>8. Staircases & Elevators</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Tread Riser Dimensions</p>
+                  <p className="text-sm">{report.staircasesElevators.treadRiserDimensions || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Handrail Details</p>
+                  <p className="text-sm">{report.staircasesElevators.handrailDetails || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Fire Exit Compliance</p>
+                  <p className="text-sm">{report.staircasesElevators.fireExitCompliance || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Accessibility Compliance</p>
+                  <p className="text-sm">{report.staircasesElevators.accessibilityCompliance || 'Not specified'}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Section 9: External Works */}
+          {report.externalWorks && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Leaf className="h-5 w-5 text-green-600" />
+                  <span>9. External Works</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Compound Wall & Gates</p>
+                  <p className="text-sm">{report.externalWorks.compoundWallGates || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Landscaping</p>
+                  <p className="text-sm">{report.externalWorks.landscaping || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">External Paving</p>
+                  <p className="text-sm">{report.externalWorks.externalPaving || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Rainwater Harvesting</p>
+                  <p className="text-sm">{report.externalWorks.rainwaterHarvesting || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Signage & Outdoor Furniture</p>
+                  <p className="text-sm">{report.externalWorks.signageOutdoorFurniture || 'Not specified'}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* MEP Sections 10, 11, 12: Mechanical, Electrical, Plumbing */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Section 10: Mechanical Systems */}
+          {report.mechanicalSystems && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Home className="h-5 w-5 text-green-600" />
+                  <span>10. Mechanical Systems</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">HVAC Design</p>
+                  <p className="text-sm">{report.mechanicalSystems.hvacDesign || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Ducting Layout</p>
+                  <p className="text-sm">{report.mechanicalSystems.ductingLayout || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Ventilation Type</p>
+                  <p className="text-sm">{report.mechanicalSystems.ventilationType || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Heat Load Calculations</p>
+                  <p className="text-sm">{report.mechanicalSystems.heatLoadCalculations || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Energy Efficiency Rating</p>
+                  <p className="text-sm">{report.mechanicalSystems.energyEfficiencyRating || 'Not specified'}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Section 11: Electrical Systems */}
           {report.electricalSystems && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Zap className="h-5 w-5 text-yellow-600" />
-                  <span>Electrical Systems</span>
+                  <span>11. Electrical Systems</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">LT Panel Design</p>
-                    <p className="text-sm">{report.electricalSystems.ltPanelDesign || 'Not specified'}</p>
-                  </div>
-                  <Separator />
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Power Distribution</p>
-                    <p className="text-sm">{report.electricalSystems.powerDistribution || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Wiring Type</p>
-                    <p className="text-sm">{report.electricalSystems.wiringType || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Cable Standards</p>
-                    <p className="text-sm">{report.electricalSystems.cableSizesStandards || 'Not specified'}</p>
-                  </div>
+              <CardContent className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">LT Panel Design</p>
+                  <p className="text-sm">{report.electricalSystems.ltPanelDesign || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Power Distribution</p>
+                  <p className="text-sm">{report.electricalSystems.powerDistribution || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Wiring Type</p>
+                  <p className="text-sm">{report.electricalSystems.wiringType || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Cable Sizes & Standards</p>
+                  <p className="text-sm">{report.electricalSystems.cableSizesStandards || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Earthing Resistance</p>
+                  <p className="text-sm">{report.electricalSystems.earthingResistance || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Light Fixtures</p>
+                  <p className="text-sm">{report.electricalSystems.lightFixtures || 'Not specified'}</p>
                 </div>
               </CardContent>
             </Card>
           )}
 
-          {/* Plumbing Systems */}
+          {/* Section 12: Plumbing Systems */}
           {report.plumbingSystems && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Droplets className="h-5 w-5 text-blue-600" />
-                  <span>Plumbing Systems</span>
+                  <span>12. Plumbing Systems</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Water Supply</p>
-                    <p className="text-sm">{report.plumbingSystems.waterSupply || 'Not specified'}</p>
-                  </div>
-                  <Separator />
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Pipe Material & Diameter</p>
-                    <p className="text-sm">{report.plumbingSystems.pipeMaterialDiameter || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Underground Tank Specs</p>
-                    <p className="text-sm">{report.plumbingSystems.undergroundTankSpecs || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">STP Layout</p>
-                    <p className="text-sm">{report.plumbingSystems.stpLayout || 'Not specified'}</p>
-                  </div>
+              <CardContent className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Water Supply</p>
+                  <p className="text-sm">{report.plumbingSystems.waterSupply || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Pipe Material & Diameter</p>
+                  <p className="text-sm">{report.plumbingSystems.pipeMaterialDiameter || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Underground Tank Specs</p>
+                  <p className="text-sm">{report.plumbingSystems.undergroundTankSpecs || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">STP Layout</p>
+                  <p className="text-sm">{report.plumbingSystems.stpLayout || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Water Pump Automation</p>
+                  <p className="text-sm">{report.plumbingSystems.waterPumpAutomation || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Rainwater Outlets</p>
+                  <p className="text-sm">{report.plumbingSystems.rainwaterOutlets || 'Not specified'}</p>
                 </div>
               </CardContent>
             </Card>
           )}
         </div>
 
-        {/* Fire Safety & HVAC Systems */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Fire Safety Systems */}
+        {/* MEP Sections 13, 14, 15: Fire Safety, BMS Automation, Green Sustainability */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Section 13: Fire Safety Systems */}
           {report.fireSafetySystems && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Flame className="h-5 w-5 text-red-600" />
-                  <span>Fire Safety Systems</span>
+                  <span>13. Fire Safety Systems</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Hydrant System Layout</p>
-                    <p className="text-sm">{report.fireSafetySystems.hydrantSystemLayout || 'Not specified'}</p>
-                  </div>
-                  <Separator />
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Sprinkler System</p>
-                    <p className="text-sm">{report.fireSafetySystems.sprinklerSystem || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Smoke Detector Layout</p>
-                    <p className="text-sm">{report.fireSafetySystems.smokeDetectorLayout || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Fire Alarm & PA</p>
-                    <p className="text-sm">{report.fireSafetySystems.fireAlarmPA || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Exit Signage</p>
-                    <p className="text-sm">{report.fireSafetySystems.exitSignage || 'Not specified'}</p>
-                  </div>
+              <CardContent className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Hydrant System Layout</p>
+                  <p className="text-sm">{report.fireSafetySystems.hydrantSystemLayout || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Sprinkler System</p>
+                  <p className="text-sm">{report.fireSafetySystems.sprinklerSystem || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Smoke Detector Layout</p>
+                  <p className="text-sm">{report.fireSafetySystems.smokeDetectorLayout || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Fire Alarm & PA</p>
+                  <p className="text-sm">{report.fireSafetySystems.fireAlarmPA || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Exit Signage</p>
+                  <p className="text-sm">{report.fireSafetySystems.exitSignage || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Fire NOC</p>
+                  <p className="text-sm">{report.fireSafetySystems.fireNOC || 'Not specified'}</p>
                 </div>
               </CardContent>
             </Card>
           )}
 
-          {/* HVAC Systems */}
-          {report.hvacSystems && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Home className="h-5 w-5 text-green-600" />
-                  <span>HVAC Systems</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Air Conditioning Design</p>
-                    <p className="text-sm">{report.hvacSystems.airConditioningDesign || 'Not specified'}</p>
-                  </div>
-                  <Separator />
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Ventilation</p>
-                    <p className="text-sm">{report.hvacSystems.ventilation || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Duct Layout</p>
-                    <p className="text-sm">{report.hvacSystems.ductLayout || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Energy Efficiency</p>
-                    <p className="text-sm">{report.hvacSystems.energyEfficiency || 'Not specified'}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        {/* Additional MEP Systems - Vertical Transportation & Communication */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Vertical Transportation */}
-          {report.verticalTransportation && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Building2 className="h-5 w-5 text-indigo-600" />
-                  <span>Vertical Transportation</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Elevator Systems</p>
-                    <p className="text-sm">{report.verticalTransportation.elevatorSystems || 'Not specified'}</p>
-                  </div>
-                  <Separator />
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Elevator Specifications</p>
-                    <p className="text-sm">{report.verticalTransportation.elevatorSpecifications || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Lift Capacity</p>
-                    <p className="text-sm">{report.verticalTransportation.liftCapacity || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Machine Room</p>
-                    <p className="text-sm">{report.verticalTransportation.machineRoom || 'Not specified'}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Communication Systems */}
-          {report.communicationSystems && (
+          {/* Section 14: BMS Automation */}
+          {report.bmsAutomation && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Zap className="h-5 w-5 text-purple-600" />
-                  <span>Communication Systems</span>
+                  <span>14. BMS Automation</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Security Systems</p>
-                    <p className="text-sm">{report.communicationSystems.securitySystems || 'Not specified'}</p>
-                  </div>
-                  <Separator />
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Intercom System</p>
-                    <p className="text-sm">{report.communicationSystems.intercomSystem || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Cable TV & Internet</p>
-                    <p className="text-sm">{report.communicationSystems.cableTvInternet || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Building Management</p>
-                    <p className="text-sm">{report.communicationSystems.buildingManagement || 'Not specified'}</p>
-                  </div>
+              <CardContent className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Home Automation</p>
+                  <p className="text-sm">{report.bmsAutomation.homeAutomation || 'Not specified'}</p>
                 </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">CCTV Layout</p>
+                  <p className="text-sm">{report.bmsAutomation.cctvLayout || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Access Control</p>
+                  <p className="text-sm">{report.bmsAutomation.accessControl || 'Not specified'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">IoT Integration</p>
+                  <p className="text-sm">{report.bmsAutomation.iotIntegration || 'Not specified'}</p>
+                </div>
+                {report.bmsAutomation.sensors && report.bmsAutomation.sensors.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Sensors</p>
+                    <div className="text-sm">
+                      {report.bmsAutomation.sensors.map((sensor, index) => (
+                        <div key={index} className="text-xs text-gray-600">
+                          {sensor.type} - {sensor.location}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
-        </div>
 
-        {/* Additional Systems - Sustainability & Quality Control */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Sustainability Systems */}
-          {report.sustainabilitySystems && (
+          {/* Section 15: Green Sustainability */}
+          {report.greenSustainability && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Leaf className="h-5 w-5 text-green-600" />
-                  <span>Sustainability Systems</span>
+                  <span>15. Green Sustainability</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Green Building Features</p>
-                    <p className="text-sm">{report.sustainabilitySystems.greenBuildingFeatures || 'Not specified'}</p>
-                  </div>
-                  <Separator />
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Renewable Energy</p>
-                    <p className="text-sm">{report.sustainabilitySystems.renewableEnergy || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Water Conservation</p>
-                    <p className="text-sm">{report.sustainabilitySystems.waterConservation || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Waste Management</p>
-                    <p className="text-sm">{report.sustainabilitySystems.wasteManagement || 'Not specified'}</p>
-                  </div>
+              <CardContent className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Waste Segregation</p>
+                  <p className="text-sm">{report.greenSustainability.wasteSegregation || 'Not specified'}</p>
                 </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Quality Control */}
-          {report.qualityControlMeasures && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <CheckCircle className="h-5 w-5 text-blue-600" />
-                  <span>Quality Control Measures</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Testing Protocols</p>
-                    <p className="text-sm">{report.qualityControlMeasures.testingProtocols || 'Not specified'}</p>
-                  </div>
-                  <Separator />
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Material Standards</p>
-                    <p className="text-sm">{report.qualityControlMeasures.materialStandards || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Inspection Schedule</p>
-                    <p className="text-sm">{report.qualityControlMeasures.inspectionSchedule || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Compliance Reports</p>
-                    <p className="text-sm">{report.qualityControlMeasures.complianceReports || 'Not specified'}</p>
-                  </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Water Recycling</p>
+                  <p className="text-sm">{report.greenSustainability.waterRecycling || 'Not specified'}</p>
                 </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        {/* Safety & Documentation */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Safety Standards */}
-          {report.safetyStandards && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Shield className="h-5 w-5 text-orange-600" />
-                  <span>Safety Standards</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Safety Compliance</p>
-                    <p className="text-sm">{report.safetyStandards.safetyCompliance || 'Not specified'}</p>
-                  </div>
-                  <Separator />
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Emergency Procedures</p>
-                    <p className="text-sm">{report.safetyStandards.emergencyProcedures || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Risk Assessment</p>
-                    <p className="text-sm">{report.safetyStandards.riskAssessment || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Occupational Health</p>
-                    <p className="text-sm">{report.safetyStandards.occupationalHealth || 'Not specified'}</p>
-                  </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Daylighting Studies</p>
+                  <p className="text-sm">{report.greenSustainability.daylightingStudies || 'Not specified'}</p>
                 </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Technical Documentation */}
-          {report.documentationAndCertification && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <FileText className="h-5 w-5 text-purple-600" />
-                  <span>Documentation & Certification</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Technical Drawings</p>
-                    <p className="text-sm">{report.documentationAndCertification.technicalDrawings || 'Not specified'}</p>
-                  </div>
-                  <Separator />
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Certification Status</p>
-                    <p className="text-sm">{report.documentationAndCertification.certificationStatus || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Regulatory Approvals</p>
-                    <p className="text-sm">{report.documentationAndCertification.regulatoryApprovals || 'Not specified'}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">As-Built Documentation</p>
-                    <p className="text-sm">{report.documentationAndCertification.asBuiltDocumentation || 'Not specified'}</p>
-                  </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Passive Cooling</p>
+                  <p className="text-sm">{report.greenSustainability.passiveCooling || 'Not specified'}</p>
                 </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Certification Status</p>
+                  <p className="text-sm">{report.greenSustainability.certificationStatus || 'Not specified'}</p>
+                </div>
+                {report.greenSustainability.solarPanels && report.greenSustainability.solarPanels.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Solar Panels</p>
+                    <div className="text-sm">
+                      {report.greenSustainability.solarPanels.map((panel, index) => (
+                        <div key={index} className="text-xs text-gray-600">
+                          {panel.capacity} - {panel.brand}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
