@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { Eye, EyeOff, Mail, Lock, Shield } from "lucide-react";
 
 interface AdminAuthFormProps {
@@ -28,8 +28,15 @@ export function AdminAuthForm({ onSuccess }: AdminAuthFormProps) {
     setIsLoading(true);
     setError(null);
 
+    // Check if Supabase is configured
+    if (!isSupabaseConfigured()) {
+      setError("Authentication service is not configured. Please contact your administrator.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase!.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
       });
@@ -46,7 +53,7 @@ export function AdminAuthForm({ onSuccess }: AdminAuthFormProps) {
                      user?.email === 'admin@ownitright.com';
 
       if (!isAdmin) {
-        await supabase.auth.signOut();
+        await supabase!.auth.signOut();
         setError("Access denied. Admin privileges required.");
         return;
       }
