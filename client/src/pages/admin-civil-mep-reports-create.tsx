@@ -130,11 +130,36 @@ export function AdminCivilMepReportsCreate() {
   });
 
   const onSubmit = (data: FormData) => {
-    // Convert date strings to Date objects
+    // Convert date strings to Date objects for submission
     const submitData = {
-      ...data,
+      propertyId: data.propertyId,
+      reportTitle: data.reportTitle,
+      engineerName: data.engineerName,
+      engineerLicense: data.engineerLicense,
       inspectionDate: new Date(data.inspectionDate),
       reportDate: new Date(data.reportDate),
+      status: data.status,
+      overallScore: data.overallScore,
+      executiveSummary: data.executiveSummary,
+      recommendations: data.recommendations,
+      conclusions: data.conclusions,
+      investmentRecommendation: data.investmentRecommendation,
+      siteInformation: data.siteInformation,
+      foundationDetails: data.foundationDetails,
+      superstructureDetails: data.superstructureDetails,
+      wallsFinishes: data.wallsFinishes,
+      roofingDetails: data.roofingDetails,
+      doorsWindows: data.doorsWindows,
+      flooringDetails: data.flooringDetails,
+      staircasesElevators: data.staircasesElevators,
+      externalWorks: data.externalWorks,
+      mechanicalSystems: data.mechanicalSystems,
+      electricalSystems: data.electricalSystems,
+      plumbingSystems: data.plumbingSystems,
+      fireSafetySystems: data.fireSafetySystems,
+      bmsAutomation: data.bmsAutomation,
+      greenSustainability: data.greenSustainability,
+      documentation: data.documentation,
     };
     createReportMutation.mutate(submitData);
   };
@@ -182,7 +207,7 @@ export function AdminCivilMepReportsCreate() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Property</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger data-testid="select-property">
                                 <SelectValue placeholder="Select a property" />
@@ -297,7 +322,7 @@ export function AdminCivilMepReportsCreate() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Status</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger data-testid="select-status">
                                 <SelectValue />
