@@ -59,7 +59,7 @@ export default function AdminDashboard() {
   const calculatePriceAnalytics = () => {
     if (filteredProperties.length === 0) return { avgPrice: 0, priceRange: { min: 0, max: 0 } };
     
-    const prices = filteredProperties.map(p => p.startingPrice || 0);
+    const prices = filteredProperties.map(p => (p as any).startingPrice || 0);
     const avgPrice = prices.reduce((sum, price) => sum + price, 0) / prices.length;
     const priceRange = { min: Math.min(...prices), max: Math.max(...prices) };
     
@@ -98,35 +98,10 @@ export default function AdminDashboard() {
 
 
   return (
-    <AdminLayout title="Property Analytics Dashboard">
-      {/* Admin Success Banner */}
-      <div className="bg-gradient-to-r from-green-500 to-blue-500 text-white py-4 mb-6">
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-center space-x-4 text-sm">
-          <span className="font-semibold">🎯 Admin Dashboard: Complete Property Management Control</span>
-          <span>• {properties.length} active properties • {leads.length} qualified leads • Real-time analytics</span>
-        </div>
-      </div>
-
-      <div className="p-6 space-y-6">
-        {/* Hero Stats Section */}
-        <div className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 rounded-2xl p-8 border border-blue-100">
-          <div className="text-center mb-8">
-            <div className="mb-4 text-sm px-4 py-2 bg-blue-100 text-blue-800 border border-blue-200 rounded-full inline-block">
-              🚀 Complete property management and analytics platform
-            </div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">
-              Your property empire{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-                at a glance
-              </span>
-            </h1>
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
-              Comprehensive insights, real-time data, and powerful tools to manage your property portfolio effectively.
-            </p>
-          </div>
-
-          {/* Key Performance Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <AdminLayout>
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
+        {/* Key Performance Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
@@ -171,7 +146,6 @@ export default function AdminDashboard() {
                 </div>
               </div>
             </div>
-          </div>
         </div>
 
         {/* Analytics Filters */}

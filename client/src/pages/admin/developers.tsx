@@ -25,8 +25,8 @@ export default function AdminDevelopers() {
   });
 
   return (
-    <AdminLayout title="Developer Management">
-      <div className="flex flex-col h-full">
+    <AdminLayout>
+      <div className="max-w-7xl mx-auto flex flex-col h-full">
         {/* Header */}
         <header className="border-b border-gray-200 bg-white px-6 py-4">
           <div className="flex items-center justify-between">

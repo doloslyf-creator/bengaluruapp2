@@ -83,8 +83,8 @@ const quickStats = [
 
 export default function LegalManagement() {
   return (
-    <AdminLayout title="Legal Due Diligence Management">
-      <div className="space-y-8">
+    <AdminLayout>
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center">
           <div className="flex items-center justify-center mb-4">

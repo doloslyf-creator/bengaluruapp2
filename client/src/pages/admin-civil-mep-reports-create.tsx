@@ -165,9 +165,21 @@ export function AdminCivilMepReportsCreate() {
   };
 
   return (
-    <AdminLayout title="Create Civil+MEP Report" showBackButton backUrl="/admin-panel/civil-mep-reports">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+    <AdminLayout>
+      <div className="max-w-7xl mx-auto">
+        <div>
+          <Link
+            to="/admin-panel/civil-mep-reports"
+            className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 mb-4"
+            data-testid="link-back-to-reports"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Civil+MEP Reports
+          </Link>
+        </div>
+        
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* Header Section */}
           <Card>
             <CardHeader>
@@ -1882,8 +1894,9 @@ export function AdminCivilMepReportsCreate() {
               </div>
             </CardContent>
           </Card>
-        </form>
-      </Form>
+          </form>
+        </Form>
+      </div>
     </AdminLayout>
   );
 }
