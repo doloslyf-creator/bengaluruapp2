@@ -1038,3 +1038,138 @@ export type ReraData = typeof reraData.$inferSelect;
 // User types - keeping existing ones
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
+
+// Notifications System
+export const notifications = pgTable("notifications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id"), // If null, it's a system-wide notification
+  userType: varchar("user_type", { enum: ["admin", "user", "all"] }).notNull().default("user"),
+  
+  // Notification content
+  title: varchar("title").notNull(),
+  message: text("message").notNull(),
+  type: varchar("type", { 
+    enum: ["info", "success", "warning", "error", "report", "booking", "payment", "system"] 
+  }).notNull().default("info"),
+  category: varchar("category", { 
+    enum: ["property", "report", "booking", "payment", "lead", "system", "promotion"] 
+  }).notNull().default("system"),
+  
+  // Notification metadata
+  priority: varchar("priority", { enum: ["low", "medium", "high", "urgent"] }).notNull().default("medium"),
+  actionUrl: varchar("action_url"), // Optional URL to navigate to
+  actionText: varchar("action_text"), // Optional action button text
+  
+  // Status tracking
+  isRead: boolean("is_read").notNull().default(false),
+  isArchived: boolean("is_archived").notNull().default(false),
+  readAt: timestamp("read_at"),
+  
+  // Email integration
+  emailSent: boolean("email_sent").notNull().default(false),
+  emailSentAt: timestamp("email_sent_at"),
+  
+  // Metadata for linking to other entities
+  relatedEntityType: varchar("related_entity_type"), // 'property', 'report', 'booking', etc.
+  relatedEntityId: varchar("related_entity_id"),
+  metadata: json("metadata").default('{}'), // Additional data
+  
+  // Expiry and scheduling
+  expiresAt: timestamp("expires_at"),
+  scheduledFor: timestamp("scheduled_for"), // For future notifications
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Notification Templates for consistent messaging
+export const notificationTemplates = pgTable("notification_templates", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  templateKey: varchar("template_key").unique().notNull(), // e.g., "REPORT_READY", "BOOKING_CONFIRMED"
+  name: varchar("name").notNull(),
+  description: text("description"),
+  
+  // Template content
+  titleTemplate: varchar("title_template").notNull(),
+  messageTemplate: text("message_template").notNull(),
+  emailSubjectTemplate: varchar("email_subject_template"),
+  emailBodyTemplate: text("email_body_template"),
+  
+  // Template settings
+  type: varchar("type", { 
+    enum: ["info", "success", "warning", "error", "report", "booking", "payment", "system"] 
+  }).notNull().default("info"),
+  category: varchar("category", { 
+    enum: ["property", "report", "booking", "payment", "lead", "system", "promotion"] 
+  }).notNull().default("system"),
+  priority: varchar("priority", { enum: ["low", "medium", "high", "urgent"] }).notNull().default("medium"),
+  
+  // Template status
+  isActive: boolean("is_active").notNull().default(true),
+  requiresEmail: boolean("requires_email").notNull().default(false),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User Notification Preferences
+export const notificationPreferences = pgTable("notification_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  userType: varchar("user_type", { enum: ["admin", "user"] }).notNull().default("user"),
+  
+  // Notification type preferences
+  emailNotifications: boolean("email_notifications").notNull().default(true),
+  pushNotifications: boolean("push_notifications").notNull().default(true),
+  smsNotifications: boolean("sms_notifications").notNull().default(false),
+  
+  // Category preferences
+  propertyUpdates: boolean("property_updates").notNull().default(true),
+  reportNotifications: boolean("report_notifications").notNull().default(true),
+  bookingNotifications: boolean("booking_notifications").notNull().default(true),
+  paymentNotifications: boolean("payment_notifications").notNull().default(true),
+  leadNotifications: boolean("lead_notifications").notNull().default(true),
+  systemNotifications: boolean("system_notifications").notNull().default(true),
+  promotionalNotifications: boolean("promotional_notifications").notNull().default(false),
+  
+  // Frequency settings
+  digestFrequency: varchar("digest_frequency", { 
+    enum: ["immediate", "daily", "weekly", "never"] 
+  }).notNull().default("immediate"),
+  quietHoursStart: varchar("quiet_hours_start").default("22:00"), // 24-hour format
+  quietHoursEnd: varchar("quiet_hours_end").default("08:00"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Schemas for notifications
+export const insertNotificationSchema = createInsertSchema(notifications).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  isRead: true,
+  readAt: true,
+  emailSent: true,
+  emailSentAt: true,
+});
+
+export const insertNotificationTemplateSchema = createInsertSchema(notificationTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertNotificationPreferencesSchema = createInsertSchema(notificationPreferences).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Type exports
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+export type NotificationTemplate = typeof notificationTemplates.$inferSelect;
+export type InsertNotificationTemplate = z.infer<typeof insertNotificationTemplateSchema>;
+export type NotificationPreferences = typeof notificationPreferences.$inferSelect;
+export type InsertNotificationPreferences = z.infer<typeof insertNotificationPreferencesSchema>;

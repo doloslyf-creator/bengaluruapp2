@@ -57,6 +57,7 @@ import TeamManagement from "@/pages/admin/team-management";
 import ReraManagement from "@/pages/admin/rera-management";
 import SupabaseMigration from "@/pages/admin/supabase-migration";
 import SupabaseStatus from "@/pages/admin/supabase-status";
+import UserNotifications from "@/pages/user-notifications";
 import NotFound from "@/pages/not-found";
 
 // Protected Routes Component that shows auth form for admin routes when not authenticated
@@ -146,6 +147,7 @@ function ProtectedRouter() {
       <Route path="/user-dashboard/valuation-reports" component={UserValuationReports} />
       <Route path="/user-dashboard/civil-mep-reports" component={UserCivilMepReports} />
       <Route path="/user-dashboard/legal-tracker" component={UserLegalTracker} />
+      <Route path="/user-notifications" component={UserNotifications} />
       
       <Route component={NotFound} />
     </Switch>

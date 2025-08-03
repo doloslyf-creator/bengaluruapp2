@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Bell, LogOut, Menu } from "lucide-react";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 // Dynamic user data from Supabase auth
 const getUserDisplayData = (user: any) => ({
@@ -69,9 +70,7 @@ export function UserDashboardHeader({ currentPage }: UserDashboardHeaderProps) {
 
           {/* User Menu */}
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="sm">
-              <Bell className="h-4 w-4" />
-            </Button>
+            <NotificationBell userId={userData.email} className="text-gray-700 hover:text-blue-600" />
             
             <div className="flex items-center space-x-3">
               <Avatar className="h-8 w-8">

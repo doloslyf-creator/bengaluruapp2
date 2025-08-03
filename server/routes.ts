@@ -20,6 +20,7 @@ import { getBlogPosts, getBlogPost, createBlogPost, updateBlogPost, deleteBlogPo
 import { reraService } from "./reraService";
 import { paymentService, apiKeysManager } from "./paymentService";
 import { supabaseMigration } from "./supabaseMigration";
+import { notificationService } from "./notificationService";
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -2687,6 +2688,274 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: "Leads migration failed", 
         details: error instanceof Error ? error.message : "Unknown error" 
       });
+    }
+  });
+
+  // ==============================
+  // NOTIFICATIONS API ENDPOINTS
+  // ==============================
+
+  // Get user notifications
+  app.get("/api/notifications", async (req, res) => {
+    try {
+      const userId = req.query.userId as string;
+      if (!userId) {
+        return res.status(400).json({ error: "userId is required" });
+      }
+
+      const options = {
+        limit: parseInt(req.query.limit as string) || 20,
+        offset: parseInt(req.query.offset as string) || 0,
+        unreadOnly: req.query.unreadOnly === 'true',
+        category: req.query.category as string,
+        priority: req.query.priority as string,
+      };
+
+      const result = await notificationService.getUserNotifications(userId, options);
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      res.status(500).json({ error: "Failed to fetch notifications" });
+    }
+  });
+
+  // Create a notification
+  app.post("/api/notifications", async (req, res) => {
+    try {
+      const notificationData = req.body;
+      const notification = await notificationService.createNotification(notificationData);
+      res.status(201).json(notification);
+    } catch (error) {
+      console.error("Error creating notification:", error);
+      res.status(500).json({ error: "Failed to create notification" });
+    }
+  });
+
+  // Create notification from template
+  app.post("/api/notifications/from-template", async (req, res) => {
+    try {
+      const { templateKey, userId, variables, metadata } = req.body;
+      
+      if (!templateKey) {
+        return res.status(400).json({ error: "templateKey is required" });
+      }
+
+      const notification = await notificationService.createNotificationFromTemplate(
+        templateKey, 
+        userId || null, 
+        variables || {}, 
+        metadata || {}
+      );
+
+      if (!notification) {
+        return res.status(404).json({ error: "Template not found" });
+      }
+
+      res.status(201).json(notification);
+    } catch (error) {
+      console.error("Error creating notification from template:", error);
+      res.status(500).json({ error: "Failed to create notification from template" });
+    }
+  });
+
+  // Mark notification as read
+  app.patch("/api/notifications/:id/read", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.body.userId as string;
+      
+      const success = await notificationService.markAsRead(id, userId);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Notification not found" });
+      }
+
+      res.json({ success: true, message: "Notification marked as read" });
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+      res.status(500).json({ error: "Failed to mark notification as read" });
+    }
+  });
+
+  // Mark all notifications as read for a user
+  app.patch("/api/notifications/mark-all-read", async (req, res) => {
+    try {
+      const userId = req.body.userId as string;
+      
+      if (!userId) {
+        return res.status(400).json({ error: "userId is required" });
+      }
+
+      const count = await notificationService.markAllAsRead(userId);
+      res.json({ success: true, message: `${count} notifications marked as read` });
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
+      res.status(500).json({ error: "Failed to mark notifications as read" });
+    }
+  });
+
+  // Archive notification
+  app.patch("/api/notifications/:id/archive", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.body.userId as string;
+      
+      const success = await notificationService.archiveNotification(id, userId);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Notification not found" });
+      }
+
+      res.json({ success: true, message: "Notification archived" });
+    } catch (error) {
+      console.error("Error archiving notification:", error);
+      res.status(500).json({ error: "Failed to archive notification" });
+    }
+  });
+
+  // ==============================
+  // NOTIFICATION TEMPLATES API
+  // ==============================
+
+  // Get all notification templates
+  app.get("/api/notification-templates", async (req, res) => {
+    try {
+      const templates = await notificationService.getAllTemplates();
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching notification templates:", error);
+      res.status(500).json({ error: "Failed to fetch notification templates" });
+    }
+  });
+
+  // Get specific notification template
+  app.get("/api/notification-templates/:templateKey", async (req, res) => {
+    try {
+      const { templateKey } = req.params;
+      const template = await notificationService.getTemplate(templateKey);
+      
+      if (!template) {
+        return res.status(404).json({ error: "Template not found" });
+      }
+
+      res.json(template);
+    } catch (error) {
+      console.error("Error fetching notification template:", error);
+      res.status(500).json({ error: "Failed to fetch notification template" });
+    }
+  });
+
+  // Create notification template
+  app.post("/api/notification-templates", async (req, res) => {
+    try {
+      const templateData = req.body;
+      const template = await notificationService.createTemplate(templateData);
+      res.status(201).json(template);
+    } catch (error) {
+      console.error("Error creating notification template:", error);
+      res.status(500).json({ error: "Failed to create notification template" });
+    }
+  });
+
+  // ==============================
+  // NOTIFICATION PREFERENCES API
+  // ==============================
+
+  // Get user notification preferences
+  app.get("/api/notification-preferences/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const preferences = await notificationService.getUserPreferences(userId);
+      
+      // Return default preferences if none exist
+      if (!preferences) {
+        const defaultPreferences = {
+          userId,
+          userType: "user",
+          emailNotifications: true,
+          pushNotifications: true,
+          smsNotifications: false,
+          propertyUpdates: true,
+          reportNotifications: true,
+          bookingNotifications: true,
+          paymentNotifications: true,
+          leadNotifications: true,
+          systemNotifications: true,
+          promotionalNotifications: false,
+          digestFrequency: "immediate",
+          quietHoursStart: "22:00",
+          quietHoursEnd: "08:00",
+        };
+        res.json(defaultPreferences);
+      } else {
+        res.json(preferences);
+      }
+    } catch (error) {
+      console.error("Error fetching notification preferences:", error);
+      res.status(500).json({ error: "Failed to fetch notification preferences" });
+    }
+  });
+
+  // Update user notification preferences
+  app.put("/api/notification-preferences/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const preferencesData = req.body;
+      
+      const preferences = await notificationService.updateUserPreferences(userId, preferencesData);
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error updating notification preferences:", error);
+      res.status(500).json({ error: "Failed to update notification preferences" });
+    }
+  });
+
+  // ==============================
+  // QUICK NOTIFICATION HELPERS
+  // ==============================
+
+  // Send system notification to all users
+  app.post("/api/notifications/system-broadcast", async (req, res) => {
+    try {
+      const { title, message, priority = "medium" } = req.body;
+      
+      if (!title || !message) {
+        return res.status(400).json({ error: "title and message are required" });
+      }
+
+      await notificationService.notifySystemMessage(title, message, priority);
+      res.json({ success: true, message: "System notification broadcasted" });
+    } catch (error) {
+      console.error("Error broadcasting system notification:", error);
+      res.status(500).json({ error: "Failed to broadcast system notification" });
+    }
+  });
+
+  // Test notification (for development)
+  app.post("/api/notifications/test", async (req, res) => {
+    try {
+      const { userId, type = "info" } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ error: "userId is required" });
+      }
+
+      await notificationService.createNotification({
+        userId,
+        userType: "user",
+        title: "Test Notification",
+        message: "This is a test notification from the OwnItRight system.",
+        type,
+        category: "system",
+        priority: "low",
+        actionUrl: "/user-dashboard",
+        actionText: "Go to Dashboard"
+      });
+
+      res.json({ success: true, message: "Test notification sent" });
+    } catch (error) {
+      console.error("Error sending test notification:", error);
+      res.status(500).json({ error: "Failed to send test notification" });
     }
   });
 
