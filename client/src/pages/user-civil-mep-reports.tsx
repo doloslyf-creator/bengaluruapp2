@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
+import { UserDashboardHeader } from "@/components/layout/UserDashboardHeader";
 import { 
   ArrowLeft, Download, Eye, Calendar, User, Building,
   CheckCircle, AlertCircle, Clock, FileText, Calculator,
@@ -65,27 +66,7 @@ export default function UserCivilMepReports() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link href="/user-panel">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Dashboard
-                </Button>
-              </Link>
-              <div>
-                <div className="text-2xl font-black tracking-tight text-gray-900">
-                  My Own<span className="text-orange-500">It</span><span className="text-blue-600">Right</span>
-                </div>
-                <p className="text-sm text-gray-600">Curated Properties • CIVIL+MEP Engineering Reports</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <UserDashboardHeader currentPage="CIVIL+MEP Reports" />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { UserDashboardHeader } from "@/components/layout/UserDashboardHeader";
 import { CheckCircle, XCircle, Clock, FileText, Download, MessageCircle, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -99,27 +100,7 @@ ${step.notes ? `**Notes:** ${step.notes}` : ''}
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="css-wordmark text-3xl font-bold mb-2">
-                  <span className="text-blue-600">Own</span>
-                  <span className="text-orange-500">It</span>
-                  <span className="text-purple-600">Right</span>
-                </div>
-                <p className="text-gray-600">Legal Due Diligence Tracker</p>
-              </div>
-              <nav className="flex space-x-8">
-                <a href="/find-property" className="text-gray-600 hover:text-blue-600 transition-colors">Find Property</a>
-                <a href="/user-panel" className="text-gray-600 hover:text-blue-600 transition-colors">Dashboard</a>
-                <a href="#" className="text-blue-600 font-medium">Legal Tracker</a>
-              </nav>
-            </div>
-          </div>
-        </div>
-      </div>
+      <UserDashboardHeader currentPage="Legal Due Diligence Tracker" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">

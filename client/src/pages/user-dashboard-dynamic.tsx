@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import { useUserAuth } from "@/hooks/useUserAuth";
 import { UserAuthForm } from "@/components/auth/UserAuthForm";
+import { UserDashboardHeader } from "@/components/layout/UserDashboardHeader";
 import { 
   User, Home, Calendar, MessageCircle, FileText, 
   Star, Heart, MapPin, Phone, Mail, 
@@ -64,11 +65,10 @@ export default function UserDashboardDynamic() {
   const [activeTab, setActiveTab] = useState("overview");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const { toast } = useToast();
   const [location, navigate] = useLocation();
-  const { user, loading, signOut } = useUserAuth();
+  const { user, loading } = useUserAuth();
   const queryClient = useQueryClient();
 
   // Dynamic data queries
@@ -208,89 +208,7 @@ export default function UserDashboardDynamic() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50">
-      {/* Header */}
-      <header className="bg-white/90 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <Link href="/">
-              <div className="flex items-center space-x-2">
-                <div className="text-2xl font-black tracking-tight text-gray-900">
-                  Own<span className="text-orange-500">It</span><span className="text-blue-600">Right</span>
-                </div>
-              </div>
-            </Link>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
-              <Link href="/find-property" className="text-gray-700 hover:text-blue-600 transition-colors">
-                Properties
-              </Link>
-              <Link href="/user-dashboard/valuation-reports" className="text-gray-700 hover:text-blue-600 transition-colors">
-                Valuation
-              </Link>
-              <Link href="/user-dashboard/civil-mep-reports" className="text-gray-700 hover:text-blue-600 transition-colors">
-                Reports
-              </Link>
-              <Link href="/user-dashboard/legal-tracker" className="text-gray-700 hover:text-blue-600 transition-colors">
-                Legal
-              </Link>
-            </nav>
-
-            {/* User Menu */}
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm">
-                <Bell className="h-4 w-4" />
-              </Button>
-              
-              <div className="flex items-center space-x-3">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={userData.avatar} />
-                  <AvatarFallback className="bg-blue-500 text-white">
-                    {userData.name.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="hidden md:block">
-                  <p className="text-sm font-medium text-gray-900">{userData.name}</p>
-                  <p className="text-xs text-gray-500">Member since {userData.memberSince}</p>
-                </div>
-              </div>
-
-              <Button variant="ghost" size="sm" onClick={signOut}>
-                <LogOut className="h-4 w-4" />
-              </Button>
-
-              {/* Mobile menu button */}
-              <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="sm" className="md:hidden">
-                    <Menu className="h-4 w-4" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent>
-                  <SheetHeader>
-                    <SheetTitle>Navigation</SheetTitle>
-                  </SheetHeader>
-                  <nav className="flex flex-col space-y-4 mt-6">
-                    <Link href="/find-property" className="text-gray-700 hover:text-blue-600">
-                      Properties
-                    </Link>
-                    <Link href="/user-dashboard/valuation-reports" className="text-gray-700 hover:text-blue-600">
-                      Valuation
-                    </Link>
-                    <Link href="/user-dashboard/civil-mep-reports" className="text-gray-700 hover:text-blue-600">
-                      Reports
-                    </Link>
-                    <Link href="/user-dashboard/legal-tracker" className="text-gray-700 hover:text-blue-600">
-                      Legal
-                    </Link>
-                  </nav>
-                </SheetContent>
-              </Sheet>
-            </div>
-          </div>
-        </div>
-      </header>
+      <UserDashboardHeader />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

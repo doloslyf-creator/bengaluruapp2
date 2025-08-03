@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { UserDashboardHeader } from "@/components/layout/UserDashboardHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,29 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Search, FileText, Download, Calendar, IndianRupee, MapPin, Building, Eye } from "lucide-react";
 
-// Simple header component for user reports
-const UserHeader = () => (
-  <header className="bg-white border-b shadow-sm">
-    <div className="container mx-auto px-4">
-      <div className="flex items-center justify-between h-16">
-        <div className="flex items-center space-x-3">
-          <Building className="h-8 w-8 text-primary" />
-          <div>
-            <div className="text-lg font-black tracking-tight text-gray-900">
-              Own<span className="text-orange-500">It</span><span className="text-blue-600">Right</span>
-            </div>
-            <span className="text-xs text-gray-500 -mt-1">Curated Properties</span>
-          </div>
-        </div>
-        <nav className="flex space-x-6">
-          <a href="/" className="text-gray-600 hover:text-gray-900">Home</a>
-          <a href="/find-property" className="text-gray-600 hover:text-gray-900">Find Property</a>
-          <a href="/user-panel" className="text-primary font-medium">My Panel</a>
-        </nav>
-      </div>
-    </div>
-  </header>
-);
+
 
 interface ValuationReport {
   id: string;
@@ -513,7 +492,7 @@ export default function UserValuationReports() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <UserHeader />
+      <UserDashboardHeader currentPage="Property Valuation Reports" />
       
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
