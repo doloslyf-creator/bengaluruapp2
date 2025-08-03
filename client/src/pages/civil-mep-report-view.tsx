@@ -157,7 +157,7 @@ export function CivilMepReportView() {
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-8 space-y-6">
+      <div className="mx-auto px-6 py-8 space-y-6" style={{ maxWidth: '900px' }}>
         {/* Executive Summary & Investment Recommendation */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
@@ -454,7 +454,73 @@ export function CivilMepReportView() {
           )}
         </div>
 
-        {/* Additional Technical Details */}
+        {/* Additional MEP Systems - Vertical Transportation & Smart Systems */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Vertical Transportation */}
+          {report.verticalTransportation && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Building2 className="h-5 w-5 text-indigo-600" />
+                  <span>Vertical Transportation</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Elevators</p>
+                    <p className="text-sm">Type: {report.verticalTransportation.elevators?.type}</p>
+                    <p className="text-xs text-gray-400">Capacity: {report.verticalTransportation.elevators?.capacity}</p>
+                  </div>
+                  <Separator />
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Escalators</p>
+                    <p className="text-sm">{report.verticalTransportation.escalators}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Emergency Access</p>
+                    <p className="text-sm">{report.verticalTransportation.emergencyAccess}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Smart Building & Automation */}
+          {report.smartBuildingFeatures && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Zap className="h-5 w-5 text-purple-600" />
+                  <span>Smart Building & Automation</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Automation Level</p>
+                    <p className="text-sm">{report.smartBuildingFeatures.automationLevel}</p>
+                  </div>
+                  <Separator />
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Energy Management</p>
+                    <p className="text-sm">{report.smartBuildingFeatures.energyManagement}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Security Systems</p>
+                    <p className="text-sm">{report.smartBuildingFeatures.securitySystems}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">IoT Integration</p>
+                    <p className="text-sm">{report.smartBuildingFeatures.iotIntegration}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* Sustainability & Compliance Sections */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Sustainability Features */}
           {report.sustainabilityFeatures && (
@@ -523,6 +589,141 @@ export function CivilMepReportView() {
                       </div>
                     </>
                   )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* Quality Control & Safety Sections */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Quality Control */}
+          {report.qualityControl && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  <span>Quality Control</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Testing Procedures</p>
+                    <p className="text-sm">{report.qualityControl.testingProcedures}</p>
+                  </div>
+                  <Separator />
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Material Standards</p>
+                    <p className="text-sm">{report.qualityControl.materialStandards}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Inspection Protocols</p>
+                    <p className="text-sm">{report.qualityControl.inspectionProtocols}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Compliance Rate</p>
+                    <p className="text-sm">{report.qualityControl.complianceRate}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Safety Measures */}
+          {report.safetyMeasures && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Shield className="h-5 w-5 text-orange-600" />
+                  <span>Safety Measures</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Construction Safety</p>
+                    <p className="text-sm">{report.safetyMeasures.constructionSafety}</p>
+                  </div>
+                  <Separator />
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Occupancy Safety</p>
+                    <p className="text-sm">{report.safetyMeasures.occupancySafety}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Emergency Protocols</p>
+                    <p className="text-sm">{report.safetyMeasures.emergencyProtocols}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Risk Assessment</p>
+                    <p className="text-sm">{report.safetyMeasures.riskAssessment}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* Inspection & Documentation Sections */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Inspection Logs */}
+          {report.inspectionLogs && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Eye className="h-5 w-5 text-blue-600" />
+                  <span>Inspection Logs</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Initial Inspection</p>
+                    <p className="text-sm">Date: {report.inspectionLogs.initialInspection?.date}</p>
+                    <p className="text-xs text-gray-400">Findings: {report.inspectionLogs.initialInspection?.findings}</p>
+                  </div>
+                  <Separator />
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Follow-up Inspections</p>
+                    <p className="text-sm">{report.inspectionLogs.followUpInspections}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Final Assessment</p>
+                    <p className="text-sm">{report.inspectionLogs.finalAssessment}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Technical Documentation */}
+          {report.technicalDocumentation && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <FileText className="h-5 w-5 text-purple-600" />
+                  <span>Technical Documentation</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Drawings & Plans</p>
+                    <p className="text-sm">{report.technicalDocumentation.drawingsAndPlans}</p>
+                  </div>
+                  <Separator />
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Specifications</p>
+                    <p className="text-sm">{report.technicalDocumentation.specifications}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Test Reports</p>
+                    <p className="text-sm">{report.technicalDocumentation.testReports}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">As-Built Drawings</p>
+                    <p className="text-sm">{report.technicalDocumentation.asBuiltDrawings}</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
