@@ -280,13 +280,12 @@ export function AdminCivilMepReports() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => {
-                                setSelectedReport(report);
-                                setShowReportDialog(true);
-                              }}
+                              asChild
                               data-testid={`button-view-${report.id}`}
                             >
-                              <Eye className="w-4 h-4" />
+                              <Link href={`/civil-mep-report/${report.id}`}>
+                                <Eye className="w-4 h-4" />
+                              </Link>
                             </Button>
                             <Button
                               variant="ghost"
