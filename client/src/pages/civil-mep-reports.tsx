@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { 
@@ -16,273 +16,531 @@ import {
   Eye,
   Check,
   TrendingUp,
-  FileText
+  FileText,
+  ArrowRight,
+  Timer,
+  Users,
+  Sparkles,
+  Wrench,
+  Search
 } from "lucide-react";
 import Header from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export default function CivilMepReports() {
-  const [, setLocation] = useLocation();
+  const [, navigate] = useLocation();
+  const [timeLeft, setTimeLeft] = useState({
+    days: 1,
+    hours: 8,
+    minutes: 42,
+    seconds: 15
+  });
+
+  // Countdown timer effect
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev.seconds > 0) {
+          return { ...prev, seconds: prev.seconds - 1 };
+        } else if (prev.minutes > 0) {
+          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
+        } else if (prev.hours > 0) {
+          return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
+        } else if (prev.days > 0) {
+          return { ...prev, days: prev.days - 1, hours: 23, minutes: 59, seconds: 59 };
+        }
+        return prev;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50" style={{ paddingTop: '100px' }}>
+    <div className="min-h-screen bg-white">
       <Header />
       
-      {/* Hero Section */}
-      <div className="bg-white/95 backdrop-blur border-b border-red-200">
-        <div className="max-w-5xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="p-3 bg-gradient-to-r from-red-600 to-orange-600 rounded-xl text-white shadow-lg">
-                <AlertTriangle className="h-7 w-7" />
-              </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">CIVIL+MEP Engineering Report</h1>
-                <p className="text-gray-600 mt-1">Professional engineering analysis before you buy - protect your investment with Priti</p>
-              </div>
-            </div>
-            
-            {/* Key Stats - Compact */}
-            <div className="hidden lg:flex items-center space-x-6">
-              <div className="text-center">
-                <div className="text-lg font-bold text-red-600">200+</div>
-                <div className="text-xs text-gray-500">Issues Found</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-orange-600">24-48h</div>
-                <div className="text-xs text-gray-500">Emergency</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-green-600">₹5L</div>
-                <div className="text-xs text-gray-500">Coverage</div>
-              </div>
-            </div>
+      {/* Promotional Banner */}
+      <div className="bg-gradient-to-r from-red-500 to-orange-500 text-white py-3">
+        <div className="max-w-7xl mx-auto px-4 flex items-center justify-center space-x-4 text-sm">
+          <span className="font-semibold">🚨 Emergency: Get CIVIL+MEP Report Before Possession:</span>
+          <div className="flex items-center space-x-2 font-mono font-bold">
+            <span>{timeLeft.days}d</span>
+            <span>{timeLeft.hours}h</span>
+            <span>{timeLeft.minutes}m</span>
+            <span>{timeLeft.seconds}s</span>
           </div>
+          <span>• Avoid ₹5-20L repair costs!</span>
         </div>
       </div>
 
-      {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-4 py-4 space-y-6">
-        
-        {/* Why You Need It Section */}
-        <section className="bg-white/80 backdrop-blur rounded-xl p-6 shadow-sm border border-red-200 max-w-4xl mx-auto">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Why You Need CIVIL+MEP Engineering Report</h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="flex items-start space-x-3">
-              <div className="p-2 bg-red-100 rounded-lg">
-                <Building2 className="h-5 w-5 text-red-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">Structural Safety Verification</h3>
-                <p className="text-sm text-gray-600">Ensure the building's foundation, beams, and load-bearing elements are structurally sound and safe for habitation.</p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <Zap className="h-5 w-5 text-orange-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">Electrical System Analysis</h3>
-                <p className="text-sm text-gray-600">Comprehensive evaluation of electrical wiring, circuits, and safety compliance to prevent fire hazards.</p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Droplets className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">Plumbing & Drainage Check</h3>
-                <p className="text-sm text-gray-600">Thorough inspection of water supply, drainage systems, and potential leakage or water damage issues.</p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Flame className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">Fire Safety Compliance</h3>
-                <p className="text-sm text-gray-600">Verify fire safety measures, emergency exits, and compliance with local fire safety regulations.</p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Shield className="h-5 w-5 text-purple-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">Code Compliance Verification</h3>
-                <p className="text-sm text-gray-600">Ensure the property meets all local building codes, RERA requirements, and municipal regulations.</p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <TrendingUp className="h-5 w-5 text-yellow-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">Future Risk Assessment</h3>
-                <p className="text-sm text-gray-600">Identify potential maintenance issues and long-term structural concerns before they become expensive problems.</p>
-              </div>
-            </div>
-          </div>
-        </section>
+      {/* Hero Section */}
+      <section className="bg-gradient-to-br from-red-50 via-white to-orange-50 py-20">
+        <div className="max-w-7xl mx-auto px-4">
+          <motion.div 
+            className="text-center max-w-4xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <Badge className="mb-6 text-sm px-4 py-2 bg-red-100 text-red-800 border-red-200">
+              ⚠️ Prevent catastrophic structural and electrical failures with expert inspection
+            </Badge>
+            
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              Don't take possession until{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-orange-600">
+                everything is perfect
+              </span>
+            </h1>
+            
+            <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
+              Our certified engineers inspect civil structure, MEP systems, and safety compliance. 
+              Find critical issues <strong>before handover</strong> - when builders still have to fix them for free.
+            </p>
 
-        {/* What's Included Section */}
-        <section className="bg-gradient-to-br from-red-50 to-orange-100 rounded-xl p-6 shadow-sm border border-red-200 max-w-4xl mx-auto">
-          <h2 className="text-xl font-bold text-red-800 mb-4">What's Included in Our Engineering Report</h2>
-          <p className="text-red-700 mb-4">Our certified engineers provide you with a comprehensive 15+ page report covering:</p>
-          <div className="grid md:grid-cols-2 gap-3">
-            <div className="flex items-center space-x-2">
-              <Check className="h-4 w-4 text-red-600" />
-              <span className="text-sm text-red-700">Complete structural integrity assessment</span>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+              <Button
+                onClick={() => navigate('/civil-mep-reports-form')}
+                size="lg"
+                className="bg-gradient-to-r from-red-600 to-orange-600 hover:shadow-lg text-white px-8 py-4 text-lg font-semibold rounded-xl"
+                data-testid="button-order-inspection"
+              >
+                <AlertTriangle className="h-5 w-5 mr-2" />
+                Order Emergency Inspection
+              </Button>
+              
+              <Button
+                onClick={() => navigate('/contact')}
+                variant="outline"
+                size="lg"
+                className="px-8 py-4 text-lg font-semibold rounded-xl border-2"
+                data-testid="button-see-sample"
+              >
+                <Eye className="h-5 w-5 mr-2" />
+                See Sample Report →
+              </Button>
             </div>
-            <div className="flex items-center space-x-2">
-              <Check className="h-4 w-4 text-red-600" />
-              <span className="text-sm text-red-700">Electrical safety and load capacity analysis</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Check className="h-4 w-4 text-red-600" />
-              <span className="text-sm text-red-700">Plumbing system evaluation and water quality test</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Check className="h-4 w-4 text-red-600" />
-              <span className="text-sm text-red-700">HVAC system performance and efficiency check</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Check className="h-4 w-4 text-red-600" />
-              <span className="text-sm text-red-700">Fire safety compliance verification</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Check className="h-4 w-4 text-red-600" />
-              <span className="text-sm text-red-700">Building code compliance documentation</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Check className="h-4 w-4 text-red-600" />
-              <span className="text-sm text-red-700">Detailed remediation recommendations</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Check className="h-4 w-4 text-red-600" />
-              <span className="text-sm text-red-700">Cost estimates for required repairs</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Check className="h-4 w-4 text-red-600" />
-              <span className="text-sm text-red-700">Professional engineer certification & stamp</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Check className="h-4 w-4 text-red-600" />
-              <span className="text-sm text-red-700">Digital report with high-resolution images</span>
-            </div>
-          </div>
-        </section>
 
-        {/* Pricing & Timeline Section */}
-        <section className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-          <div className="bg-white/80 backdrop-blur rounded-xl p-6 shadow-sm border border-gray-200">
-            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-              <Clock className="h-5 w-5 text-red-600 mr-2" />
-              Timeline & Process
-            </h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Standard Report</span>
-                <span className="text-sm font-semibold text-gray-900">5-7 business days</span>
+            {/* Social Proof */}
+            <div className="flex items-center justify-center space-x-8 text-sm text-gray-600">
+              <div className="flex items-center space-x-2">
+                <div className="text-red-500">💸</div>
+                <span><strong>₹8.5L</strong> average repair costs avoided</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Priority Service</span>
-                <span className="text-sm font-semibold text-orange-600">3-4 business days</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Emergency Service</span>
-                <span className="text-sm font-semibold text-red-600">24-48 hours</span>
-              </div>
-              <div className="pt-2 border-t border-gray-200">
-                <p className="text-xs text-gray-500">All reports include on-site inspection by certified engineers</p>
+              <div className="flex items-center space-x-2">
+                <div className="text-yellow-500">⚡</div>
+                <span><strong>24-48hr</strong> emergency inspection available</span>
               </div>
             </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Horror Story Demo */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              We Saved This Family from Disaster
+            </h2>
+            <p className="text-xl text-gray-600">
+              Real case study - family almost took possession of apartment with 47 critical defects.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="max-w-2xl mx-auto"
+          >
+            <Card className="bg-white shadow-lg border-0 overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-red-50 to-orange-50 border-b">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900">Sobha Emerald</h3>
+                    <p className="text-gray-600">3BHK, Sarjapur Road • Pre-possession</p>
+                  </div>
+                  <Badge className="bg-red-100 text-red-800">47 Defects Found!</Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="grid md:grid-cols-3 gap-6 mb-6">
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">Defects Found</p>
+                    <p className="text-2xl font-bold text-red-600">47</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">Repair Cost Avoided</p>
+                    <p className="text-2xl font-bold text-green-600">₹12.5 L</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">Family Saved</p>
+                    <p className="text-2xl font-bold text-primary">₹12.5 L</p>
+                  </div>
+                </div>
+
+                <div className="bg-red-50 p-4 rounded-lg mb-6">
+                  <h4 className="font-semibold text-gray-900 mb-3">Critical Issues We Found:</h4>
+                  <div className="space-y-2 text-sm text-gray-700">
+                    <div className="flex items-center space-x-2">
+                      <AlertTriangle className="h-4 w-4 text-red-500" />
+                      <span><strong>Electrical:</strong> Faulty wiring, no earthing (fire hazard)</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <AlertTriangle className="h-4 w-4 text-red-500" />
+                      <span><strong>Plumbing:</strong> 6 leakages, pressure issues</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <AlertTriangle className="h-4 w-4 text-red-500" />
+                      <span><strong>Civil:</strong> Wall cracks, flooring defects</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <AlertTriangle className="h-4 w-4 text-red-500" />
+                      <span><strong>Safety:</strong> No smoke detectors, fire exits blocked</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-green-50 p-4 rounded-lg mb-6">
+                  <h4 className="font-semibold text-gray-900 mb-2">Result:</h4>
+                  <p className="text-sm text-gray-700">
+                    Builder fixed ALL 47 defects for free before handover. Family moved into perfect apartment 
+                    without spending a single rupee on repairs.
+                  </p>
+                </div>
+
+                <Button 
+                  className="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white py-3 rounded-xl font-semibold"
+                  onClick={() => navigate('/civil-mep-reports-form')}
+                  data-testid="button-book-inspection"
+                >
+                  Book My Pre-Possession Inspection →
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* What We Inspect */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              What Our Engineers Inspect
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Comprehensive 150+ point checklist covering every aspect of your new home.
+            </p>
           </div>
 
-          <div className="bg-white/80 backdrop-blur rounded-xl p-6 shadow-sm border border-gray-200">
-            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-              <IndianRupee className="h-5 w-5 text-green-600 mr-2" />
-              Professional Pricing
-            </h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Standard Report</span>
-                <span className="text-lg font-bold text-green-600">₹8,999</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Priority Service</span>
-                <span className="text-lg font-bold text-orange-600">₹12,999</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Emergency Service</span>
-                <span className="text-lg font-bold text-red-600">₹18,999</span>
-              </div>
-              <div className="pt-2 border-t border-gray-200">
-                <p className="text-xs text-gray-500">Includes ₹5 lakh repair cost protection coverage</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Trust Badges */}
-        <section className="bg-white/80 backdrop-blur rounded-xl p-4 shadow-sm border border-gray-200 max-w-4xl mx-auto">
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div className="flex flex-col items-center space-y-2">
-              <Award className="h-8 w-8 text-blue-600" />
-              <span className="text-sm font-semibold text-gray-900">Certified Engineers</span>
-              <span className="text-xs text-gray-600">15+ Years Experience</span>
-            </div>
-            <div className="flex flex-col items-center space-y-2">
-              <Shield className="h-8 w-8 text-green-600" />
-              <span className="text-sm font-semibold text-gray-900">₹5L Protection</span>
-              <span className="text-xs text-gray-600">Repair Cost Coverage</span>
-            </div>
-            <div className="flex flex-col items-center space-y-2">
-              <CheckCircle className="h-8 w-8 text-purple-600" />
-              <span className="text-sm font-semibold text-gray-900">100% Satisfaction</span>
-              <span className="text-xs text-gray-600">Guaranteed Quality</span>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="text-center bg-gradient-to-r from-red-600/10 to-orange-600/10 rounded-xl p-8 border border-red-600/20 max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Protect Your Investment. Get Peace of Mind.</h2>
-          <p className="text-gray-600 mb-6 max-w-xl mx-auto">
-            Don't let hidden engineering issues cost you lakhs later. Get your property professionally inspected by certified engineers today.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-            <Button
-              onClick={() => setLocation("/civil-mep-reports/form")}
-              className="bg-gradient-to-r from-red-600 to-orange-600 hover:shadow-lg text-white px-8 py-3 text-lg font-semibold rounded-xl"
+          <div className="grid md:grid-cols-4 gap-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
             >
-              Order Engineering Report
-              <ChevronRight className="ml-2 h-5 w-5" />
+              <Card className="h-full text-center p-6 border-0 shadow-lg bg-gradient-to-br from-red-50 to-red-100">
+                <div className="flex justify-center mb-4">
+                  <div className="p-3 bg-red-500 rounded-2xl text-white">
+                    <Building2 className="h-6 w-6" />
+                  </div>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-3">Civil Structure</h3>
+                <ul className="text-sm text-gray-600 space-y-2">
+                  <li>• Wall cracks & seepage</li>
+                  <li>• Floor & ceiling defects</li>
+                  <li>• Door & window alignment</li>
+                  <li>• Paint quality issues</li>
+                  <li>• Tile installation problems</li>
+                </ul>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              <Card className="h-full text-center p-6 border-0 shadow-lg bg-gradient-to-br from-yellow-50 to-yellow-100">
+                <div className="flex justify-center mb-4">
+                  <div className="p-3 bg-yellow-500 rounded-2xl text-white">
+                    <Zap className="h-6 w-6" />
+                  </div>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-3">Electrical Systems</h3>
+                <ul className="text-sm text-gray-600 space-y-2">
+                  <li>• Wiring & switch points</li>
+                  <li>• Earthing & safety</li>
+                  <li>• Circuit breaker testing</li>
+                  <li>• Power outlet functionality</li>
+                  <li>• Lighting systems</li>
+                </ul>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <Card className="h-full text-center p-6 border-0 shadow-lg bg-gradient-to-br from-blue-50 to-blue-100">
+                <div className="flex justify-center mb-4">
+                  <div className="p-3 bg-blue-500 rounded-2xl text-white">
+                    <Droplets className="h-6 w-6" />
+                  </div>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-3">Plumbing</h3>
+                <ul className="text-sm text-gray-600 space-y-2">
+                  <li>• Water supply & pressure</li>
+                  <li>• Drainage system</li>
+                  <li>• Leakage detection</li>
+                  <li>• Fixture installation</li>
+                  <li>• Hot water systems</li>
+                </ul>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              <Card className="h-full text-center p-6 border-0 shadow-lg bg-gradient-to-br from-green-50 to-green-100">
+                <div className="flex justify-center mb-4">
+                  <div className="p-3 bg-green-500 rounded-2xl text-white">
+                    <Shield className="h-6 w-6" />
+                  </div>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-3">Safety & Compliance</h3>
+                <ul className="text-sm text-gray-600 space-y-2">
+                  <li>• Fire safety systems</li>
+                  <li>• Ventilation adequacy</li>
+                  <li>• Emergency exits</li>
+                  <li>• Building code compliance</li>
+                  <li>• Security systems</li>
+                </ul>
+              </Card>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Emergency Inspection Pricing
+          </h2>
+          <p className="text-xl text-gray-600 mb-12">
+            Professional engineering inspection - costs ₹8,000, saves ₹8 lakhs on average.
+          </p>
+
+          <div className="max-w-md mx-auto">
+            <Card className="p-8 border-2 border-red-500 bg-white relative">
+              <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-red-500 text-white">
+                24-48 Hour Service
+              </Badge>
+              <div className="mb-6">
+                <div className="text-4xl font-bold text-red-600 mb-2">₹8,000</div>
+                <div className="text-gray-600">Complete CIVIL+MEP Inspection</div>
+                <div className="text-sm text-green-600 font-semibold mt-2">Average savings: ₹8.5 lakhs</div>
+              </div>
+              <ul className="text-left space-y-3 mb-8">
+                <li className="flex items-center space-x-3">
+                  <CheckCircle className="h-5 w-5 text-red-600" />
+                  <span>150+ point inspection checklist</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <CheckCircle className="h-5 w-5 text-red-600" />
+                  <span>Certified civil & MEP engineers</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <CheckCircle className="h-5 w-5 text-red-600" />
+                  <span>Detailed defect report with photos</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <CheckCircle className="h-5 w-5 text-red-600" />
+                  <span>Priority-wise fixing guidelines</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <CheckCircle className="h-5 w-5 text-red-600" />
+                  <span>24-48 hour inspection slot</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <CheckCircle className="h-5 w-5 text-red-600" />
+                  <span>Builder negotiation support</span>
+                </li>
+              </ul>
+              
+              <Button
+                onClick={() => navigate('/civil-mep-reports-form')}
+                size="lg"
+                className="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white py-3 text-lg font-semibold rounded-xl"
+                data-testid="button-book-emergency"
+              >
+                Book Emergency Inspection →
+              </Button>
+              
+              <p className="text-sm text-gray-500 mt-4">
+                🚨 Don't take possession until you know everything is perfect
+              </p>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-16 bg-white">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Families We've Protected
+            </h2>
+            <p className="text-xl text-gray-600">
+              Real stories of how our inspections prevented costly disasters
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <Card className="p-6 bg-white border-0 shadow-lg h-full">
+                <div className="flex items-center mb-4">
+                  <div className="flex text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-current" />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-gray-700 mb-6 leading-relaxed">
+                  "Found 23 electrical defects including fire hazards. Builder fixed everything for free 
+                  before handover. Could have cost us ₹5 lakhs later."
+                </p>
+                <div className="flex items-center">
+                  <div>
+                    <div className="font-semibold text-gray-900">Vikram & Kavitha Nair</div>
+                    <div className="text-sm text-gray-500">Pharmacists, Marathahalli</div>
+                    <Badge className="mt-2 bg-red-100 text-red-800 text-xs">₹5L saved</Badge>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              <Card className="p-6 bg-white border-0 shadow-lg h-full">
+                <div className="flex items-center mb-4">
+                  <div className="flex text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-current" />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-gray-700 mb-6 leading-relaxed">
+                  "Detected major plumbing issues that would have flooded our apartment. 
+                  The inspection was thorough and professional. Money well spent!"
+                </p>
+                <div className="flex items-center">
+                  <div>
+                    <div className="font-semibold text-gray-900">Ramesh Kumar</div>
+                    <div className="text-sm text-gray-500">Bank Manager, Whitefield</div>
+                    <Badge className="mt-2 bg-blue-100 text-blue-800 text-xs">Flood Prevented</Badge>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <Card className="p-6 bg-white border-0 shadow-lg h-full">
+                <div className="flex items-center mb-4">
+                  <div className="flex text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-current" />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-gray-700 mb-6 leading-relaxed">
+                  "The detailed report with photos helped us negotiate with builder professionally. 
+                  They fixed all 31 defects without argument. Excellent service!"
+                </p>
+                <div className="flex items-center">
+                  <div>
+                    <div className="font-semibold text-gray-900">Deepika Sharma</div>
+                    <div className="text-sm text-gray-500">HR Executive, Electronic City</div>
+                    <Badge className="mt-2 bg-green-100 text-green-800 text-xs">31 Defects Fixed</Badge>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-20 bg-gradient-to-r from-red-600 to-orange-600 text-white">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              Don't Take Possession of a Defective Home
+            </h2>
+            <p className="text-xl mb-2 opacity-90 max-w-2xl mx-auto">
+              24-48 hour emergency inspection available. Find issues while builder still has to fix them free.
+            </p>
+            <p className="text-sm mb-8 opacity-75">
+              200+ families protected from costly repairs. Average savings: ₹8.5 lakhs.
+            </p>
+            
+            <Button
+              onClick={() => navigate('/civil-mep-reports-form')}
+              size="lg"
+              variant="secondary"
+              className="bg-white text-red-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold rounded-xl"
+              data-testid="button-emergency-inspection"
+            >
+              <AlertTriangle className="h-5 w-5 mr-2" />
+              Book Emergency Inspection Now
             </Button>
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <Eye className="h-4 w-4" />
-              <span>Pay Later Option Available</span>
-            </div>
-          </div>
 
-          <div className="mt-6 flex items-center justify-center space-x-8 text-sm text-gray-500">
-            <div className="flex items-center space-x-1">
-              <FileText className="h-4 w-4" />
-              <span>Detailed Report</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <Shield className="h-4 w-4" />
-              <span>Professional Engineers</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <Clock className="h-4 w-4" />
-              <span>Quick Turnaround</span>
-            </div>
-          </div>
-        </section>
-
-      </main>
+            <p className="text-sm opacity-75 mt-6">
+              🚨 Every day you delay, defects become your expensive responsibility
+            </p>
+          </motion.div>
+        </div>
+      </section>
     </div>
   );
 }

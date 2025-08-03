@@ -34,30 +34,53 @@ export default function About() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-white">
       <Header />
       
+      {/* Promotional Banner */}
+      <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3">
+        <div className="max-w-7xl mx-auto px-4 flex items-center justify-center space-x-4 text-sm">
+          <span className="font-semibold">💜 Meet the founders who work for buyers first - never for builders</span>
+          <span>• 100% buyer-focused approach • Zero builder partnerships</span>
+        </div>
+      </div>
+
       {/* Hero Section */}
-      <section className="bg-white/80 backdrop-blur border-b">
-        <div className="max-w-6xl mx-auto px-4 py-16">
+      <section className="bg-gradient-to-br from-purple-50 via-white to-pink-50 py-20">
+        <div className="max-w-7xl mx-auto px-4">
           <motion.div 
-            className="text-center"
+            className="text-center max-w-4xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="flex justify-center mb-6">
-              <div className="p-4 bg-gradient-to-r from-primary to-primary/80 rounded-2xl text-white">
-                <Heart className="h-8 w-8" />
+            <div className="mb-6 text-sm px-4 py-2 bg-purple-100 text-purple-800 border border-purple-200 rounded-full inline-block">
+              💜 The only property advisors who work exclusively for buyers
+            </div>
+            
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              Meet the team that{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+                fights for you
+              </span>
+            </h1>
+            
+            <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
+              Priti and Zaki built OwnItRight with one mission - help buyers make smart property decisions 
+              without builder bias, broker pressure, or hidden agendas.
+            </p>
+
+            {/* Social Proof */}
+            <div className="flex items-center justify-center space-x-8 text-sm text-gray-600 mb-12">
+              <div className="flex items-center space-x-2">
+                <div className="text-purple-500">🚫</div>
+                <span><strong>Zero</strong> builder partnerships</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="text-pink-500">💝</div>
+                <span><strong>100%</strong> buyer-first approach</span>
               </div>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Meet Priti & Zaki
-            </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              The dream team behind OwnItRight - where your property dreams meet our expertise, 
-              and where we always put buyers first, no matter what.
-            </p>
           </motion.div>
         </div>
       </section>
