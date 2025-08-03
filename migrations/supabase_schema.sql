@@ -1,12 +1,26 @@
 -- OwnItRight Supabase Database Schema
 -- This file contains the complete database schema for migration to Supabase
 
--- Enable UUID extension
+-- Enable required extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Drop existing tables if they exist (in correct order to handle dependencies)
+DROP TABLE IF EXISTS notification_preferences CASCADE;
+DROP TABLE IF EXISTS notification_templates CASCADE;
+DROP TABLE IF EXISTS notifications CASCADE;
+DROP TABLE IF EXISTS valuation_reports CASCADE;
+DROP TABLE IF EXISTS civil_mep_reports CASCADE;
+DROP TABLE IF EXISTS team_members CASCADE;
+DROP TABLE IF EXISTS bookings CASCADE;
+DROP TABLE IF EXISTS leads CASCADE;
+DROP TABLE IF EXISTS rera_data CASCADE;
+DROP TABLE IF EXISTS property_scores CASCADE;
+DROP TABLE IF EXISTS property_configurations CASCADE;
+DROP TABLE IF EXISTS properties CASCADE;
 
 -- Properties table (updated to match current schema)
 CREATE TABLE properties (
-  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
   name TEXT NOT NULL,
   type TEXT NOT NULL CHECK (type IN ('apartment', 'villa', 'plot')),
   developer TEXT NOT NULL,
@@ -87,7 +101,7 @@ CREATE TABLE properties (
 
 -- Property configurations table (updated)
 CREATE TABLE property_configurations (
-  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
   property_id TEXT REFERENCES properties(id) ON DELETE CASCADE,
   configuration_type TEXT NOT NULL,
   area DECIMAL(10,2),
@@ -100,7 +114,7 @@ CREATE TABLE property_configurations (
 
 -- Property scores table (comprehensive scoring system)
 CREATE TABLE property_scores (
-  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
   property_id TEXT NOT NULL,
   
   -- Scoring metadata
@@ -180,7 +194,7 @@ CREATE TABLE property_scores (
 
 -- RERA Data Integration table
 CREATE TABLE rera_data (
-  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
   rera_id TEXT NOT NULL UNIQUE,
   property_id TEXT REFERENCES properties(id),
   
@@ -215,7 +229,7 @@ CREATE TABLE rera_data (
 
 -- Leads table (updated)
 CREATE TABLE leads (
-  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
   source TEXT NOT NULL CHECK (source IN ('site-visit', 'consultation', 'property-inquiry')),
   lead_type TEXT CHECK (lead_type IN ('hot', 'warm', 'cold')),
   priority TEXT CHECK (priority IN ('high', 'medium', 'low')),
@@ -241,7 +255,7 @@ CREATE TABLE leads (
 
 -- Bookings table (updated)
 CREATE TABLE bookings (
-  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
   booking_id TEXT NOT NULL,
   property_id TEXT REFERENCES properties(id),
   property_name TEXT,
@@ -260,7 +274,7 @@ CREATE TABLE bookings (
 
 -- Team Members table
 CREATE TABLE team_members (
-  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
   name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
   phone TEXT,
@@ -280,7 +294,7 @@ CREATE TABLE team_members (
 
 -- Civil MEP Reports table (comprehensive)
 CREATE TABLE civil_mep_reports (
-  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
   property_id TEXT NOT NULL REFERENCES properties(id),
   report_type TEXT NOT NULL DEFAULT 'combined' CHECK (report_type IN ('civil', 'mep', 'combined')),
   report_version TEXT DEFAULT '1.0',
@@ -315,7 +329,7 @@ CREATE TABLE civil_mep_reports (
 
 -- Valuation Reports table
 CREATE TABLE valuation_reports (
-  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
   property_id TEXT NOT NULL REFERENCES properties(id),
   customer_name TEXT NOT NULL,
   customer_email TEXT,
@@ -344,7 +358,7 @@ CREATE TABLE valuation_reports (
 
 -- Notifications table
 CREATE TABLE notifications (
-  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
   user_id TEXT,
   title TEXT NOT NULL,
   message TEXT NOT NULL,
@@ -359,7 +373,7 @@ CREATE TABLE notifications (
 
 -- Notification Templates table  
 CREATE TABLE notification_templates (
-  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
   name TEXT NOT NULL UNIQUE,
   description TEXT,
   category TEXT NOT NULL,
@@ -376,7 +390,7 @@ CREATE TABLE notification_templates (
 
 -- Notification Preferences table
 CREATE TABLE notification_preferences (
-  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
   user_id TEXT NOT NULL,
   category TEXT NOT NULL,
   in_app_enabled BOOLEAN DEFAULT true,
