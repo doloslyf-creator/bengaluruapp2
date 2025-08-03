@@ -19,9 +19,48 @@ import { z } from "zod";
 import { getBlogPosts, getBlogPost, createBlogPost, updateBlogPost, deleteBlogPost } from "./blog";
 import { reraService } from "./reraService";
 import { paymentService, apiKeysManager } from "./paymentService";
+import * as fs from 'fs';
+import * as path from 'path';
 
-// Global API keys storage (in production, use database with encryption)
-const globalApiKeys: Record<string, any> = {};
+// Persistent API keys storage using file system
+const API_KEYS_FILE = path.join(process.cwd(), 'api-keys.json');
+
+// Load API keys from file on startup
+function loadApiKeys(): Record<string, any> {
+  try {
+    if (fs.existsSync(API_KEYS_FILE)) {
+      const data = fs.readFileSync(API_KEYS_FILE, 'utf8');
+      return JSON.parse(data);
+    }
+  } catch (error) {
+    console.error('Error loading API keys:', error);
+  }
+  return {};
+}
+
+// Save API keys to file
+function saveApiKeys(keys: Record<string, any>) {
+  try {
+    fs.writeFileSync(API_KEYS_FILE, JSON.stringify(keys, null, 2));
+    console.log('API keys saved to:', API_KEYS_FILE);
+  } catch (error) {
+    console.error('Error saving API keys:', error);
+  }
+}
+
+// Global API keys storage with file persistence
+const globalApiKeys: Record<string, any> = loadApiKeys();
+console.log('Loaded API keys on startup:', Object.keys(globalApiKeys));
+
+// Initialize services with stored keys on startup
+if (globalApiKeys.razorpayKeyId && globalApiKeys.razorpayKeySecret) {
+  try {
+    paymentService.updateKeys(globalApiKeys.razorpayKeyId, globalApiKeys.razorpayKeySecret);
+    console.log('Razorpay initialized with stored keys');
+  } catch (error) {
+    console.error('Failed to initialize Razorpay with stored keys:', error);
+  }
+}
 
 // Helper function to calculate lead score from contact form
 function calculateContactLeadScore(contactData: any): number {
@@ -2467,8 +2506,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const apiKeysData = req.body;
       console.log("API keys update request received:", Object.keys(apiKeysData));
       
-      // Store all API keys in global memory storage
+      // Store all API keys in global memory storage and save to file
       Object.assign(globalApiKeys, apiKeysData);
+      saveApiKeys(globalApiKeys);
       console.log("Stored API keys:", Object.keys(globalApiKeys));
       
       // Also update the apiKeysManager for payment service
