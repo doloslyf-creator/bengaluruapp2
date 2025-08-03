@@ -2,5 +2,8 @@
   "razorpayKeyId": "rzp_live_aG2i5282K5YLDj",
   "razorpayKeySecret": "6W3DxUlsbj2XqM9lAtqsYh4D",
   "googleAnalyticsId": "G-QF329MKJJ2",
-  "googleMapsApiKey": "AIzaSyExample123"
+  "googleMapsApiKey": "AIzaSyExample123",
+  "twilioAccountSid": "AC1234567890abcdef1234567890abcdef",
+  "twilioAuthToken": "your_twilio_auth_token_here",
+  "twilioPhoneNumber": "+1234567890"
 }
