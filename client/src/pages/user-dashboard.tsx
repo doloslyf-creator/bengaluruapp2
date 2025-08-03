@@ -83,24 +83,7 @@ export default function UserDashboard() {
   const { user, loading, signOut } = useUserAuth();
   const queryClient = useQueryClient();
 
-  // Show loading state while checking authentication
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  // Show auth form if user is not authenticated
-  if (!user) {
-    return <UserAuthForm />;
-  }
-
-  // Get current user display data
-  const currentUser = getUserDisplayData(user);
-
-  // Dynamic data queries
+  // Dynamic data queries - always call hooks before early returns
   const { data: properties = [], isLoading: propertiesLoading } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
     enabled: !!user,
@@ -125,6 +108,23 @@ export default function UserDashboard() {
     queryKey: ["/api/civil-mep-reports"],
     enabled: !!user,
   });
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  // Show auth form if user is not authenticated
+  if (!user) {
+    return <UserAuthForm />;
+  }
+
+  // Get current user display data
+  const currentUser = getUserDisplayData(user);
 
   // Calculate dynamic user stats
   const userStats: UserStats = {
