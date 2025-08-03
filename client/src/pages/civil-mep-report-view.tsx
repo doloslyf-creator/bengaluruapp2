@@ -169,7 +169,7 @@ export function CivilMepReportView() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-700 leading-relaxed">{report.executiveSummary}</p>
+                <p className="text-gray-700 leading-relaxed">{report.executiveSummary || 'Executive summary not available'}</p>
               </CardContent>
             </Card>
           </div>
@@ -183,17 +183,17 @@ export function CivilMepReportView() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="text-center">
-                <Badge className={`${getInvestmentColor(report.investmentRecommendation)} text-lg px-4 py-2 border`}>
-                  {report.investmentRecommendation.toUpperCase().replace('-', ' ')}
+                <Badge className={`${getInvestmentColor(report.investmentRecommendation || 'conditional')} text-lg px-4 py-2 border`}>
+                  {(report.investmentRecommendation || 'conditional').toUpperCase().replace('-', ' ')}
                 </Badge>
               </div>
               
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Overall Score</span>
-                  <span className="font-semibold">{report.overallScore}/10</span>
+                  <span className="font-semibold">{report.overallScore || 0}/10</span>
                 </div>
-                <Progress value={report.overallScore * 10} className="h-2" />
+                <Progress value={(report.overallScore || 0) * 10} className="h-2" />
               </div>
               
               <div className="grid grid-cols-3 gap-2 text-center">
@@ -261,24 +261,24 @@ export function CivilMepReportView() {
                 <div className="grid grid-cols-1 gap-3">
                   <div>
                     <p className="text-sm font-medium text-gray-500">Foundation Type</p>
-                    <p className="font-semibold text-lg">{report.foundationDetails.type}</p>
+                    <p className="font-semibold text-lg">{report.foundationDetails.type || 'Not specified'}</p>
                   </div>
                   <Separator />
                   <div>
+                    <p className="text-sm font-medium text-gray-500">Depth & Footing</p>
+                    <p className="text-sm">{report.foundationDetails.depthAndFooting || 'Not specified'}</p>
+                  </div>
+                  <div>
                     <p className="text-sm font-medium text-gray-500">Soil Bearing Capacity</p>
-                    <p className="text-sm">{report.foundationDetails.soilBearingCapacity}</p>
+                    <p className="text-sm">{report.foundationDetails.soilBearingCapacity || 'Not specified'}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Soil Investigation</p>
-                    <p className="text-sm">{report.foundationDetails.soilInvestigation}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Settlement Analysis</p>
-                    <p className="text-sm">{report.foundationDetails.settlementAnalysis}</p>
+                    <p className="text-sm font-medium text-gray-500">Anti-Termite Treatment</p>
+                    <p className="text-sm">{report.foundationDetails.antiTermiteTreatment || 'Not specified'}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-500">Waterproofing</p>
-                    <p className="text-sm">{report.foundationDetails.waterproofingMethod}</p>
+                    <p className="text-sm">{report.foundationDetails.waterproofingMethod || 'Not specified'}</p>
                   </div>
                 </div>
               </CardContent>
@@ -298,24 +298,24 @@ export function CivilMepReportView() {
                 <div className="grid grid-cols-1 gap-3">
                   <div>
                     <p className="text-sm font-medium text-gray-500">Structural Type</p>
-                    <p className="font-semibold text-lg">{report.structuralDetails.structuralType}</p>
+                    <p className="font-semibold text-lg">{report.structuralDetails.structuralType || 'Not specified'}</p>
                   </div>
                   <Separator />
                   <div>
                     <p className="text-sm font-medium text-gray-500">Concrete Grade</p>
-                    <p className="text-sm">{report.structuralDetails.concreteGrade}</p>
+                    <p className="text-sm">{report.structuralDetails.concreteGrade || 'Not specified'}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-500">Steel Grade</p>
-                    <p className="text-sm">{report.structuralDetails.steelGrade}</p>
+                    <p className="text-sm">{report.structuralDetails.steelGrade || 'Not specified'}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-500">Column Spacing</p>
-                    <p className="text-sm">{report.structuralDetails.columnSpacing}</p>
+                    <p className="text-sm">{report.structuralDetails.columnSpacing || 'Not specified'}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-500">Slab Thickness</p>
-                    <p className="text-sm">{report.structuralDetails.slabThickness}</p>
+                    <p className="text-sm">{report.structuralDetails.slabThickness || 'Not specified'}</p>
                   </div>
                 </div>
               </CardContent>
@@ -337,20 +337,21 @@ export function CivilMepReportView() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 gap-3">
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Power Supply</p>
-                    <p className="text-sm">{report.electricalSystems.powerSupply?.mainConnection}</p>
-                    <p className="text-xs text-gray-400">Backup: {report.electricalSystems.powerSupply?.backup}</p>
+                    <p className="text-sm font-medium text-gray-500">LT Panel Design</p>
+                    <p className="text-sm">{report.electricalSystems.ltPanelDesign || 'Not specified'}</p>
                   </div>
                   <Separator />
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Lighting Systems</p>
-                    <p className="text-sm">Common: {report.electricalSystems.lighting?.common}</p>
-                    <p className="text-xs text-gray-400">Emergency: {report.electricalSystems.lighting?.emergency}</p>
+                    <p className="text-sm font-medium text-gray-500">Power Distribution</p>
+                    <p className="text-sm">{report.electricalSystems.powerDistribution || 'Not specified'}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Distribution</p>
-                    <p className="text-sm">Panels: {report.electricalSystems.distribution?.panels}</p>
-                    <p className="text-xs text-gray-400">Cable Type: {report.electricalSystems.distribution?.cableType}</p>
+                    <p className="text-sm font-medium text-gray-500">Wiring Type</p>
+                    <p className="text-sm">{report.electricalSystems.wiringType || 'Not specified'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Cable Standards</p>
+                    <p className="text-sm">{report.electricalSystems.cableSizesStandards || 'Not specified'}</p>
                   </div>
                 </div>
               </CardContent>
@@ -370,18 +371,20 @@ export function CivilMepReportView() {
                 <div className="grid grid-cols-1 gap-3">
                   <div>
                     <p className="text-sm font-medium text-gray-500">Water Supply</p>
-                    <p className="text-sm">Source: {report.plumbingSystems.waterSupply?.source}</p>
-                    <p className="text-xs text-gray-400">Storage: {report.plumbingSystems.waterSupply?.storage}</p>
+                    <p className="text-sm">{report.plumbingSystems.waterSupply || 'Not specified'}</p>
                   </div>
                   <Separator />
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Drainage System</p>
-                    <p className="text-sm">Type: {report.plumbingSystems.drainage?.system}</p>
-                    <p className="text-xs text-gray-400">STP: {report.plumbingSystems.drainage?.stpCapacity}</p>
+                    <p className="text-sm font-medium text-gray-500">Pipe Material & Diameter</p>
+                    <p className="text-sm">{report.plumbingSystems.pipeMaterialDiameter || 'Not specified'}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Hot Water</p>
-                    <p className="text-sm">{report.plumbingSystems.hotWater?.system}</p>
+                    <p className="text-sm font-medium text-gray-500">Underground Tank Specs</p>
+                    <p className="text-sm">{report.plumbingSystems.undergroundTankSpecs || 'Not specified'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">STP Layout</p>
+                    <p className="text-sm">{report.plumbingSystems.stpLayout || 'Not specified'}</p>
                   </div>
                 </div>
               </CardContent>
@@ -403,20 +406,25 @@ export function CivilMepReportView() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 gap-3">
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Fire Detection</p>
-                    <p className="text-sm">System: {report.fireSafetySystems.fireDetection?.system}</p>
-                    <p className="text-xs text-gray-400">Coverage: {report.fireSafetySystems.fireDetection?.coverage}</p>
+                    <p className="text-sm font-medium text-gray-500">Hydrant System Layout</p>
+                    <p className="text-sm">{report.fireSafetySystems.hydrantSystemLayout || 'Not specified'}</p>
                   </div>
                   <Separator />
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Fire Fighting</p>
-                    <p className="text-sm">Hydrant: {report.fireSafetySystems.fireFighting?.hydrant}</p>
-                    <p className="text-xs text-gray-400">Sprinkler: {report.fireSafetySystems.fireFighting?.sprinkler}</p>
+                    <p className="text-sm font-medium text-gray-500">Sprinkler System</p>
+                    <p className="text-sm">{report.fireSafetySystems.sprinklerSystem || 'Not specified'}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Evacuation</p>
-                    <p className="text-sm">Exits: {report.fireSafetySystems.evacuation?.exits}</p>
-                    <p className="text-xs text-gray-400">Staircase: {report.fireSafetySystems.evacuation?.staircase}</p>
+                    <p className="text-sm font-medium text-gray-500">Smoke Detector Layout</p>
+                    <p className="text-sm">{report.fireSafetySystems.smokeDetectorLayout || 'Not specified'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Fire Alarm & PA</p>
+                    <p className="text-sm">{report.fireSafetySystems.fireAlarmPA || 'Not specified'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Exit Signage</p>
+                    <p className="text-sm">{report.fireSafetySystems.exitSignage || 'Not specified'}</p>
                   </div>
                 </div>
               </CardContent>
@@ -435,18 +443,21 @@ export function CivilMepReportView() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 gap-3">
                   <div>
-                    <p className="text-sm font-medium text-gray-500">System Type</p>
-                    <p className="text-sm">{report.hvacSystems.systemType}</p>
+                    <p className="text-sm font-medium text-gray-500">Air Conditioning Design</p>
+                    <p className="text-sm">{report.hvacSystems.airConditioningDesign || 'Not specified'}</p>
                   </div>
                   <Separator />
                   <div>
                     <p className="text-sm font-medium text-gray-500">Ventilation</p>
-                    <p className="text-sm">Natural: {report.hvacSystems.ventilation?.natural}</p>
-                    <p className="text-xs text-gray-400">Mechanical: {report.hvacSystems.ventilation?.mechanical}</p>
+                    <p className="text-sm">{report.hvacSystems.ventilation || 'Not specified'}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Exhaust System</p>
-                    <p className="text-sm">{report.hvacSystems.exhaustSystem}</p>
+                    <p className="text-sm font-medium text-gray-500">Duct Layout</p>
+                    <p className="text-sm">{report.hvacSystems.ductLayout || 'Not specified'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Energy Efficiency</p>
+                    <p className="text-sm">{report.hvacSystems.energyEfficiency || 'Not specified'}</p>
                   </div>
                 </div>
               </CardContent>
@@ -454,7 +465,7 @@ export function CivilMepReportView() {
           )}
         </div>
 
-        {/* Additional MEP Systems - Vertical Transportation & Smart Systems */}
+        {/* Additional MEP Systems - Vertical Transportation & Communication */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Vertical Transportation */}
           {report.verticalTransportation && (
@@ -468,51 +479,54 @@ export function CivilMepReportView() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 gap-3">
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Elevators</p>
-                    <p className="text-sm">Type: {report.verticalTransportation.elevators?.type}</p>
-                    <p className="text-xs text-gray-400">Capacity: {report.verticalTransportation.elevators?.capacity}</p>
+                    <p className="text-sm font-medium text-gray-500">Elevator Systems</p>
+                    <p className="text-sm">{report.verticalTransportation.elevatorSystems || 'Not specified'}</p>
                   </div>
                   <Separator />
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Escalators</p>
-                    <p className="text-sm">{report.verticalTransportation.escalators}</p>
+                    <p className="text-sm font-medium text-gray-500">Elevator Specifications</p>
+                    <p className="text-sm">{report.verticalTransportation.elevatorSpecifications || 'Not specified'}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Emergency Access</p>
-                    <p className="text-sm">{report.verticalTransportation.emergencyAccess}</p>
+                    <p className="text-sm font-medium text-gray-500">Lift Capacity</p>
+                    <p className="text-sm">{report.verticalTransportation.liftCapacity || 'Not specified'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Machine Room</p>
+                    <p className="text-sm">{report.verticalTransportation.machineRoom || 'Not specified'}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
           )}
 
-          {/* Smart Building & Automation */}
-          {report.smartBuildingFeatures && (
+          {/* Communication Systems */}
+          {report.communicationSystems && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Zap className="h-5 w-5 text-purple-600" />
-                  <span>Smart Building & Automation</span>
+                  <span>Communication Systems</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 gap-3">
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Automation Level</p>
-                    <p className="text-sm">{report.smartBuildingFeatures.automationLevel}</p>
+                    <p className="text-sm font-medium text-gray-500">Security Systems</p>
+                    <p className="text-sm">{report.communicationSystems.securitySystems || 'Not specified'}</p>
                   </div>
                   <Separator />
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Energy Management</p>
-                    <p className="text-sm">{report.smartBuildingFeatures.energyManagement}</p>
+                    <p className="text-sm font-medium text-gray-500">Intercom System</p>
+                    <p className="text-sm">{report.communicationSystems.intercomSystem || 'Not specified'}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Security Systems</p>
-                    <p className="text-sm">{report.smartBuildingFeatures.securitySystems}</p>
+                    <p className="text-sm font-medium text-gray-500">Cable TV & Internet</p>
+                    <p className="text-sm">{report.communicationSystems.cableTvInternet || 'Not specified'}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">IoT Integration</p>
-                    <p className="text-sm">{report.smartBuildingFeatures.iotIntegration}</p>
+                    <p className="text-sm font-medium text-gray-500">Building Management</p>
+                    <p className="text-sm">{report.communicationSystems.buildingManagement || 'Not specified'}</p>
                   </div>
                 </div>
               </CardContent>
@@ -520,143 +534,68 @@ export function CivilMepReportView() {
           )}
         </div>
 
-        {/* Sustainability & Compliance Sections */}
+        {/* Additional Systems - Sustainability & Quality Control */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Sustainability Features */}
-          {report.sustainabilityFeatures && (
+          {/* Sustainability Systems */}
+          {report.sustainabilitySystems && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Leaf className="h-5 w-5 text-green-600" />
-                  <span>Sustainability Features</span>
+                  <span>Sustainability Systems</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 gap-3">
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Energy Efficiency</p>
-                    <p className="text-sm">{report.sustainabilityFeatures.energyEfficiency}</p>
+                    <p className="text-sm font-medium text-gray-500">Green Building Features</p>
+                    <p className="text-sm">{report.sustainabilitySystems.greenBuildingFeatures || 'Not specified'}</p>
                   </div>
                   <Separator />
                   <div>
+                    <p className="text-sm font-medium text-gray-500">Renewable Energy</p>
+                    <p className="text-sm">{report.sustainabilitySystems.renewableEnergy || 'Not specified'}</p>
+                  </div>
+                  <div>
                     <p className="text-sm font-medium text-gray-500">Water Conservation</p>
-                    <p className="text-sm">{report.sustainabilityFeatures.waterConservation}</p>
+                    <p className="text-sm">{report.sustainabilitySystems.waterConservation || 'Not specified'}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-500">Waste Management</p>
-                    <p className="text-sm">{report.sustainabilityFeatures.wasteManagement}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Green Building Rating</p>
-                    <p className="text-sm">{report.sustainabilityFeatures.greenBuildingRating}</p>
+                    <p className="text-sm">{report.sustainabilitySystems.wasteManagement || 'Not specified'}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
           )}
 
-          {/* Compliance & Documentation */}
-          {(report.complianceDocuments || report.certifications) && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Shield className="h-5 w-5 text-blue-600" />
-                  <span>Compliance & Certifications</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 gap-3">
-                  {report.complianceDocuments && (
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Compliance Documents</p>
-                      <div className="space-y-1">
-                        <p className="text-sm">Building Plan: {report.complianceDocuments.buildingPlanApproval}</p>
-                        <p className="text-xs text-gray-400">Fire NOC: {report.complianceDocuments.fireNOC}</p>
-                        <p className="text-xs text-gray-400">Structural Drawings: {report.complianceDocuments.structuralDrawings}</p>
-                      </div>
-                    </div>
-                  )}
-                  {report.certifications && (
-                    <>
-                      <Separator />
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Certifications</p>
-                        <div className="space-y-1">
-                          <p className="text-sm">Occupancy: {report.certifications.occupancyCertificate}</p>
-                          <p className="text-xs text-gray-400">Completion: {report.certifications.completionCertificate}</p>
-                          <p className="text-xs text-gray-400">RERA: {report.certifications.reraRegistration}</p>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        {/* Quality Control & Safety Sections */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Quality Control */}
-          {report.qualityControl && (
+          {report.qualityControlMeasures && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                  <span>Quality Control</span>
+                  <CheckCircle className="h-5 w-5 text-blue-600" />
+                  <span>Quality Control Measures</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 gap-3">
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Testing Procedures</p>
-                    <p className="text-sm">{report.qualityControl.testingProcedures}</p>
+                    <p className="text-sm font-medium text-gray-500">Testing Protocols</p>
+                    <p className="text-sm">{report.qualityControlMeasures.testingProtocols || 'Not specified'}</p>
                   </div>
                   <Separator />
                   <div>
                     <p className="text-sm font-medium text-gray-500">Material Standards</p>
-                    <p className="text-sm">{report.qualityControl.materialStandards}</p>
+                    <p className="text-sm">{report.qualityControlMeasures.materialStandards || 'Not specified'}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Inspection Protocols</p>
-                    <p className="text-sm">{report.qualityControl.inspectionProtocols}</p>
+                    <p className="text-sm font-medium text-gray-500">Inspection Schedule</p>
+                    <p className="text-sm">{report.qualityControlMeasures.inspectionSchedule || 'Not specified'}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Compliance Rate</p>
-                    <p className="text-sm">{report.qualityControl.complianceRate}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Safety Measures */}
-          {report.safetyMeasures && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Shield className="h-5 w-5 text-orange-600" />
-                  <span>Safety Measures</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Construction Safety</p>
-                    <p className="text-sm">{report.safetyMeasures.constructionSafety}</p>
-                  </div>
-                  <Separator />
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Occupancy Safety</p>
-                    <p className="text-sm">{report.safetyMeasures.occupancySafety}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Emergency Protocols</p>
-                    <p className="text-sm">{report.safetyMeasures.emergencyProtocols}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Risk Assessment</p>
-                    <p className="text-sm">{report.safetyMeasures.riskAssessment}</p>
+                    <p className="text-sm font-medium text-gray-500">Compliance Reports</p>
+                    <p className="text-sm">{report.qualityControlMeasures.complianceReports || 'Not specified'}</p>
                   </div>
                 </div>
               </CardContent>
@@ -664,32 +603,35 @@ export function CivilMepReportView() {
           )}
         </div>
 
-        {/* Inspection & Documentation Sections */}
+        {/* Safety & Documentation */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Inspection Logs */}
-          {report.inspectionLogs && (
+          {/* Safety Standards */}
+          {report.safetyStandards && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <Eye className="h-5 w-5 text-blue-600" />
-                  <span>Inspection Logs</span>
+                  <Shield className="h-5 w-5 text-orange-600" />
+                  <span>Safety Standards</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 gap-3">
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Initial Inspection</p>
-                    <p className="text-sm">Date: {report.inspectionLogs.initialInspection?.date}</p>
-                    <p className="text-xs text-gray-400">Findings: {report.inspectionLogs.initialInspection?.findings}</p>
+                    <p className="text-sm font-medium text-gray-500">Safety Compliance</p>
+                    <p className="text-sm">{report.safetyStandards.safetyCompliance || 'Not specified'}</p>
                   </div>
                   <Separator />
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Follow-up Inspections</p>
-                    <p className="text-sm">{report.inspectionLogs.followUpInspections}</p>
+                    <p className="text-sm font-medium text-gray-500">Emergency Procedures</p>
+                    <p className="text-sm">{report.safetyStandards.emergencyProcedures || 'Not specified'}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Final Assessment</p>
-                    <p className="text-sm">{report.inspectionLogs.finalAssessment}</p>
+                    <p className="text-sm font-medium text-gray-500">Risk Assessment</p>
+                    <p className="text-sm">{report.safetyStandards.riskAssessment || 'Not specified'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Occupational Health</p>
+                    <p className="text-sm">{report.safetyStandards.occupationalHealth || 'Not specified'}</p>
                   </div>
                 </div>
               </CardContent>
@@ -697,32 +639,32 @@ export function CivilMepReportView() {
           )}
 
           {/* Technical Documentation */}
-          {report.technicalDocumentation && (
+          {report.documentationAndCertification && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <FileText className="h-5 w-5 text-purple-600" />
-                  <span>Technical Documentation</span>
+                  <span>Documentation & Certification</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 gap-3">
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Drawings & Plans</p>
-                    <p className="text-sm">{report.technicalDocumentation.drawingsAndPlans}</p>
+                    <p className="text-sm font-medium text-gray-500">Technical Drawings</p>
+                    <p className="text-sm">{report.documentationAndCertification.technicalDrawings || 'Not specified'}</p>
                   </div>
                   <Separator />
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Specifications</p>
-                    <p className="text-sm">{report.technicalDocumentation.specifications}</p>
+                    <p className="text-sm font-medium text-gray-500">Certification Status</p>
+                    <p className="text-sm">{report.documentationAndCertification.certificationStatus || 'Not specified'}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Test Reports</p>
-                    <p className="text-sm">{report.technicalDocumentation.testReports}</p>
+                    <p className="text-sm font-medium text-gray-500">Regulatory Approvals</p>
+                    <p className="text-sm">{report.documentationAndCertification.regulatoryApprovals || 'Not specified'}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">As-Built Drawings</p>
-                    <p className="text-sm">{report.technicalDocumentation.asBuiltDrawings}</p>
+                    <p className="text-sm font-medium text-gray-500">As-Built Documentation</p>
+                    <p className="text-sm">{report.documentationAndCertification.asBuiltDocumentation || 'Not specified'}</p>
                   </div>
                 </div>
               </CardContent>
