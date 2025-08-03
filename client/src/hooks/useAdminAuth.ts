@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { User } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 interface UseAdminAuthReturn {
   user: User | null;
@@ -14,9 +14,15 @@ export function useAdminAuth(): UseAdminAuthReturn {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // If Supabase is not configured, disable authentication
+    if (!isSupabaseConfigured()) {
+      setLoading(false);
+      return;
+    }
+
     // Get initial session
     const getInitialSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase!.auth.getSession();
       setUser(session?.user ?? null);
       setLoading(false);
     };
@@ -24,7 +30,7 @@ export function useAdminAuth(): UseAdminAuthReturn {
     getInitialSession();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    const { data: { subscription } } = supabase!.auth.onAuthStateChange(
       (event, session) => {
         setUser(session?.user ?? null);
         setLoading(false);
@@ -35,7 +41,9 @@ export function useAdminAuth(): UseAdminAuthReturn {
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    if (isSupabaseConfigured()) {
+      await supabase!.auth.signOut();
+    }
   };
 
   // Check if user has admin privileges
