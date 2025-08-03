@@ -121,6 +121,12 @@ const navigation = [
     icon: Settings,
     description: "App Configuration"
   },
+  {
+    name: "Database Migration",
+    href: "/admin-panel/supabase-migration", 
+    icon: Shield,
+    description: "Migrate to Supabase"
+  },
 ];
 
 export function AdminLayout({ children, title, showBackButton = false, backUrl = "/admin-panel" }: AdminLayoutProps) {

@@ -19,6 +19,7 @@ import { z } from "zod";
 import { getBlogPosts, getBlogPost, createBlogPost, updateBlogPost, deleteBlogPost } from "./blog";
 import { reraService } from "./reraService";
 import { paymentService, apiKeysManager } from "./paymentService";
+import { supabaseMigration } from "./supabaseMigration";
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -2627,6 +2628,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error verifying payment:", error);
       res.status(500).json({ error: "Failed to verify payment" });
+    }
+  });
+
+  // Supabase Migration API endpoints
+  app.get("/api/supabase/status", async (req, res) => {
+    try {
+      const summary = await supabaseMigration.getDataSummary();
+      res.json(summary);
+    } catch (error) {
+      console.error("Error getting Supabase status:", error);
+      res.status(500).json({ error: "Failed to get Supabase status" });
+    }
+  });
+
+  app.post("/api/supabase/migrate", async (req, res) => {
+    try {
+      await supabaseMigration.migrateAll();
+      res.json({ 
+        success: true, 
+        message: "Migration completed successfully" 
+      });
+    } catch (error) {
+      console.error("Error during migration:", error);
+      res.status(500).json({ 
+        error: "Migration failed", 
+        details: error instanceof Error ? error.message : "Unknown error" 
+      });
+    }
+  });
+
+  app.post("/api/supabase/migrate/properties", async (req, res) => {
+    try {
+      await supabaseMigration.migrateProperties();
+      res.json({ 
+        success: true, 
+        message: "Properties migration completed successfully" 
+      });
+    } catch (error) {
+      console.error("Error during properties migration:", error);
+      res.status(500).json({ 
+        error: "Properties migration failed", 
+        details: error instanceof Error ? error.message : "Unknown error" 
+      });
+    }
+  });
+
+  app.post("/api/supabase/migrate/leads", async (req, res) => {
+    try {
+      await supabaseMigration.migrateLeads();
+      res.json({ 
+        success: true, 
+        message: "Leads migration completed successfully" 
+      });
+    } catch (error) {
+      console.error("Error during leads migration:", error);
+      res.status(500).json({ 
+        error: "Leads migration failed", 
+        details: error instanceof Error ? error.message : "Unknown error" 
+      });
     }
   });
 

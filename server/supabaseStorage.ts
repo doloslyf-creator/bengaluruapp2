@@ -51,15 +51,53 @@ export class SupabaseStorage implements IStorage {
 
   // Property CRUD operations
   async getProperty(id: string): Promise<Property | undefined> {
-    this.fallbackToDatabase()
-    // TODO: Implement Supabase version
-    throw new Error('Not implemented yet - using existing database')
+    if (!this.isConfigured()) {
+      this.fallbackToDatabase()
+    }
+
+    try {
+      const { data, error } = await supabaseAdmin!
+        .from('properties')
+        .select('*')
+        .eq('id', id)
+        .single()
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          return undefined // No rows found
+        }
+        throw error
+      }
+
+      return data as Property
+    } catch (error) {
+      console.error('Error fetching property from Supabase:', error)
+      this.fallbackToDatabase()
+      return undefined
+    }
   }
 
   async getAllProperties(): Promise<Property[]> {
-    this.fallbackToDatabase()
-    // TODO: Implement Supabase version
-    throw new Error('Not implemented yet - using existing database')
+    if (!this.isConfigured()) {
+      this.fallbackToDatabase()
+    }
+
+    try {
+      const { data, error } = await supabaseAdmin!
+        .from('properties')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        throw error
+      }
+
+      return data as Property[]
+    } catch (error) {
+      console.error('Error fetching properties from Supabase:', error)
+      this.fallbackToDatabase()
+      return []
+    }
   }
 
   async getPropertyWithConfigurations(id: string): Promise<PropertyWithConfigurations | undefined> {
@@ -69,21 +107,76 @@ export class SupabaseStorage implements IStorage {
   }
 
   async createProperty(property: InsertProperty): Promise<Property> {
-    this.fallbackToDatabase()
-    // TODO: Implement Supabase version
-    throw new Error('Not implemented yet - using existing database')
+    if (!this.isConfigured()) {
+      this.fallbackToDatabase()
+    }
+
+    try {
+      const { data, error } = await supabaseAdmin!
+        .from('properties')
+        .insert(property)
+        .select()
+        .single()
+
+      if (error) {
+        throw error
+      }
+
+      return data as Property
+    } catch (error) {
+      console.error('Error creating property in Supabase:', error)
+      this.fallbackToDatabase()
+      throw error
+    }
   }
 
   async updateProperty(id: string, property: Partial<InsertProperty>): Promise<Property | undefined> {
-    this.fallbackToDatabase()
-    // TODO: Implement Supabase version
-    throw new Error('Not implemented yet - using existing database')
+    if (!this.isConfigured()) {
+      this.fallbackToDatabase()
+    }
+
+    try {
+      const { data, error } = await supabaseAdmin!
+        .from('properties')
+        .update(property)
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          return undefined // No rows found
+        }
+        throw error
+      }
+
+      return data as Property
+    } catch (error) {
+      console.error('Error updating property in Supabase:', error)
+      this.fallbackToDatabase()
+    }
   }
 
   async deleteProperty(id: string): Promise<boolean> {
-    this.fallbackToDatabase()
-    // TODO: Implement Supabase version
-    throw new Error('Not implemented yet - using existing database')
+    if (!this.isConfigured()) {
+      this.fallbackToDatabase()
+    }
+
+    try {
+      const { error } = await supabaseAdmin!
+        .from('properties')
+        .delete()
+        .eq('id', id)
+
+      if (error) {
+        throw error
+      }
+
+      return true
+    } catch (error) {
+      console.error('Error deleting property in Supabase:', error)
+      return false
+    }
   }
 
   // Property Scoring operations
@@ -150,8 +243,67 @@ export class SupabaseStorage implements IStorage {
   }
 
   async getPropertyStats(): Promise<PropertyStats> {
-    this.fallbackToDatabase()
-    throw new Error('Not implemented yet - using existing database')
+    if (!this.isConfigured()) {
+      this.fallbackToDatabase()
+    }
+
+    try {
+      // Get total properties count
+      const { count: totalProperties, error: totalError } = await supabaseAdmin!
+        .from('properties')
+        .select('*', { count: 'exact', head: true })
+
+      if (totalError) {
+        throw totalError
+      }
+
+      // Get active projects count
+      const { count: activeProjects, error: activeError } = await supabaseAdmin!
+        .from('properties')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'active')
+
+      if (activeError) {
+        throw activeError
+      }
+
+      // Get average price
+      const { data: priceData, error: priceError } = await supabaseAdmin!
+        .from('properties')
+        .select('starting_price')
+        .not('starting_price', 'is', null)
+
+      if (priceError) {
+        throw priceError
+      }
+
+      const averagePrice = priceData.length > 0
+        ? priceData.reduce((sum, p) => sum + (p.starting_price || 0), 0) / priceData.length
+        : 0
+
+      // Get total area
+      const { data: areaData, error: areaError } = await supabaseAdmin!
+        .from('properties')
+        .select('total_area')
+        .not('total_area', 'is', null)
+
+      if (areaError) {
+        throw areaError
+      }
+
+      const totalArea = areaData.reduce((sum, p) => sum + (p.total_area || 0), 0)
+
+      return {
+        totalProperties: totalProperties || 0,
+        activeProjects: activeProjects || 0,
+        avgPrice: averagePrice,
+        totalArea
+      }
+    } catch (error) {
+      console.error('Error fetching property stats from Supabase:', error)
+      this.fallbackToDatabase()
+      return { totalProperties: 0, activeProjects: 0, avgPrice: 0, totalArea: 0 }
+    }
   }
 
   // Lead operations
@@ -377,7 +529,7 @@ export class SupabaseStorage implements IStorage {
     throw new Error('Not implemented yet - using existing database')
   }
 
-  async updateAppSettings(id: string, settings: Partial<InsertAppSettings>): Promise<AppSettings | undefined> {
+  async updateAppSettings(settings: Partial<InsertAppSettings>): Promise<AppSettings | undefined> {
     this.fallbackToDatabase()
     throw new Error('Not implemented yet - using existing database')
   }
