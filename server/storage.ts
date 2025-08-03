@@ -44,10 +44,7 @@ import {
   teamMembers,
   reraData,
   type ReraData,
-  type InsertReraData,
-  users,
-  type User,
-  type UpsertUser
+  type InsertReraData
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, ilike, gte, lte, desc, sql } from "drizzle-orm";
@@ -176,10 +173,6 @@ export interface IStorage {
   getAllReraData(): Promise<ReraData[]>;
   updateReraData(reraId: string, updates: Partial<InsertReraData>): Promise<ReraData | undefined>;
   deleteReraData(reraId: string): Promise<boolean>;
-
-  // User operations for Replit Auth
-  getUser(id: string): Promise<User | undefined>;
-  upsertUser(user: UpsertUser): Promise<User>;
 }
 
 export class MemStorage implements IStorage {
@@ -2091,27 +2084,6 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(teamMembers)
       .where(eq(teamMembers.status, "active"))
       .orderBy(desc(teamMembers.joinDate));
-  }
-
-  // User operations for Replit Auth
-  async getUser(id: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user;
-  }
-
-  async upsertUser(userData: UpsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(userData)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
-    return user;
   }
 }
 

@@ -36,9 +36,6 @@ const apiKeysSchema = z.object({
   twilioAccountSid: z.string().optional(),
   twilioAuthToken: z.string().optional(),
   twilioPhoneNumber: z.string().optional(),
-  mailgunApiKey: z.string().optional(),
-  mailgunDomain: z.string().optional(),
-  mailgunFromEmail: z.string().optional(),
   sendgridApiKey: z.string().optional(),
   sendgridFromEmail: z.string().optional(),
   surepassApiKey: z.string().optional(),
@@ -154,39 +151,9 @@ const apiKeySections: ApiKeySection[] = [
     ]
   },
   {
-    id: "mailgun",
-    title: "Mailgun Email Service", 
-    description: "Email delivery and customer communication",
-    icon: Mail,
-    color: "purple",
-    keys: [
-      {
-        name: "mailgunApiKey",
-        label: "API Key",
-        type: "password",
-        placeholder: "key-••••••••••••••••",
-        description: "Your Mailgun API key"
-      },
-      {
-        name: "mailgunDomain",
-        label: "Domain",
-        type: "text",
-        placeholder: "mg.ownitright.com",
-        description: "Your verified Mailgun domain"
-      },
-      {
-        name: "mailgunFromEmail",
-        label: "From Email",
-        type: "text",
-        placeholder: "noreply@ownitright.com",
-        description: "Default sender email address"
-      }
-    ]
-  },
-  {
     id: "sendgrid",
     title: "SendGrid Email Service",
-    description: "Alternative email delivery service",
+    description: "Email delivery and marketing automation",
     icon: Mail,
     color: "blue",
     keys: [

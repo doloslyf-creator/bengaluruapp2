@@ -4,8 +4,6 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAnalyticsInit, useAnalytics } from "@/hooks/use-analytics";
-import { useAuth } from "@/hooks/useAuth";
-import Landing from "@/pages/landing";
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminProperties from "@/pages/admin/properties";
 import PropertiesView from "@/pages/admin/properties-view";
@@ -62,16 +60,10 @@ function Router() {
   // Track page views when routes change
   useAnalytics();
   
-  const { isAuthenticated, isLoading } = useAuth();
-
   return (
     <Switch>
-      {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
-      ) : (
-        <>
-          <Route path="/" component={Home} />
-          <Route path="/admin" component={Home} />
+      <Route path="/" component={CustomerHome} />
+      <Route path="/admin" component={Home} />
       <Route path="/admin-panel" component={AdminDashboard} />
       <Route path="/admin-panel/properties" component={AdminProperties} />
       <Route path="/admin-panel/properties/view" component={PropertiesView} />
@@ -122,9 +114,8 @@ function Router() {
       <Route path="/user-dashboard" component={EnhancedUserPanel} />
       <Route path="/user-panel/valuation-reports" component={UserValuationReports} />
       <Route path="/user-panel/civil-mep-reports" component={UserCivilMepReports} />
-          <Route path="/user-panel/legal-tracker" component={UserLegalTracker} />
-        </>
-      )}
+      <Route path="/user-panel/legal-tracker" component={UserLegalTracker} />
+      
       <Route component={NotFound} />
     </Switch>
   );
