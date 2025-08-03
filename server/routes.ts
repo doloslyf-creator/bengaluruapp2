@@ -2489,7 +2489,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         twilioAccountSid: globalApiKeys.twilioAccountSid || "",
         twilioAuthToken: "", // Never return sensitive tokens
         twilioPhoneNumber: globalApiKeys.twilioPhoneNumber || "",
-        sendgridApiKey: "", // Never return sensitive keys
+        sendgridApiKey: globalApiKeys.sendgridApiKey ? "SG.***...***" : "", // Show masked version if exists
         sendgridFromEmail: globalApiKeys.sendgridFromEmail || "",
         surepassApiKey: "", // Never return sensitive keys
         lastUpdated: new Date().toISOString(),
