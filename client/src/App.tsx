@@ -55,6 +55,7 @@ import AdminSettings from "@/pages/admin/settings";
 import TeamManagement from "@/pages/admin/team-management";
 import ReraManagement from "@/pages/admin/rera-management";
 import SupabaseMigration from "@/pages/admin/supabase-migration";
+import SupabaseStatus from "@/pages/admin/supabase-status";
 import NotFound from "@/pages/not-found";
 
 // Protected Routes Component that shows auth form for admin routes when not authenticated
@@ -117,6 +118,7 @@ function ProtectedRouter() {
       <Route path="/admin-panel/team-management" component={TeamManagement} />
       <Route path="/admin-panel/rera-management" component={ReraManagement} />
       <Route path="/admin-panel/supabase-migration" component={SupabaseMigration} />
+      <Route path="/admin-panel/supabase-status" component={SupabaseStatus} />
       
       {/* Customer-facing routes */}
       <Route path="/find-property" component={FindProperty} />
