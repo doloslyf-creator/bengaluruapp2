@@ -111,7 +111,7 @@ export function AdminCivilMepReports() {
             </p>
           </div>
           <Button asChild data-testid="button-create-report">
-            <Link href="/admin/civil-mep-reports/create">
+            <Link href="/admin-panel/civil-mep-reports/create">
               <Plus className="w-4 h-4 mr-2" />
               Create Report
             </Link>
