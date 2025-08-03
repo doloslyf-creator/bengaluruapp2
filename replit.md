@@ -34,7 +34,7 @@ The API follows RESTful principles, providing standard CRUD operations for entit
 - **Booking System**: Site visit and consultation booking with confirmation workflows.
 - **Legal Due Diligence**: A 12-step tracker for legal verification, with admin and user panel interfaces, document management, and progress visualization.
 - **Professional Property Valuation Reports**: User-facing valuation reports with detailed property specifications, cost breakdowns, market analysis, and risk assessment.
-- **CIVIL+MEP Report System**: Engineering report ordering with "pay later" functionality and comprehensive order management, featuring a compact table-based admin interface.
+- **Clean Architecture**: Streamlined codebase with Civil MEP Reports functionality completely removed for fresh implementation (January 2025).
 - **Order & Revenue Management**: Comprehensive revenue tracking with monthly trends analysis, payment status monitoring, service-wise revenue breakdown, and financial operation tools.
 - **Lead Management System**: Comprehensive lead management with automated scoring, qualification criteria (BANT methodology), conversion funnel visualization, pipeline management, and nurturing campaigns.
 - **Blog Management System**: Admin panel for full CRUD operations on blog posts, content categories, and SEO metadata.

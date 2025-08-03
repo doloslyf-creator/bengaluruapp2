@@ -136,12 +136,7 @@ const groupedNavigation: NavigationGroup[] = [
     name: "Reports",
     icon: FileSpreadsheet,
     items: [
-      { 
-        name: "CIVIL+MEP Reports", 
-        href: "/admin-panel/civil-mep-reports", 
-        icon: Hammer,
-        description: "Engineering Reports"
-      },
+
       { 
         name: "Valuation Reports", 
         href: "/admin-panel/valuation-reports", 

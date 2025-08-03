@@ -7,7 +7,7 @@ const navigation = [
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Developers", href: "/developers", icon: Users },
   { name: "Zones", href: "/zones", icon: MapPin },
-  { name: "CIVIL+MEP Reports", href: "/civil-mep-reports", icon: FileText },
+
 ];
 
 export function Sidebar() {

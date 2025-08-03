@@ -20,11 +20,7 @@ import AdminDevelopers from "@/pages/admin/developers";
 import DevelopersView from "@/pages/admin/developers-view";
 import DevelopersAdd from "@/pages/admin/developers-add";
 import BlogManagement from "@/pages/admin/blog";
-import CivilMepReports from "@/pages/admin/civil-mep-reports";
-import CivilMepReportDetail from "@/pages/admin/civil-mep-report-detail";
-import CreateCivilMepReport from "@/pages/admin/create-civil-mep-report";
-import CivilMepReportsPage from "@/pages/civil-mep-reports";
-import CivilMepReportsForm from "@/pages/civil-mep-reports-form";
+
 import LegalDueDiligencePage from "@/pages/legal-due-diligence";
 import LegalDueDiligenceForm from "@/pages/legal-due-diligence-form";
 import Contact from "@/pages/contact";
@@ -46,7 +42,7 @@ import EnhancedUserPanel from "@/pages/enhanced-user-panel";
 import UserDashboardDynamic from "@/pages/user-dashboard-dynamic";
 import UserDashboard from "@/pages/user-dashboard";
 import UserValuationReports from "@/pages/user-valuation-reports";
-import UserCivilMepReports from "@/pages/user-civil-mep-reports";
+
 import CustomerHome from "@/pages/customer-home";
 import Home from "@/pages/home";
 import About from "@/pages/about";
@@ -105,9 +101,7 @@ function ProtectedRouter() {
       <Route path="/admin-panel/zones/view" component={ZonesView} />
       <Route path="/admin-panel/zones/add" component={ZonesAdd} />
       <Route path="/admin-panel/blog" component={BlogManagement} />
-      <Route path="/admin-panel/civil-mep-reports" component={CivilMepReports} />
-      <Route path="/admin-panel/civil-mep-reports/:id" component={CivilMepReportDetail} />
-      <Route path="/admin-panel/create-civil-mep-report" component={CreateCivilMepReport} />
+
       <Route path="/admin-panel/orders" component={Orders} />
       <Route path="/admin-panel/customers" component={Customers} />
       <Route path="/admin/customers" component={Customers} />
@@ -135,8 +129,7 @@ function ProtectedRouter() {
       <Route path="/property/:id" component={PropertyDetail} />
       <Route path="/property-valuation" component={PropertyValuation} />
       <Route path="/property-valuation-form" component={PropertyValuationForm} />
-      <Route path="/civil-mep-reports" component={CivilMepReportsPage} />
-      <Route path="/civil-mep-reports-form" component={CivilMepReportsForm} />
+
       <Route path="/legal-due-diligence" component={LegalDueDiligencePage} />
       <Route path="/legal-due-diligence-form" component={LegalDueDiligenceForm} />
       <Route path="/contact" component={Contact} />
@@ -147,12 +140,12 @@ function ProtectedRouter() {
       <Route path="/user-dashboard" component={UserDashboard} />
       <Route path="/user-dashboard-legacy" component={EnhancedUserPanel} />
       <Route path="/user-panel/valuation-reports" component={UserValuationReports} />
-      <Route path="/user-panel/civil-mep-reports" component={UserCivilMepReports} />
+
       <Route path="/user-panel/legal-tracker" component={UserLegalTracker} />
       
       {/* User Dashboard Routes */}
       <Route path="/user-dashboard/valuation-reports" component={UserValuationReports} />
-      <Route path="/user-dashboard/civil-mep-reports" component={UserCivilMepReports} />
+
       <Route path="/user-dashboard/legal-tracker" component={UserLegalTracker} />
       <Route path="/user-notifications" component={UserNotifications} />
       

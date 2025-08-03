@@ -17,8 +17,7 @@ import {
   type LeadStats,
   type Booking,
   type InsertBooking,
-  type CivilMepReport,
-  type InsertCivilMepReport,
+
   type PropertyValuationReport,
   type InsertPropertyValuationReport,
   type ReportPayment,
@@ -36,7 +35,7 @@ import {
   leadActivities, 
   leadNotes, 
   bookings,
-  civilMepReports,
+
   propertyValuationReports,
   reportPayments,
   customerNotes,
@@ -128,14 +127,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<any>;
   createUser(user: any): Promise<any>;
 
-  // CIVIL+MEP Report operations
-  enableCivilMepReport(propertyId: string): Promise<Property | undefined>;
-  getCivilMepReport(propertyId: string): Promise<CivilMepReport | undefined>;
-  getCivilMepReportById(reportId: string): Promise<CivilMepReport | undefined>;
-  getCivilMepReportByPropertyId(propertyId: string): Promise<CivilMepReport | undefined>;
-  createCivilMepReport(report: InsertCivilMepReport): Promise<CivilMepReport>;
-  updateCivilMepReport(reportId: string, updates: Partial<InsertCivilMepReport>): Promise<CivilMepReport | undefined>;
-  getPropertiesWithReports(statusFilter?: string): Promise<Array<Property & { civilMepReport?: CivilMepReport; reportStats?: any }>>;
+
   
   // Property Valuation Report operations
   enableValuationReport(propertyId: string): Promise<Property | undefined>;
@@ -149,7 +141,7 @@ export interface IStorage {
   getReportPayments(reportId: string, reportType?: string): Promise<ReportPayment[]>;
   getAllReportPayments(): Promise<ReportPayment[]>;
   updatePaymentStatus(paymentId: string, status: string): Promise<ReportPayment | undefined>;
-  getCivilMepReportStats(): Promise<any>;
+
   getValuationReportStats(): Promise<any>;
 
   // App Settings operations
@@ -986,30 +978,7 @@ export class MemStorage implements IStorage {
     return this.appSettings!;
   }
 
-  // Placeholder implementations for CIVIL+MEP and Valuation reports
-  async enableCivilMepReport(propertyId: string): Promise<Property | undefined> {
-    return undefined;
-  }
-
-  async getCivilMepReport(propertyId: string): Promise<CivilMepReport | undefined> {
-    return undefined;
-  }
-
-  async getCivilMepReportByPropertyId(propertyId: string): Promise<CivilMepReport | undefined> {
-    return undefined;
-  }
-
-  async createCivilMepReport(report: InsertCivilMepReport): Promise<CivilMepReport> {
-    throw new Error("CIVIL+MEP reports not implemented in MemStorage");
-  }
-
-  async updateCivilMepReport(reportId: string, updates: Partial<InsertCivilMepReport>): Promise<CivilMepReport | undefined> {
-    return undefined;
-  }
-
-  async getPropertiesWithReports(statusFilter?: string): Promise<Array<Property & { civilMepReport?: CivilMepReport; reportStats?: any }>> {
-    return [];
-  }
+  // Placeholder implementations for Valuation reports
 
   async enableValuationReport(propertyId: string): Promise<Property | undefined> {
     return undefined;
@@ -1047,9 +1016,7 @@ export class MemStorage implements IStorage {
     return undefined;
   }
 
-  async getCivilMepReportStats(): Promise<any> {
-    return {};
-  }
+
 
   async getValuationReportStats(): Promise<any> {
     return {};
@@ -1525,77 +1492,7 @@ export class DatabaseStorage implements IStorage {
     return { ...insertUser, id };
   }
 
-  // CIVIL+MEP Report operations
-  async enableCivilMepReport(propertyId: string): Promise<Property | undefined> {
-    const [property] = await db.update(properties)
-      .set({ hasCivilMepReport: true })
-      .where(eq(properties.id, propertyId))
-      .returning();
-    return property || undefined;
-  }
 
-  async getCivilMepReport(propertyId: string): Promise<CivilMepReport | undefined> {
-    const [report] = await db.select().from(civilMepReports)
-      .where(eq(civilMepReports.propertyId, propertyId));
-    return report || undefined;
-  }
-
-  async getCivilMepReportByPropertyId(propertyId: string): Promise<CivilMepReport | undefined> {
-    const [report] = await db.select().from(civilMepReports)
-      .where(eq(civilMepReports.propertyId, propertyId));
-    return report || undefined;
-  }
-
-  async getCivilMepReportById(reportId: string): Promise<CivilMepReport | undefined> {
-    const [report] = await db.select().from(civilMepReports)
-      .where(eq(civilMepReports.id, reportId));
-    return report || undefined;
-  }
-
-  async createCivilMepReport(report: InsertCivilMepReport): Promise<CivilMepReport> {
-    const [newReport] = await db.insert(civilMepReports)
-      .values(report)
-      .returning();
-    return newReport;
-  }
-
-  async updateCivilMepReport(reportId: string, updates: Partial<InsertCivilMepReport>): Promise<CivilMepReport | undefined> {
-    const [report] = await db.update(civilMepReports)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(civilMepReports.id, reportId))
-      .returning();
-    return report || undefined;
-  }
-
-  async getPropertiesWithReports(statusFilter?: string): Promise<Array<Property & { civilMepReport?: CivilMepReport; reportStats?: any }>> {
-    const allProperties = await db.select().from(properties);
-    
-    const result = [];
-    for (const property of allProperties) {
-      const [report] = await db.select().from(civilMepReports)
-        .where(eq(civilMepReports.propertyId, property.id));
-      
-      let reportStats = null;
-      if (report) {
-        const payments = await db.select().from(reportPayments)
-          .where(eq(reportPayments.reportId, report.id));
-        
-        reportStats = {
-          totalPayments: payments.length,
-          totalRevenue: payments.reduce((sum, p) => sum + Number(p.amount), 0),
-          pendingPayments: payments.filter(p => p.paymentStatus === 'pay-later-pending').length
-        };
-      }
-      
-      result.push({
-        ...property,
-        civilMepReport: report || undefined,
-        reportStats
-      });
-    }
-    
-    return result;
-  }
 
   async createReportPayment(payment: InsertReportPayment): Promise<ReportPayment> {
     const [newPayment] = await db.insert(reportPayments)
@@ -1630,17 +1527,7 @@ export class DatabaseStorage implements IStorage {
     return payment || undefined;
   }
 
-  async getCivilMepReportStats(): Promise<any> {
-    const allReports = await db.select().from(civilMepReports);
-    const civilMepPayments = await db.select().from(reportPayments)
-      .where(eq(reportPayments.reportType, "civil-mep"));
-    
-    return {
-      totalReports: allReports.length,
-      totalRevenue: civilMepPayments.reduce((sum, p) => sum + Number(p.amount), 0),
-      pendingPayments: civilMepPayments.filter(p => p.paymentStatus === 'pay-later-pending').length
-    };
-  }
+
 
   // Property Valuation Report operations
   async enableValuationReport(propertyId: string): Promise<Property | undefined> {

@@ -230,136 +230,7 @@ export const reraData = pgTable("rera_data", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// CIVIL+MEP Reports table for comprehensive property analysis
-export const civilMepReports = pgTable("civil_mep_reports", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  propertyId: varchar("property_id").notNull().references(() => properties.id),
-  
-  // Report Meta
-  reportType: varchar("report_type", { enum: ["civil", "mep", "combined"] }).notNull().default("combined"),
-  reportVersion: text("report_version").default("1.0"),
-  generatedBy: text("generated_by"), // Engineer/consultant name
-  reportDate: timestamp("report_date").defaultNow(),
-  
-  // Civil Engineering Analysis
-  structuralAnalysis: json("structural_analysis").$type<{
-    foundationType: string;
-    structuralSystem: string;
-    materialQuality: string;
-    loadBearingCapacity: string;
-    seismicCompliance: string;
-    structuralSafety: number; // 1-10 score
-  }>(),
-  
-  materialBreakdown: json("material_breakdown").$type<{
-    concrete: { grade: string; quantity: string; cost: number };
-    steel: { grade: string; quantity: string; cost: number };
-    bricks: { type: string; quantity: string; cost: number };
-    cement: { brand: string; quantity: string; cost: number };
-    aggregates: { type: string; quantity: string; cost: number };
-    otherMaterials: Array<{ name: string; quantity: string; cost: number }>;
-  }>(),
-  
-  costBreakdown: json("cost_breakdown").$type<{
-    civilWork: number;
-    mepWork: number;
-    finishingWork: number;
-    laborCosts: number;
-    materialCosts: number;
-    overheadCosts: number;
-    contingency: number;
-    totalEstimatedCost: number;
-  }>(),
-  
-  qualityAssessment: json("quality_assessment").$type<{
-    workmanshipGrade: string; // A+, A, B+, B, C
-    materialGrade: string;
-    finishingQuality: string;
-    overallQuality: number; // 1-10 score
-    certifications: string[];
-  }>(),
-  
-  // MEP (Mechanical, Electrical, Plumbing) Analysis
-  mepSystems: json("mep_systems").$type<{
-    electrical: {
-      loadCapacity: string;
-      wiringStandard: string;
-      safetyCompliance: string;
-      backupSystems: string[];
-      energyEfficiency: number; // 1-10 score
-    };
-    plumbing: {
-      waterSupplySystem: string;
-      drainageSystem: string;
-      sewageTreatment: string;
-      waterQuality: string;
-      pressureRating: string;
-    };
-    hvac: {
-      ventilationSystem: string;
-      airQuality: string;
-      temperatureControl: string;
-      energyRating: string;
-    };
-    fireSuppressionSystem: {
-      fireDetection: string;
-      sprinklerSystem: string;
-      emergencyExits: string;
-      compliance: string;
-    };
-  }>(),
-  
-  // Compliance and Standards
-  complianceChecklist: json("compliance_checklist").$type<{
-    buildingCodes: { compliant: boolean; details: string };
-    fireNOC: { status: string; validUntil: string };
-    environmentalClearance: { status: string; details: string };
-    structuralCertificate: { available: boolean; issuer: string };
-    electricalApproval: { status: string; authority: string };
-    plumbingApproval: { status: string; details: string };
-  }>(),
-  
-  // Snag Report
-  snagReport: json("snag_report").$type<{
-    criticalIssues: Array<{
-      category: string;
-      description: string;
-      severity: "high" | "medium" | "low";
-      location: string;
-      recommendedAction: string;
-      estimatedCost: number;
-    }>;
-    minorIssues: Array<{
-      category: string;
-      description: string;
-      location: string;
-      recommendedAction: string;
-    }>;
-    overallCondition: string;
-    immediateActions: string[];
-    futureMaintenanceSchedule: Array<{
-      task: string;
-      frequency: string;
-      estimatedCost: number;
-    }>;
-  }>(),
-  
-  // Executive Summary
-  executiveSummary: text("executive_summary"),
-  overallScore: decimal("overall_score", { precision: 3, scale: 1 }).default("0.0"), // 1-10
-  investmentRecommendation: varchar("investment_recommendation", { 
-    enum: ["highly-recommended", "recommended", "conditional", "not-recommended"] 
-  }),
-  estimatedMaintenanceCost: decimal("estimated_maintenance_cost", { precision: 10, scale: 2 }),
-  
-  // Report Files
-  reportPdfUrl: text("report_pdf_url"), // Generated PDF report
-  supportingDocuments: json("supporting_documents").$type<string[]>().default([]),
-  
-  // Timestamps
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+
 
 // Property Valuation Reports table
 export const propertyValuationReports = pgTable("property_valuation_reports", {
@@ -662,11 +533,7 @@ export const insertBookingSchema = createInsertSchema(bookings).omit({
   updatedAt: true,
 });
 
-export const insertCivilMepReportSchema = createInsertSchema(civilMepReports).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
+
 
 export const insertReportPaymentSchema = createInsertSchema(reportPayments).omit({
   id: true,
