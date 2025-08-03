@@ -14,6 +14,7 @@ import { Bell, Plus, Send, Users, Mail, Eye, Edit, Trash2, Filter, Search } from
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { formatDistance } from "date-fns";
+import { AdminLayout } from "@/components/layout/admin-layout";
 
 interface Notification {
   id: string;
@@ -138,7 +139,8 @@ export default function AdminNotifications() {
   };
 
   return (
-    <div className="space-y-6">
+    <AdminLayout title="Notification Management">
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -424,7 +426,8 @@ export default function AdminNotifications() {
           </div>
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }
 

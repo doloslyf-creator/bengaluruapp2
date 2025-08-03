@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { AdminLayout } from "@/components/layout/admin-layout";
 import { 
   Database, 
   CheckCircle, 
@@ -243,7 +244,8 @@ export default function ReraManagement() {
   );
 
   return (
-    <div className="space-y-6">
+    <AdminLayout title="RERA Data Management">
+      <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">RERA Data Management</h1>
@@ -490,6 +492,7 @@ export default function ReraManagement() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

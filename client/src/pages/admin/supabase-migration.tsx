@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { AdminLayout } from "@/components/layout/admin-layout";
 import { 
   Database, 
   RefreshCw, 
@@ -79,17 +80,18 @@ export default function SupabaseMigration() {
 
   if (statusLoading) {
     return (
-      <div className="container mx-auto p-6">
+      <AdminLayout title="Supabase Migration">
         <div className="flex items-center justify-center min-h-[400px]">
           <RefreshCw className="h-8 w-8 animate-spin" />
           <span className="ml-2">Loading Supabase status...</span>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <AdminLayout title="Supabase Migration">
+      <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Supabase Migration</h1>
@@ -345,6 +347,7 @@ export default function SupabaseMigration() {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }
