@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
+import { useUserAuth } from "@/hooks/useUserAuth";
+import { UserAuthForm } from "@/components/auth/UserAuthForm";
 import { 
   User, Home, Calendar, MessageCircle, FileText, 
   Star, Heart, MapPin, Phone, Mail, 
@@ -26,20 +28,17 @@ import { formatPriceDisplay } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
 import { type Property, type Lead, type Booking, type CivilMepReport, type ReportPayment } from "@shared/schema";
 
-// Mock user data (will be replaced with auth later)
-const mockUser = {
-  id: "user-1",
-  name: "Arjun Mehta",
-  email: "arjun.mehta@example.com",
-  phone: "+91 98765 43210",
-  avatar: "",
-  memberSince: "January 2024",
-  location: "Koramangala, Bengaluru",
-  preferredBudget: "₹1.2Cr - ₹1.8Cr",
-  totalProperties: 12,
-  totalBookings: 4,
-  totalOrders: 2
-};
+// Get user data from Supabase auth
+const getUserDisplayData = (user: any) => ({
+  id: user.id,
+  name: user.user_metadata?.full_name || user.email?.split('@')[0] || "User",
+  email: user.email,
+  phone: user.user_metadata?.phone || "",
+  avatar: user.user_metadata?.avatar_url || "",
+  memberSince: new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+  location: user.user_metadata?.location || "",
+  preferredBudget: user.user_metadata?.preferred_budget || "",
+});
 
 interface UserStats {
   totalViewed: number;
@@ -68,6 +67,24 @@ export default function EnhancedUserPanel() {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const { toast } = useToast();
   const [location, navigate] = useLocation();
+  const { user, loading, signOut } = useUserAuth();
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  // Show auth form if user is not authenticated
+  if (!user) {
+    return <UserAuthForm />;
+  }
+
+  // Get current user display data
+  const currentUser = getUserDisplayData(user);
 
   // Fetch user's properties (favorites/viewed)
   const { data: viewedProperties = [] } = useQuery<Property[]>({
@@ -319,25 +336,42 @@ export default function EnhancedUserPanel() {
             <div className="p-6 border-b">
               <div className="flex items-center space-x-3">
                 <Avatar className="w-12 h-12">
-                  <AvatarImage src={mockUser.avatar} />
+                  <AvatarImage src={currentUser.avatar} />
                   <AvatarFallback className="bg-primary text-white">
-                    {mockUser.name.split(' ').map(n => n[0]).join('')}
+                    {currentUser.name.split(' ').map(n => n[0]).join('')}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 truncate">{mockUser.name}</h3>
-                  <p className="text-sm text-gray-600 truncate">{mockUser.location}</p>
+                  <h3 className="font-semibold text-gray-900 truncate">{currentUser.name}</h3>
+                  <p className="text-sm text-gray-600 truncate">{currentUser.location || "Location not set"}</p>
                 </div>
               </div>
               <div className="mt-4 space-y-2">
                 <div className="flex items-center text-sm text-gray-600">
                   <Mail className="h-4 w-4 mr-2" />
-                  <span className="truncate">{mockUser.email}</span>
+                  <span className="truncate">{currentUser.email}</span>
                 </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Phone className="h-4 w-4 mr-2" />
-                  <span>{mockUser.phone}</span>
-                </div>
+                {currentUser.phone && (
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Phone className="h-4 w-4 mr-2" />
+                    <span>{currentUser.phone}</span>
+                  </div>
+                )}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full mt-3"
+                  onClick={() => {
+                    signOut();
+                    toast({
+                      title: "Signed out successfully",
+                      description: "You have been logged out of your account.",
+                    });
+                  }}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
               </div>
             </div>
 
@@ -391,7 +425,7 @@ export default function EnhancedUserPanel() {
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
                 <div>
                   <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
-                    Welcome back, {mockUser.name.split(' ')[0]}! 👋
+                    Welcome back, {currentUser.name.split(' ')[0]}! 👋
                   </h1>
                   <p className="text-gray-600 mt-1">Here's what's happening with your property journey</p>
                 </div>
