@@ -28,7 +28,8 @@ import {
   Hammer,
   Zap,
   Factory,
-  Database
+  Database,
+  Archive
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -97,6 +98,12 @@ const singleNavigation: NavigationItem[] = [
     href: "/admin-panel/supabase-migration", 
     icon: Database,
     description: "Migrate to Supabase"
+  },
+  { 
+    name: "Backup System", 
+    href: "/admin-panel/backup-system", 
+    icon: Archive,
+    description: "Data Backup & Recovery"
   },
 ];
 

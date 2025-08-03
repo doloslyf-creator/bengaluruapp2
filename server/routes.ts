@@ -21,6 +21,7 @@ import { reraService } from "./reraService";
 import { paymentService, apiKeysManager } from "./paymentService";
 import { supabaseMigration } from "./supabaseMigration";
 import { notificationService } from "./notificationService";
+import { backupService } from "./backupService";
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -2974,6 +2975,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error sending test notification:", error);
       res.status(500).json({ error: "Failed to send test notification" });
+    }
+  });
+
+  // Backup System API Routes
+  app.get("/api/admin/backups", async (req, res) => {
+    try {
+      const backups = backupService.getBackupHistory();
+      res.json(backups);
+    } catch (error) {
+      console.error("Error fetching backup history:", error);
+      res.status(500).json({ error: "Failed to fetch backup history" });
+    }
+  });
+
+  app.post("/api/admin/backups/create", async (req, res) => {
+    try {
+      const { type } = req.body;
+      
+      if (!['full', 'database', 'files', 'config'].includes(type)) {
+        return res.status(400).json({ error: "Invalid backup type" });
+      }
+
+      const backupId = await backupService.createBackup(type);
+      
+      res.json({ 
+        success: true, 
+        backupId,
+        message: `${type.charAt(0).toUpperCase() + type.slice(1)} backup initiated successfully`
+      });
+    } catch (error) {
+      console.error("Error creating backup:", error);
+      res.status(500).json({ error: "Failed to create backup" });
+    }
+  });
+
+  app.get("/api/admin/backups/:id/download", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const backup = backupService.getBackup(id);
+      
+      if (!backup) {
+        return res.status(404).json({ error: "Backup not found" });
+      }
+      
+      if (backup.status !== 'completed') {
+        return res.status(400).json({ error: "Backup is not ready for download" });
+      }
+
+      const filePath = await backupService.getBackupFilePath(id);
+      
+      if (!filePath) {
+        return res.status(404).json({ error: "Backup file not found" });
+      }
+
+      const stats = await fs.promises.stat(filePath);
+      const filename = `backup-${backup.type}-${new Date(backup.createdAt).toISOString().split('T')[0]}.zip`;
+
+      res.setHeader('Content-Type', 'application/zip');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.setHeader('Content-Length', stats.size);
+
+      const stream = fs.createReadStream(filePath);
+      stream.pipe(res);
+      
+      stream.on('error', (error) => {
+        console.error("Error streaming backup file:", error);
+        if (!res.headersSent) {
+          res.status(500).json({ error: "Error downloading backup file" });
+        }
+      });
+      
+    } catch (error) {
+      console.error("Error downloading backup:", error);
+      res.status(500).json({ error: "Failed to download backup" });
+    }
+  });
+
+  app.delete("/api/admin/backups/cleanup", async (req, res) => {
+    try {
+      const { daysToKeep = 30 } = req.body;
+      await backupService.deleteOldBackups(daysToKeep);
+      res.json({ success: true, message: "Old backups cleaned up successfully" });
+    } catch (error) {
+      console.error("Error cleaning up backups:", error);
+      res.status(500).json({ error: "Failed to cleanup old backups" });
     }
   });
 

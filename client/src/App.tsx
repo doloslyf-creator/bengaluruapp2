@@ -1,4 +1,5 @@
 import { Switch, Route } from "wouter";
+import { lazy } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -121,6 +122,7 @@ function ProtectedRouter() {
       <Route path="/admin-panel/team-management" component={TeamManagement} />
       <Route path="/admin-panel/rera-management" component={ReraManagement} />
       <Route path="/admin-panel/notifications" component={AdminNotifications} />
+      <Route path="/admin-panel/backup-system" component={lazy(() => import("@/pages/admin/backup-system"))} />
       <Route path="/admin-panel/supabase-migration" component={SupabaseMigration} />
       <Route path="/admin-panel/supabase-status" component={SupabaseStatus} />
       
