@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, boolean, timestamp, json, decimal, real } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, boolean, timestamp, json, decimal, real, date } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -1056,3 +1056,278 @@ export type NotificationTemplate = typeof notificationTemplates.$inferSelect;
 export type InsertNotificationTemplate = z.infer<typeof insertNotificationTemplateSchema>;
 export type NotificationPreferences = typeof notificationPreferences.$inferSelect;
 export type InsertNotificationPreferences = z.infer<typeof insertNotificationPreferencesSchema>;
+
+// Civil+MEP Reports Schema - Fresh Implementation
+export const civilMepReports = pgTable("civil_mep_reports", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  propertyId: varchar("property_id").references(() => properties.id),
+  reportTitle: text("report_title").notNull(),
+  engineerName: text("engineer_name").notNull(),
+  engineerLicense: text("engineer_license").notNull(),
+  inspectionDate: date("inspection_date").notNull(),
+  reportDate: date("report_date").notNull(),
+  status: varchar("status", { enum: ["draft", "in-progress", "completed", "approved"] }).notNull().default("draft"),
+  overallScore: real("overall_score").default(0),
+  
+  // Civil Engineering Sections (1-9)
+  siteInformation: json("site_information").$type<{
+    projectName?: string;
+    location?: string;
+    plotArea?: string;
+    surveyNumber?: string;
+    zoningClassification?: string;
+    soilTestReport?: string;
+    landUsePermissions?: string;
+    images?: string[];
+  }>(),
+  
+  foundationDetails: json("foundation_details").$type<{
+    type?: string;
+    depthAndFooting?: string;
+    soilBearingCapacity?: string;
+    antiTermiteTreatment?: string;
+    waterproofingMethod?: string;
+    inspectionLogs?: Array<{
+      date?: string;
+      inspector?: string;
+      findings?: string;
+      images?: string[];
+    }>;
+  }>(),
+  
+  superstructureDetails: json("superstructure_details").$type<{
+    structuralSystem?: string;
+    columnBeamSlab?: string;
+    floorToFloorHeight?: string;
+    loadCalculations?: string;
+    seismicDesignCode?: string;
+    concreteGradeReinforcement?: string;
+    images?: string[];
+  }>(),
+  
+  wallsFinishes: json("walls_finishes").$type<{
+    type?: string;
+    plasteringType?: string;
+    wallInsulation?: string;
+    interiorExteriorFinishes?: string;
+    waterproofingTests?: Array<{
+      testType?: string;
+      result?: string;
+      date?: string;
+      images?: string[];
+    }>;
+    paintSpecs?: string;
+  }>(),
+  
+  roofingDetails: json("roofing_details").$type<{
+    type?: string;
+    roofTreatment?: string;
+    drainageProvisions?: string;
+    parapetHandrail?: string;
+    thermalCoating?: string;
+    images?: string[];
+  }>(),
+  
+  doorsWindows: json("doors_windows").$type<{
+    entries?: Array<{
+      type?: string;
+      size?: string;
+      material?: string;
+      glazingSpecs?: string;
+      safetyFeatures?: string;
+      acousticProperties?: string;
+      images?: string[];
+    }>;
+  }>(),
+  
+  flooringDetails: json("flooring_details").$type<{
+    finishType?: string;
+    skirtingHeight?: string;
+    expansionJoints?: string;
+    slopeDrainage?: string;
+    images?: string[];
+  }>(),
+  
+  staircasesElevators: json("staircases_elevators").$type<{
+    treadRiserDimensions?: string;
+    handrailDetails?: string;
+    elevatorSpecs?: Array<{
+      brand?: string;
+      capacity?: string;
+      floors?: string;
+      images?: string[];
+    }>;
+    fireExitCompliance?: string;
+    accessibilityCompliance?: string;
+  }>(),
+  
+  externalWorks: json("external_works").$type<{
+    compoundWallGates?: string;
+    landscaping?: string;
+    externalPaving?: string;
+    rainwaterHarvesting?: string;
+    signageOutdoorFurniture?: string;
+    images?: string[];
+  }>(),
+  
+  // MEP Sections (10-15)
+  mechanicalSystems: json("mechanical_systems").$type<{
+    hvacDesign?: string;
+    ductingLayout?: string;
+    equipmentSpecs?: Array<{
+      type?: string;
+      brand?: string;
+      capacity?: string;
+      model?: string;
+      images?: string[];
+    }>;
+    ventilationType?: string;
+    heatLoadCalculations?: string;
+    energyEfficiencyRating?: string;
+  }>(),
+  
+  electricalSystems: json("electrical_systems").$type<{
+    ltPanelDesign?: string;
+    powerDistribution?: string;
+    wiringType?: string;
+    cableSizesStandards?: string;
+    backupSystem?: Array<{
+      type?: string;
+      rating?: string;
+      brand?: string;
+      images?: string[];
+    }>;
+    earthingResistance?: string;
+    lightFixtures?: string;
+    energyMetering?: string;
+    lightningProtection?: string;
+  }>(),
+  
+  plumbingSystems: json("plumbing_systems").$type<{
+    waterSupply?: string;
+    pipeMaterialDiameter?: string;
+    undergroundTankSpecs?: string;
+    stpLayout?: string;
+    waterPumpAutomation?: string;
+    fixtures?: Array<{
+      location?: string;
+      brand?: string;
+      model?: string;
+      images?: string[];
+    }>;
+    pressureTestReports?: Array<{
+      date?: string;
+      pressure?: string;
+      result?: string;
+      images?: string[];
+    }>;
+    rainwaterOutlets?: string;
+  }>(),
+  
+  fireSafetySystems: json("fire_safety_systems").$type<{
+    hydrantSystemLayout?: string;
+    sprinklerSystem?: string;
+    smokeDetectorLayout?: string;
+    fireAlarmPA?: string;
+    exitSignage?: string;
+    fireNOC?: string;
+    equipmentList?: Array<{
+      equipment?: string;
+      location?: string;
+      brand?: string;
+      certificationNumber?: string;
+      images?: string[];
+    }>;
+  }>(),
+  
+  bmsAutomation: json("bms_automation").$type<{
+    homeAutomation?: string;
+    cctvLayout?: string;
+    accessControl?: string;
+    sensors?: Array<{
+      type?: string;
+      location?: string;
+      model?: string;
+      images?: string[];
+    }>;
+    iotIntegration?: string;
+  }>(),
+  
+  greenSustainability: json("green_sustainability").$type<{
+    solarPanels?: Array<{
+      capacity?: string;
+      brand?: string;
+      location?: string;
+      images?: string[];
+    }>;
+    wasteSegregation?: string;
+    waterRecycling?: string;
+    daylightingStudies?: string;
+    passiveCooling?: string;
+    certificationStatus?: string;
+  }>(),
+  
+  // Documentation & Appendices
+  documentation: json("documentation").$type<{
+    sitePhotos?: Array<{
+      title?: string;
+      description?: string;
+      imageUrl?: string;
+      date?: string;
+    }>;
+    testReports?: Array<{
+      testType?: string;
+      reportNumber?: string;
+      date?: string;
+      result?: string;
+      imageUrl?: string;
+    }>;
+    warranties?: Array<{
+      item?: string;
+      vendor?: string;
+      warrantyPeriod?: string;
+      documentUrl?: string;
+    }>;
+    vendorBrandList?: Array<{
+      category?: string;
+      brand?: string;
+      model?: string;
+      vendor?: string;
+    }>;
+    complianceCertificates?: Array<{
+      certificateType?: string;
+      number?: string;
+      issuingAuthority?: string;
+      validUntil?: string;
+      imageUrl?: string;
+    }>;
+    signOffSheet?: {
+      architect?: string;
+      pmc?: string;
+      client?: string;
+      signOffDate?: string;
+      images?: string[];
+    };
+  }>(),
+  
+  executiveSummary: text("executive_summary"),
+  recommendations: text("recommendations"),
+  conclusions: text("conclusions"),
+  investmentRecommendation: varchar("investment_recommendation", { 
+    enum: ["highly-recommended", "recommended", "conditional", "not-recommended"] 
+  }).default("conditional"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export type CivilMepReport = typeof civilMepReports.$inferSelect;
+export type NewCivilMepReport = typeof civilMepReports.$inferInsert;
+
+export const insertCivilMepReportSchema = createInsertSchema(civilMepReports).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export type InsertCivilMepReport = z.infer<typeof insertCivilMepReportSchema>;

@@ -1,0 +1,207 @@
+🏗️ CIVIL ENGINEERING SECTION
+1. Site Information
+Project Name
+
+Location (Latitude/Longitude, Address)
+
+Plot Area (in sq. ft./m²)
+
+Survey Number / Plot ID
+
+Zoning Classification
+
+Soil Test Report Reference
+
+Land Use Permissions
+
+2. Foundation Details
+Type (Raft, Pile, Isolated, etc.)
+
+Depth and Footing Size
+
+Soil Bearing Capacity (SBC)
+
+Anti-Termite Treatment
+
+Waterproofing Method
+
+Foundation Inspection Log
+
+3. Superstructure Details
+Structural System (RCC Frame, Load Bearing)
+
+Column-Beam Slab Details
+
+Floor-to-Floor Height
+
+Load Calculations
+
+Seismic/Structural Design Code Followed
+
+Concrete Grade and Reinforcement Details
+
+4. Walls & Finishes
+Type (Brick, Block, Precast)
+
+Plastering Type
+
+Wall Insulation (if any)
+
+Interior & Exterior Finishes
+
+Waterproofing Tests Conducted
+
+Paint Manufacturer & Specs
+
+5. Roofing
+Type of Roofing (Flat, Sloped, etc.)
+
+Roof Treatment/Insulation
+
+Water Drainage Provisions
+
+Parapet/Handrail Details
+
+Thermal Coating or Membrane Layer (if applicable)
+
+6. Doors & Windows
+Type & Size (Main, Internal, Utility)
+
+Material (Wood, Aluminum, uPVC)
+
+Glazing Specifications
+
+Safety Grill/Lock Details
+
+Acoustic/Weather Insulation Properties
+
+7. Flooring
+Floor Finish Type (Tile, Granite, Marble, Epoxy, etc.)
+
+Skirting Height
+
+Expansion Joints
+
+Slope & Drainage Verification
+
+8. Staircases & Elevators
+Tread and Riser Dimensions
+
+Handrail Details
+
+Elevator Brand & Capacity
+
+Fire Exit Compliance
+
+Accessibility Compliance
+
+9. External Works
+Compound Wall & Gates
+
+Landscaping Details
+
+External Paving (Type, Slope)
+
+Rainwater Harvesting Setup
+
+Signage & Outdoor Furniture
+
+⚙️ MEP SECTION
+10. Mechanical Systems
+HVAC Design Details
+
+Ducting Layout
+
+Equipment Specifications (Chillers, AHUs)
+
+Ventilation Type (Natural/Forced)
+
+Heat Load Calculations
+
+Energy Efficiency Rating (Star/LEED/BEE)
+
+11. Electrical Systems
+LT Panel Design & Location
+
+Power Distribution (Phase, Load per Unit)
+
+Wiring Type (Concealed/Trunking)
+
+Cable Sizes and IS Standards
+
+Backup System (DG/UPS/KVA Rating)
+
+Earthing Resistance Report
+
+Light Fixtures and Lumens per Room
+
+Energy Metering and Monitoring
+
+Lightning Protection System
+
+12. Plumbing Systems
+Water Supply (Source, Line Diagram)
+
+Pipe Material & Diameter
+
+Underground Tank/Borewell Specs
+
+STP/UGD Layout & Capacity
+
+Water Pump and Automation Controls
+
+Bathroom & Kitchen Fixture Brands
+
+Pressure Testing Reports
+
+Roof Rainwater Outlet Details
+
+13. Fire Safety Systems
+Fire Hydrant System Layout
+
+Sprinkler System & Zones
+
+Smoke Detector Layout
+
+Fire Alarm & PA System
+
+Exit Signage Locations
+
+Fire NOC & Compliance
+
+14. BMS / Automation
+Home Automation or Building Management System
+
+CCTV Layout & DVR Specs
+
+Access Control Points
+
+Motion/Occupancy Sensors
+
+IoT Device Integration (if any)
+
+15. Green & Sustainability Additions
+Solar Panel Provision/Installed Capacity
+
+Waste Segregation Systems
+
+Water Recycling (Greywater Treatment)
+
+Daylighting Studies
+
+Passive Cooling Elements
+
+LEED/IGBC Certification Status
+
+📝 APPENDICES & DOCUMENTATION
+Site Inspection Photos (Before/After)
+
+Test Reports (Concrete Cube, Pressure, Electrical IR)
+
+Warranty Documents (OEMs, Subcontractors)
+
+Vendor/Brand List
+
+Compliance Certificates (CE, ISI, LEED, etc.)
+
+Final Sign-Off Sheet (Architect, PMC, Client)

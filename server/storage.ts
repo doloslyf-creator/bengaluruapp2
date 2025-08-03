@@ -20,6 +20,8 @@ import {
 
   type PropertyValuationReport,
   type InsertPropertyValuationReport,
+  type CivilMepReport,
+  type InsertCivilMepReport,
   type ReportPayment,
   type InsertReportPayment,
   type CustomerNote,
@@ -37,6 +39,7 @@ import {
   bookings,
 
   propertyValuationReports,
+  civilMepReports,
   reportPayments,
   customerNotes,
   appSettings,
@@ -165,6 +168,15 @@ export interface IStorage {
   getAllReraData(): Promise<ReraData[]>;
   updateReraData(reraId: string, updates: Partial<InsertReraData>): Promise<ReraData | undefined>;
   deleteReraData(reraId: string): Promise<boolean>;
+
+  // Civil+MEP Report operations
+  createCivilMepReport(report: InsertCivilMepReport): Promise<CivilMepReport>;
+  getCivilMepReport(reportId: string): Promise<CivilMepReport | undefined>;
+  getCivilMepReportByProperty(propertyId: string): Promise<CivilMepReport | undefined>;
+  getAllCivilMepReports(): Promise<CivilMepReport[]>;
+  updateCivilMepReport(reportId: string, updates: Partial<InsertCivilMepReport>): Promise<CivilMepReport | undefined>;
+  deleteCivilMepReport(reportId: string): Promise<boolean>;
+  getCivilMepReportStats(): Promise<any>;
 }
 
 export class MemStorage implements IStorage {
@@ -1020,6 +1032,73 @@ export class MemStorage implements IStorage {
 
   async getValuationReportStats(): Promise<any> {
     return {};
+  }
+
+  // RERA Data operations - MemStorage stub implementations
+  async createReraData(reraInfo: InsertReraData): Promise<ReraData> {
+    throw new Error("RERA data not implemented in MemStorage");
+  }
+
+  async getReraData(reraId: string): Promise<ReraData | undefined> {
+    return undefined;
+  }
+
+  async getReraDataByProperty(propertyId: string): Promise<ReraData | undefined> {
+    return undefined;
+  }
+
+  async getAllReraData(): Promise<ReraData[]> {
+    return [];
+  }
+
+  async updateReraData(reraId: string, updates: Partial<InsertReraData>): Promise<ReraData | undefined> {
+    return undefined;
+  }
+
+  async deleteReraData(reraId: string): Promise<boolean> {
+    return false;
+  }
+
+  // Civil+MEP Report operations - MemStorage stub implementations  
+  async createCivilMepReport(report: InsertCivilMepReport): Promise<CivilMepReport> {
+    throw new Error("Civil+MEP reports not implemented in MemStorage");
+  }
+
+  async getCivilMepReport(reportId: string): Promise<CivilMepReport | undefined> {
+    return undefined;
+  }
+
+  async getCivilMepReportByProperty(propertyId: string): Promise<CivilMepReport | undefined> {
+    return undefined;
+  }
+
+  async getAllCivilMepReports(): Promise<CivilMepReport[]> {
+    return [];
+  }
+
+  async updateCivilMepReport(reportId: string, updates: Partial<InsertCivilMepReport>): Promise<CivilMepReport | undefined> {
+    return undefined;
+  }
+
+  async deleteCivilMepReport(reportId: string): Promise<boolean> {
+    return false;
+  }
+
+  async getCivilMepReportStats(): Promise<any> {
+    return {
+      totalReports: 0,
+      completedReports: 0,
+      inProgressReports: 0,
+      draftReports: 0,
+      approvedReports: 0,
+      avgScore: 0,
+      byRecommendation: {
+        "highly-recommended": 0,
+        "recommended": 0,
+        "conditional": 0,
+        "not-recommended": 0,
+      }
+    };
   }
 }
 
@@ -1971,6 +2050,116 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(teamMembers)
       .where(eq(teamMembers.status, "active"))
       .orderBy(desc(teamMembers.joinDate));
+  }
+
+  // RERA Data operations
+  async createReraData(reraInfo: InsertReraData): Promise<ReraData> {
+    const [rera] = await db.insert(reraData)
+      .values(reraInfo)
+      .returning();
+    return rera;
+  }
+
+  async getReraData(reraId: string): Promise<ReraData | undefined> {
+    const [rera] = await db.select().from(reraData)
+      .where(eq(reraData.id, reraId));
+    return rera || undefined;
+  }
+
+  async getReraDataByProperty(propertyId: string): Promise<ReraData | undefined> {
+    const [rera] = await db.select().from(reraData)
+      .where(eq(reraData.propertyId, propertyId));
+    return rera || undefined;
+  }
+
+  async getAllReraData(): Promise<ReraData[]> {
+    return await db.select().from(reraData)
+      .orderBy(desc(reraData.createdAt));
+  }
+
+  async updateReraData(reraId: string, updates: Partial<InsertReraData>): Promise<ReraData | undefined> {
+    const [rera] = await db.update(reraData)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(reraData.id, reraId))
+      .returning();
+    return rera || undefined;
+  }
+
+  async deleteReraData(reraId: string): Promise<boolean> {
+    const result = await db.delete(reraData)
+      .where(eq(reraData.id, reraId));
+    return result.rowCount > 0;
+  }
+
+  // Civil+MEP Report operations
+  async createCivilMepReport(report: InsertCivilMepReport): Promise<CivilMepReport> {
+    const [newReport] = await db.insert(civilMepReports)
+      .values(report)
+      .returning();
+    return newReport;
+  }
+
+  async getCivilMepReport(reportId: string): Promise<CivilMepReport | undefined> {
+    const [report] = await db.select().from(civilMepReports)
+      .where(eq(civilMepReports.id, reportId));
+    return report || undefined;
+  }
+
+  async getCivilMepReportByProperty(propertyId: string): Promise<CivilMepReport | undefined> {
+    const [report] = await db.select().from(civilMepReports)
+      .where(eq(civilMepReports.propertyId, propertyId));
+    return report || undefined;
+  }
+
+  async getAllCivilMepReports(): Promise<CivilMepReport[]> {
+    return await db.select().from(civilMepReports)
+      .orderBy(desc(civilMepReports.createdAt));
+  }
+
+  async updateCivilMepReport(reportId: string, updates: Partial<InsertCivilMepReport>): Promise<CivilMepReport | undefined> {
+    const [report] = await db.update(civilMepReports)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(civilMepReports.id, reportId))
+      .returning();
+    return report || undefined;
+  }
+
+  async deleteCivilMepReport(reportId: string): Promise<boolean> {
+    const result = await db.delete(civilMepReports)
+      .where(eq(civilMepReports.id, reportId));
+    return result.rowCount > 0;
+  }
+
+  async getCivilMepReportStats(): Promise<any> {
+    const reports = await this.getAllCivilMepReports();
+    
+    const totalReports = reports.length;
+    const completedReports = reports.filter(r => r.status === "completed").length;
+    const inProgressReports = reports.filter(r => r.status === "in-progress").length;
+    const draftReports = reports.filter(r => r.status === "draft").length;
+    const approvedReports = reports.filter(r => r.status === "approved").length;
+    
+    const avgScore = reports.length > 0 
+      ? reports.reduce((sum, r) => sum + (r.overallScore || 0), 0) / reports.length 
+      : 0;
+    
+    // Group by investment recommendation
+    const byRecommendation = {
+      "highly-recommended": reports.filter(r => r.investmentRecommendation === "highly-recommended").length,
+      "recommended": reports.filter(r => r.investmentRecommendation === "recommended").length,
+      "conditional": reports.filter(r => r.investmentRecommendation === "conditional").length,
+      "not-recommended": reports.filter(r => r.investmentRecommendation === "not-recommended").length,
+    };
+    
+    return {
+      totalReports,
+      completedReports,
+      inProgressReports,
+      draftReports,
+      approvedReports,
+      avgScore,
+      byRecommendation
+    };
   }
 }
 

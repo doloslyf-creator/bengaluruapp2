@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
-import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertPropertyValuationReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests } from "@shared/schema";
+import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertPropertyValuationReportSchema, insertCivilMepReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
@@ -999,6 +999,111 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Civil+MEP Reports API - Complete CRUD operations
+  app.post("/api/civil-mep-reports", async (req, res) => {
+    try {
+      const validation = insertCivilMepReportSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ 
+          error: "Invalid report data", 
+          details: validation.error.format() 
+        });
+      }
+
+      const report = await storage.createCivilMepReport(validation.data);
+      res.status(201).json(report);
+    } catch (error) {
+      console.error("Error creating Civil+MEP report:", error);
+      res.status(500).json({ error: "Failed to create Civil+MEP report" });
+    }
+  });
+
+  app.get("/api/civil-mep-reports", async (req, res) => {
+    try {
+      const reports = await storage.getAllCivilMepReports();
+      res.json(reports);
+    } catch (error) {
+      console.error("Error fetching Civil+MEP reports:", error);
+      res.status(500).json({ error: "Failed to fetch Civil+MEP reports" });
+    }
+  });
+
+  app.get("/api/civil-mep-reports/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const report = await storage.getCivilMepReport(id);
+      
+      if (!report) {
+        return res.status(404).json({ error: "Civil+MEP report not found" });
+      }
+      
+      res.json(report);
+    } catch (error) {
+      console.error("Error fetching Civil+MEP report:", error);
+      res.status(500).json({ error: "Failed to fetch Civil+MEP report" });
+    }
+  });
+
+  app.get("/api/civil-mep-reports/property/:propertyId", async (req, res) => {
+    try {
+      const { propertyId } = req.params;
+      const report = await storage.getCivilMepReportByProperty(propertyId);
+      
+      if (!report) {
+        return res.status(404).json({ error: "Civil+MEP report not found for this property" });
+      }
+      
+      res.json(report);
+    } catch (error) {
+      console.error("Error fetching Civil+MEP report by property:", error);
+      res.status(500).json({ error: "Failed to fetch Civil+MEP report" });
+    }
+  });
+
+  app.patch("/api/civil-mep-reports/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+      
+      const report = await storage.updateCivilMepReport(id, updates);
+      
+      if (!report) {
+        return res.status(404).json({ error: "Civil+MEP report not found" });
+      }
+      
+      res.json(report);
+    } catch (error) {
+      console.error("Error updating Civil+MEP report:", error);
+      res.status(500).json({ error: "Failed to update Civil+MEP report" });
+    }
+  });
+
+  app.delete("/api/civil-mep-reports/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deleteCivilMepReport(id);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Civil+MEP report not found" });
+      }
+      
+      res.json({ success: true, message: "Civil+MEP report deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting Civil+MEP report:", error);
+      res.status(500).json({ error: "Failed to delete Civil+MEP report" });
+    }
+  });
+
+  app.get("/api/civil-mep-reports-stats", async (req, res) => {
+    try {
+      const stats = await storage.getCivilMepReportStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching Civil+MEP report stats:", error);
+      res.status(500).json({ error: "Failed to fetch Civil+MEP report statistics" });
+    }
+  });
+
   // Valuation Reports API - Get valuation report stats
   app.get("/api/valuation-reports/stats", async (req, res) => {
     try {
@@ -1729,7 +1834,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { serviceType, customerName, customerEmail, customerPhone, propertyId, propertyName, amount, requirements } = req.body;
       
       // Determine report type based on service
-      let reportType: "valuation" | "legal-due-diligence" = "valuation";
+      let reportType: "civil-mep" | "valuation" | "legal-due-diligence" = "valuation";
+      if (serviceType === "civil-mep-reports") reportType = "civil-mep";
       if (serviceType === "property-valuation") reportType = "valuation";
       if (serviceType === "legal-due-diligence") reportType = "legal-due-diligence";
       

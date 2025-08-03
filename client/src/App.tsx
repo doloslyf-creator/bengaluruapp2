@@ -58,6 +58,7 @@ import SupabaseStatus from "@/pages/admin/supabase-status";
 import AdminNotifications from "@/pages/admin/notifications";
 import UserNotifications from "@/pages/user-notifications";
 import BackupSystem from "@/pages/admin/backup-system";
+import { AdminCivilMepReports } from "@/pages/admin-civil-mep-reports";
 import NotFound from "@/pages/not-found";
 
 // Protected Routes Component that shows auth form for admin routes when not authenticated
@@ -107,6 +108,7 @@ function ProtectedRouter() {
       <Route path="/admin/customers" component={Customers} />
       <Route path="/admin-panel/valuation-reports" component={ValuationReports} />
       <Route path="/admin-panel/valuation-reports/:action/:id?" component={ValuationReportEdit} />
+      <Route path="/admin-panel/civil-mep-reports" component={AdminCivilMepReports} />
       <Route path="/admin-panel/property/:id/edit" component={PropertyEdit} />
 
       <Route path="/admin-panel/legal-management" component={LegalManagement} />

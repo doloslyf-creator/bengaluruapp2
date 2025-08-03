@@ -29,7 +29,8 @@ import {
   Zap,
   Factory,
   Database,
-  Archive
+  Archive,
+  Wrench
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -137,6 +138,12 @@ const groupedNavigation: NavigationGroup[] = [
     icon: FileSpreadsheet,
     items: [
 
+      { 
+        name: "Civil+MEP Reports", 
+        href: "/admin-panel/civil-mep-reports", 
+        icon: Wrench,
+        description: "Engineering Assessments"
+      },
       { 
         name: "Valuation Reports", 
         href: "/admin-panel/valuation-reports", 
