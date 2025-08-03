@@ -5,5 +5,6 @@
   "googleMapsApiKey": "AIzaSyExample123",
   "twilioAccountSid": "SK15b9b6888ab155de54d51845055bfa64",
   "twilioAuthToken": "jg7kxmXDIuev7POPSHRbYPLFvxwGIFFW",
-  "twilioPhoneNumber": "+12565787880"
+  "twilioPhoneNumber": "+12565787880",
+  "sendgridApiKey": "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"
 }
