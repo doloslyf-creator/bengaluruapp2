@@ -43,6 +43,7 @@ import BookVisit from "@/pages/book-visit";
 import Consultation from "@/pages/consultation";
 import UserPanel from "@/pages/user-panel";
 import EnhancedUserPanel from "@/pages/enhanced-user-panel";
+import UserDashboardDynamic from "@/pages/user-dashboard-dynamic";
 import UserValuationReports from "@/pages/user-valuation-reports";
 import UserCivilMepReports from "@/pages/user-civil-mep-reports";
 import CustomerHome from "@/pages/customer-home";
@@ -135,7 +136,8 @@ function ProtectedRouter() {
       <Route path="/book-visit" component={BookVisit} />
       <Route path="/consultation" component={Consultation} />
       <Route path="/user-panel" component={UserPanel} />
-      <Route path="/user-dashboard" component={EnhancedUserPanel} />
+      <Route path="/user-dashboard" component={UserDashboardDynamic} />
+      <Route path="/user-dashboard-legacy" component={EnhancedUserPanel} />
       <Route path="/user-panel/valuation-reports" component={UserValuationReports} />
       <Route path="/user-panel/civil-mep-reports" component={UserCivilMepReports} />
       <Route path="/user-panel/legal-tracker" component={UserLegalTracker} />
