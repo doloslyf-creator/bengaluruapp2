@@ -105,17 +105,33 @@ export default function Orders() {
   };
 
   return (
-    <AdminLayout title="Order Management">
+    <AdminLayout title="Order & Revenue Management Hub">
+      {/* Orders Success Banner */}
+      <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white py-4 mb-6">
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-center space-x-4 text-sm">
+          <span className="font-semibold">💰 Order Management: Revenue Tracking & Financial Operations</span>
+          <span>• Process orders • Track payments • Monitor revenue • Analyze trends</span>
+        </div>
+      </div>
+
       <div className="flex flex-col h-full">
-        {/* Header */}
-        <header className="border-b border-gray-200 bg-white px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-medium text-gray-900">Report Orders Management</h2>
-              <p className="text-sm text-gray-600">Track CIVIL+MEP and Property Valuation report orders</p>
+        {/* Enhanced Header */}
+        <div className="bg-gradient-to-br from-indigo-50 via-white to-purple-50 rounded-2xl p-8 border border-indigo-100 mx-6 mt-6 mb-6">
+          <div className="text-center">
+            <div className="mb-4 text-sm px-4 py-2 bg-indigo-100 text-indigo-800 border border-indigo-200 rounded-full inline-block">
+              🛒 Complete order and revenue management system
             </div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">
+              Track orders and{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
+                maximize revenue
+              </span>
+            </h1>
+            <p className="text-xl text-gray-600 mb-6 leading-relaxed max-w-2xl mx-auto">
+              Comprehensive order management with revenue analytics, payment tracking, and performance insights.
+            </p>
           </div>
-        </header>
+        </div>
 
         <main className="flex-1 overflow-y-auto p-6">
           {/* Stats Cards */}

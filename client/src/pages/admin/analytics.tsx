@@ -46,18 +46,46 @@ export default function AdminAnalytics() {
 
 
   return (
-    <AdminLayout title="Analytics Dashboard">
+    <AdminLayout title="Advanced Analytics Dashboard">
+      {/* Analytics Success Banner */}
+      <div className="bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 text-white py-4 mb-6">
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-center space-x-4 text-sm">
+          <span className="font-semibold">📊 Advanced Analytics: Deep Business Insights & Market Intelligence</span>
+          <span>• Real-time data • Market trends • Performance metrics • Revenue analysis</span>
+        </div>
+      </div>
+
       <div className="p-6">
+        {/* Analytics Hero Section */}
+        <div className="bg-gradient-to-br from-purple-50 via-white to-blue-50 rounded-2xl p-8 border border-purple-100 mb-8">
+          <div className="text-center mb-8">
+            <div className="mb-4 text-sm px-4 py-2 bg-purple-100 text-purple-800 border border-purple-200 rounded-full inline-block">
+              📈 Comprehensive business intelligence platform
+            </div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">
+              Data-driven insights for{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
+                smarter decisions
+              </span>
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
+              Deep analytics, market intelligence, and performance metrics to drive your property business forward with confidence.
+            </p>
+          </div>
+        </div>
+
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
+          <Card className="border border-blue-100 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Properties</CardTitle>
-              <Building className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-blue-700">Total Properties</CardTitle>
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Building className="h-4 w-4 text-blue-600" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalProperties}</div>
-              <p className="text-xs text-muted-foreground">Active listings</p>
+              <div className="text-3xl font-bold text-blue-600">{totalProperties}</div>
+              <p className="text-xs text-gray-600 mt-1">Active listings managed</p>
             </CardContent>
           </Card>
 

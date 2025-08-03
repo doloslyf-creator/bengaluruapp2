@@ -129,16 +129,42 @@ const CivilMepReports = () => {
   };
 
   return (
-    <AdminLayout title="CIVIL+MEP Reports">
+    <AdminLayout title="CIVIL+MEP Engineering Reports Hub">
+      {/* CIVIL+MEP Success Banner */}
+      <div className="bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 text-white py-4 mb-6">
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-center space-x-4 text-sm">
+          <span className="font-semibold">🔧 CIVIL+MEP Reports: Engineering Excellence & Technical Analysis</span>
+          <span>• Professional reports • Technical assessments • Revenue tracking • Quality assurance</span>
+        </div>
+      </div>
+
       <div className="p-6">
+        {/* Enhanced Header */}
+        <div className="bg-gradient-to-br from-orange-50 via-white to-yellow-50 rounded-2xl p-8 border border-orange-100 mb-8">
+          <div className="text-center mb-6">
+            <div className="mb-4 text-sm px-4 py-2 bg-orange-100 text-orange-800 border border-orange-200 rounded-full inline-block">
+              🏗️ Professional engineering assessment platform
+            </div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">
+              Engineering reports that{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-red-600">
+                build trust
+              </span>
+            </h1>
+            <p className="text-xl text-gray-600 mb-6 leading-relaxed max-w-2xl mx-auto">
+              Comprehensive CIVIL+MEP reporting system with detailed assessments, revenue tracking, and professional documentation.
+            </p>
+          </div>
+        </div>
+
         {/* Compact Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center">
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center">
             <Briefcase className="h-7 w-7 mr-2 text-violet-600" />
-            CIVIL+MEP Reports
-          </h1>
+            CIVIL+MEP Reports Management
+          </h2>
           <p className="text-gray-600 text-sm">
-            Comprehensive property engineering analysis reports
+            Comprehensive property engineering analysis reports with professional assessment tools
           </p>
         </div>
 

@@ -98,20 +98,102 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout title="Property Analytics Dashboard">
+      {/* Admin Success Banner */}
+      <div className="bg-gradient-to-r from-green-500 to-blue-500 text-white py-4 mb-6">
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-center space-x-4 text-sm">
+          <span className="font-semibold">🎯 Admin Dashboard: Complete Property Management Control</span>
+          <span>• {properties.length} active properties • {leads.length} qualified leads • Real-time analytics</span>
+        </div>
+      </div>
+
       <div className="p-6 space-y-6">
+        {/* Hero Stats Section */}
+        <div className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 rounded-2xl p-8 border border-blue-100">
+          <div className="text-center mb-8">
+            <div className="mb-4 text-sm px-4 py-2 bg-blue-100 text-blue-800 border border-blue-200 rounded-full inline-block">
+              🚀 Complete property management and analytics platform
+            </div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">
+              Your property empire{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
+                at a glance
+              </span>
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
+              Comprehensive insights, real-time data, and powerful tools to manage your property portfolio effectively.
+            </p>
+          </div>
+
+          {/* Key Performance Metrics */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-primary">{stats?.totalProperties || properties.length}</div>
+                  <div className="text-sm text-gray-600">Total Properties</div>
+                </div>
+                <div className="p-3 bg-blue-100 rounded-lg">
+                  <Building2 className="h-6 w-6 text-blue-600" />
+                </div>
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-green-600">{leads.length}</div>
+                  <div className="text-sm text-gray-600">Active Leads</div>
+                </div>
+                <div className="p-3 bg-green-100 rounded-lg">
+                  <Users className="h-6 w-6 text-green-600" />
+                </div>
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-purple-600">{bookings.length}</div>
+                  <div className="text-sm text-gray-600">Site Visits</div>
+                </div>
+                <div className="p-3 bg-purple-100 rounded-lg">
+                  <Calendar className="h-6 w-6 text-purple-600" />
+                </div>
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-2xl font-bold text-orange-600">{valuationReports.length}</div>
+                  <div className="text-sm text-gray-600">Valuations</div>
+                </div>
+                <div className="p-3 bg-orange-100 rounded-lg">
+                  <FileText className="h-6 w-6 text-orange-600" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Analytics Filters */}
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-              <Filter className="h-5 w-5 mr-2" />
-              Analytics Filters
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold text-gray-900 flex items-center">
+              <Filter className="h-6 w-6 mr-3 text-primary" />
+              Advanced Analytics & Insights
             </h3>
-            <Link href="/admin-panel/properties/view">
-              <Button variant="outline" size="sm">
-                <Eye className="h-4 w-4 mr-2" />
-                View All Properties
-              </Button>
-            </Link>
+            <div className="flex space-x-3">
+              <Link href="/admin-panel/properties/view">
+                <Button variant="outline" size="sm" className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 text-blue-700 hover:from-blue-100 hover:to-indigo-100">
+                  <Eye className="h-4 w-4 mr-2" />
+                  View All Properties
+                </Button>
+              </Link>
+              <Link href="/admin-panel/analytics">
+                <Button size="sm" className="bg-gradient-to-r from-primary to-blue-600 text-white">
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Full Analytics
+                </Button>
+              </Link>
+            </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

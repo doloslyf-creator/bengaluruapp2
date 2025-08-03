@@ -112,14 +112,42 @@ export default function BlogManagement() {
   ];
 
   return (
-    <AdminLayout title="Blog Management">
+    <AdminLayout title="Blog Content Management Hub">
+      {/* Blog Management Success Banner */}
+      <div className="bg-gradient-to-r from-rose-500 via-pink-500 to-fuchsia-500 text-white py-4 mb-6">
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-center space-x-4 text-sm">
+          <span className="font-semibold">✍️ Blog Management: Content Strategy & Publishing Platform</span>
+          <span>• Create engaging content • Manage categories • SEO optimization • Audience growth</span>
+        </div>
+      </div>
+
       <div className="p-6">
+        {/* Blog Hero Section */}
+        <div className="bg-gradient-to-br from-rose-50 via-white to-pink-50 rounded-2xl p-8 border border-rose-100 mb-8">
+          <div className="text-center mb-8">
+            <div className="mb-4 text-sm px-4 py-2 bg-rose-100 text-rose-800 border border-rose-200 rounded-full inline-block">
+              📝 Professional content management system
+            </div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">
+              Create content that{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-pink-600">
+                drives engagement
+              </span>
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
+              Powerful blogging platform with SEO tools, content categories, and performance analytics to grow your audience.
+            </p>
+          </div>
+        </div>
+
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
+          <Card className="border border-rose-100 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Posts</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium text-rose-700">Total Posts</CardTitle>
+              <div className="p-2 bg-rose-100 rounded-lg">
+                <FileText className="h-4 w-4 text-rose-600" />
+              </div>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalPosts || 0}</div>
