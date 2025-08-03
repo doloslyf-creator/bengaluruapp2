@@ -77,12 +77,12 @@ export default function CivilMepReportsForm() {
     queryKey: ["/api/properties"]
   });
 
-  const filteredProperties = properties.filter((property: any) => 
+  const filteredProperties = (properties as any[])?.filter((property: any) => 
     property.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     property.area?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     property.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     property.developer?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ) || [];
 
   const submitCivilMepRequest = useMutation({
     mutationFn: async (requestData: CivilMepRequest) => {
@@ -96,19 +96,28 @@ export default function CivilMepReportsForm() {
       if (requestData.urgencyLevel === "priority") baseAmount += 5000;
 
       // Create service order via new API
-      return await apiRequest("/api/orders/service", {
-        method: "POST",
+      const response = await fetch('/api/orders/service', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           serviceType: 'civil-mep-reports',
           customerName: requestData.contactName,
           customerEmail: requestData.contactEmail,
           customerPhone: requestData.contactPhone,
           propertyId: requestData.propertyId,
-          propertyName: selectedProperty?.name || 'Selected Property',
+          propertyName: (selectedProperty as any)?.name || 'Selected Property',
           amount: baseAmount,
           requirements: `Report Type: ${requestData.reportType}, Urgency: ${requestData.urgencyLevel}, Reason: ${requestData.requestReason}, Additional Requirements: ${requestData.additionalRequirements || 'None'}`
         })
       });
+      
+      if (!response.ok) {
+        throw new Error('Failed to submit civil MEP request');
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       toast({

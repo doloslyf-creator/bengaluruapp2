@@ -80,12 +80,12 @@ export default function LegalDueDiligenceForm() {
     queryKey: ["/api/properties"]
   });
 
-  const filteredProperties = properties.filter((property: any) => 
+  const filteredProperties = (properties as any[])?.filter((property: any) => 
     property.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     property.area?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     property.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     property.developer?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ) || [];
 
   const submitLegalDueDiligenceRequest = useMutation({
     mutationFn: async (requestData: LegalDueDiligenceRequest) => {
@@ -99,20 +99,28 @@ export default function LegalDueDiligenceForm() {
       if (requestData.urgencyLevel === "priority") baseAmount += 3000;
 
       // Create service order via new API
-      return await apiRequest({
-        url: "/api/orders/service",
-        method: "POST",
+      const response = await fetch('/api/orders/service', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           serviceType: 'legal-due-diligence',
           customerName: requestData.contactName,
           customerEmail: requestData.contactEmail,
           customerPhone: requestData.contactPhone,
           propertyId: requestData.propertyId,
-          propertyName: selectedProperty?.name || 'Selected Property',
+          propertyName: (selectedProperty as any)?.name || 'Selected Property',
           amount: baseAmount,
           requirements: `Buyer Type: ${requestData.buyerType}, Urgency: ${requestData.urgencyLevel}, Reason: ${requestData.requestReason}, Concerns: ${requestData.specificConcerns.join(', ')}, Notes: ${requestData.additionalNotes || 'None'}`
         })
       });
+      
+      if (!response.ok) {
+        throw new Error('Failed to submit legal due diligence request');
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       toast({
@@ -249,8 +257,8 @@ export default function LegalDueDiligenceForm() {
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-2">
-                            <h4 className="font-semibold text-gray-900">{property.name}</h4>
-                            {property.legallyVerified && (
+                            <h4 className="font-semibold text-gray-900">{(property as any).name}</h4>
+                            {(property as any).legallyVerified && (
                               <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">
                                 Verified
                               </span>
@@ -258,12 +266,12 @@ export default function LegalDueDiligenceForm() {
                           </div>
                           <div className="flex items-center text-gray-600 text-sm mb-2">
                             <MapPin className="h-4 w-4 mr-1" />
-                            {property.address}
+                            {(property as any).address}
                           </div>
                           <div className="flex items-center space-x-4 text-sm text-gray-600">
-                            <span className="font-medium">{property.type}</span>
-                            <span>{property.developer}</span>
-                            <span className="font-medium text-green-600">{property.status}</span>
+                            <span className="font-medium">{(property as any).type}</span>
+                            <span>{(property as any).developer}</span>
+                            <span className="font-medium text-green-600">{(property as any).status}</span>
                           </div>
                         </div>
                         {selectedProperty?.id === property.id && (
