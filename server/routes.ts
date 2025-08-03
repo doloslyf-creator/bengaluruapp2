@@ -2857,6 +2857,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update notification template
+  app.put("/api/notification-templates/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const templateData = req.body;
+      const template = await notificationService.updateTemplate(id, templateData);
+      
+      if (!template) {
+        return res.status(404).json({ error: "Template not found" });
+      }
+
+      res.json(template);
+    } catch (error) {
+      console.error("Error updating notification template:", error);
+      res.status(500).json({ error: "Failed to update notification template" });
+    }
+  });
+
   // ==============================
   // NOTIFICATION PREFERENCES API
   // ==============================

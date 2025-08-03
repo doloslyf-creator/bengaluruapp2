@@ -418,6 +418,16 @@ class NotificationService {
       .orderBy(asc(notificationTemplates.name));
   }
 
+  async updateTemplate(id: string, data: Partial<InsertNotificationTemplate>): Promise<NotificationTemplate | null> {
+    const [updated] = await db
+      .update(notificationTemplates)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(notificationTemplates.id, id))
+      .returning();
+    
+    return updated || null;
+  }
+
   // User Preferences Management
   async getUserPreferences(userId: string): Promise<NotificationPreferences | null> {
     const [preferences] = await db

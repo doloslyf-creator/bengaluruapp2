@@ -53,6 +53,8 @@ interface NotificationTemplate {
 export default function AdminNotifications() {
   const [activeTab, setActiveTab] = useState("notifications");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditTemplateDialogOpen, setIsEditTemplateDialogOpen] = useState(false);
+  const [editingTemplate, setEditingTemplate] = useState<NotificationTemplate | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
   const [filterCategory, setFilterCategory] = useState<string>("all");
@@ -103,6 +105,34 @@ export default function AdminNotifications() {
       });
     },
   });
+
+  // Update template mutation
+  const updateTemplateMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await apiRequest(`/api/notification-templates/${data.id}`, "PUT", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/notification-templates"] });
+      setIsEditTemplateDialogOpen(false);
+      setEditingTemplate(null);
+      toast({
+        title: "Template Updated",
+        description: "Notification template has been updated successfully.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Failed to Update",
+        description: "Failed to update notification template. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleEditTemplate = (template: NotificationTemplate) => {
+    setEditingTemplate(template);
+    setIsEditTemplateDialogOpen(true);
+  };
 
   // Filter notifications
   const filteredNotifications = (notifications as Notification[]).filter((notification: Notification) => {
@@ -388,7 +418,11 @@ export default function AdminNotifications() {
                               <Send className="h-4 w-4 mr-1" />
                               Test
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleEditTemplate(template)}
+                            >
                               <Edit className="h-4 w-4" />
                             </Button>
                           </div>
@@ -426,6 +460,29 @@ export default function AdminNotifications() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Edit Template Dialog */}
+      <Dialog open={isEditTemplateDialogOpen} onOpenChange={setIsEditTemplateDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Notification Template</DialogTitle>
+            <DialogDescription>
+              Update the notification template content and settings
+            </DialogDescription>
+          </DialogHeader>
+          {editingTemplate && (
+            <EditTemplateForm 
+              template={editingTemplate}
+              onSubmit={(data) => updateTemplateMutation.mutate(data)}
+              isLoading={updateTemplateMutation.isPending}
+              onCancel={() => {
+                setIsEditTemplateDialogOpen(false);
+                setEditingTemplate(null);
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
       </div>
     </AdminLayout>
   );
@@ -576,5 +633,192 @@ function CreateNotificationForm({ onSubmit, isLoading, templates }: {
         </Button>
       </div>
     </form>
+  );
+}
+
+// Edit Template Form Component
+function EditTemplateForm({ template, onSubmit, isLoading, onCancel }: {
+  template: NotificationTemplate;
+  onSubmit: (data: any) => void;
+  isLoading: boolean;
+  onCancel: () => void;
+}) {
+  const [formData, setFormData] = useState({
+    id: template.id,
+    name: template.name,
+    description: template.description,
+    type: template.type,
+    category: template.category,
+    priority: template.priority,
+    titleTemplate: template.titleTemplate,
+    messageTemplate: template.messageTemplate,
+    emailSubjectTemplate: template.emailSubjectTemplate || "",
+    emailBodyTemplate: template.emailBodyTemplate || "",
+    requiresEmail: template.requiresEmail,
+    isActive: template.isActive,
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
+  };
+
+  return (
+    <div className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label>Template Name</Label>
+            <Input
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              required
+            />
+          </div>
+          <div>
+            <Label>Template Key</Label>
+            <Input
+              value={template.templateKey}
+              disabled
+              className="bg-gray-100"
+            />
+          </div>
+        </div>
+
+        <div>
+          <Label>Description</Label>
+          <Textarea
+            rows={2}
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            required
+          />
+        </div>
+
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <Label>Type</Label>
+            <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="info">Info</SelectItem>
+                <SelectItem value="success">Success</SelectItem>
+                <SelectItem value="warning">Warning</SelectItem>
+                <SelectItem value="error">Error</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Category</Label>
+            <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="system">System</SelectItem>
+                <SelectItem value="booking">Booking</SelectItem>
+                <SelectItem value="payment">Payment</SelectItem>
+                <SelectItem value="property">Property</SelectItem>
+                <SelectItem value="user">User</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Priority</Label>
+            <Select value={formData.priority} onValueChange={(value) => setFormData({ ...formData, priority: value })}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+                <SelectItem value="urgent">Urgent</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div>
+          <Label>Title Template</Label>
+          <Input
+            value={formData.titleTemplate}
+            onChange={(e) => setFormData({ ...formData, titleTemplate: e.target.value })}
+            placeholder="Use {{variable}} for dynamic content"
+            required
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Available variables: {{userName}}, {{propertyName}}, {{amount}}, {{date}}
+          </p>
+        </div>
+
+        <div>
+          <Label>Message Template</Label>
+          <Textarea
+            rows={3}
+            value={formData.messageTemplate}
+            onChange={(e) => setFormData({ ...formData, messageTemplate: e.target.value })}
+            placeholder="Use {{variable}} for dynamic content"
+            required
+          />
+        </div>
+
+        <div className="flex items-center space-x-4">
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={formData.requiresEmail}
+              onChange={(e) => setFormData({ ...formData, requiresEmail: e.target.checked })}
+            />
+            <span className="text-sm">Send Email Notification</span>
+          </label>
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={formData.isActive}
+              onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+            />
+            <span className="text-sm">Template Active</span>
+          </label>
+        </div>
+
+        {formData.requiresEmail && (
+          <div className="space-y-4 p-4 bg-blue-50 rounded-lg">
+            <h4 className="font-medium text-blue-900">Email Settings</h4>
+            <div>
+              <Label>Email Subject Template</Label>
+              <Input
+                value={formData.emailSubjectTemplate}
+                onChange={(e) => setFormData({ ...formData, emailSubjectTemplate: e.target.value })}
+                placeholder="Email subject with {{variables}}"
+              />
+            </div>
+            <div>
+              <Label>Email Body Template</Label>
+              <Textarea
+                rows={4}
+                value={formData.emailBodyTemplate}
+                onChange={(e) => setFormData({ ...formData, emailBodyTemplate: e.target.value })}
+                placeholder="HTML email body with {{variables}}"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Supports HTML formatting. Use {{variables}} for dynamic content.
+              </p>
+            </div>
+          </div>
+        )}
+
+        <div className="flex justify-end space-x-3 pt-4 border-t">
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? "Updating..." : "Update Template"}
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }
