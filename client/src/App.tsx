@@ -4,6 +4,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAnalyticsInit, useAnalytics } from "@/hooks/use-analytics";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { AuthForm } from "@/components/auth/AuthForm";
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminProperties from "@/pages/admin/properties";
 import PropertiesView from "@/pages/admin/properties-view";
@@ -53,12 +55,29 @@ import TeamManagement from "@/pages/admin/team-management";
 import ReraManagement from "@/pages/admin/rera-management";
 import NotFound from "@/pages/not-found";
 
-function Router() {
+// Protected Routes Component that shows auth form for admin routes when not authenticated
+function ProtectedRouter() {
+  const { user, loading } = useAuth();
+  
   // Initialize Google Analytics with stored measurement ID
   useAnalyticsInit();
   
   // Track page views when routes change
   useAnalytics();
+  
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+  
+  // Show auth form for admin routes if not authenticated
+  const currentPath = window.location.pathname;
+  if (!user && (currentPath.startsWith('/admin-panel') || currentPath === '/admin')) {
+    return <AuthForm />;
+  }
   
   return (
     <Switch>
@@ -124,10 +143,12 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <ProtectedRouter />
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

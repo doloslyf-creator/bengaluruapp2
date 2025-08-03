@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { SignOutButton } from "@/components/auth/SignOutButton";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -177,7 +178,7 @@ export function AdminLayout({ children, title, showBackButton = false, backUrl =
             </div>
           </div>
 
-          {/* Customer Site Link */}
+          {/* Customer Site Link & Authentication */}
           <div className="flex items-center space-x-4">
             <Button variant="outline" size="sm" asChild>
               <Link href="/">
@@ -185,6 +186,7 @@ export function AdminLayout({ children, title, showBackButton = false, backUrl =
                 View Site
               </Link>
             </Button>
+            <SignOutButton variant="ghost" size="sm" />
           </div>
         </div>
       </header>

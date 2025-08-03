@@ -39,12 +39,14 @@ The API follows RESTful principles, providing standard CRUD operations for entit
 - **Branding**: "OwnItRight" brand update across the application with a custom wordmark logo.
 - **Enhanced Home Pages & Global Header**: Complete redesign of both customer-facing and admin home pages with modern, mobile-responsive design. Global header with scroll effects, comprehensive navigation, services dropdown, and enhanced mobile menu experience.
 - **Team Management System**: Complete CRUD operations with role-based access control, performance scoring, universal sidebar with filters, and professional UI design.
+- **Supabase Integration**: Comprehensive migration to Supabase for unified database and authentication. Features include email/password authentication, real-time database updates, built-in file storage, automatic API generation, and row-level security. Admin routes protected with authentication forms, sign-out functionality integrated into admin layout.
 
 ## External Dependencies
 
-### Database Services
-- **Neon Database**: PostgreSQL database hosting.
-- **Drizzle ORM**: Database toolkit for type-safe queries.
+### Database & Authentication Services
+- **Supabase**: Integrated database and authentication platform (in migration).
+- **Neon Database**: PostgreSQL database hosting (current, being migrated).
+- **Drizzle ORM**: Database toolkit for type-safe queries (current system).
 
 ### Cloud Storage
 - **Google Cloud Storage**: Primary file storage service.
