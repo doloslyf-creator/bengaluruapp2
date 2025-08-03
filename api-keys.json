@@ -5,5 +5,8 @@
   "googleMapsApiKey": "AIzaSyExample123",
   "twilioAccountSid": "SK15b9b6888ab155de54d51845055bfa64",
   "twilioAuthToken": "jg7kxmXDIuev7POPSHRbYPLFvxwGIFFW",
-  "twilioPhoneNumber": "+12565787880"
+  "twilioPhoneNumber": "+12565787880",
+  "mailgunApiKey": "key-example123",
+  "mailgunDomain": "mg.ownitright.com",
+  "mailgunFromEmail": "noreply@ownitright.com"
 }

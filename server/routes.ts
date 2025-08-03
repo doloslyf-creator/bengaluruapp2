@@ -19,6 +19,7 @@ import { z } from "zod";
 import { getBlogPosts, getBlogPost, createBlogPost, updateBlogPost, deleteBlogPost } from "./blog";
 import { reraService } from "./reraService";
 import { paymentService, apiKeysManager } from "./paymentService";
+import { emailService } from "./emailService";
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -582,6 +583,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("📅 New booking request:", booking);
       
+      // Send booking confirmation email
+      try {
+        if (emailService.isConfigured()) {
+          await emailService.sendBookingConfirmation(booking);
+          console.log("📧 Booking confirmation email sent");
+        }
+      } catch (error) {
+        console.error("Failed to send booking confirmation email:", error);
+        // Don't fail the booking if email fails
+      }
+      
       // Automatically create a lead from the booking
       const leadId = `LD${Date.now()}${Math.floor(Math.random() * 1000)}`;
       const lead = await storage.createLead({
@@ -620,6 +632,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`🎯 Auto-created lead: ${lead.leadId} from booking ${booking.bookingId}`);
       
+      // Send lead notification email
+      try {
+        if (emailService.isConfigured()) {
+          await emailService.sendLeadNotification(lead);
+          console.log("📧 Lead notification email sent");
+        }
+      } catch (error) {
+        console.error("Failed to send lead notification email:", error);
+        // Don't fail the booking if email fails
+      }
+      
       res.status(201).json({ 
         success: true,
         bookingId: booking.bookingId,
@@ -647,6 +670,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const booking = await storage.createBooking(validatedData);
       
       console.log("💬 New consultation request:", booking);
+      
+      // Send consultation confirmation email
+      try {
+        if (emailService.isConfigured()) {
+          await emailService.sendBookingConfirmation(booking);
+          console.log("📧 Consultation confirmation email sent");
+        }
+      } catch (error) {
+        console.error("Failed to send consultation confirmation email:", error);
+        // Don't fail the booking if email fails
+      }
       
       // Automatically create a lead from the consultation
       const leadId = `LD${Date.now()}${Math.floor(Math.random() * 1000)}`;
@@ -2488,6 +2522,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         twilioAccountSid: globalApiKeys.twilioAccountSid || "",
         twilioAuthToken: "", // Never return sensitive tokens
         twilioPhoneNumber: globalApiKeys.twilioPhoneNumber || "",
+        mailgunApiKey: "", // Never return sensitive keys
+        mailgunDomain: globalApiKeys.mailgunDomain || "",
+        mailgunFromEmail: globalApiKeys.mailgunFromEmail || "",
         sendgridApiKey: "", // Never return sensitive keys
         sendgridFromEmail: globalApiKeys.sendgridFromEmail || "",
         surepassApiKey: "", // Never return sensitive keys
@@ -2525,10 +2562,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Update Mailgun email service if keys are provided
+      if (apiKeysData.mailgunApiKey && apiKeysData.mailgunDomain && apiKeysData.mailgunFromEmail) {
+        try {
+          emailService.updateKeys(apiKeysData.mailgunApiKey, apiKeysData.mailgunDomain, apiKeysData.mailgunFromEmail);
+          console.log("Mailgun email service updated successfully");
+        } catch (error) {
+          console.error("Failed to update email service:", error);
+          return res.status(500).json({ error: "Failed to initialize Mailgun with provided keys" });
+        }
+      }
+      
       res.json({ success: true, message: "API keys updated successfully" });
     } catch (error) {
       console.error("Error updating API keys:", error);
       res.status(500).json({ error: "Failed to update API keys" });
+    }
+  });
+
+  // Email Service Routes
+  app.post("/api/email/send", async (req, res) => {
+    try {
+      if (!emailService.isConfigured()) {
+        return res.status(400).json({ error: "Email service not configured. Please add Mailgun API keys." });
+      }
+
+      const { to, subject, text, html, from } = req.body;
+      
+      if (!to || !subject || (!text && !html)) {
+        return res.status(400).json({ error: "Missing required fields: to, subject, and text or html" });
+      }
+
+      const result = await emailService.sendEmail({ to, subject, text, html, from });
+      res.json({ success: true, messageId: result.id, message: "Email sent successfully" });
+    } catch (error) {
+      console.error("Error sending email:", error);
+      res.status(500).json({ error: "Failed to send email" });
+    }
+  });
+
+  app.get("/api/email/status", async (req, res) => {
+    try {
+      const isConfigured = emailService.isConfigured();
+      res.json({ 
+        configured: isConfigured,
+        message: isConfigured ? "Email service ready" : "Email service not configured"
+      });
+    } catch (error) {
+      console.error("Error checking email status:", error);
+      res.status(500).json({ error: "Failed to check email status" });
     }
   });
 
