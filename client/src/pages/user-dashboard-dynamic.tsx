@@ -139,7 +139,7 @@ export default function UserDashboardDynamic() {
       title: "Property Valuation",
       description: "Get professional reports",
       icon: Calculator,
-      href: "/property-valuation",
+      href: "/user-dashboard/valuation-reports",
       color: "bg-purple-500",
       count: valuationReports.length,
     },
@@ -148,7 +148,7 @@ export default function UserDashboardDynamic() {
       title: "Legal Due Diligence",
       description: "Track document progress",
       icon: Scale,
-      href: "/legal-due-diligence",
+      href: "/user-dashboard/legal-tracker",
       color: "bg-orange-500",
       count: Math.floor(Math.random() * 3), // Will be dynamic when legal tracker is user-specific
     },
@@ -157,7 +157,7 @@ export default function UserDashboardDynamic() {
       title: "CIVIL+MEP Reports",
       description: "Engineering assessments",
       icon: Wrench,
-      href: "/civil-mep-reports",
+      href: "/user-dashboard/civil-mep-reports",
       color: "bg-indigo-500",
       count: civilMepReports.length,
     },
@@ -226,13 +226,13 @@ export default function UserDashboardDynamic() {
               <Link href="/find-property" className="text-gray-700 hover:text-blue-600 transition-colors">
                 Properties
               </Link>
-              <Link href="/property-valuation" className="text-gray-700 hover:text-blue-600 transition-colors">
+              <Link href="/user-dashboard/valuation-reports" className="text-gray-700 hover:text-blue-600 transition-colors">
                 Valuation
               </Link>
-              <Link href="/civil-mep-reports" className="text-gray-700 hover:text-blue-600 transition-colors">
+              <Link href="/user-dashboard/civil-mep-reports" className="text-gray-700 hover:text-blue-600 transition-colors">
                 Reports
               </Link>
-              <Link href="/legal-due-diligence" className="text-gray-700 hover:text-blue-600 transition-colors">
+              <Link href="/user-dashboard/legal-tracker" className="text-gray-700 hover:text-blue-600 transition-colors">
                 Legal
               </Link>
             </nav>
@@ -275,13 +275,13 @@ export default function UserDashboardDynamic() {
                     <Link href="/find-property" className="text-gray-700 hover:text-blue-600">
                       Properties
                     </Link>
-                    <Link href="/property-valuation" className="text-gray-700 hover:text-blue-600">
+                    <Link href="/user-dashboard/valuation-reports" className="text-gray-700 hover:text-blue-600">
                       Valuation
                     </Link>
-                    <Link href="/civil-mep-reports" className="text-gray-700 hover:text-blue-600">
+                    <Link href="/user-dashboard/civil-mep-reports" className="text-gray-700 hover:text-blue-600">
                       Reports
                     </Link>
-                    <Link href="/legal-due-diligence" className="text-gray-700 hover:text-blue-600">
+                    <Link href="/user-dashboard/legal-tracker" className="text-gray-700 hover:text-blue-600">
                       Legal
                     </Link>
                   </nav>
@@ -406,7 +406,7 @@ export default function UserDashboardDynamic() {
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     Recent Bookings
-                    <Link href="/user-panel/bookings">
+                    <Link href="#" onClick={() => setActiveTab("bookings")}>
                       <Button variant="ghost" size="sm">
                         View All
                         <ChevronRight className="h-4 w-4 ml-1" />
@@ -449,7 +449,7 @@ export default function UserDashboardDynamic() {
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     Recent Reports
-                    <Link href="/user-panel/reports">
+                    <Link href="#" onClick={() => setActiveTab("reports")}>
                       <Button variant="ghost" size="sm">
                         View All
                         <ChevronRight className="h-4 w-4 ml-1" />
@@ -480,7 +480,7 @@ export default function UserDashboardDynamic() {
                     <div className="text-center py-4">
                       <FileText className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                       <p className="text-sm text-gray-500">No reports generated yet</p>
-                      <Link href="/property-valuation">
+                      <Link href="/user-dashboard/valuation-reports">
                         <Button size="sm" className="mt-2">Get Your First Report</Button>
                       </Link>
                     </div>
@@ -728,7 +728,7 @@ export default function UserDashboardDynamic() {
                     <div className="text-center py-4">
                       <Calculator className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                       <p className="text-sm text-gray-500 mb-2">No valuation reports</p>
-                      <Link href="/property-valuation">
+                      <Link href="/user-dashboard/valuation-reports">
                         <Button size="sm">Get Report</Button>
                       </Link>
                     </div>
@@ -775,7 +775,7 @@ export default function UserDashboardDynamic() {
                     <div className="text-center py-4">
                       <Wrench className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                       <p className="text-sm text-gray-500 mb-2">No engineering reports</p>
-                      <Link href="/civil-mep-reports">
+                      <Link href="/user-dashboard/civil-mep-reports">
                         <Button size="sm">Order Report</Button>
                       </Link>
                     </div>

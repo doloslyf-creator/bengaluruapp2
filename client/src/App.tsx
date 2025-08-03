@@ -142,6 +142,11 @@ function ProtectedRouter() {
       <Route path="/user-panel/civil-mep-reports" component={UserCivilMepReports} />
       <Route path="/user-panel/legal-tracker" component={UserLegalTracker} />
       
+      {/* User Dashboard Routes */}
+      <Route path="/user-dashboard/valuation-reports" component={UserValuationReports} />
+      <Route path="/user-dashboard/civil-mep-reports" component={UserCivilMepReports} />
+      <Route path="/user-dashboard/legal-tracker" component={UserLegalTracker} />
+      
       <Route component={NotFound} />
     </Switch>
   );
