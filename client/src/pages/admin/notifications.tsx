@@ -750,7 +750,7 @@ function EditTemplateForm({ template, onSubmit, isLoading, onCancel }: {
             required
           />
           <p className="text-xs text-gray-500 mt-1">
-            Available variables: {{userName}}, {{propertyName}}, {{amount}}, {{date}}
+            Available variables: {`{{userName}}, {{propertyName}}, {{amount}}, {{date}}`}
           </p>
         </div>
 
