@@ -81,7 +81,7 @@ export default function SupabaseMigration() {
   if (statusLoading) {
     return (
       <AdminLayout title="Supabase Migration">
-        <div className="flex items-center justify-center min-h-[400px]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center min-h-[400px]">
           <RefreshCw className="h-8 w-8 animate-spin" />
           <span className="ml-2">Loading Supabase status...</span>
         </div>
@@ -91,7 +91,7 @@ export default function SupabaseMigration() {
 
   return (
     <AdminLayout title="Supabase Migration">
-      <div className="space-y-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Supabase Migration</h1>
