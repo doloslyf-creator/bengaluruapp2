@@ -83,72 +83,72 @@ export function CivilMepReportView() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header Section */}
       <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 text-white">
-        <div className="container mx-auto px-6 py-8">
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <div className="flex items-center space-x-3 mb-4">
+        <div className="mx-auto px-6 py-8" style={{ maxWidth: '900px' }}>
+          <div className="space-y-6">
+            <div className="flex items-center space-x-3">
+              <div className="bg-white/20 p-3 rounded-lg">
                 <Building2 className="h-8 w-8" />
-                <div>
-                  <h1 className="text-3xl font-bold">{report.reportTitle}</h1>
-                  <p className="text-blue-100 text-lg">Comprehensive Civil + MEP Technical Assessment</p>
-                </div>
               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                  <div className="flex items-center space-x-2">
-                    <User className="h-5 w-5 text-blue-200" />
-                    <span className="text-sm text-blue-200">Lead Engineer</span>
-                  </div>
-                  <p className="font-semibold text-lg">{report.engineerName}</p>
-                  <p className="text-sm text-blue-200">License: {report.engineerLicense}</p>
-                </div>
-                
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="h-5 w-5 text-blue-200" />
-                    <span className="text-sm text-blue-200">Inspection Date</span>
-                  </div>
-                  <p className="font-semibold text-lg">{new Date(report.inspectionDate).toLocaleDateString()}</p>
-                  <p className="text-sm text-blue-200">Report: {new Date(report.reportDate).toLocaleDateString()}</p>
-                </div>
-                
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                  <div className="flex items-center space-x-2">
-                    <Award className="h-5 w-5 text-blue-200" />
-                    <span className="text-sm text-blue-200">Overall Score</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-3xl font-bold">{report.overallScore}</span>
-                    <span className="text-lg text-blue-200">/10</span>
-                  </div>
-                </div>
-                
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                  <div className="flex items-center space-x-2">
-                    <FileText className="h-5 w-5 text-blue-200" />
-                    <span className="text-sm text-blue-200">Status</span>
-                  </div>
-                  <Badge className={`${getStatusColor(report.status)} border text-sm`}>
-                    {report.status.toUpperCase()}
-                  </Badge>
-                </div>
+              <div>
+                <h1 className="text-3xl font-bold">{report.reportTitle}</h1>
+                <p className="text-blue-100 text-lg">Comprehensive Civil + MEP Technical Assessment</p>
               </div>
             </div>
             
-            <div className="hidden md:flex space-x-3">
-              <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                <div className="flex items-center space-x-2 mb-2">
+                  <User className="h-5 w-5 text-blue-200" />
+                  <span className="text-sm text-blue-200 font-medium">Lead Engineer</span>
+                </div>
+                <p className="font-semibold text-lg text-white">{report.engineerName}</p>
+                <p className="text-sm text-blue-200">License: {report.engineerLicense}</p>
+              </div>
+              
+              <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                <div className="flex items-center space-x-2 mb-2">
+                  <Calendar className="h-5 w-5 text-blue-200" />
+                  <span className="text-sm text-blue-200 font-medium">Inspection Date</span>
+                </div>
+                <p className="font-semibold text-lg text-white">{new Date(report.inspectionDate).toLocaleDateString()}</p>
+                <p className="text-sm text-blue-200">Report: {new Date(report.reportDate).toLocaleDateString()}</p>
+              </div>
+              
+              <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                <div className="flex items-center space-x-2 mb-2">
+                  <Award className="h-5 w-5 text-blue-200" />
+                  <span className="text-sm text-blue-200 font-medium">Overall Score</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-3xl font-bold text-white">{report.overallScore}</span>
+                  <span className="text-lg text-blue-200">/10</span>
+                </div>
+              </div>
+              
+              <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                <div className="flex items-center space-x-2 mb-2">
+                  <Shield className="h-5 w-5 text-blue-200" />
+                  <span className="text-sm text-blue-200 font-medium">Status</span>
+                </div>
+                <Badge className={`${getStatusColor(report.status)} border text-sm font-medium`}>
+                  {report.status.toUpperCase()}
+                </Badge>
+              </div>
+            </div>
+            
+            <div className="flex flex-wrap gap-3 pt-4">
+              <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20 transition-all">
                 <Download className="h-4 w-4 mr-2" />
                 Download PDF
               </Button>
-              <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+              <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20 transition-all">
                 <Printer className="h-4 w-4 mr-2" />
                 Print
               </Button>
-              <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+              <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20 transition-all">
                 <Share2 className="h-4 w-4 mr-2" />
                 Share
               </Button>
@@ -161,53 +161,57 @@ export function CivilMepReportView() {
         {/* Executive Summary & Investment Recommendation */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Eye className="h-5 w-5 text-blue-600" />
-                  <span>Executive Summary</span>
+            <Card className="shadow-lg border-0 bg-white hover:shadow-xl transition-shadow">
+              <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
+                <CardTitle className="flex items-center space-x-3">
+                  <div className="bg-blue-600 p-2 rounded-lg">
+                    <Eye className="h-5 w-5 text-white" />
+                  </div>
+                  <span className="text-gray-800 font-semibold">Executive Summary</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-gray-700 leading-relaxed">{report.executiveSummary || 'Executive summary not available'}</p>
+              <CardContent className="p-6">
+                <p className="text-gray-700 leading-relaxed text-base">{report.executiveSummary || 'Executive summary not available'}</p>
               </CardContent>
             </Card>
           </div>
           
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Target className="h-5 w-5 text-green-600" />
-                <span>Investment Recommendation</span>
+          <Card className="shadow-lg border-0 bg-white hover:shadow-xl transition-shadow">
+            <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b">
+              <CardTitle className="flex items-center space-x-3">
+                <div className="bg-green-600 p-2 rounded-lg">
+                  <Target className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-gray-800 font-semibold">Investment Grade</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="p-6 space-y-4">
               <div className="text-center">
-                <Badge className={`${getInvestmentColor(report.investmentRecommendation || 'conditional')} text-lg px-4 py-2 border`}>
+                <Badge className={`${getInvestmentColor(report.investmentRecommendation || 'conditional')} text-lg px-4 py-2 border-0 font-semibold`}>
                   {(report.investmentRecommendation || 'conditional').toUpperCase().replace('-', ' ')}
                 </Badge>
               </div>
               
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Overall Score</span>
-                  <span className="font-semibold">{report.overallScore || 0}/10</span>
+                  <span className="text-sm text-gray-600 font-medium">Overall Score</span>
+                  <span className="font-bold text-xl text-gray-900">{report.overallScore || 0}/10</span>
                 </div>
-                <Progress value={(report.overallScore || 0) * 10} className="h-2" />
+                <Progress value={(report.overallScore || 0) * 10} className="h-3" />
               </div>
               
               <div className="grid grid-cols-3 gap-2 text-center">
-                <div className="p-2 bg-green-50 rounded">
+                <div className="p-3 bg-green-50 rounded-lg border border-green-100">
                   <CheckCircle className="h-5 w-5 text-green-600 mx-auto mb-1" />
-                  <p className="text-xs text-green-700">Quality</p>
+                  <p className="text-xs text-green-700 font-medium">Quality</p>
                 </div>
-                <div className="p-2 bg-blue-50 rounded">
+                <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
                   <Shield className="h-5 w-5 text-blue-600 mx-auto mb-1" />
-                  <p className="text-xs text-blue-700">Safety</p>
+                  <p className="text-xs text-blue-700 font-medium">Safety</p>
                 </div>
-                <div className="p-2 bg-purple-50 rounded">
+                <div className="p-3 bg-purple-50 rounded-lg border border-purple-100">
                   <Star className="h-5 w-5 text-purple-600 mx-auto mb-1" />
-                  <p className="text-xs text-purple-700">Value</p>
+                  <p className="text-xs text-purple-700 font-medium">Value</p>
                 </div>
               </div>
             </CardContent>
@@ -216,11 +220,13 @@ export function CivilMepReportView() {
 
         {/* Site Information */}
         {report.siteInformation && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <MapPin className="h-5 w-5 text-orange-600" />
-                <span>Site Information</span>
+          <Card className="shadow-lg border-0 bg-white hover:shadow-xl transition-shadow">
+            <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 border-b">
+              <CardTitle className="flex items-center space-x-3">
+                <div className="bg-orange-600 p-2 rounded-lg">
+                  <MapPin className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-gray-800 font-semibold">1. Site Information</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -246,52 +252,18 @@ export function CivilMepReportView() {
           </Card>
         )}
 
-        {/* Section 1: Site Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <MapPin className="h-5 w-5 text-blue-600" />
-              <span>1. Site Information</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Project Name</p>
-                <p className="text-sm">{report.siteInformation?.projectName || 'Not specified'}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Location</p>
-                <p className="text-sm">{report.siteInformation?.location || 'Not specified'}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Plot Area</p>
-                <p className="text-sm">{report.siteInformation?.plotArea || 'Not specified'}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Survey Number</p>
-                <p className="text-sm">{report.siteInformation?.surveyNumber || 'Not specified'}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Zoning Classification</p>
-                <p className="text-sm">{report.siteInformation?.zoningClassification || 'Not specified'}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Soil Test Report</p>
-                <p className="text-sm">{report.siteInformation?.soilTestReport || 'Not specified'}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+
 
         {/* Section 2 & 3: Foundation & Superstructure */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Section 2: Foundation Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Construction className="h-5 w-5 text-orange-600" />
-                <span>2. Foundation Details</span>
+          <Card className="shadow-lg border-0 bg-white hover:shadow-xl transition-shadow">
+            <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 border-b">
+              <CardTitle className="flex items-center space-x-3">
+                <div className="bg-orange-600 p-2 rounded-lg">
+                  <Construction className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-gray-800 font-semibold">2. Foundation Details</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -319,11 +291,13 @@ export function CivilMepReportView() {
           </Card>
 
           {/* Section 3: Superstructure Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Building2 className="h-5 w-5 text-blue-600" />
-                <span>3. Superstructure Details</span>
+          <Card className="shadow-lg border-0 bg-white hover:shadow-xl transition-shadow">
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
+              <CardTitle className="flex items-center space-x-3">
+                <div className="bg-blue-600 p-2 rounded-lg">
+                  <Building2 className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-gray-800 font-semibold">3. Superstructure Details</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -358,11 +332,13 @@ export function CivilMepReportView() {
         {/* Sections 4, 5, 6: Walls, Roofing, Doors & Windows */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Section 4: Walls & Finishes */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Home className="h-5 w-5 text-green-600" />
-                <span>4. Walls & Finishes</span>
+          <Card className="shadow-lg border-0 bg-white hover:shadow-xl transition-shadow">
+            <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b">
+              <CardTitle className="flex items-center space-x-3">
+                <div className="bg-green-600 p-2 rounded-lg">
+                  <Home className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-gray-800 font-semibold">4. Walls & Finishes</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -390,11 +366,13 @@ export function CivilMepReportView() {
           </Card>
 
           {/* Section 5: Roofing Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Home className="h-5 w-5 text-blue-600" />
-                <span>5. Roofing Details</span>
+          <Card className="shadow-lg border-0 bg-white hover:shadow-xl transition-shadow">
+            <CardHeader className="bg-gradient-to-r from-purple-50 to-violet-50 border-b">
+              <CardTitle className="flex items-center space-x-3">
+                <div className="bg-purple-600 p-2 rounded-lg">
+                  <Home className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-gray-800 font-semibold">5. Roofing Details</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -422,11 +400,13 @@ export function CivilMepReportView() {
           </Card>
 
           {/* Section 6: Doors & Windows */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Home className="h-5 w-5 text-purple-600" />
-                <span>6. Doors & Windows</span>
+          <Card className="shadow-lg border-0 bg-white hover:shadow-xl transition-shadow">
+            <CardHeader className="bg-gradient-to-r from-indigo-50 to-blue-50 border-b">
+              <CardTitle className="flex items-center space-x-3">
+                <div className="bg-indigo-600 p-2 rounded-lg">
+                  <Home className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-gray-800 font-semibold">6. Doors & Windows</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -457,11 +437,13 @@ export function CivilMepReportView() {
         {/* Sections 7, 8, 9: Flooring, Staircases, External Works */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Section 7: Flooring Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Home className="h-5 w-5 text-indigo-600" />
-                <span>7. Flooring Details</span>
+          <Card className="shadow-lg border-0 bg-white hover:shadow-xl transition-shadow">
+            <CardHeader className="bg-gradient-to-r from-indigo-50 to-blue-50 border-b">
+              <CardTitle className="flex items-center space-x-3">
+                <div className="bg-indigo-600 p-2 rounded-lg">
+                  <Home className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-gray-800 font-semibold">7. Flooring Details</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -485,11 +467,13 @@ export function CivilMepReportView() {
           </Card>
 
           {/* Section 8: Staircases & Elevators */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Building2 className="h-5 w-5 text-orange-600" />
-                <span>8. Staircases & Elevators</span>
+          <Card className="shadow-lg border-0 bg-white hover:shadow-xl transition-shadow">
+            <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 border-b">
+              <CardTitle className="flex items-center space-x-3">
+                <div className="bg-orange-600 p-2 rounded-lg">
+                  <Building2 className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-gray-800 font-semibold">8. Staircases & Elevators</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -513,11 +497,13 @@ export function CivilMepReportView() {
           </Card>
 
           {/* Section 9: External Works */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Leaf className="h-5 w-5 text-green-600" />
-                <span>9. External Works</span>
+          <Card className="shadow-lg border-0 bg-white hover:shadow-xl transition-shadow">
+            <CardHeader className="bg-gradient-to-r from-emerald-50 to-green-50 border-b">
+              <CardTitle className="flex items-center space-x-3">
+                <div className="bg-emerald-600 p-2 rounded-lg">
+                  <Leaf className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-gray-800 font-semibold">9. External Works</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -548,11 +534,13 @@ export function CivilMepReportView() {
         {/* MEP Sections 10, 11, 12: Mechanical, Electrical, Plumbing */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Section 10: Mechanical Systems */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Home className="h-5 w-5 text-green-600" />
-                <span>10. Mechanical Systems</span>
+          <Card className="shadow-lg border-0 bg-white hover:shadow-xl transition-shadow">
+            <CardHeader className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b">
+              <CardTitle className="flex items-center space-x-3">
+                <div className="bg-emerald-600 p-2 rounded-lg">
+                  <Wrench className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-gray-800 font-semibold">10. Mechanical Systems</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -580,11 +568,13 @@ export function CivilMepReportView() {
           </Card>
 
           {/* Section 11: Electrical Systems */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Zap className="h-5 w-5 text-yellow-600" />
-                <span>11. Electrical Systems</span>
+          <Card className="shadow-lg border-0 bg-white hover:shadow-xl transition-shadow">
+            <CardHeader className="bg-gradient-to-r from-yellow-50 to-amber-50 border-b">
+              <CardTitle className="flex items-center space-x-3">
+                <div className="bg-yellow-600 p-2 rounded-lg">
+                  <Zap className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-gray-800 font-semibold">11. Electrical Systems</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -616,11 +606,13 @@ export function CivilMepReportView() {
           </Card>
 
           {/* Section 12: Plumbing Systems */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Droplets className="h-5 w-5 text-blue-600" />
-                <span>12. Plumbing Systems</span>
+          <Card className="shadow-lg border-0 bg-white hover:shadow-xl transition-shadow">
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-cyan-50 border-b">
+              <CardTitle className="flex items-center space-x-3">
+                <div className="bg-blue-600 p-2 rounded-lg">
+                  <Droplets className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-gray-800 font-semibold">12. Plumbing Systems</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -672,11 +664,13 @@ export function CivilMepReportView() {
         {/* MEP Sections 13, 14, 15: Fire Safety, BMS Automation, Green Sustainability */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Section 13: Fire Safety Systems */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Flame className="h-5 w-5 text-red-600" />
-                <span>13. Fire Safety Systems</span>
+          <Card className="shadow-lg border-0 bg-white hover:shadow-xl transition-shadow">
+            <CardHeader className="bg-gradient-to-r from-red-50 to-rose-50 border-b">
+              <CardTitle className="flex items-center space-x-3">
+                <div className="bg-red-600 p-2 rounded-lg">
+                  <Flame className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-gray-800 font-semibold">13. Fire Safety Systems</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -708,11 +702,13 @@ export function CivilMepReportView() {
           </Card>
 
           {/* Section 14: BMS Automation */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Zap className="h-5 w-5 text-purple-600" />
-                <span>14. BMS Automation</span>
+          <Card className="shadow-lg border-0 bg-white hover:shadow-xl transition-shadow">
+            <CardHeader className="bg-gradient-to-r from-purple-50 to-violet-50 border-b">
+              <CardTitle className="flex items-center space-x-3">
+                <div className="bg-purple-600 p-2 rounded-lg">
+                  <Zap className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-gray-800 font-semibold">14. BMS Automation</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -748,11 +744,13 @@ export function CivilMepReportView() {
           </Card>
 
           {/* Section 15: Green Sustainability */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Leaf className="h-5 w-5 text-green-600" />
-                <span>15. Green Sustainability</span>
+          <Card className="shadow-lg border-0 bg-white hover:shadow-xl transition-shadow">
+            <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b">
+              <CardTitle className="flex items-center space-x-3">
+                <div className="bg-green-600 p-2 rounded-lg">
+                  <Leaf className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-gray-800 font-semibold">15. Green Sustainability</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
