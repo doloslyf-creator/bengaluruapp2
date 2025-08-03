@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { useAuth } from '@/contexts/AuthContext'
+import { useAdminAuth } from '@/hooks/useAdminAuth'
 import { useToast } from '@/hooks/use-toast'
 import { LogOut, Loader2 } from 'lucide-react'
 import { useState } from 'react'
@@ -20,26 +20,18 @@ export function SignOutButton({
   children = 'Sign Out'
 }: SignOutButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
-  const { signOut, user } = useAuth()
+  const { signOut, user } = useAdminAuth()
   const { toast } = useToast()
 
   const handleSignOut = async () => {
     setIsLoading(true)
     
     try {
-      const { error } = await signOut()
-      if (error) {
-        toast({
-          title: 'Sign out failed',
-          description: error.message,
-          variant: 'destructive',
-        })
-      } else {
-        toast({
-          title: 'Signed out successfully',
-          description: 'You have been logged out.',
-        })
-      }
+      await signOut()
+      toast({
+        title: 'Signed out successfully',
+        description: 'You have been logged out of the admin panel.',
+      })
     } catch (error) {
       toast({
         title: 'Sign out failed',

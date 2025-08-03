@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAnalyticsInit, useAnalytics } from "@/hooks/use-analytics";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { AuthForm } from "@/components/auth/AuthForm";
+import { AdminAuthForm } from "@/components/auth/AdminAuthForm";
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminProperties from "@/pages/admin/properties";
 import PropertiesView from "@/pages/admin/properties-view";
@@ -74,10 +75,10 @@ function ProtectedRouter() {
     );
   }
   
-  // Show auth form for admin routes if not authenticated
+  // Show admin auth form for admin routes if not authenticated
   const currentPath = window.location.pathname;
   if (!user && (currentPath.startsWith('/admin-panel') || currentPath === '/admin')) {
-    return <AuthForm />;
+    return <AdminAuthForm />;
   }
   
   return (

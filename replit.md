@@ -39,7 +39,7 @@ The API follows RESTful principles, providing standard CRUD operations for entit
 - **Branding**: "OwnItRight" brand update across the application with a custom wordmark logo.
 - **Enhanced Home Pages & Global Header**: Complete redesign of both customer-facing and admin home pages with modern, mobile-responsive design. Global header with scroll effects, comprehensive navigation, services dropdown, and enhanced mobile menu experience.
 - **Team Management System**: Complete CRUD operations with role-based access control, performance scoring, universal sidebar with filters, and professional UI design.
-- **Supabase Integration**: Comprehensive migration to Supabase for unified database and authentication. Features include email/password authentication, real-time database updates, built-in file storage, automatic API generation, and row-level security. Admin routes protected with authentication forms, sign-out functionality integrated into admin layout.
+- **Supabase Integration**: Comprehensive migration to Supabase for unified database and authentication. Features include email/password authentication, real-time database updates, built-in file storage, automatic API generation, and row-level security. Both admin and user dashboards protected with dedicated authentication forms (AdminAuthForm for admin panel, UserAuthForm for user dashboard), admin role-based access control, and sign-out functionality integrated into layouts.
 
 ## External Dependencies
 
