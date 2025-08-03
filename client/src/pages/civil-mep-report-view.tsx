@@ -17,7 +17,6 @@ import {
   Flame, 
   Leaf, 
   FileText,
-  TrendingUp,
   CheckCircle,
   AlertTriangle,
   Star,
@@ -25,17 +24,12 @@ import {
   Printer,
   Share2,
   MapPin,
-  Ruler,
   Construction,
   Home,
   Wrench,
   Eye,
-  Target,
-  BarChart3
+  Target
 } from "lucide-react";
-import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, LineChart, Line } from "recharts";
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
 export function CivilMepReportView() {
   const { id } = useParams<{ id: string }>();
@@ -47,10 +41,10 @@ export function CivilMepReportView() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading comprehensive technical report...</p>
+          <p className="text-gray-600">Loading report...</p>
         </div>
       </div>
     );
@@ -58,7 +52,7 @@ export function CivilMepReportView() {
 
   if (!report) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-rose-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <AlertTriangle className="h-16 w-16 text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Report Not Found</h2>
@@ -67,34 +61,6 @@ export function CivilMepReportView() {
       </div>
     );
   }
-
-  // Calculate category scores for visualization
-  const categoryScores = [
-    { category: 'Structural', score: 9.2, color: '#0088FE' },
-    { category: 'Foundation', score: 8.8, color: '#00C49F' },
-    { category: 'MEP Systems', score: 8.5, color: '#FFBB28' },
-    { category: 'Fire Safety', score: 9.0, color: '#FF8042' },
-    { category: 'Sustainability', score: 8.9, color: '#8884D8' },
-    { category: 'Compliance', score: 9.1, color: '#82CA9D' }
-  ];
-
-  // System performance data
-  const systemPerformance = [
-    { name: 'Electrical', efficiency: 92, capacity: 88, reliability: 95 },
-    { name: 'Plumbing', efficiency: 89, capacity: 91, reliability: 87 },
-    { name: 'HVAC', efficiency: 85, capacity: 89, reliability: 92 },
-    { name: 'Fire Safety', efficiency: 96, capacity: 94, reliability: 98 },
-    { name: 'Automation', efficiency: 88, capacity: 85, reliability: 90 }
-  ];
-
-  // Compliance status
-  const complianceData = [
-    { name: 'NBC 2016', status: 'Compliant', value: 100 },
-    { name: 'Fire Safety', status: 'Compliant', value: 100 },
-    { name: 'Seismic Design', status: 'Compliant', value: 100 },
-    { name: 'Green Building', status: 'Certified', value: 95 },
-    { name: 'Accessibility', status: 'Compliant', value: 100 }
-  ];
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -117,10 +83,10 @@ export function CivilMepReportView() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
       <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 text-white">
-        <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="container mx-auto px-6 py-8">
           <div className="flex items-center justify-between">
             <div className="flex-1">
               <div className="flex items-center space-x-3 mb-4">
@@ -191,11 +157,11 @@ export function CivilMepReportView() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+      <div className="container mx-auto px-6 py-8 space-y-6">
         {/* Executive Summary & Investment Recommendation */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <Card className="h-full">
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Eye className="h-5 w-5 text-blue-600" />
@@ -208,7 +174,7 @@ export function CivilMepReportView() {
             </Card>
           </div>
           
-          <Card className="lg:col-span-1">
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Target className="h-5 w-5 text-green-600" />
@@ -280,152 +246,283 @@ export function CivilMepReportView() {
           </Card>
         )}
 
-        {/* Performance Analytics Dashboard */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Category Scores Radar Chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <BarChart3 className="h-5 w-5 text-purple-600" />
-                <span>Technical Performance Analysis</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <RadarChart data={categoryScores}>
-                  <PolarGrid />
-                  <PolarAngleAxis dataKey="category" />
-                  <PolarRadiusAxis angle={90} domain={[0, 10]} />
-                  <Radar name="Score" dataKey="score" stroke="#8884d8" fill="#8884d8" fillOpacity={0.3} />
-                </RadarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* System Performance Bar Chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <TrendingUp className="h-5 w-5 text-green-600" />
-                <span>MEP Systems Performance</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={systemPerformance}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="efficiency" fill="#8884d8" name="Efficiency %" />
-                  <Bar dataKey="capacity" fill="#82ca9d" name="Capacity %" />
-                  <Bar dataKey="reliability" fill="#ffc658" name="Reliability %" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Compliance Status */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Shield className="h-5 w-5 text-blue-600" />
-              <span>Regulatory Compliance Status</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              {complianceData.map((item, index) => (
-                <div key={index} className="text-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border border-green-200">
-                  <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                  <h3 className="font-semibold text-sm">{item.name}</h3>
-                  <p className="text-xs text-green-700 mt-1">{item.status}</p>
-                  <div className="mt-2">
-                    <Progress value={item.value} className="h-1" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Key Technical Sections */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Foundation */}
+        {/* Technical Details Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Foundation Details */}
           {report.foundationDetails && (
-            <Card className="border-l-4 border-l-blue-500">
+            <Card>
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-blue-700">
-                  <Construction className="h-5 w-5" />
+                <CardTitle className="flex items-center space-x-2">
+                  <Construction className="h-5 w-5 text-orange-600" />
                   <span>Foundation System</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Foundation Type</p>
-                  <p className="font-semibold">{report.foundationDetails.type}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Soil Bearing Capacity</p>
-                  <p className="text-sm">{report.foundationDetails.soilBearingCapacity}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Waterproofing</p>
-                  <p className="text-sm">{report.foundationDetails.waterproofingMethod}</p>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Foundation Type</p>
+                    <p className="font-semibold text-lg">{report.foundationDetails.type}</p>
+                  </div>
+                  <Separator />
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Soil Bearing Capacity</p>
+                    <p className="text-sm">{report.foundationDetails.soilBearingCapacity}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Soil Investigation</p>
+                    <p className="text-sm">{report.foundationDetails.soilInvestigation}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Settlement Analysis</p>
+                    <p className="text-sm">{report.foundationDetails.settlementAnalysis}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Waterproofing</p>
+                    <p className="text-sm">{report.foundationDetails.waterproofingMethod}</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           )}
 
+          {/* Structural Details */}
+          {report.structuralDetails && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Building2 className="h-5 w-5 text-blue-600" />
+                  <span>Structural System</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Structural Type</p>
+                    <p className="font-semibold text-lg">{report.structuralDetails.structuralType}</p>
+                  </div>
+                  <Separator />
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Concrete Grade</p>
+                    <p className="text-sm">{report.structuralDetails.concreteGrade}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Steel Grade</p>
+                    <p className="text-sm">{report.structuralDetails.steelGrade}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Column Spacing</p>
+                    <p className="text-sm">{report.structuralDetails.columnSpacing}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Slab Thickness</p>
+                    <p className="text-sm">{report.structuralDetails.slabThickness}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* MEP Systems Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Electrical Systems */}
           {report.electricalSystems && (
-            <Card className="border-l-4 border-l-yellow-500">
+            <Card>
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-yellow-700">
-                  <Zap className="h-5 w-5" />
+                <CardTitle className="flex items-center space-x-2">
+                  <Zap className="h-5 w-5 text-yellow-600" />
                   <span>Electrical Systems</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Power Supply</p>
-                  <p className="text-sm">{report.electricalSystems.powerSupply?.mainConnection}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Backup Power</p>
-                  <p className="text-sm">{report.electricalSystems.powerSupply?.backup}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Lighting</p>
-                  <p className="text-sm">{report.electricalSystems.lighting?.common}</p>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Power Supply</p>
+                    <p className="text-sm">{report.electricalSystems.powerSupply?.mainConnection}</p>
+                    <p className="text-xs text-gray-400">Backup: {report.electricalSystems.powerSupply?.backup}</p>
+                  </div>
+                  <Separator />
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Lighting Systems</p>
+                    <p className="text-sm">Common: {report.electricalSystems.lighting?.common}</p>
+                    <p className="text-xs text-gray-400">Emergency: {report.electricalSystems.lighting?.emergency}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Distribution</p>
+                    <p className="text-sm">Panels: {report.electricalSystems.distribution?.panels}</p>
+                    <p className="text-xs text-gray-400">Cable Type: {report.electricalSystems.distribution?.cableType}</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           )}
 
-          {/* Fire Safety */}
-          {report.fireSafetySystems && (
-            <Card className="border-l-4 border-l-red-500">
+          {/* Plumbing Systems */}
+          {report.plumbingSystems && (
+            <Card>
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2 text-red-700">
-                  <Flame className="h-5 w-5" />
+                <CardTitle className="flex items-center space-x-2">
+                  <Droplets className="h-5 w-5 text-blue-600" />
+                  <span>Plumbing Systems</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Water Supply</p>
+                    <p className="text-sm">Source: {report.plumbingSystems.waterSupply?.source}</p>
+                    <p className="text-xs text-gray-400">Storage: {report.plumbingSystems.waterSupply?.storage}</p>
+                  </div>
+                  <Separator />
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Drainage System</p>
+                    <p className="text-sm">Type: {report.plumbingSystems.drainage?.system}</p>
+                    <p className="text-xs text-gray-400">STP: {report.plumbingSystems.drainage?.stpCapacity}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Hot Water</p>
+                    <p className="text-sm">{report.plumbingSystems.hotWater?.system}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* Fire Safety & HVAC Systems */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Fire Safety Systems */}
+          {report.fireSafetySystems && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Flame className="h-5 w-5 text-red-600" />
                   <span>Fire Safety Systems</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Detection System</p>
-                  <p className="text-sm">{report.fireSafetySystems.fireDetection?.system}</p>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Fire Detection</p>
+                    <p className="text-sm">System: {report.fireSafetySystems.fireDetection?.system}</p>
+                    <p className="text-xs text-gray-400">Coverage: {report.fireSafetySystems.fireDetection?.coverage}</p>
+                  </div>
+                  <Separator />
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Fire Fighting</p>
+                    <p className="text-sm">Hydrant: {report.fireSafetySystems.fireFighting?.hydrant}</p>
+                    <p className="text-xs text-gray-400">Sprinkler: {report.fireSafetySystems.fireFighting?.sprinkler}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Evacuation</p>
+                    <p className="text-sm">Exits: {report.fireSafetySystems.evacuation?.exits}</p>
+                    <p className="text-xs text-gray-400">Staircase: {report.fireSafetySystems.evacuation?.staircase}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Fire Fighting</p>
-                  <p className="text-sm">{report.fireSafetySystems.fireFighting?.hydrant}</p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* HVAC Systems */}
+          {report.hvacSystems && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Home className="h-5 w-5 text-green-600" />
+                  <span>HVAC Systems</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">System Type</p>
+                    <p className="text-sm">{report.hvacSystems.systemType}</p>
+                  </div>
+                  <Separator />
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Ventilation</p>
+                    <p className="text-sm">Natural: {report.hvacSystems.ventilation?.natural}</p>
+                    <p className="text-xs text-gray-400">Mechanical: {report.hvacSystems.ventilation?.mechanical}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Exhaust System</p>
+                    <p className="text-sm">{report.hvacSystems.exhaustSystem}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Evacuation</p>
-                  <p className="text-sm">{report.fireSafetySystems.evacuation?.exits}</p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* Additional Technical Details */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Sustainability Features */}
+          {report.sustainabilityFeatures && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Leaf className="h-5 w-5 text-green-600" />
+                  <span>Sustainability Features</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Energy Efficiency</p>
+                    <p className="text-sm">{report.sustainabilityFeatures.energyEfficiency}</p>
+                  </div>
+                  <Separator />
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Water Conservation</p>
+                    <p className="text-sm">{report.sustainabilityFeatures.waterConservation}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Waste Management</p>
+                    <p className="text-sm">{report.sustainabilityFeatures.wasteManagement}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Green Building Rating</p>
+                    <p className="text-sm">{report.sustainabilityFeatures.greenBuildingRating}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Compliance & Documentation */}
+          {(report.complianceDocuments || report.certifications) && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Shield className="h-5 w-5 text-blue-600" />
+                  <span>Compliance & Certifications</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 gap-3">
+                  {report.complianceDocuments && (
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Compliance Documents</p>
+                      <div className="space-y-1">
+                        <p className="text-sm">Building Plan: {report.complianceDocuments.buildingPlanApproval}</p>
+                        <p className="text-xs text-gray-400">Fire NOC: {report.complianceDocuments.fireNOC}</p>
+                        <p className="text-xs text-gray-400">Structural Drawings: {report.complianceDocuments.structuralDrawings}</p>
+                      </div>
+                    </div>
+                  )}
+                  {report.certifications && (
+                    <>
+                      <Separator />
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">Certifications</p>
+                        <div className="space-y-1">
+                          <p className="text-sm">Occupancy: {report.certifications.occupancyCertificate}</p>
+                          <p className="text-xs text-gray-400">Completion: {report.certifications.completionCertificate}</p>
+                          <p className="text-xs text-gray-400">RERA: {report.certifications.reraRegistration}</p>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -464,7 +561,7 @@ export function CivilMepReportView() {
         </div>
 
         {/* Footer */}
-        <Card className="bg-gradient-to-r from-slate-50 to-blue-50 border-slate-200">
+        <Card className="bg-gray-50 border-gray-200">
           <CardContent className="pt-6">
             <div className="text-center space-y-4">
               <div className="flex items-center justify-center space-x-2">
