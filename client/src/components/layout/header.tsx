@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
 import { 
   Home, 
   Search, 
@@ -31,6 +32,14 @@ export default function Header() {
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { user } = useAuth();
+
+  // Check if user has admin privileges
+  const isAdmin = user ? (
+    user.user_metadata?.role === 'admin' || 
+    user.email?.endsWith('@ownitright.com') ||
+    user.email === 'admin@ownitright.com'
+  ) : false;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -148,33 +157,35 @@ export default function Header() {
               </Link>
             </Button>
 
-            {/* Admin Access */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="hidden md:flex text-gray-600 hover:text-primary">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Admin
-                  <ChevronDown className="h-3 w-3 ml-1" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                {adminLinks.map((link) => (
-                  <DropdownMenuItem key={link.name} asChild>
-                    <Link href={link.href} className="flex items-center">
-                      <link.icon className="h-4 w-4 mr-3" />
-                      {link.name}
+            {/* Admin Access - Only show for admin users */}
+            {isAdmin && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="hidden md:flex text-gray-600 hover:text-primary">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Admin
+                    <ChevronDown className="h-3 w-3 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  {adminLinks.map((link) => (
+                    <DropdownMenuItem key={link.name} asChild>
+                      <Link href={link.href} className="flex items-center">
+                        <link.icon className="h-4 w-4 mr-3" />
+                        {link.name}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin-panel/settings" className="flex items-center">
+                      <Settings className="h-4 w-4 mr-3" />
+                      Settings
                     </Link>
                   </DropdownMenuItem>
-                ))}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/admin-panel/settings" className="flex items-center">
-                    <Settings className="h-4 w-4 mr-3" />
-                    Settings
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
 
             {/* CTA Button */}
             <Button asChild className="hidden md:flex bg-primary hover:bg-primary/90 text-white px-6">
@@ -250,19 +261,21 @@ export default function Header() {
                         Find Property
                       </Link>
                     </Button>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className={`grid gap-3 ${isAdmin ? 'grid-cols-2' : 'grid-cols-1'}`}>
                       <Button asChild variant="outline" size="sm" onClick={() => setIsOpen(false)}>
                         <Link href="/user-dashboard">
                           <User className="h-4 w-4 mr-2" />
                           My Panel
                         </Link>
                       </Button>
-                      <Button asChild variant="outline" size="sm" onClick={() => setIsOpen(false)}>
-                        <Link href="/admin-panel">
-                          <Settings className="h-4 w-4 mr-2" />
-                          Admin
-                        </Link>
-                      </Button>
+                      {isAdmin && (
+                        <Button asChild variant="outline" size="sm" onClick={() => setIsOpen(false)}>
+                          <Link href="/admin-panel">
+                            <Settings className="h-4 w-4 mr-2" />
+                            Admin
+                          </Link>
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
