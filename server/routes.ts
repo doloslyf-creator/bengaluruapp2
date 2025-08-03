@@ -20,6 +20,9 @@ import { getBlogPosts, getBlogPost, createBlogPost, updateBlogPost, deleteBlogPo
 import { reraService } from "./reraService";
 import { paymentService, apiKeysManager } from "./paymentService";
 
+// Global API keys storage (in production, use database with encryption)
+const globalApiKeys: Record<string, any> = {};
+
 // Helper function to calculate lead score from contact form
 function calculateContactLeadScore(contactData: any): number {
   let score = 40; // Base score for contact form submission
@@ -2435,17 +2438,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // API Keys Settings Routes
   app.get("/api/settings/api-keys", async (req, res) => {
     try {
-      // Return mock data for now - in production, would fetch from database
+      console.log("Global API keys stored:", Object.keys(globalApiKeys));
+      
       const apiKeys = {
         id: "1",
-        razorpayKeyId: "",
-        razorpayTestMode: true,
-        googleMapsApiKey: "",
-        googleAnalyticsId: "",
-        twilioAccountSid: "",
-        twilioPhoneNumber: "",
-        sendgridFromEmail: "",
-        surepassApiKey: "",
+        razorpayKeyId: globalApiKeys.razorpayKeyId || "",
+        razorpayTestMode: globalApiKeys.razorpayTestMode || true,
+        googleMapsApiKey: globalApiKeys.googleMapsApiKey || "",
+        googleAnalyticsId: globalApiKeys.googleAnalyticsId || "",
+        twilioAccountSid: globalApiKeys.twilioAccountSid || "",
+        twilioAuthToken: "", // Never return sensitive tokens
+        twilioPhoneNumber: globalApiKeys.twilioPhoneNumber || "",
+        sendgridApiKey: "", // Never return sensitive keys
+        sendgridFromEmail: globalApiKeys.sendgridFromEmail || "",
+        surepassApiKey: "", // Never return sensitive keys
         lastUpdated: new Date().toISOString(),
         updatedBy: "admin"
       };
@@ -2459,9 +2465,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/settings/api-keys", async (req, res) => {
     try {
       const apiKeysData = req.body;
-      console.log("API keys update request received");
+      console.log("API keys update request received:", Object.keys(apiKeysData));
       
-      // Update API keys in memory storage
+      // Store all API keys in global memory storage
+      Object.assign(globalApiKeys, apiKeysData);
+      console.log("Stored API keys:", Object.keys(globalApiKeys));
+      
+      // Also update the apiKeysManager for payment service
+      apiKeysManager.setKeys(apiKeysData);
+      
+      // Update Razorpay service if keys are provided
       if (apiKeysData.razorpayKeyId && apiKeysData.razorpayKeySecret) {
         try {
           paymentService.updateKeys(apiKeysData.razorpayKeyId, apiKeysData.razorpayKeySecret);

@@ -20,16 +20,29 @@ interface ApiKeysStorage {
   razorpayKeyId?: string;
   razorpayKeySecret?: string;
   razorpayTestMode?: boolean;
+  googleMapsApiKey?: string;
+  googleAnalyticsId?: string;
+  twilioAccountSid?: string;
+  twilioAuthToken?: string;
+  twilioPhoneNumber?: string;
+  sendgridApiKey?: string;
+  sendgridFromEmail?: string;
+  surepassApiKey?: string;
 }
 
 class ApiKeysManager {
   private apiKeys: ApiKeysStorage = {};
 
-  setKeys(keys: ApiKeysStorage) {
+  setKeys(keys: Partial<ApiKeysStorage>) {
     this.apiKeys = { ...this.apiKeys, ...keys };
+    console.log("API keys updated in storage:", Object.keys(keys));
   }
 
   getKeys(): ApiKeysStorage {
+    return this.apiKeys;
+  }
+
+  getAllKeys(): ApiKeysStorage {
     return this.apiKeys;
   }
 
