@@ -47,8 +47,8 @@ The API follows RESTful principles, providing standard CRUD operations for entit
 ## External Dependencies
 
 ### Database & Authentication Services
-- **Supabase**: Integrated database and authentication platform (in migration).
-- **Neon Database**: PostgreSQL database hosting (current, being migrated).
+- **PostgreSQL**: Primary database hosted on Replit with full schema migration completed.
+- **Supabase**: Optional authentication platform (gracefully handles missing configuration).
 - **Drizzle ORM**: Database toolkit for type-safe queries.
 
 ### Cloud Storage
