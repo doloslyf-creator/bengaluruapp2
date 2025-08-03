@@ -20,6 +20,7 @@ import { getBlogPosts, getBlogPost, createBlogPost, updateBlogPost, deleteBlogPo
 import { reraService } from "./reraService";
 import { paymentService, apiKeysManager } from "./paymentService";
 import { emailService } from "./emailService";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -265,6 +266,20 @@ function generateComplianceCertificate(report: CivilMepReport): Buffer {
 // No server-side session management needed
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup authentication middleware
+  await setupAuth(app);
+
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
   // Firebase authentication - no server-side auth routes needed
   // Authentication is handled entirely by Firebase
 
