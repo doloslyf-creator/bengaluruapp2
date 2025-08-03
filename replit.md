@@ -10,6 +10,7 @@ Focus areas: Customer-facing features, real data integration, and seamless user 
 UI Design preferences: Clean, minimal design without unnecessary panels or borders. Prefer simple layouts that encourage clicking to view details rather than multiple action buttons. Match labels should be displayed in brackets at the top of cards. Strongly prefers compact, table-based interfaces over verbose card layouts for admin panels - values data density and efficiency.
 Messaging preference: Personalized messaging that makes customers "feel us, our message" rather than sounding like an organization. Content should be human-centered and relatable.
 Admin Layout Consistency: ALL admin pages MUST maintain admin sidebar and topbar using AdminLayout component. This includes RERA management, Supabase Migration, Notifications management, and all future admin pages.
+Admin Sidebar Organization: Grouped menu structure with collapsible sections - Customer Relations (customers, developers, team management), Reports (civil/MEP reports, valuation reports, legal tracker, property scoring, analytics), Property Management (properties, zones), with single items (dashboard, blog, orders, notifications, RERA, settings, database migration) remaining ungrouped.
 
 ## System Architecture
 

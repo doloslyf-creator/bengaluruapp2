@@ -1,5 +1,6 @@
 import { useLocation } from "wouter";
 import { Link } from "wouter";
+import { useState } from "react";
 import { 
   Home, 
   BarChart3, 
@@ -16,7 +17,18 @@ import {
   Scale,
   Star,
   Shield,
-  Bell
+  Bell,
+  ChevronDown,
+  ChevronRight,
+  Users,
+  Briefcase,
+  FileSpreadsheet,
+  Target,
+  TrendingUp,
+  Hammer,
+  Zap,
+  Factory,
+  Database
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -30,7 +42,20 @@ interface AdminLayoutProps {
   backUrl?: string;
 }
 
-const navigation = [
+interface NavigationItem {
+  name: string;
+  href: string;
+  icon: any;
+  description: string;
+}
+
+interface NavigationGroup {
+  name: string;
+  icon: any;
+  items: NavigationItem[];
+}
+
+const singleNavigation: NavigationItem[] = [
   { 
     name: "Dashboard", 
     href: "/admin-panel", 
@@ -38,41 +63,10 @@ const navigation = [
     description: "Overview & Analytics"
   },
   { 
-    name: "Properties", 
-    href: "/admin-panel/properties", 
-    icon: Building2,
-    description: "Manage Property Listings"
-  },
-  { 
-    name: "Property Scoring", 
-    href: "/admin-panel/property-scoring", 
-    icon: Star,
-    description: "Property Evaluation & Scoring"
-  },
-  { 
-    name: "Analytics", 
-    href: "/admin-panel/analytics", 
-    icon: BarChart3,
-    description: "Data & Insights"
-  },
-
-  { 
     name: "Blog", 
     href: "/admin-panel/blog", 
     icon: PenTool,
     description: "Content Management"
-  },
-  { 
-    name: "CIVIL+MEP Reports", 
-    href: "/admin-panel/civil-mep-reports", 
-    icon: FileText,
-    description: "Engineering Reports"
-  },
-  { 
-    name: "Valuation Reports", 
-    href: "/admin-panel/valuation-reports", 
-    icon: Calculator,
-    description: "Property Valuations"
   },
   { 
     name: "Orders", 
@@ -81,40 +75,10 @@ const navigation = [
     description: "Order Management"
   },
   { 
-    name: "Legal Management", 
-    href: "/admin-panel/legal-management", 
-    icon: Scale,
-    description: "Legal Due Diligence"
-  },
-  { 
     name: "Notifications", 
     href: "/admin-panel/notifications", 
     icon: Bell,
     description: "Notification Management"
-  },
-  { 
-    name: "Customers", 
-    href: "/admin-panel/customers", 
-    icon: Users2,
-    description: "Customer CRM"
-  },
-  { 
-    name: "Developers", 
-    href: "/admin-panel/developers", 
-    icon: Users2,
-    description: "Developer Directory"
-  },
-  { 
-    name: "Zones", 
-    href: "/admin-panel/zones", 
-    icon: MapPin,
-    description: "Location Management"
-  },
-  { 
-    name: "Team Management", 
-    href: "/admin-panel/team-management", 
-    icon: Users2,
-    description: "Manage Team Members"
   },
   { 
     name: "RERA Management", 
@@ -131,13 +95,95 @@ const navigation = [
   {
     name: "Database Migration",
     href: "/admin-panel/supabase-migration", 
-    icon: Shield,
+    icon: Database,
     description: "Migrate to Supabase"
   },
 ];
 
+const groupedNavigation: NavigationGroup[] = [
+  {
+    name: "Customer Relations",
+    icon: Users,
+    items: [
+      { 
+        name: "Customers", 
+        href: "/admin-panel/customers", 
+        icon: Users2,
+        description: "Customer CRM"
+      },
+      { 
+        name: "Developers", 
+        href: "/admin-panel/developers", 
+        icon: Factory,
+        description: "Developer Directory"
+      },
+      { 
+        name: "Team Management", 
+        href: "/admin-panel/team-management", 
+        icon: Briefcase,
+        description: "Manage Team Members"
+      },
+    ]
+  },
+  {
+    name: "Reports",
+    icon: FileSpreadsheet,
+    items: [
+      { 
+        name: "CIVIL+MEP Reports", 
+        href: "/admin-panel/civil-mep-reports", 
+        icon: Hammer,
+        description: "Engineering Reports"
+      },
+      { 
+        name: "Valuation Reports", 
+        href: "/admin-panel/valuation-reports", 
+        icon: Calculator,
+        description: "Property Valuations"
+      },
+      { 
+        name: "Legal Tracker", 
+        href: "/admin-panel/legal-management", 
+        icon: Scale,
+        description: "Legal Due Diligence"
+      },
+      { 
+        name: "Property Scoring", 
+        href: "/admin-panel/property-scoring", 
+        icon: Target,
+        description: "Property Evaluation & Scoring"
+      },
+      { 
+        name: "Analytics", 
+        href: "/admin-panel/analytics", 
+        icon: TrendingUp,
+        description: "Data & Insights"
+      },
+    ]
+  },
+  {
+    name: "Property Management",
+    icon: Building2,
+    items: [
+      { 
+        name: "Properties", 
+        href: "/admin-panel/properties", 
+        icon: Building2,
+        description: "Manage Property Listings"
+      },
+      { 
+        name: "Zones", 
+        href: "/admin-panel/zones", 
+        icon: MapPin,
+        description: "Location Management"
+      },
+    ]
+  }
+];
+
 export function AdminLayout({ children, title, showBackButton = false, backUrl = "/admin-panel" }: AdminLayoutProps) {
   const [location] = useLocation();
+  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set(['Customer Relations', 'Reports', 'Property Management']));
 
   const isActive = (href: string) => {
     if (href === "/admin-panel") {
@@ -147,8 +193,31 @@ export function AdminLayout({ children, title, showBackButton = false, backUrl =
   };
 
   const getCurrentPageName = () => {
-    const currentNav = navigation.find(nav => isActive(nav.href));
-    return currentNav?.name || "Admin Panel";
+    // Check single navigation items
+    const singleNav = singleNavigation.find(nav => isActive(nav.href));
+    if (singleNav) return singleNav.name;
+
+    // Check grouped navigation items
+    for (const group of groupedNavigation) {
+      const groupNav = group.items.find(nav => isActive(nav.href));
+      if (groupNav) return groupNav.name;
+    }
+    
+    return "Admin Panel";
+  };
+
+  const toggleGroup = (groupName: string) => {
+    const newOpenGroups = new Set(openGroups);
+    if (newOpenGroups.has(groupName)) {
+      newOpenGroups.delete(groupName);
+    } else {
+      newOpenGroups.add(groupName);
+    }
+    setOpenGroups(newOpenGroups);
+  };
+
+  const isGroupActive = (group: NavigationGroup) => {
+    return group.items.some(item => isActive(item.href));
   };
 
   return (
@@ -210,7 +279,8 @@ export function AdminLayout({ children, title, showBackButton = false, backUrl =
           <div className="h-[calc(100vh-4rem)] overflow-y-auto">
             {/* Navigation */}
             <nav className="p-4 space-y-2">
-              {navigation.map((item) => {
+              {/* Single Navigation Items */}
+              {singleNavigation.map((item) => {
                 const active = isActive(item.href);
                 return (
                   <Link
@@ -234,6 +304,77 @@ export function AdminLayout({ children, title, showBackButton = false, backUrl =
                       </div>
                     </div>
                   </Link>
+                );
+              })}
+
+              {/* Add separator */}
+              <div className="my-3">
+                <Separator />
+              </div>
+
+              {/* Grouped Navigation Items */}
+              {groupedNavigation.map((group) => {
+                const isOpen = openGroups.has(group.name);
+                const groupActive = isGroupActive(group);
+                
+                return (
+                  <div key={group.name} className="space-y-1">
+                    {/* Group Header */}
+                    <button
+                      onClick={() => toggleGroup(group.name)}
+                      className={`group w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
+                        groupActive
+                          ? "bg-primary/10 text-primary border border-primary/20"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      }`}
+                    >
+                      <group.icon
+                        className={`mr-3 h-5 w-5 transition-colors ${
+                          groupActive ? "text-primary" : "text-gray-400 group-hover:text-gray-600"
+                        }`}
+                      />
+                      <div className="flex-1 text-left">
+                        <div className="font-semibold">{group.name}</div>
+                      </div>
+                      {isOpen ? (
+                        <ChevronDown className="h-4 w-4 transition-transform" />
+                      ) : (
+                        <ChevronRight className="h-4 w-4 transition-transform" />
+                      )}
+                    </button>
+
+                    {/* Group Items */}
+                    {isOpen && (
+                      <div className="ml-6 space-y-1">
+                        {group.items.map((item) => {
+                          const active = isActive(item.href);
+                          return (
+                            <Link
+                              key={item.name}
+                              href={item.href}
+                              className={`group flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                                active
+                                  ? "bg-primary text-white shadow-md"
+                                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                              }`}
+                            >
+                              <item.icon
+                                className={`mr-3 h-4 w-4 transition-colors ${
+                                  active ? "text-white" : "text-gray-400 group-hover:text-gray-600"
+                                }`}
+                              />
+                              <div className="flex-1">
+                                <div className="font-medium">{item.name}</div>
+                                <div className={`text-xs ${active ? "text-white/80" : "text-gray-500"}`}>
+                                  {item.description}
+                                </div>
+                              </div>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </nav>
