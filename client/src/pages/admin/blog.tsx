@@ -45,14 +45,16 @@ export default function BlogManagement() {
   // Fetch blog posts with filters
   const { data: blogData, isLoading } = useQuery({
     queryKey: ["/api/blog", statusFilter, categoryFilter, searchTerm],
-    queryFn: () => {
+    queryFn: async () => {
       const params = new URLSearchParams({
         status: statusFilter,
         category: categoryFilter,
         search: searchTerm,
         includeStats: "true"
       });
-      return apiRequest(`/api/blog?${params}`);
+      const response = await fetch(`/api/blog?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch blog data');
+      return response.json();
     }
   });
 
@@ -61,8 +63,10 @@ export default function BlogManagement() {
 
   // Delete post mutation
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => {
-      return apiRequest(`/api/blog/${id}`, { method: "DELETE" });
+    mutationFn: async (id: string) => {
+      const response = await fetch(`/api/blog/${id}`, { method: "DELETE" });
+      if (!response.ok) throw new Error('Failed to delete post');
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/blog"] });
