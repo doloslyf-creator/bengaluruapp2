@@ -92,7 +92,7 @@ export default function CreateLeadDialog({ open, onOpenChange }: CreateLeadDialo
       ...formData,
       budgetMin: formData.budgetMin ? parseInt(formData.budgetMin) : null,
       budgetMax: formData.budgetMax ? parseInt(formData.budgetMax) : null,
-      source: "manual-entry",
+      source: "walk-in",
       status: "new",
       createdBy: "admin"
     };
@@ -303,10 +303,11 @@ export default function CreateLeadDialog({ open, onOpenChange }: CreateLeadDialo
                   <SelectValue placeholder="Select BHK" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1-bhk">1 BHK</SelectItem>
-                  <SelectItem value="2-bhk">2 BHK</SelectItem>
-                  <SelectItem value="3-bhk">3 BHK</SelectItem>
-                  <SelectItem value="4-bhk">4+ BHK</SelectItem>
+                  <SelectItem value="1bhk">1 BHK</SelectItem>
+                  <SelectItem value="2bhk">2 BHK</SelectItem>
+                  <SelectItem value="3bhk">3 BHK</SelectItem>
+                  <SelectItem value="4bhk">4 BHK</SelectItem>
+                  <SelectItem value="5bhk+">5+ BHK</SelectItem>
                 </SelectContent>
               </Select>
             </div>
