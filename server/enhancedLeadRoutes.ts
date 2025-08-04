@@ -38,7 +38,15 @@ export function registerEnhancedLeadRoutes(app: Express) {
         smartTags: generateSmartTags(req.body),
       };
 
-      const validatedData = insertLeadSchema.parse(leadData);
+      // Add required fields for validation
+      const completeLeadData = {
+        ...leadData,
+        propertyName: leadData.propertyName || "General Inquiry",
+        interestedConfiguration: leadData.interestedConfiguration || leadData.bhkPreference || "any",  
+        budgetRange: leadData.budgetMin && leadData.budgetMax ? `${leadData.budgetMin}L-${leadData.budgetMax}L` : "TBD"
+      };
+      
+      const validatedData = insertLeadSchema.parse(completeLeadData);
       const lead = await storage.createLead(validatedData);
 
       // Add initial activity for enhanced lead

@@ -94,7 +94,18 @@ export default function CreateLeadDialog({ open, onOpenChange }: CreateLeadDialo
       budgetMax: formData.budgetMax ? parseInt(formData.budgetMax) : null,
       source: "walk-in",
       status: "new",
-      createdBy: "admin"
+      createdBy: "admin",
+      propertyName: "General Inquiry", // Required field
+      interestedConfiguration: formData.bhkPreference || "any", // Required field
+      budgetRange: formData.budgetMin && formData.budgetMax ? `${formData.budgetMin}L-${formData.budgetMax}L` : "TBD",
+      preferredAreas: formData.preferredAreas || [],
+      smartTags: [],
+      amenitiesNeeded: [],
+      interestedInReports: [],
+      leadDetails: {
+        personalizedNotes: formData.notes || "",
+        keyNonNegotiables: []
+      }
     };
 
     createLeadMutation.mutate(submitData);
