@@ -339,7 +339,7 @@ export default function ValuationReportEditComprehensive() {
                       <CardDescription>Navigate through report sections</CardDescription>
                     </CardHeader>
                     <CardContent className="p-0">
-                      <nav className="space-y-1">
+                      <TabsList className="flex flex-col h-auto p-1 bg-transparent space-y-1">
                         <TabsTrigger 
                           value="executive" 
                           className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
@@ -430,7 +430,7 @@ export default function ValuationReportEditComprehensive() {
                             </div>
                           </div>
                         </TabsTrigger>
-                      </nav>
+                      </TabsList>
                     </CardContent>
                   </Card>
                 </div>
@@ -443,7 +443,7 @@ export default function ValuationReportEditComprehensive() {
                     <CardTitle className="text-lg">Report Sections</CardTitle>
                   </CardHeader>
                   <CardContent className="p-0">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-1">
+                    <TabsList className="grid grid-cols-2 sm:grid-cols-3 gap-1 h-auto bg-transparent p-1">
                       <TabsTrigger 
                         value="executive" 
                         className="vertical-nav-trigger flex flex-col items-center gap-1 p-3 text-xs bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all"
@@ -499,7 +499,7 @@ export default function ValuationReportEditComprehensive() {
                         <Scale className="h-4 w-4" />
                         <span>Final</span>
                       </TabsTrigger>
-                    </div>
+                    </TabsList>
                   </CardContent>
                 </Card>
               </div>
