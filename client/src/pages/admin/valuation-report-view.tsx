@@ -103,6 +103,26 @@ export default function ValuationReportView() {
     return [];
   };
 
+  const formatAmount = (value: string | number | null | undefined): string => {
+    if (!value) return "Not specified";
+    
+    // If it's already formatted (contains 'Cr' or 'L'), return as is
+    if (typeof value === 'string' && (value.includes('Cr') || value.includes('L') || value.includes('₹'))) {
+      return value;
+    }
+    
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
+    if (isNaN(numValue)) return "Not specified";
+    
+    if (numValue >= 10000000) { // 1 Crore or more
+      return `₹${(numValue / 10000000).toFixed(2)} Cr`;
+    } else if (numValue >= 100000) { // 1 Lakh or more
+      return `₹${(numValue / 100000).toFixed(1)} L`;
+    } else {
+      return `₹${numValue.toLocaleString()}`;
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -169,7 +189,7 @@ export default function ValuationReportView() {
                   <div className="text-center lg:text-right">
                     <div className="bg-white/20 rounded-lg p-6 backdrop-blur-sm">
                       <div className="text-4xl font-bold mb-2">
-                        {report.estimatedMarketValue || "₹2.8 Cr"}
+                        {formatAmount(report.estimatedMarketValue)}
                       </div>
                       <div className="text-blue-100 text-sm mb-3">Estimated Market Value</div>
                       <div className="text-lg font-semibold">
@@ -330,13 +350,13 @@ export default function ValuationReportView() {
                     <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg">
                       <div className="text-sm text-gray-600 mb-1">Builder Quoted Price</div>
                       <div className="text-2xl font-bold text-gray-800">
-                        {report.builderQuotedPrice || "₹2.95 Cr"}
+                        {formatAmount(report.builderQuotedPrice)}
                       </div>
                     </div>
                     <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg">
                       <div className="text-sm text-gray-600 mb-1">Our Estimated Value</div>
                       <div className="text-2xl font-bold text-gray-800">
-                        {report.totalEstimatedValue || "₹2.8 Cr"}
+                        {formatAmount(report.totalEstimatedValue)}
                       </div>
                     </div>
                   </div>
@@ -351,13 +371,13 @@ export default function ValuationReportView() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="text-center">
                       <div className="text-lg font-bold text-gray-800 mb-1">
-                        {report.landShareValue || "₹1.2 Cr"}
+                        {formatAmount(report.landShareValue)}
                       </div>
                       <div className="text-sm text-gray-600">Land Share Value</div>
                     </div>
                     <div className="text-center">
                       <div className="text-lg font-bold text-gray-800 mb-1">
-                        {report.constructionValue || "₹1.6 Cr"}
+                        {formatAmount(report.constructionValue)}
                       </div>
                       <div className="text-sm text-gray-600">Construction Value</div>
                     </div>
@@ -520,22 +540,22 @@ export default function ValuationReportView() {
                 <CardContent className="p-4">
                   <div className="space-y-3">
                     {[
-                      { label: "Base Unit Cost", value: report.baseUnitCost },
-                      { label: "Amenities", value: report.amenitiesCharges },
-                      { label: "Floor Rise", value: report.floorRiseCharges },
-                      { label: "GST", value: report.gstAmount },
-                      { label: "Registration", value: report.stampDutyRegistration },
-                      { label: "Khata Transfer", value: report.khataTransferCosts }
+                      { label: "Base Unit Cost", value: formatAmount(report.baseUnitCost) },
+                      { label: "Amenities", value: formatAmount(report.amenitiesCharges) },
+                      { label: "Floor Rise", value: formatAmount(report.floorRiseCharges) },
+                      { label: "GST", value: formatAmount(report.gstAmount) },
+                      { label: "Registration", value: formatAmount(report.stampDutyRegistration) },
+                      { label: "Khata Transfer", value: formatAmount(report.khataTransferCosts) }
                     ].map((item, index) => (
                       <div key={index} className="flex justify-between text-sm">
                         <span className="text-gray-600">{item.label}</span>
-                        <span className="font-medium">{item.value || "—"}</span>
+                        <span className="font-medium">{item.value}</span>
                       </div>
                     ))}
                     <Separator />
                     <div className="flex justify-between text-base font-bold">
                       <span>Total All-In Price</span>
-                      <span className="text-orange-600">{report.totalAllInPrice || "₹2.83 Cr"}</span>
+                      <span className="text-orange-600">{formatAmount(report.totalAllInPrice)}</span>
                     </div>
                   </div>
                 </CardContent>
