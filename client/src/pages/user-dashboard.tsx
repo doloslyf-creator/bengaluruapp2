@@ -182,14 +182,7 @@ export default function UserDashboard() {
       color: "bg-orange-500",
       count: civilMepReports.length,
     },
-    {
-      id: "legal-tracker",
-      title: "Legal Tracker",
-      description: "Due diligence tracking",
-      icon: TrendingUp,
-      href: "/legal-due-diligence",
-      color: "bg-indigo-500",
-    },
+
     {
       id: "consultation",
       title: "Book Consultation",

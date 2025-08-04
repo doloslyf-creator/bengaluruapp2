@@ -37,7 +37,7 @@ export function UserDashboardHeader({ currentPage }: UserDashboardHeaderProps) {
     { href: "/find-property", label: "Properties", active: location.startsWith("/find-property") },
     { href: "/user-dashboard/valuation-reports", label: "Valuation", active: location.includes("/valuation") },
     { href: "/user-dashboard/civil-mep-reports", label: "Reports", active: location.includes("/civil-mep") },
-    { href: "/user-dashboard/legal-tracker", label: "Legal", active: location.includes("/legal") },
+
   ];
 
   return (

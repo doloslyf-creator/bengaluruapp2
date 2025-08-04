@@ -9,7 +9,7 @@ import {
   Star, Heart, MapPin, Phone, Mail, 
   Eye, Download, ExternalLink, Clock, 
   IndianRupee, CheckCircle, AlertCircle, XCircle,
-  Filter, Search, ChevronRight, Settings, Bell, Calculator, Building, Scale,
+  Filter, Search, ChevronRight, Settings, Bell, Calculator, Building,
   TrendingUp, BarChart3, PieChart, Activity, Award, Shield,
   Menu, X, Plus, ArrowUpRight, ArrowDownRight, DollarSign,
   Zap, Home as HomeIcon, Wrench, Camera, Map, BookOpen,
@@ -143,15 +143,7 @@ export default function UserDashboardDynamic() {
       color: "bg-purple-500",
       count: valuationReports.length,
     },
-    {
-      id: "legal-tracker",
-      title: "Legal Due Diligence",
-      description: "Track document progress",
-      icon: Scale,
-      href: "/user-dashboard/legal-tracker",
-      color: "bg-orange-500",
-      count: Math.floor(Math.random() * 3), // Will be dynamic when legal tracker is user-specific
-    },
+
     {
       id: "civil-mep",
       title: "CIVIL+MEP Reports",

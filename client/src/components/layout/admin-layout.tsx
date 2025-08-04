@@ -14,7 +14,7 @@ import {
   ArrowLeft,
   ShoppingCart,
   Calculator,
-  Scale,
+
   Star,
   Shield,
   Bell,
@@ -151,12 +151,7 @@ const groupedNavigation: NavigationGroup[] = [
         description: "Property Valuation Analysis"
       },
 
-      { 
-        name: "Legal Tracker", 
-        href: "/admin-panel/legal-management", 
-        icon: Scale,
-        description: "Legal Due Diligence"
-      },
+
       { 
         name: "Property Scoring", 
         href: "/admin-panel/property-scoring", 

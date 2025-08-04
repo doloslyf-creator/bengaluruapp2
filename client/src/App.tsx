@@ -46,9 +46,7 @@ import CustomerHome from "@/pages/customer-home";
 import Home from "@/pages/home";
 import About from "@/pages/about";
 import LeadsPage from "@/pages/leads";
-import LegalTracker from "@/pages/admin/legal-tracker-enhanced";
-import LegalManagement from "@/pages/admin/legal-management";
-import UserLegalTracker from "@/pages/user-legal-tracker-enhanced";
+
 import AdminSettings from "@/pages/admin/settings";
 import TeamManagement from "@/pages/admin/team-management";
 import ReraManagement from "@/pages/admin/rera-management";
@@ -119,11 +117,8 @@ function ProtectedRouter() {
       <Route path="/admin-panel/valuation-reports/edit/:id" component={ValuationReportEdit} />
       <Route path="/admin-panel/property/:id/edit" component={PropertyEdit} />
 
-      <Route path="/admin-panel/legal-management" component={LegalManagement} />
-      <Route path="/admin-panel/legal-tracker" component={LegalTracker} />
-      <Route path="/admin-panel/legal-tracker/manage" component={LegalTracker} />
-      <Route path="/admin-panel/legal-tracker/team" component={LegalTracker} />
-      <Route path="/admin-panel/legal-tracker/reports" component={LegalTracker} />
+
+
       <Route path="/admin-panel/settings" component={AdminSettings} />
       <Route path="/admin-panel/team-management" component={TeamManagement} />
       <Route path="/admin-panel/rera-management" component={ReraManagement} />
@@ -151,12 +146,7 @@ function ProtectedRouter() {
       <Route path="/user-dashboard-legacy" component={EnhancedUserPanel} />
 
 
-      <Route path="/user-panel/legal-tracker" component={UserLegalTracker} />
-      
-      {/* User Dashboard Routes */}
 
-
-      <Route path="/user-dashboard/legal-tracker" component={UserLegalTracker} />
       <Route path="/user-notifications" component={UserNotifications} />
       
       <Route component={NotFound} />

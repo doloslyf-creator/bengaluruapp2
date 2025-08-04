@@ -187,7 +187,7 @@ export default function UserNotifications() {
               <CardContent className="space-y-4">
                 {[
                   { key: "propertyUpdates", label: "Property Updates", description: "New properties, price changes, and availability updates" },
-                  { key: "reportNotifications", label: "Report Notifications", description: "Property valuation reports, legal tracker updates, and CIVIL+MEP reports" },
+                  { key: "reportNotifications", label: "Report Notifications", description: "Property valuation reports and CIVIL+MEP reports" },
                   { key: "bookingNotifications", label: "Booking Notifications", description: "Site visit confirmations, rescheduling, and reminders" },
                   { key: "paymentNotifications", label: "Payment Notifications", description: "Payment confirmations, receipts, and payment reminders" },
                   { key: "leadNotifications", label: "Lead Updates", description: "Follow-up reminders and lead status updates" },

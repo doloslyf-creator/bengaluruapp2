@@ -8,7 +8,7 @@ import {
   Star, Heart, MapPin, Phone, Mail, 
   Eye, Download, ExternalLink, Clock, 
   IndianRupee, CheckCircle, AlertCircle, XCircle,
-  Filter, Search, ChevronRight, Settings, Bell, Calculator, Building, Scale,
+  Filter, Search, ChevronRight, Settings, Bell, Calculator, Building,
   TrendingUp, BarChart3, PieChart, Activity, Award, Shield,
   Menu, X, Plus, ArrowUpRight, ArrowDownRight, DollarSign,
   Zap, Home as HomeIcon, Wrench, Camera, Map, BookOpen
@@ -122,11 +122,7 @@ export default function EnhancedUserPanel() {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Fetch legal trackers
-  const { data: legalTrackers = [] } = useQuery({
-    queryKey: ["/api/legal-trackers"],
-    staleTime: 5 * 60 * 1000,
-  });
+
 
   // Calculate user statistics
   const userStats: UserStats = {
@@ -166,15 +162,7 @@ export default function EnhancedUserPanel() {
       color: "bg-purple-500",
       count: civilMepStats?.totalReports || 0
     },
-    {
-      id: "legal",
-      title: "Legal Due Diligence",
-      description: "Track legal processes",
-      icon: Scale,
-      href: "/user-legal-tracker-enhanced",
-      color: "bg-orange-500",
-      count: legalTrackers.length
-    }
+
   ];
 
   const getStatusBadge = (status: string) => {
@@ -713,54 +701,7 @@ export default function EnhancedUserPanel() {
                     </CardContent>
                   </Card>
 
-                  {/* Legal Due Diligence */}
-                  <Card className="border-l-4 border-l-orange-500">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="flex items-center text-lg">
-                        <div className="p-2 bg-orange-100 rounded-lg mr-3">
-                          <Scale className="h-5 w-5 text-orange-600" />
-                        </div>
-                        <div>
-                          <div className="text-gray-900">Legal Due Diligence</div>
-                          <div className="text-sm text-gray-500 font-normal">Verification Tracker</div>
-                        </div>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="text-2xl font-bold text-orange-600">
-                              {legalTrackers.length > 0 
-                                ? Math.round((legalTrackers.reduce((acc: number, tracker: any) => 
-                                    acc + (tracker.completedSteps || 0), 0) / (legalTrackers.length * 12)) * 100)
-                                : 0}%
-                              </div>
-                            <div className="text-sm text-gray-600">Average Progress</div>
-                          </div>
-                          <Badge className="bg-orange-50 text-orange-700 border-orange-200">
-                            {legalTrackers.length > 0 ? 'In Progress' : 'No Trackers'}
-                          </Badge>
-                        </div>
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">Active Properties</span>
-                            <span className="font-medium">{legalTrackers.length} Properties</span>
-                          </div>
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">Total Steps</span>
-                            <span className="font-medium text-orange-600">{legalTrackers.length * 12} Steps</span>
-                          </div>
-                        </div>
-                        <Link href="/user-legal-tracker-enhanced" className="block">
-                          <Button className="w-full bg-orange-600 hover:bg-orange-700">
-                            <Activity className="h-4 w-4 mr-2" />
-                            Track Progress
-                          </Button>
-                        </Link>
-                      </div>
-                    </CardContent>
-                  </Card>
+
                 </div>
 
                 {/* Report Summary Card */}
@@ -772,7 +713,7 @@ export default function EnhancedUserPanel() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div className="text-center">
                         <div className="text-3xl font-bold text-blue-600 mb-1">{valuationReports.length + (civilMepStats?.totalReports || 0)}</div>
                         <div className="text-sm text-gray-600">Total Reports</div>
@@ -782,17 +723,8 @@ export default function EnhancedUserPanel() {
                         <div className="text-sm text-gray-600">Total Investment</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-3xl font-bold text-purple-600 mb-1">
-                          {legalTrackers.length > 0 
-                            ? Math.round((legalTrackers.reduce((acc: number, tracker: any) => 
-                                acc + (tracker.completedSteps || 0), 0) / (legalTrackers.length * 12)) * 100)
-                            : 0}%
-                        </div>
-                        <div className="text-sm text-gray-600">Avg Completion</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-orange-600 mb-1">{legalTrackers.length}</div>
-                        <div className="text-sm text-gray-600">Active Trackers</div>
+                        <div className="text-3xl font-bold text-purple-600 mb-1">{userStats.recentActivity}</div>
+                        <div className="text-sm text-gray-600">Recent Activity</div>
                       </div>
                     </div>
                   </CardContent>

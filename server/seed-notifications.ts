@@ -134,13 +134,13 @@ async function createSampleNotifications() {
     {
       userId: null,
       userType: "all" as const,
-      title: "New Feature: Legal Due Diligence Tracker",
-      message: "Track your property legal verification process with our new 12-step legal due diligence tracker.",
+      title: "Platform Enhancement Update",
+      message: "We've updated our property advisory platform with enhanced features and improved user experience.",
       type: "info" as const,
       category: "system" as const,
       priority: "medium" as const,
-      actionUrl: "/user-dashboard/legal-tracker",
-      actionText: "Learn More"
+      actionUrl: "/user-dashboard",
+      actionText: "Explore Updates"
     }
   ];
 
