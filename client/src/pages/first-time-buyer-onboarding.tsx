@@ -160,6 +160,7 @@ export default function FirstTimeBuyerOnboarding() {
         leadType: "warm" as const,
         priority: "high" as const,
         buyerPersona: "first-time-buyer" as const,
+        propertyName: `First-time buyer lead from ${data.customerName}`,
         ...data,
         budgetMin: Math.round(Number(data.budgetMin) * 100), // Convert crores to lakhs for storage
         budgetMax: Math.round(Number(data.budgetMax) * 100), // Convert crores to lakhs for storage

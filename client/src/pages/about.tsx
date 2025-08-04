@@ -9,132 +9,134 @@ import {
   Home,
   Building,
   Handshake,
-  Star
+  Star,
+  AlertTriangle,
+  TrendingUp,
+  Search,
+  Eye,
+  FileText,
+  Phone,
+  Mail
 } from "lucide-react";
 import Header from "@/components/layout/header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
 
 export default function About() {
   const [, navigate] = useLocation();
 
-  const fadeInUp = {
-    initial: { opacity: 0, y: 30 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.6 }
-  };
-
-  const staggerChildren = {
-    animate: {
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
   return (
     <div className="min-h-screen bg-white">
       <Header />
       
-      {/* Promotional Banner */}
-      <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3">
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-center space-x-4 text-sm">
-          <span className="font-semibold">💜 Meet the founders who work for buyers first - never for builders</span>
-          <span>• 100% buyer-focused approach • Zero builder partnerships</span>
-        </div>
-      </div>
-
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-purple-50 via-white to-pink-50 py-20">
-        <div className="max-w-7xl mx-auto px-4">
+      <section className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-20">
+        <div className="max-w-6xl mx-auto px-4">
           <motion.div 
             className="text-center max-w-4xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="mb-6 text-sm px-4 py-2 bg-purple-100 text-purple-800 border border-purple-200 rounded-full inline-block">
-              💜 The only property advisors who work exclusively for buyers
-            </div>
+            <Badge className="mb-6 text-sm px-4 py-2 bg-primary/10 text-primary border-primary/20">
+              🏡 Our Story
+            </Badge>
             
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Meet the team that{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
-                fights for you
+              Built From the Ground,{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-600">
+                For the People
               </span>
             </h1>
             
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
-              Priti and Zaki built OwnItRight with one mission - help buyers make smart property decisions 
-              without builder bias, broker pressure, or hidden agendas.
+            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+              We didn't start with a sales target. We started with a frustration.
             </p>
 
-            {/* Social Proof */}
-            <div className="flex items-center justify-center space-x-8 text-sm text-gray-600 mb-12">
-              <div className="flex items-center space-x-2">
-                <div className="text-purple-500">🚫</div>
-                <span><strong>Zero</strong> builder partnerships</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="text-pink-500">💝</div>
-                <span><strong>100%</strong> buyer-first approach</span>
-              </div>
+            <div className="bg-orange-50 border border-orange-200 rounded-xl p-6 mb-12">
+              <p className="text-lg text-gray-700 leading-relaxed">
+                After helping friends and family navigate the chaos of buying homes — delayed projects, shady titles, 
+                drainage issues, and false promises — we realized something painfully clear:
+              </p>
+              <p className="text-xl font-semibold text-primary mt-4">
+                👉 Buying a property in Bengaluru wasn't hard because of lack of options.<br/>
+                It was hard because no one was truly on the buyer's side.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+              <Button
+                onClick={() => navigate('/consultation')}
+                size="lg"
+                className="bg-gradient-to-r from-primary to-blue-600 hover:shadow-lg text-white px-8 py-4 text-lg font-semibold rounded-xl"
+              >
+                <Shield className="h-5 w-5 mr-2" />
+                Meet Our Founders
+              </Button>
+              
+              <Button
+                onClick={() => navigate('/find-property')}
+                variant="outline"
+                size="lg"
+                className="px-8 py-4 text-lg font-semibold rounded-xl border-2"
+              >
+                <Eye className="h-5 w-5 mr-2" />
+                See Our Approach
+              </Button>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Founders Story */}
-      <section className="py-16">
+      {/* The Journey Section */}
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <motion.div
-            variants={staggerChildren}
-            initial="initial"
-            whileInView="animate"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="grid lg:grid-cols-2 gap-12 items-center"
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
           >
-            {/* Priti's Story */}
-            <motion.div variants={fadeInUp}>
-              <Card className="bg-white/80 backdrop-blur border-0 shadow-lg h-full">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              🌱 From Landscapers to Problem-Solvers
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              We began in the most grounded way possible — quite literally. For 3+ years, we worked hands-on in villa landscaping and post-handover maintenance.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-8 mb-16">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <Card className="h-full bg-red-50 border-red-200">
                 <CardContent className="p-8">
-                  <div className="flex items-center space-x-4 mb-6">
-                    <div className="p-3 bg-pink-100 rounded-xl">
-                      <Heart className="h-6 w-6 text-pink-600" />
-                    </div>
+                  <div className="flex items-start space-x-4">
+                    <AlertTriangle className="h-8 w-8 text-red-600 mt-1" />
                     <div>
-                      <h3 className="text-2xl font-bold text-gray-900">Priti</h3>
-                      <p className="text-pink-600 font-medium">Customer Experience Expert</p>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4 text-gray-700">
-                    <p className="leading-relaxed">
-                      "I believe finding your dream home shouldn't feel like a battle. Every family deserves 
-                      someone who truly listens to their needs and guides them with genuine care."
-                    </p>
-                    
-                    <p className="leading-relaxed">
-                      With years of experience in understanding what makes a house feel like home, 
-                      Priti specializes in translating your dreams into reality. She takes the time to 
-                      understand your lifestyle, preferences, and budget to find properties that truly match your vision.
-                    </p>
-                    
-                    <div className="bg-pink-50 p-4 rounded-lg">
-                      <h4 className="font-semibold text-gray-900 mb-2">Priti's Expertise:</h4>
-                      <ul className="space-y-1 text-sm">
-                        <li className="flex items-center space-x-2">
-                          <CheckCircle className="h-4 w-4 text-pink-600" />
-                          <span>Customer needs analysis & lifestyle matching</span>
+                      <h3 className="text-xl font-bold text-gray-900 mb-4">What We Witnessed</h3>
+                      <ul className="space-y-3 text-gray-700">
+                        <li className="flex items-start space-x-2">
+                          <span className="text-red-500 mt-1">•</span>
+                          <span>Water pooling in ₹4 Cr homes</span>
                         </li>
-                        <li className="flex items-center space-x-2">
-                          <CheckCircle className="h-4 w-4 text-pink-600" />
-                          <span>Property search strategy & personalized recommendations</span>
+                        <li className="flex items-start space-x-2">
+                          <span className="text-red-500 mt-1">•</span>
+                          <span>Poor quality RCC in "premium" villas</span>
                         </li>
-                        <li className="flex items-center space-x-2">
-                          <CheckCircle className="h-4 w-4 text-pink-600" />
-                          <span>Buyer advocacy & negotiation support</span>
+                        <li className="flex items-start space-x-2">
+                          <span className="text-red-500 mt-1">•</span>
+                          <span>OC delays despite "100% compliance" claims</span>
+                        </li>
+                        <li className="flex items-start space-x-2">
+                          <span className="text-red-500 mt-1">•</span>
+                          <span>Builder silence once full payment was done</span>
                         </li>
                       </ul>
                     </div>
@@ -143,313 +145,334 @@ export default function About() {
               </Card>
             </motion.div>
 
-            {/* Zaki's Story */}
-            <motion.div variants={fadeInUp}>
-              <Card className="bg-white/80 backdrop-blur border-0 shadow-lg h-full">
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <Card className="h-full bg-blue-50 border-blue-200">
                 <CardContent className="p-8">
-                  <div className="flex items-center space-x-4 mb-6">
-                    <div className="p-3 bg-blue-100 rounded-xl">
-                      <Building className="h-6 w-6 text-blue-600" />
-                    </div>
+                  <div className="flex items-start space-x-4">
+                    <Shield className="h-8 w-8 text-blue-600 mt-1" />
                     <div>
-                      <h3 className="text-2xl font-bold text-gray-900">Zaki</h3>
-                      <p className="text-blue-600 font-medium">Technical Operations & Quality Expert</p>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4 text-gray-700">
-                    <p className="leading-relaxed">
-                      "Every property has a story written in its structure, compliance, and construction quality. 
-                      My job is to read that story and make sure it's one our clients want to be part of."
-                    </p>
-                    
-                    <p className="leading-relaxed">
-                      Zaki brings deep technical expertise in construction, vendor management, and team operations. 
-                      He ensures every property recommendation is backed by thorough technical evaluation and 
-                      manages the complex network of inspectors, legal experts, and industry professionals.
-                    </p>
-                    
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                      <h4 className="font-semibold text-gray-900 mb-2">Zaki's Expertise:</h4>
-                      <ul className="space-y-1 text-sm">
-                        <li className="flex items-center space-x-2">
-                          <CheckCircle className="h-4 w-4 text-blue-600" />
-                          <span>Civil engineering insights & structural analysis</span>
-                        </li>
-                        <li className="flex items-center space-x-2">
-                          <CheckCircle className="h-4 w-4 text-blue-600" />
-                          <span>Vendor network management & quality control</span>
-                        </li>
-                        <li className="flex items-center space-x-2">
-                          <CheckCircle className="h-4 w-4 text-blue-600" />
-                          <span>Team coordination & operational excellence</span>
-                        </li>
-                      </ul>
+                      <h3 className="text-xl font-bold text-gray-900 mb-4">Our Realization</h3>
+                      <p className="text-gray-700 leading-relaxed mb-4">
+                        This wasn't just poor service. It was a systematic gap in buyer protection and guidance.
+                      </p>
+                      <p className="text-lg font-semibold text-blue-600">
+                        That's when we stepped in.
+                      </p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </motion.div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Our Story */}
-      <section className="py-16 bg-white/60 backdrop-blur">
-        <div className="max-w-4xl mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              How OwnItRight Began
-            </h2>
-            <p className="text-lg text-gray-600 leading-relaxed">
-              A shared frustration with the property industry led to a revolutionary approach.
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="prose prose-lg max-w-none text-gray-700"
-          >
-            <div className="bg-white/80 backdrop-blur rounded-2xl p-8 shadow-lg">
-              <p className="text-lg leading-relaxed mb-6">
-                It started with a simple observation: <strong>the property industry was broken</strong>. 
-                Builders focused on selling, agents focused on commissions, and buyers? They were left 
-                to navigate a maze of information, hidden costs, and biased advice.
-              </p>
-              
-              <p className="text-lg leading-relaxed mb-6">
-                Priti, with her deep understanding of customer psychology and needs, kept seeing families 
-                make expensive mistakes because they didn't have someone truly advocating for them. 
-                Meanwhile, Zaki, with his technical background and industry connections, witnessed how 
-                crucial technical details were being overlooked in property decisions.
-              </p>
-              
-              <p className="text-lg leading-relaxed mb-6">
-                <strong>That's when we decided to flip the script.</strong> What if there was a service 
-                that worked exclusively for buyers? What if technical expertise and customer care could 
-                come together to create something genuinely different?
-              </p>
-              
-              <p className="text-lg leading-relaxed">
-                OwnItRight was born from this vision - a place where Priti's customer-first approach 
-                meets Zaki's technical excellence, where we critique builder properties not to sell them, 
-                but to help you make the right decision for your family's future.
-              </p>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Our Approach */}
-      <section className="py-16">
+      {/* Solution Section */}
+      <section className="py-16 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-12"
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              Why We're Different
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              🛠️ So We Built the Bridge We Wish We Had
             </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              We don't work for builders. We don't work for developers. We work for you - the buyer.
+            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
+              We combined our on-ground experience with deep research into legal, civil, MEP, and infrastructure risks. 
+              From that, we launched a new kind of real estate service — not one that just lists properties, but one that questions, verifies, and protects.
             </p>
           </motion.div>
 
-          <motion.div
-            variants={staggerChildren}
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-            className="grid md:grid-cols-3 gap-8"
-          >
-            <motion.div variants={fadeInUp}>
-              <Card className="bg-white/80 backdrop-blur border-0 shadow-lg h-full text-center">
-                <CardContent className="p-8">
-                  <div className="flex justify-center mb-4">
-                    <div className="p-4 bg-red-100 rounded-xl">
-                      <Shield className="h-8 w-8 text-red-600" />
-                    </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                icon: FileText,
+                title: "Legal Standing",
+                description: "RERA, EC, Khata, encumbrance verification",
+                color: "text-green-600 bg-green-100"
+              },
+              {
+                icon: Building,
+                title: "Civil & MEP Quality", 
+                description: "Drainage, design defects, slope failures analysis",
+                color: "text-blue-600 bg-blue-100"
+              },
+              {
+                icon: Home,
+                title: "Infrastructure Readiness",
+                description: "Water source, UDS, zoning risks assessment",
+                color: "text-purple-600 bg-purple-100"
+              },
+              {
+                icon: TrendingUp,
+                title: "Builder Track Record",
+                description: "Financial stability — not just marketing gloss",
+                color: "text-orange-600 bg-orange-100"
+              }
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+              >
+                <Card className="h-full text-center p-6 border-0 shadow-lg">
+                  <div className={`w-16 h-16 rounded-2xl ${item.color} flex items-center justify-center mx-auto mb-4`}>
+                    <item.icon className="h-8 w-8" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">Buyer-First Philosophy</h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    We're not here to sell you a property. We're here to help you find the right one. 
-                    Our loyalty is to you, not to builders or developers.
-                  </p>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            <motion.div variants={fadeInUp}>
-              <Card className="bg-white/80 backdrop-blur border-0 shadow-lg h-full text-center">
-                <CardContent className="p-8">
-                  <div className="flex justify-center mb-4">
-                    <div className="p-4 bg-green-100 rounded-xl">
-                      <Target className="h-8 w-8 text-green-600" />
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">Critical Analysis</h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    We critique every property with the same scrutiny we'd use for our own family's purchase. 
-                    No sugar-coating, no hidden agendas.
-                  </p>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            <motion.div variants={fadeInUp}>
-              <Card className="bg-white/80 backdrop-blur border-0 shadow-lg h-full text-center">
-                <CardContent className="p-8">
-                  <div className="flex justify-center mb-4">
-                    <div className="p-4 bg-purple-100 rounded-xl">
-                      <Award className="h-8 w-8 text-purple-600" />
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">Technical Excellence</h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    Every recommendation is backed by thorough technical evaluation, legal verification, 
-                    and market analysis. No guesswork.
-                  </p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </motion.div>
+                  <h3 className="font-bold text-gray-900 mb-2">{item.title}</h3>
+                  <p className="text-gray-600 text-sm">{item.description}</p>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Values */}
-      <section className="py-16 bg-white/60 backdrop-blur">
-        <div className="max-w-4xl mx-auto px-4">
+      {/* Not Agents, Advisors Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-6xl mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-12"
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              What Drives Us Every Day
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              💡 Not Agents. Advisors.
             </h2>
+            <p className="text-xl text-gray-600 mb-8">
+              We're not here to convince you to buy.
+            </p>
           </motion.div>
 
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">We're here to show you:</h3>
+              <div className="space-y-4">
+                {[
+                  "✅ What the builder won't tell you",
+                  "✅ What the brochure hides",
+                  "✅ What most buyers regret finding out too late"
+                ].map((item, index) => (
+                  <div key={index} className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <CheckCircle className="h-5 w-5 text-green-600" />
+                    </div>
+                    <span className="text-lg text-gray-700">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8">
+                <p className="text-lg text-gray-700 mb-6">
+                  You won't see "hot deals" or sales pressure here.
+                </p>
+                <h4 className="text-xl font-bold text-gray-900 mb-4">What you'll see is:</h4>
+                <ul className="space-y-3">
+                  {[
+                    "Civil/MEP audit reports",
+                    "Legal clarity checklists", 
+                    "Custom 'buyer-fit' reports",
+                    "Property walkthroughs with zero bias"
+                  ].map((item, index) => (
+                    <li key={index} className="flex items-center space-x-3">
+                      <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                      <span className="text-gray-700">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Why This Matters Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4">
           <motion.div
-            variants={staggerChildren}
-            initial="initial"
-            whileInView="animate"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="grid md:grid-cols-2 gap-8"
+            transition={{ duration: 0.6 }}
           >
-            <motion.div variants={fadeInUp}>
-              <div className="flex items-start space-x-4">
-                <div className="p-3 bg-primary/10 rounded-lg flex-shrink-0">
-                  <Handshake className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Transparency First</h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    Every property analysis, every cost breakdown, every recommendation comes with 
-                    complete transparency. You know exactly what you're getting and why.
-                  </p>
-                </div>
+            <Card className="bg-white border-0 shadow-xl p-8 lg:p-12">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                  💬 Why This Matters
+                </h2>
+                <p className="text-xl text-gray-600">
+                  In an unregulated ocean of agents and portals, buyers need a compass — not just a map.
+                </p>
               </div>
-            </motion.div>
 
-            <motion.div variants={fadeInUp}>
-              <div className="flex items-start space-x-4">
-                <div className="p-3 bg-primary/10 rounded-lg flex-shrink-0">
-                  <Users className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Personal Touch</h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    We treat every client like family. Your dreams become our mission, 
-                    and your success is our greatest reward.
-                  </p>
-                </div>
+              <div className="grid md:grid-cols-3 gap-8">
+                {[
+                  {
+                    icon: Heart,
+                    title: "Young Couples",
+                    description: "Buying your first villa with confidence"
+                  },
+                  {
+                    icon: Users,
+                    title: "NRI Investors", 
+                    description: "Planning a safe retirement home investment"
+                  },
+                  {
+                    icon: Target,
+                    title: "Cautious Investors",
+                    description: "Wondering if the ROI is actually real"
+                  }
+                ].map((buyer, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    className="text-center"
+                  >
+                    <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <buyer.icon className="h-8 w-8 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{buyer.title}</h3>
+                    <p className="text-gray-600">{buyer.description}</p>
+                  </motion.div>
+                ))}
               </div>
-            </motion.div>
 
-            <motion.div variants={fadeInUp}>
-              <div className="flex items-start space-x-4">
-                <div className="p-3 bg-primary/10 rounded-lg flex-shrink-0">
-                  <Star className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Excellence Always</h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    We don't compromise on quality - not in our analysis, not in our service, 
-                    and not in our recommendations. You deserve nothing less.
-                  </p>
-                </div>
+              <div className="text-center mt-12">
+                <p className="text-xl font-semibold text-primary mb-6">
+                  We exist for you. To make homebuying clear, grounded, and safe.
+                </p>
+                <Button
+                  onClick={() => navigate('/first-time-buyer')}
+                  size="lg"
+                  className="bg-gradient-to-r from-primary to-blue-600 hover:shadow-lg text-white px-8 py-4 text-lg font-semibold rounded-xl"
+                >
+                  Start Your Protected Home Search
+                </Button>
               </div>
-            </motion.div>
-
-            <motion.div variants={fadeInUp}>
-              <div className="flex items-start space-x-4">
-                <div className="p-3 bg-primary/10 rounded-lg flex-shrink-0">
-                  <Home className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Long-term Partnership</h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    We're not just here for the transaction. We're here for your entire property journey, 
-                    providing support and guidance whenever you need it.
-                  </p>
-                </div>
-              </div>
-            </motion.div>
+            </Card>
           </motion.div>
         </div>
       </section>
 
-      {/* Call to Action */}
-      <section className="py-16">
+      {/* Impact Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-6xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              🚀 The Impact So Far
+            </h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: TrendingUp,
+                number: "₹100+ Cr",
+                title: "Worth of Real Estate Decisions",
+                description: "Helped families make informed property investments"
+              },
+              {
+                icon: Shield,
+                number: "20+",
+                title: "Unsafe Projects Flagged",
+                description: "Identified legally risky or structurally unsafe projects"
+              },
+              {
+                icon: Users,
+                number: "Growing",
+                title: "Community of Trust",
+                description: "Buyers who refer us because we tell the truth, not because we sell"
+              }
+            ].map((stat, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+              >
+                <Card className="text-center p-8 border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50">
+                  <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <stat.icon className="h-8 w-8 text-white" />
+                  </div>
+                  <div className="text-3xl font-bold text-primary mb-2">{stat.number}</div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{stat.title}</h3>
+                  <p className="text-gray-600">{stat.description}</p>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 bg-gradient-to-br from-primary to-blue-600 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.6 }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              Ready to Experience the Difference?
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              Ready to Experience Buyer-First Property Advisory?
             </h2>
-            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-              Let Priti and Zaki guide you to your perfect property. Because when you own it right, 
-              you own it with confidence.
+            <p className="text-xl mb-8 opacity-90">
+              Join hundreds of families who chose truth over sales pitches
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
-                onClick={() => navigate('/find-property')}
+                onClick={() => navigate('/consultation')}
                 size="lg"
-                className="bg-gradient-to-r from-primary to-primary/80 hover:shadow-lg text-white px-8 py-3 text-lg font-semibold rounded-xl"
-                data-testid="button-find-property"
+                variant="secondary"
+                className="px-8 py-4 text-lg font-semibold rounded-xl"
               >
-                <Home className="h-5 w-5 mr-2" />
-                Find Your Dream Home
+                <Phone className="h-5 w-5 mr-2" />
+                Schedule a Call
               </Button>
               
               <Button
-                onClick={() => navigate('/contact')}
-                variant="outline"
+                onClick={() => navigate('/find-property')}
                 size="lg"
-                className="px-8 py-3 text-lg font-semibold rounded-xl"
-                data-testid="button-contact-us"
+                variant="outline"
+                className="px-8 py-4 text-lg font-semibold rounded-xl border-2 border-white text-white hover:bg-white hover:text-primary"
               >
-                <Users className="h-5 w-5 mr-2" />
-                Talk to Us
+                <Search className="h-5 w-5 mr-2" />
+                Start Property Search
               </Button>
             </div>
           </motion.div>

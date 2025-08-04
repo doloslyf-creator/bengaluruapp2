@@ -466,7 +466,7 @@ export const leads = pgTable("leads", {
   
   // Legacy fields for backward compatibility
   propertyId: varchar("property_id").references(() => properties.id),
-  propertyName: text("property_name").notNull(),
+  propertyName: text("property_name"),
   interestedConfiguration: text("interested_configuration"), // Specific BHK/configuration
   budgetRange: text("budget_range"), // e.g., "50L-1Cr", "1Cr-2Cr" - legacy field
   
