@@ -177,6 +177,7 @@ export default function ValuationReportEditComprehensive() {
     const updateData = {
       // Basic Information
       reportTitle: formData.get("reportTitle") as string,
+      propertyId: formData.get("propertyId") as string,
       reportStatus: formData.get("reportStatus") as string,
       assignedTo: formData.get("assignedTo") as string,
       
@@ -372,6 +373,21 @@ export default function ValuationReportEditComprehensive() {
                     defaultValue={report.reportTitle}
                     required
                   />
+                </div>
+                <div>
+                  <Label htmlFor="propertyId">Property *</Label>
+                  <Select name="propertyId" defaultValue={report.propertyId} required>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select property" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {properties.map((property) => (
+                        <SelectItem key={property.id} value={property.id}>
+                          {property.name} - {property.location}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label htmlFor="reportStatus">Status</Label>

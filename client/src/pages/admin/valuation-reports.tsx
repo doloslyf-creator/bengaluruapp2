@@ -699,8 +699,14 @@ function CustomerAssignmentDialog({
   // Handle customer removal
   const handleRemoveCustomer = async (customerId: string) => {
     try {
-      const response = await fetch(`/api/valuation-reports/${reportId}/customers/${customerId}`, {
+      const response = await fetch(`/api/valuation-reports/${reportId}/customers`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customerIds: [customerId]
+        }),
       });
 
       if (response.ok) {
