@@ -518,23 +518,23 @@ export default function CustomerAccount() {
                           </div>
                           <div>
                             <h3 className="font-bold text-xl text-gray-900">
-                              {('propertyName' in report && report.propertyName) || 
-                               (isCivilMep ? 'Civil & MEP Engineering Report' : 'Property Valuation Report')}
+                              {isCivilMep ? 
+                                (('projectName' in reportData && reportData.projectName) || 'Civil & MEP Engineering Report') :
+                                (('propertyName' in reportData && reportData.propertyName) || 'Property Valuation Report')
+                              }
                             </h3>
                             <p className="text-gray-600 font-medium">
                               {isCivilMep ? 'Civil & MEP Engineering Analysis' : 'Property Valuation Assessment'}
                             </p>
                             <div className="flex items-center space-x-4 mt-1">
                               <p className="text-sm text-gray-500 flex items-center">
+                                <MapPin className="h-4 w-4 mr-1" />
+                                {('location' in reportData && reportData.location) || 'Location not specified'}
+                              </p>
+                              <p className="text-sm text-gray-500 flex items-center">
                                 <Calendar className="h-4 w-4 mr-1" />
                                 Created {report.createdAt ? new Date(report.createdAt).toLocaleDateString() : 'Unknown date'}
                               </p>
-                              {('propertyId' in report && report.propertyId) && (
-                                <p className="text-sm text-gray-500 flex items-center">
-                                  <MapPin className="h-4 w-4 mr-1" />
-                                  Property ID: {report.propertyId.slice(0, 8)}...
-                                </p>
-                              )}
                             </div>
                           </div>
                         </div>
@@ -651,20 +651,18 @@ export default function CustomerAccount() {
                       </div>
                       <div>
                         <h3 className="font-bold text-xl text-gray-900">
-                          {('propertyName' in report && report.propertyName) || 'Civil & MEP Engineering Report'}
+                          {('projectName' in report && report.projectName) || 'Civil & MEP Engineering Report'}
                         </h3>
                         <p className="text-green-600 font-medium">Civil & MEP Engineering Analysis</p>
                         <div className="flex items-center space-x-4 mt-1">
                           <p className="text-sm text-gray-500 flex items-center">
+                            <MapPin className="h-4 w-4 mr-1" />
+                            {('location' in report && report.location) || 'Location not specified'}
+                          </p>
+                          <p className="text-sm text-gray-500 flex items-center">
                             <Calendar className="h-4 w-4 mr-1" />
                             Created {report.createdAt ? new Date(report.createdAt).toLocaleDateString() : 'Unknown date'}
                           </p>
-                          {report.propertyId && (
-                            <p className="text-sm text-gray-500 flex items-center">
-                              <MapPin className="h-4 w-4 mr-1" />
-                              Property ID: {report.propertyId.slice(0, 8)}...
-                            </p>
-                          )}
                         </div>
                       </div>
                     </div>
@@ -762,15 +760,13 @@ export default function CustomerAccount() {
                         <p className="text-purple-600 font-medium">Property Valuation Assessment</p>
                         <div className="flex items-center space-x-4 mt-1">
                           <p className="text-sm text-gray-500 flex items-center">
+                            <MapPin className="h-4 w-4 mr-1" />
+                            {('location' in report && report.location) || 'Location not specified'}
+                          </p>
+                          <p className="text-sm text-gray-500 flex items-center">
                             <Calendar className="h-4 w-4 mr-1" />
                             Created {report.createdAt ? new Date(report.createdAt).toLocaleDateString() : 'Unknown date'}
                           </p>
-                          {report.propertyId && (
-                            <p className="text-sm text-gray-500 flex items-center">
-                              <MapPin className="h-4 w-4 mr-1" />
-                              Property ID: {report.propertyId.slice(0, 8)}...
-                            </p>
-                          )}
                         </div>
                       </div>
                     </div>
