@@ -1634,8 +1634,18 @@ export class DatabaseStorage implements IStorage {
 
   // Lead activities
   async addLeadActivity(insertActivity: InsertLeadActivity): Promise<LeadActivity> {
+    const activityData = {
+      ...insertActivity,
+      attendees: insertActivity.attendees || [],
+      attachments: insertActivity.attachments || [],
+      duration: insertActivity.duration || null,
+      scheduledAt: insertActivity.scheduledAt || null,
+      completedAt: insertActivity.completedAt || null,
+      nextAction: insertActivity.nextAction || null
+    };
+    
     const [activity] = await db.insert(leadActivities)
-      .values(insertActivity)
+      .values(activityData)
       .returning();
     return activity;
   }

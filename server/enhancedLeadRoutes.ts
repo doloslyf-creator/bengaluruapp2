@@ -57,6 +57,12 @@ export function registerEnhancedLeadRoutes(app: Express) {
         description: `Persona: ${lead.buyerPersona}, Urgency: ${lead.urgency}, Budget: ₹${lead.budgetMin}L-₹${lead.budgetMax}L`,
         outcome: "positive",
         performedBy: req.body.createdBy || "admin",
+        attendees: [],
+        attachments: [],
+        duration: null,
+        scheduledAt: null,
+        completedAt: null,
+        nextAction: null
       });
 
       console.log(`🎯 Enhanced lead created: ${lead.leadId} (${lead.buyerPersona})`);
