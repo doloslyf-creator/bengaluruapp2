@@ -122,6 +122,16 @@ export default function CustomerHome() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Button
+                onClick={() => navigate('/first-time-buyer')}
+                size="lg"
+                className="bg-gradient-to-r from-orange-500 to-red-600 hover:shadow-lg text-white px-8 py-4 text-lg font-semibold rounded-xl border-2 border-orange-400"
+                data-testid="button-first-time-buyer"
+              >
+                <Sparkles className="h-5 w-5 mr-2" />
+                First-Time Buyer? Start Here →
+              </Button>
+              
+              <Button
                 onClick={() => navigate('/find-property')}
                 size="lg"
                 className="bg-gradient-to-r from-primary to-blue-600 hover:shadow-lg text-white px-8 py-4 text-lg font-semibold rounded-xl"

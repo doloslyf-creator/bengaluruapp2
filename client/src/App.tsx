@@ -46,6 +46,7 @@ import About from "@/pages/about";
 import LeadsPage from "@/pages/leads";
 import FAQ from "@/pages/faq";
 import ReportDocumentation from "@/pages/report-documentation";
+import FirstTimeBuyerOnboarding from "@/pages/first-time-buyer-onboarding";
 
 import AdminSettings from "@/pages/admin/settings";
 import TeamManagement from "@/pages/admin/team-management";
@@ -160,6 +161,9 @@ function ProtectedRouter() {
       {/* Help & Support */}
       <Route path="/faq" component={FAQ} />
       <Route path="/report-documentation" component={ReportDocumentation} />
+      
+      {/* Onboarding */}
+      <Route path="/first-time-buyer" component={FirstTimeBuyerOnboarding} />
 
       
       <Route component={NotFound} />
