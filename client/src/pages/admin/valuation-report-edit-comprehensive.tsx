@@ -18,10 +18,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Save, FileText, Calculator, TrendingUp, MapPin, Shield, Home, DollarSign, Building, Scale } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ArrowLeft, Save, FileText, Calculator, TrendingUp, MapPin, Shield, Home, DollarSign, Building, Scale, Plus, Edit, Trash2, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import type { PropertyValuationReport, Property } from "@shared/schema";
+import type { PropertyValuationReport, Property, PropertyValuationReportConfiguration } from "@shared/schema";
 
 export default function ValuationReportEditComprehensive() {
   const [, params] = useRoute("/admin-panel/valuation-reports/edit/:id");
@@ -29,6 +30,8 @@ export default function ValuationReportEditComprehensive() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const reportId = params?.id;
+  const [showAddConfigDialog, setShowAddConfigDialog] = useState(false);
+  const [editingConfig, setEditingConfig] = useState<PropertyValuationReportConfiguration | null>(null);
 
   // Fetch valuation report
   const { data: report, isLoading } = useQuery<PropertyValuationReport>({
@@ -39,6 +42,12 @@ export default function ValuationReportEditComprehensive() {
   // Fetch properties for dropdown
   const { data: properties = [] } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
+  });
+
+  // Fetch configurations for this report
+  const { data: configurations = [], refetch: refetchConfigurations } = useQuery<PropertyValuationReportConfiguration[]>({
+    queryKey: ["/api/valuation-reports", reportId, "configurations"],
+    enabled: !!reportId,
   });
 
   // Update report mutation
@@ -58,6 +67,89 @@ export default function ValuationReportEditComprehensive() {
       toast({
         title: "Error",
         description: error.message || "Failed to update valuation report",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Configuration mutations
+  const createConfigMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await apiRequest(`/api/valuation-reports/${reportId}/configurations`, "POST", data);
+    },
+    onSuccess: () => {
+      refetchConfigurations();
+      setShowAddConfigDialog(false);
+      toast({
+        title: "Success",
+        description: "Property configuration created successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create configuration",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateConfigMutation = useMutation({
+    mutationFn: async ({ configId, data }: { configId: string; data: any }) => {
+      return await apiRequest(`/api/valuation-reports/${reportId}/configurations/${configId}`, "PUT", data);
+    },
+    onSuccess: () => {
+      refetchConfigurations();
+      setEditingConfig(null);
+      toast({
+        title: "Success",
+        description: "Property configuration updated successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update configuration",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteConfigMutation = useMutation({
+    mutationFn: async (configId: string) => {
+      return await apiRequest(`/api/valuation-reports/${reportId}/configurations/${configId}`, "DELETE");
+    },
+    onSuccess: () => {
+      refetchConfigurations();
+      toast({
+        title: "Success",
+        description: "Property configuration deleted successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete configuration",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const setPrimaryConfigMutation = useMutation({
+    mutationFn: async (configId: string) => {
+      return await apiRequest(`/api/valuation-reports/${reportId}/configurations/${configId}/set-primary`, "PATCH");
+    },
+    onSuccess: () => {
+      refetchConfigurations();
+      toast({
+        title: "Success",
+        description: "Primary configuration updated successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to set primary configuration",
         variant: "destructive",
       });
     },
@@ -236,7 +328,7 @@ export default function ValuationReportEditComprehensive() {
 
         <form onSubmit={handleSubmit} className="max-w-full">
           <Tabs defaultValue="executive" className="w-full">
-            <TabsList className="grid grid-cols-3 sm:grid-cols-6 w-full gap-1">
+            <TabsList className="grid grid-cols-3 sm:grid-cols-7 w-full gap-1">
               <TabsTrigger value="executive" className="flex items-center text-xs">
                 <FileText className="h-3 w-3 mr-1" />
                 Executive
@@ -244,6 +336,10 @@ export default function ValuationReportEditComprehensive() {
               <TabsTrigger value="property" className="flex items-center text-xs">
                 <Home className="h-3 w-3 mr-1" />
                 Property
+              </TabsTrigger>
+              <TabsTrigger value="configurations" className="flex items-center text-xs">
+                <Building className="h-3 w-3 mr-1" />
+                Configs
               </TabsTrigger>
               <TabsTrigger value="market" className="flex items-center text-xs">
                 <TrendingUp className="h-3 w-3 mr-1" />
@@ -534,6 +630,150 @@ export default function ValuationReportEditComprehensive() {
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* 2.5 Property Configurations */}
+            <TabsContent value="configurations">
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <Building className="h-5 w-5 mr-2" />
+                        Property Configurations
+                      </div>
+                      <Button 
+                        type="button"
+                        onClick={() => setShowAddConfigDialog(true)}
+                        size="sm"
+                        data-testid="button-add-configuration"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Configuration
+                      </Button>
+                    </CardTitle>
+                    <CardDescription>
+                      Manage multiple property configurations (3BHK, 4BHK, etc.) with specific metadata
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {configurations.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <Building className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p>No configurations added yet</p>
+                        <p className="text-sm">Add configurations to specify different property types and their details</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {configurations.map((config) => (
+                          <Card key={config.id} className={`relative ${config.isPrimary ? 'ring-2 ring-primary' : ''}`}>
+                            {config.isPrimary && (
+                              <Badge className="absolute top-2 right-2" variant="default">
+                                <Star className="h-3 w-3 mr-1" />
+                                Primary
+                              </Badge>
+                            )}
+                            <CardHeader className="pb-3">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <CardTitle className="text-lg">{config.configurationType}</CardTitle>
+                                  {config.configurationName && (
+                                    <CardDescription>{config.configurationName}</CardDescription>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  {!config.isPrimary && (
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => setPrimaryConfigMutation.mutate(config.id)}
+                                      data-testid={`button-set-primary-${config.id}`}
+                                    >
+                                      <Star className="h-3 w-3 mr-1" />
+                                      Set Primary
+                                    </Button>
+                                  )}
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setEditingConfig(config)}
+                                    data-testid={`button-edit-config-${config.id}`}
+                                  >
+                                    <Edit className="h-3 w-3 mr-1" />
+                                    Edit
+                                  </Button>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => deleteConfigMutation.mutate(config.id)}
+                                    data-testid={`button-delete-config-${config.id}`}
+                                  >
+                                    <Trash2 className="h-3 w-3 mr-1" />
+                                    Delete
+                                  </Button>
+                                </div>
+                              </div>
+                            </CardHeader>
+                            <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                              {config.builtUpArea && (
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">Built-up Area</Label>
+                                  <p className="font-medium">{config.builtUpArea} sq.ft</p>
+                                </div>
+                              )}
+                              {config.plotArea && (
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">Plot Area</Label>
+                                  <p className="font-medium">{config.plotArea} sq.ft</p>
+                                </div>
+                              )}
+                              {config.udsShare && (
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">UDS Share</Label>
+                                  <p className="font-medium">{config.udsShare} sq.ft</p>
+                                </div>
+                              )}
+                              {config.totalPrice && (
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">Total Price</Label>
+                                  <p className="font-medium">₹{config.totalPrice}</p>
+                                </div>
+                              )}
+                              {config.numberOfBedrooms && (
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">Bedrooms</Label>
+                                  <p className="font-medium">{config.numberOfBedrooms}</p>
+                                </div>
+                              )}
+                              {config.numberOfBathrooms && (
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">Bathrooms</Label>
+                                  <p className="font-medium">{config.numberOfBathrooms}</p>
+                                </div>
+                              )}
+                              {config.facing && (
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">Facing</Label>
+                                  <p className="font-medium">{config.facing}</p>
+                                </div>
+                              )}
+                              {config.floorNumber && (
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">Floor</Label>
+                                  <p className="font-medium">{config.floorNumber}</p>
+                                </div>
+                              )}
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
 
             {/* 3. Market Valuation */}
@@ -1165,6 +1405,327 @@ Project resale cycle still slow"
           </div>
         </form>
       </div>
+
+      {/* Add Configuration Dialog */}
+      <Dialog open={showAddConfigDialog} onOpenChange={setShowAddConfigDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Add Property Configuration</DialogTitle>
+            <DialogDescription>
+              Add a new property configuration with specific details like BUA, plot area, and UDS share.
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              const data = {
+                configurationType: formData.get("configurationType"),
+                configurationName: formData.get("configurationName"),
+                builtUpArea: formData.get("builtUpArea") ? parseFloat(formData.get("builtUpArea") as string) : null,
+                plotArea: formData.get("plotArea") ? parseFloat(formData.get("plotArea") as string) : null,
+                udsShare: formData.get("udsShare") ? parseFloat(formData.get("udsShare") as string) : null,
+                totalPrice: formData.get("totalPrice") || null,
+                numberOfBedrooms: formData.get("numberOfBedrooms") ? parseInt(formData.get("numberOfBedrooms") as string) : null,
+                numberOfBathrooms: formData.get("numberOfBathrooms") ? parseInt(formData.get("numberOfBathrooms") as string) : null,
+                facing: formData.get("facing") || null,
+                floorNumber: formData.get("floorNumber") ? parseInt(formData.get("floorNumber") as string) : null,
+                isPrimary: configurations.length === 0, // First config is automatically primary
+              };
+              createConfigMutation.mutate(data);
+            }}
+            className="space-y-4"
+          >
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="configurationType">Configuration Type *</Label>
+                <Select name="configurationType" required>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1BHK">1BHK</SelectItem>
+                    <SelectItem value="2BHK">2BHK</SelectItem>
+                    <SelectItem value="3BHK">3BHK</SelectItem>
+                    <SelectItem value="4BHK">4BHK</SelectItem>
+                    <SelectItem value="5BHK">5BHK</SelectItem>
+                    <SelectItem value="Villa">Villa</SelectItem>
+                    <SelectItem value="Penthouse">Penthouse</SelectItem>
+                    <SelectItem value="Studio">Studio</SelectItem>
+                    <SelectItem value="Plot">Plot</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="configurationName">Configuration Name</Label>
+                <Input
+                  name="configurationName"
+                  placeholder="e.g., Premium East Facing"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="builtUpArea">Built-up Area (sq.ft)</Label>
+                <Input
+                  name="builtUpArea"
+                  type="number"
+                  step="0.01"
+                  placeholder="1550"
+                />
+              </div>
+              <div>
+                <Label htmlFor="plotArea">Plot Area (sq.ft)</Label>
+                <Input
+                  name="plotArea"
+                  type="number"
+                  step="0.01"
+                  placeholder="3000"
+                />
+              </div>
+              <div>
+                <Label htmlFor="udsShare">UDS Share (sq.ft)</Label>
+                <Input
+                  name="udsShare"
+                  type="number"
+                  step="0.01"
+                  placeholder="1260"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="totalPrice">Total Price</Label>
+                <Input
+                  name="totalPrice"
+                  placeholder="₹2.5 Cr"
+                />
+              </div>
+              <div>
+                <Label htmlFor="facing">Facing</Label>
+                <Select name="facing">
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select facing" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="North">North</SelectItem>
+                    <SelectItem value="South">South</SelectItem>
+                    <SelectItem value="East">East</SelectItem>
+                    <SelectItem value="West">West</SelectItem>
+                    <SelectItem value="North-East">North-East</SelectItem>
+                    <SelectItem value="North-West">North-West</SelectItem>
+                    <SelectItem value="South-East">South-East</SelectItem>
+                    <SelectItem value="South-West">South-West</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="numberOfBedrooms">Bedrooms</Label>
+                <Input
+                  name="numberOfBedrooms"
+                  type="number"
+                  placeholder="3"
+                />
+              </div>
+              <div>
+                <Label htmlFor="numberOfBathrooms">Bathrooms</Label>
+                <Input
+                  name="numberOfBathrooms"
+                  type="number"
+                  placeholder="2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="floorNumber">Floor Number</Label>
+                <Input
+                  name="floorNumber"
+                  type="number"
+                  placeholder="5"
+                />
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setShowAddConfigDialog(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={createConfigMutation.isPending}>
+                {createConfigMutation.isPending ? "Adding..." : "Add Configuration"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Configuration Dialog */}
+      <Dialog open={!!editingConfig} onOpenChange={() => setEditingConfig(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Property Configuration</DialogTitle>
+            <DialogDescription>
+              Update the property configuration details.
+            </DialogDescription>
+          </DialogHeader>
+          {editingConfig && (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const data = {
+                  configurationType: formData.get("configurationType"),
+                  configurationName: formData.get("configurationName"),
+                  builtUpArea: formData.get("builtUpArea") ? parseFloat(formData.get("builtUpArea") as string) : null,
+                  plotArea: formData.get("plotArea") ? parseFloat(formData.get("plotArea") as string) : null,
+                  udsShare: formData.get("udsShare") ? parseFloat(formData.get("udsShare") as string) : null,
+                  totalPrice: formData.get("totalPrice") || null,
+                  numberOfBedrooms: formData.get("numberOfBedrooms") ? parseInt(formData.get("numberOfBedrooms") as string) : null,
+                  numberOfBathrooms: formData.get("numberOfBathrooms") ? parseInt(formData.get("numberOfBathrooms") as string) : null,
+                  facing: formData.get("facing") || null,
+                  floorNumber: formData.get("floorNumber") ? parseInt(formData.get("floorNumber") as string) : null,
+                };
+                updateConfigMutation.mutate({ configId: editingConfig.id, data });
+              }}
+              className="space-y-4"
+            >
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="configurationType">Configuration Type *</Label>
+                  <Select name="configurationType" defaultValue={editingConfig.configurationType} required>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1BHK">1BHK</SelectItem>
+                      <SelectItem value="2BHK">2BHK</SelectItem>
+                      <SelectItem value="3BHK">3BHK</SelectItem>
+                      <SelectItem value="4BHK">4BHK</SelectItem>
+                      <SelectItem value="5BHK">5BHK</SelectItem>
+                      <SelectItem value="Villa">Villa</SelectItem>
+                      <SelectItem value="Penthouse">Penthouse</SelectItem>
+                      <SelectItem value="Studio">Studio</SelectItem>
+                      <SelectItem value="Plot">Plot</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="configurationName">Configuration Name</Label>
+                  <Input
+                    name="configurationName"
+                    defaultValue={editingConfig.configurationName || ""}
+                    placeholder="e.g., Premium East Facing"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="builtUpArea">Built-up Area (sq.ft)</Label>
+                  <Input
+                    name="builtUpArea"
+                    type="number"
+                    step="0.01"
+                    defaultValue={editingConfig.builtUpArea || ""}
+                    placeholder="1550"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="plotArea">Plot Area (sq.ft)</Label>
+                  <Input
+                    name="plotArea"
+                    type="number"
+                    step="0.01"
+                    defaultValue={editingConfig.plotArea || ""}
+                    placeholder="3000"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="udsShare">UDS Share (sq.ft)</Label>
+                  <Input
+                    name="udsShare"
+                    type="number"
+                    step="0.01"
+                    defaultValue={editingConfig.udsShare || ""}
+                    placeholder="1260"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="totalPrice">Total Price</Label>
+                  <Input
+                    name="totalPrice"
+                    defaultValue={editingConfig.totalPrice || ""}
+                    placeholder="₹2.5 Cr"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="facing">Facing</Label>
+                  <Select name="facing" defaultValue={editingConfig.facing || ""}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select facing" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="North">North</SelectItem>
+                      <SelectItem value="South">South</SelectItem>
+                      <SelectItem value="East">East</SelectItem>
+                      <SelectItem value="West">West</SelectItem>
+                      <SelectItem value="North-East">North-East</SelectItem>
+                      <SelectItem value="North-West">North-West</SelectItem>
+                      <SelectItem value="South-East">South-East</SelectItem>
+                      <SelectItem value="South-West">South-West</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="numberOfBedrooms">Bedrooms</Label>
+                  <Input
+                    name="numberOfBedrooms"
+                    type="number"
+                    defaultValue={editingConfig.numberOfBedrooms || ""}
+                    placeholder="3"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="numberOfBathrooms">Bathrooms</Label>
+                  <Input
+                    name="numberOfBathrooms"
+                    type="number"
+                    defaultValue={editingConfig.numberOfBathrooms || ""}
+                    placeholder="2"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="floorNumber">Floor Number</Label>
+                  <Input
+                    name="floorNumber"
+                    type="number"
+                    defaultValue={editingConfig.floorNumber || ""}
+                    placeholder="5"
+                  />
+                </div>
+              </div>
+
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setEditingConfig(null)}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={updateConfigMutation.isPending}>
+                  {updateConfigMutation.isPending ? "Updating..." : "Update Configuration"}
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 }

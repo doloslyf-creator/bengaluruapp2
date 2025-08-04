@@ -857,6 +857,73 @@ export const insertPropertyValuationReportCustomerSchema = createInsertSchema(pr
 });
 export type InsertPropertyValuationReportCustomer = z.infer<typeof insertPropertyValuationReportCustomerSchema>;
 export type PropertyValuationReportCustomer = typeof propertyValuationReportCustomers.$inferSelect;
+
+// Property Valuation Report Configurations - Multiple configurations per report
+export const propertyValuationReportConfigurations = pgTable("property_valuation_report_configurations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  reportId: varchar("report_id").notNull().references(() => propertyValuationReports.id, { onDelete: "cascade" }),
+  
+  // Configuration Details
+  configurationType: text("configuration_type").notNull(), // 3BHK, 4BHK, 5BHK, Villa, Plot, etc.
+  configurationName: text("configuration_name"), // Custom name like "3BHK Premium", "Garden Villa"
+  isPrimary: boolean("is_primary").default(false), // Mark one as primary configuration
+  
+  // Area Details
+  builtUpArea: decimal("built_up_area", { precision: 8, scale: 2 }), // BUA in sq.ft
+  superBuiltUpArea: decimal("super_built_up_area", { precision: 8, scale: 2 }), // Super BUA in sq.ft
+  carpetArea: decimal("carpet_area", { precision: 8, scale: 2 }), // Carpet area in sq.ft
+  plotArea: decimal("plot_area", { precision: 8, scale: 2 }), // Plot area in sq.ft
+  balconyArea: decimal("balcony_area", { precision: 8, scale: 2 }), // Balcony area in sq.ft
+  
+  // UDS and Land Details
+  udsShare: decimal("uds_share", { precision: 8, scale: 2 }), // Undivided share in sq.ft
+  udsPercentage: decimal("uds_percentage", { precision: 5, scale: 2 }), // UDS as percentage
+  landShareValue: decimal("land_share_value", { precision: 12, scale: 2 }), // Land share value in INR
+  
+  // Pricing Details
+  basicPrice: decimal("basic_price", { precision: 12, scale: 2 }), // Basic unit price
+  ratePerSqft: decimal("rate_per_sqft", { precision: 10, scale: 2 }), // Rate per sq.ft
+  ratePerSqftBua: decimal("rate_per_sqft_bua", { precision: 10, scale: 2 }), // Rate per BUA sq.ft
+  ratePerSqftSba: decimal("rate_per_sqft_sba", { precision: 10, scale: 2 }), // Rate per SBA sq.ft
+  totalPrice: decimal("total_price", { precision: 12, scale: 2 }), // Total configuration price
+  
+  // Additional Charges
+  amenitiesCharges: decimal("amenities_charges", { precision: 10, scale: 2 }),
+  maintenanceCharges: decimal("maintenance_charges", { precision: 10, scale: 2 }),
+  parkingCharges: decimal("parking_charges", { precision: 10, scale: 2 }),
+  floorRiseCharges: decimal("floor_rise_charges", { precision: 10, scale: 2 }),
+  
+  // Configuration Specific Details
+  numberOfBedrooms: integer("number_of_bedrooms"),
+  numberOfBathrooms: integer("number_of_bathrooms"),
+  numberOfBalconies: integer("number_of_balconies"),
+  facing: text("facing"), // North, South, East, West, North-East, etc.
+  floorNumber: text("floor_number"), // Floor details
+  
+  // Availability
+  totalUnits: integer("total_units"), // Total units of this configuration
+  availableUnits: integer("available_units"), // Available units
+  soldUnits: integer("sold_units"), // Sold units
+  
+  // Configuration Notes
+  configurationNotes: text("configuration_notes"), // Additional notes for this configuration
+  amenitiesIncluded: json("amenities_included").$type<string[]>().default([]), // Configuration specific amenities
+  
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_report_config").on(table.reportId),
+]);
+
+export const insertPropertyValuationReportConfigurationSchema = createInsertSchema(propertyValuationReportConfigurations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertPropertyValuationReportConfiguration = z.infer<typeof insertPropertyValuationReportConfigurationSchema>;
+export type PropertyValuationReportConfiguration = typeof propertyValuationReportConfigurations.$inferSelect;
+
 export type InsertPropertyValuationReport = typeof propertyValuationReports.$inferInsert;
 
 export const insertPropertyValuationReportSchema = createInsertSchema(propertyValuationReports).omit({

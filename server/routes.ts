@@ -2,11 +2,11 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
-import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertCivilMepReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, insertPropertyValuationReportSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests, propertyValuationReportCustomers } from "@shared/schema";
+import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertCivilMepReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, insertPropertyValuationReportSchema, insertPropertyValuationReportConfigurationSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests, propertyValuationReportCustomers, propertyValuationReportConfigurations } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
-import { or, eq } from "drizzle-orm";
+import { or, eq, and, sql } from "drizzle-orm";
 
 // Database connection
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -1067,6 +1067,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching report customers:", error);
       res.status(500).json({ error: "Failed to fetch report customers" });
+    }
+  });
+
+  // Property Valuation Report Configurations API
+  // Get all configurations for a report
+  app.get("/api/valuation-reports/:reportId/configurations", async (req, res) => {
+    try {
+      const { reportId } = req.params;
+      
+      const configurations = await db.select()
+        .from(propertyValuationReportConfigurations)
+        .where(eq(propertyValuationReportConfigurations.reportId, reportId));
+      
+      res.json(configurations);
+    } catch (error) {
+      console.error("Error fetching report configurations:", error);
+      res.status(500).json({ error: "Failed to fetch report configurations" });
+    }
+  });
+
+  // Create a new configuration for a report
+  app.post("/api/valuation-reports/:reportId/configurations", async (req, res) => {
+    try {
+      const { reportId } = req.params;
+      const validation = insertPropertyValuationReportConfigurationSchema.safeParse({
+        ...req.body,
+        reportId
+      });
+      
+      if (!validation.success) {
+        return res.status(400).json({ 
+          error: "Invalid configuration data", 
+          details: validation.error.format() 
+        });
+      }
+
+      const [configuration] = await db.insert(propertyValuationReportConfigurations)
+        .values(validation.data)
+        .returning();
+
+      console.log(`🏗️ New configuration added to report ${reportId}: ${configuration.configurationType}`);
+      res.status(201).json(configuration);
+    } catch (error) {
+      console.error("Error creating report configuration:", error);
+      res.status(500).json({ error: "Failed to create report configuration" });
+    }
+  });
+
+  // Update a specific configuration
+  app.put("/api/valuation-reports/:reportId/configurations/:configId", async (req, res) => {
+    try {
+      const { reportId, configId } = req.params;
+      const validation = insertPropertyValuationReportConfigurationSchema.safeParse({
+        ...req.body,
+        reportId
+      });
+      
+      if (!validation.success) {
+        return res.status(400).json({ 
+          error: "Invalid configuration data", 
+          details: validation.error.format() 
+        });
+      }
+
+      const [configuration] = await db.update(propertyValuationReportConfigurations)
+        .set({ ...validation.data, updatedAt: new Date() })
+        .where(eq(propertyValuationReportConfigurations.id, configId))
+        .returning();
+
+      if (!configuration) {
+        return res.status(404).json({ error: "Configuration not found" });
+      }
+
+      console.log(`🏗️ Configuration updated: ${configuration.configurationType} for report ${reportId}`);
+      res.json(configuration);
+    } catch (error) {
+      console.error("Error updating report configuration:", error);
+      res.status(500).json({ error: "Failed to update report configuration" });
+    }
+  });
+
+  // Delete a specific configuration
+  app.delete("/api/valuation-reports/:reportId/configurations/:configId", async (req, res) => {
+    try {
+      const { configId } = req.params;
+      
+      await db.delete(propertyValuationReportConfigurations)
+        .where(eq(propertyValuationReportConfigurations.id, configId));
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting report configuration:", error);
+      res.status(500).json({ error: "Failed to delete report configuration" });
+    }
+  });
+
+  // Set primary configuration
+  app.patch("/api/valuation-reports/:reportId/configurations/:configId/set-primary", async (req, res) => {
+    try {
+      const { reportId, configId } = req.params;
+      
+      // First, unset all primary flags for this report
+      await db.update(propertyValuationReportConfigurations)
+        .set({ isPrimary: false, updatedAt: new Date() })
+        .where(eq(propertyValuationReportConfigurations.reportId, reportId));
+      
+      // Then set the selected configuration as primary
+      const [configuration] = await db.update(propertyValuationReportConfigurations)
+        .set({ isPrimary: true, updatedAt: new Date() })
+        .where(eq(propertyValuationReportConfigurations.id, configId))
+        .returning();
+
+      if (!configuration) {
+        return res.status(404).json({ error: "Configuration not found" });
+      }
+
+      console.log(`🏗️ Primary configuration set: ${configuration.configurationType} for report ${reportId}`);
+      res.json(configuration);
+    } catch (error) {
+      console.error("Error setting primary configuration:", error);
+      res.status(500).json({ error: "Failed to set primary configuration" });
     }
   });
 
