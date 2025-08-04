@@ -412,7 +412,7 @@ export const leads = pgTable("leads", {
   leadId: varchar("lead_id").notNull().unique(), // User-facing lead ID like LD1754081800724
   
   // Lead source and type
-  source: varchar("source", { enum: ["site-visit", "consultation", "property-inquiry"] }).notNull(),
+  source: varchar("source", { enum: ["site-visit", "consultation", "property-inquiry", "referral", "social-media", "walk-in", "advertisement"] }).notNull(),
   leadType: varchar("lead_type", { enum: ["hot", "warm", "cold"] }).notNull().default("warm"),
   priority: varchar("priority", { enum: ["high", "medium", "low"] }).notNull().default("medium"),
   
@@ -420,14 +420,57 @@ export const leads = pgTable("leads", {
   customerName: text("customer_name").notNull(),
   phone: text("phone").notNull(),
   email: text("email").notNull(),
+  preferredContactTime: text("preferred_contact_time"), // Morning, Afternoon, Evening
+  referredBy: text("referred_by"), // Source of referral
   
-  // Property interest
+  // Buyer Persona Information
+  buyerPersona: varchar("buyer_persona", { 
+    enum: ["end-user-family", "nri-investor", "first-time-buyer", "senior-buyer", "working-couple", "research-oriented"] 
+  }),
+  buyingFor: varchar("buying_for", { enum: ["self", "parents", "investment", "resale-flip"] }),
+  urgency: varchar("urgency", { enum: ["immediate", "3-6-months", "6-12-months", "exploratory"] }),
+  
+  // Budget & Financing Details
+  budgetMin: integer("budget_min"), // In lakhs
+  budgetMax: integer("budget_max"), // In lakhs
+  financing: varchar("financing", { enum: ["own-funds", "bank-loan", "inheritance", "mixed"] }),
+  preferredLoanPartner: text("preferred_loan_partner"),
+  hasPreApproval: boolean("has_pre_approval").default(false),
+  
+  // Location Preferences
+  preferredAreas: json("preferred_areas").$type<string[]>().default([]), // Array of preferred locations
+  commuteRequirements: text("commute_requirements"), // Specific commute needs
+  schoolWorkplaceConsiderations: text("school_workplace_considerations"),
+  
+  // Property Type & Layout Preferences
+  propertyType: varchar("property_type", { enum: ["villa", "apartment", "plot", "duplex"] }),
+  bhkPreference: varchar("bhk_preference", { enum: ["1bhk", "2bhk", "3bhk", "4bhk", "5bhk+"] }),
+  floorPreference: text("floor_preference"), // Ground floor, top floor, etc.
+  gatedPreference: varchar("gated_preference", { enum: ["gated", "standalone", "no-preference"] }),
+  
+  // Lifestyle Preferences
+  amenitiesNeeded: json("amenities_needed").$type<string[]>().default([]), // Pool, park, EV charging, solar, etc.
+  vastuFacingRequirements: text("vastu_facing_requirements"),
+  seniorCitizenFriendly: boolean("senior_citizen_friendly").default(false),
+  petsChildrenConsideration: text("pets_children_consideration"),
+  greenZonesPreference: boolean("green_zones_preference").default(false),
+  
+  // Legal & Documentation Needs
+  wantsLegalSupport: boolean("wants_legal_support").default(false),
+  interestedInReports: json("interested_in_reports").$type<string[]>().default([]), // valuation, civil-mep, legal, infra
+  
+  // Investment Criteria (For Investors)
+  preferredRentalYield: real("preferred_rental_yield"), // Percentage
+  exitHorizon: varchar("exit_horizon", { enum: ["2-years", "5-years", "10-years"] }),
+  legalStatusFocus: varchar("legal_status_focus", { enum: ["rera-only", "oc", "a-khata", "clear-title"] }),
+  
+  // Legacy fields for backward compatibility
   propertyId: varchar("property_id").references(() => properties.id),
   propertyName: text("property_name").notNull(),
   interestedConfiguration: text("interested_configuration"), // Specific BHK/configuration
-  budgetRange: text("budget_range"), // e.g., "50L-1Cr", "1Cr-2Cr"
+  budgetRange: text("budget_range"), // e.g., "50L-1Cr", "1Cr-2Cr" - legacy field
   
-  // Lead details
+  // Lead details (expanded)
   leadDetails: json("lead_details").$type<{
     visitType?: string;
     numberOfVisitors?: string;
@@ -437,11 +480,16 @@ export const leads = pgTable("leads", {
     urgency?: string;
     questions?: string;
     specialRequests?: string;
+    personalizedNotes?: string;
+    keyNonNegotiables?: string[];
   }>().notNull().default({}),
   
   // Lead scoring and qualification
   leadScore: integer("lead_score").default(0), // 0-100 scoring
   qualificationNotes: text("qualification_notes"),
+  
+  // Smart Tags for Quick Filtering
+  smartTags: json("smart_tags").$type<string[]>().default([]), // hot-lead, ready-to-visit, needs-legal-handholding, first-time-buyer
   
   // Lead status and assignment
   status: varchar("status", { 
@@ -470,14 +518,19 @@ export const leadActivities = pgTable("lead_activities", {
   
   // Activity details
   activityType: varchar("activity_type", { 
-    enum: ["call", "email", "meeting", "site-visit", "proposal", "follow-up", "note"] 
+    enum: ["call", "email", "meeting", "site-visit", "proposal", "follow-up", "note", "whatsapp", "document-shared", "report-sent"] 
   }).notNull(),
   subject: text("subject").notNull(),
   description: text("description"),
   
   // Activity outcome
-  outcome: varchar("outcome", { enum: ["positive", "neutral", "negative", "no-response"] }),
+  outcome: varchar("outcome", { enum: ["positive", "neutral", "negative", "no-response", "rescheduled", "interested", "not-interested"] }),
   nextAction: text("next_action"),
+  
+  // Enhanced tracking
+  duration: integer("duration"), // Duration in minutes for calls/meetings
+  attendees: json("attendees").$type<string[]>().default([]), // People involved
+  attachments: json("attachments").$type<string[]>().default([]), // File URLs or names
   
   // Scheduling
   scheduledAt: timestamp("scheduled_at"),
@@ -489,17 +542,86 @@ export const leadActivities = pgTable("lead_activities", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Lead notes for additional context
+// Lead notes for detailed customer insights
 export const leadNotes = pgTable("lead_notes", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   leadId: varchar("lead_id").notNull().references(() => leads.id, { onDelete: "cascade" }),
   
-  note: text("note").notNull(),
-  noteType: varchar("note_type", { enum: ["general", "qualification", "objection", "requirement"] }).default("general"),
-  isPrivate: boolean("is_private").default(false),
+  // Note details
+  title: text("title"),
+  content: text("content").notNull(),
+  noteType: varchar("note_type", { 
+    enum: ["general", "important", "follow-up", "concern", "opportunity", "persona-insight", "non-negotiable", "preference"] 
+  }).default("general"),
   
-  createdBy: text("created_by").notNull(),
+  // Note metadata
+  isPinned: boolean("is_pinned").default(false),
+  isPrivate: boolean("is_private").default(false),
+  tags: json("tags").$type<string[]>().default([]),
+  
+  // Enhanced categorization
+  category: varchar("category", { 
+    enum: ["budget", "location", "timeline", "family", "lifestyle", "legal", "investment", "concerns", "opportunities"] 
+  }),
+  sentiment: varchar("sentiment", { enum: ["positive", "neutral", "negative", "mixed"] }),
+  
+  // Timestamps
   createdAt: timestamp("created_at").defaultNow(),
+  createdBy: text("created_by"),
+});
+
+// Lead timeline milestones
+export const leadTimeline = pgTable("lead_timeline", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  leadId: varchar("lead_id").notNull().references(() => leads.id, { onDelete: "cascade" }),
+  
+  // Milestone details
+  milestone: varchar("milestone", {
+    enum: ["first-contact", "qualified", "site-visit-scheduled", "site-visit-completed", "proposal-presented", 
+           "negotiation-started", "legal-docs-shared", "financing-approved", "booking-confirmed", "closed-won", "closed-lost"]
+  }).notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  
+  // Milestone metadata
+  isCompleted: boolean("is_completed").default(false),
+  completedAt: timestamp("completed_at"),
+  dueDate: timestamp("due_date"),
+  
+  // Associated data
+  attachments: json("attachments").$type<string[]>().default([]),
+  relatedActivityId: varchar("related_activity_id").references(() => leadActivities.id),
+  
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow(),
+  createdBy: text("created_by"),
+});
+
+// Lead documents and attachments
+export const leadDocuments = pgTable("lead_documents", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  leadId: varchar("lead_id").notNull().references(() => leads.id, { onDelete: "cascade" }),
+  
+  // Document details
+  fileName: text("file_name").notNull(),
+  fileUrl: text("file_url").notNull(),
+  fileType: varchar("file_type", { enum: ["pdf", "image", "document", "spreadsheet", "presentation"] }),
+  fileSize: integer("file_size"), // In bytes
+  
+  // Document categorization
+  category: varchar("category", {
+    enum: ["property-brochure", "floor-plan", "legal-document", "financial-document", "site-photos", 
+           "valuation-report", "civil-mep-report", "loan-documents", "booking-form", "agreement"]
+  }),
+  
+  // Document metadata
+  isPublic: boolean("is_public").default(false), // Can be shared with customer
+  tags: json("tags").$type<string[]>().default([]),
+  description: text("description"),
+  
+  // Timestamps
+  uploadedAt: timestamp("uploaded_at").defaultNow(),
+  uploadedBy: text("uploaded_by"),
 });
 
 // Create insert schemas for lead management
@@ -519,6 +641,16 @@ export const insertLeadNoteSchema = createInsertSchema(leadNotes).omit({
   createdAt: true,
 });
 
+export const insertLeadTimelineSchema = createInsertSchema(leadTimeline).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertLeadDocumentSchema = createInsertSchema(leadDocuments).omit({
+  id: true,
+  uploadedAt: true,
+});
+
 // Lead types
 export type Lead = typeof leads.$inferSelect;
 export type InsertLead = z.infer<typeof insertLeadSchema>;
@@ -526,6 +658,10 @@ export type LeadActivity = typeof leadActivities.$inferSelect;
 export type InsertLeadActivity = z.infer<typeof insertLeadActivitySchema>;
 export type LeadNote = typeof leadNotes.$inferSelect;
 export type InsertLeadNote = z.infer<typeof insertLeadNoteSchema>;
+export type LeadTimeline = typeof leadTimeline.$inferSelect;
+export type InsertLeadTimeline = z.infer<typeof insertLeadTimelineSchema>;
+export type LeadDocument = typeof leadDocuments.$inferSelect;
+export type InsertLeadDocument = z.infer<typeof insertLeadDocumentSchema>;
 
 // Enhanced lead with activities and notes
 export interface LeadWithDetails extends Lead {

@@ -1,0 +1,114 @@
+🔄 Lead Management System: Upgrade Plan
+✅ Goal
+Make your system capable of:
+
+Capturing persona-specific details
+
+Tracking buyer's preferences
+
+Logging interactions and context
+
+Providing a clear, searchable profile for each lead
+
+🧠 1. Define Buyer Personas (Tag or Selectable)
+Include these as a select field or tag when creating or updating a lead:
+
+Persona Type	Description
+🏠 End-User Family	Buying for self, wants comfort, legal clarity, good community
+🧳 NRI Investor	Wants appreciation, rental yields, prefers hassle-free properties
+👨‍👩‍👧‍👦 First-Time Buyer	Needs hand-holding, clarity on docs, financing help
+🧓 Senior Buyer	Prefers ground floor/lift, peace, amenities like hospital proximity
+🏢 Working Couple	Prioritizes commute, layout, and modern amenities
+🧠 Research-Oriented	High-detail, data-driven buyer. Needs deep validation
+
+🧾 2. Lead Fields to Capture (Based on Persona)
+Organize your form into logical sections:
+
+🧍 General Info
+Name, Phone, Email
+
+Preferred Contact Time
+
+Referred by (if applicable)
+
+🧠 Buyer Persona Info (Dropdown or Tags)
+Buyer Type (select from above)
+
+Buying For: [Self / Parents / Investment / Resale Flip]
+
+Urgency: [Immediate / 3-6 Months / 6-12 Months / Exploratory]
+
+💰 Budget & Financing
+Budget Range (Min–Max)
+
+Financing: [Own Funds / Bank Loan / Inheritance]
+
+Preferred Loan Partner (optional)
+
+Has Pre-Approval? [Yes/No]
+
+📍 Location Preferences
+Preferred Areas / Corridors
+
+Commute Requirements (e.g. within 10km of X)
+
+Schools, Workplaces, Family Considerations
+
+🏘️ Property Type & Layout
+Villa / Apartment / Plot / Duplex
+
+BHK Type (2BHK/3BHK/4BHK)
+
+Floor Preference (e.g. ground floor, top floor)
+
+Gated or Standalone Preference
+
+🌿 Lifestyle Preferences
+Amenities Needed (pool, park, EV charging, solar)
+
+Vastu/Facing Requirements
+
+Senior Citizen Friendly?
+
+Pets/Children Consideration
+
+Nearby Green Zones or Calm Areas
+
+📂 Legal & Documentation Needs
+Wants Legal Support? [Yes/No]
+
+Interest in Property Reports: [Valuation / Civil & MEP / Legal / Infra]
+
+Document Upload Option (for resale property leads)
+
+📊 Investment Criteria (For Investors)
+Preferred Rental Yield %
+
+Exit Horizon (2 years, 5 years, 10+ years)
+
+Legal Status Focus: [RERA Only / OC / A-Khata / Clear Title]
+
+🗂️ 3. Lead Notes & Timeline
+Each lead should have:
+
+📝 Note Log – Add meeting notes, calls, or personal insights
+
+📅 Timeline – Track key milestones (e.g. First Call, Site Visit, Report Sent)
+
+📎 Attachments – Upload related documents (e.g. property links, PDFs)
+
+📌 Pinned Insights – Highlight key non-negotiables
+
+🔍 4. Smart Filters (Admin Panel View)
+So you can prioritize quickly:
+
+Filter leads by persona
+
+Show “Hot Leads” (High urgency + budget match)
+
+“Ready to Visit” tag
+
+“Needs Legal Handholding” tag
+
+“First-Time Buyers Only” view
+

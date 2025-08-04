@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { registerEnhancedLeadRoutes } from "./enhancedLeadRoutes";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertCivilMepReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, insertPropertyValuationReportSchema, insertPropertyValuationReportConfigurationSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests, propertyValuationReportCustomers, propertyValuationReportConfigurations } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
@@ -2979,6 +2980,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to check setup status" });
     }
   });
+
+  // Register enhanced lead routes
+  registerEnhancedLeadRoutes(app);
 
   const httpServer = createServer(app);
   return httpServer;

@@ -14,6 +14,10 @@ import {
   type InsertLeadActivity,
   type LeadNote,
   type InsertLeadNote,
+  type LeadTimeline,
+  type InsertLeadTimeline,
+  type LeadDocument,
+  type InsertLeadDocument,
   type LeadStats,
   type Booking,
   type InsertBooking,
@@ -34,7 +38,9 @@ import {
   propertyScores,
   leads, 
   leadActivities, 
-  leadNotes, 
+  leadNotes,
+  leadTimeline,
+  leadDocuments,
   bookings,
   propertyValuationReports,
   civilMepReports,
@@ -119,9 +125,26 @@ export interface IStorage {
     dateTo?: string;
   }): Promise<Lead[]>;
   
+  // Enhanced lead filtering
+  getEnhancedLeads(filters: {
+    persona?: string;
+    urgency?: string;
+    budget?: string;
+    status?: string;
+    smartTags?: string[];
+    assignedTo?: string;
+    dateRange?: string;
+  }): Promise<LeadWithDetails[]>;
+  
   // Lead scoring and qualification
   updateLeadScore(leadId: string, score: number, notes?: string): Promise<Lead | undefined>;
   qualifyLead(leadId: string, qualified: boolean, notes: string): Promise<Lead | undefined>;
+  
+  // Enhanced lead operations
+  addLeadTimeline(timeline: InsertLeadTimeline): Promise<LeadTimeline>;
+  getLeadTimeline(leadId: string): Promise<LeadTimeline[]>;
+  addLeadDocument(document: InsertLeadDocument): Promise<LeadDocument>;
+  getLeadDocuments(leadId: string): Promise<LeadDocument[]>;
   
   // User operations (from original template)
   getUser(id: string): Promise<any>;
@@ -860,7 +883,7 @@ export class MemStorage implements IStorage {
     if (notes) {
       await this.addLeadNote({
         leadId: lead.id,
-        note: `Lead score updated to ${score}. ${notes}`,
+        content: `Lead score updated to ${score}. ${notes}`,
         noteType: "qualification",
         createdBy: "system",
       });
@@ -884,12 +907,90 @@ export class MemStorage implements IStorage {
     
     await this.addLeadNote({
       leadId: lead.id,
-      note: `Lead ${qualified ? 'qualified' : 'disqualified'}: ${notes}`,
+      content: `Lead ${qualified ? 'qualified' : 'disqualified'}: ${notes}`,
       noteType: "qualification",
       createdBy: "system",
     });
     
     return updated;
+  }
+
+  // Enhanced lead filtering
+  async getEnhancedLeads(filters: {
+    persona?: string;
+    urgency?: string;
+    budget?: string;
+    status?: string;
+    smartTags?: string[];
+    assignedTo?: string;
+    dateRange?: string;
+  }): Promise<LeadWithDetails[]> {
+    let filteredLeads = Array.from(this.leads.values());
+
+    // Apply filters
+    if (filters.persona && filters.persona !== "all") {
+      filteredLeads = filteredLeads.filter(lead => lead.buyerPersona === filters.persona);
+    }
+    
+    if (filters.urgency && filters.urgency !== "all") {
+      filteredLeads = filteredLeads.filter(lead => lead.urgency === filters.urgency);
+    }
+    
+    if (filters.status && filters.status !== "all") {
+      filteredLeads = filteredLeads.filter(lead => lead.status === filters.status);
+    }
+    
+    if (filters.smartTags && filters.smartTags.length > 0) {
+      filteredLeads = filteredLeads.filter(lead => 
+        lead.smartTags && filters.smartTags!.some(tag => lead.smartTags!.includes(tag))
+      );
+    }
+    
+    if (filters.assignedTo && filters.assignedTo !== "all") {
+      filteredLeads = filteredLeads.filter(lead => lead.assignedTo === filters.assignedTo);
+    }
+
+    // Convert to LeadWithDetails
+    const leadsWithDetails: LeadWithDetails[] = await Promise.all(
+      filteredLeads.map(async (lead) => ({
+        ...lead,
+        activities: await this.getLeadActivities(lead.id),
+        notes: await this.getLeadNotes(lead.id),
+      }))
+    );
+
+    return leadsWithDetails;
+  }
+
+  // Enhanced lead operations
+  async addLeadTimeline(timeline: InsertLeadTimeline): Promise<LeadTimeline> {
+    const id = randomUUID();
+    const fullTimeline: LeadTimeline = {
+      ...timeline,
+      id,
+      isCompleted: timeline.isCompleted || false,
+      createdAt: new Date(),
+    };
+    return fullTimeline;
+  }
+
+  async getLeadTimeline(leadId: string): Promise<LeadTimeline[]> {
+    return [];
+  }
+
+  async addLeadDocument(document: InsertLeadDocument): Promise<LeadDocument> {
+    const id = randomUUID();
+    const fullDocument: LeadDocument = {
+      ...document,
+      id,
+      isPublic: document.isPublic || false,
+      uploadedAt: new Date(),
+    };
+    return fullDocument;
+  }
+
+  async getLeadDocuments(leadId: string): Promise<LeadDocument[]> {
+    return [];
   }
 
   // User operations (from original template)
@@ -1098,6 +1199,74 @@ export class MemStorage implements IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  
+  // Enhanced lead filtering
+  async getEnhancedLeads(filters: {
+    persona?: string;
+    urgency?: string;
+    budget?: string;
+    status?: string;
+    smartTags?: string[];
+    assignedTo?: string;
+    dateRange?: string;
+  }): Promise<LeadWithDetails[]> {
+    let query = db.select().from(leads);
+
+    // Build where conditions based on filters
+    const conditions = [];
+    
+    if (filters.persona && filters.persona !== "all") {
+      conditions.push(eq(leads.buyerPersona, filters.persona));
+    }
+    
+    if (filters.urgency && filters.urgency !== "all") {
+      conditions.push(eq(leads.urgency, filters.urgency));
+    }
+    
+    if (filters.status && filters.status !== "all") {
+      conditions.push(eq(leads.status, filters.status));
+    }
+    
+    if (filters.assignedTo && filters.assignedTo !== "all") {
+      conditions.push(eq(leads.assignedTo, filters.assignedTo));
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+
+    const leadResults = await query.orderBy(desc(leads.createdAt));
+
+    // Convert to LeadWithDetails
+    const leadsWithDetails: LeadWithDetails[] = await Promise.all(
+      leadResults.map(async (lead) => ({
+        ...lead,
+        activities: await this.getLeadActivities(lead.id),
+        notes: await this.getLeadNotes(lead.id),
+      }))
+    );
+
+    return leadsWithDetails;
+  }
+
+  // Enhanced lead operations
+  async addLeadTimeline(timeline: InsertLeadTimeline): Promise<LeadTimeline> {
+    const [result] = await db.insert(leadTimeline).values(timeline).returning();
+    return result;
+  }
+
+  async getLeadTimeline(leadId: string): Promise<LeadTimeline[]> {
+    return await db.select().from(leadTimeline).where(eq(leadTimeline.leadId, leadId));
+  }
+
+  async addLeadDocument(document: InsertLeadDocument): Promise<LeadDocument> {
+    const [result] = await db.insert(leadDocuments).values(document).returning();
+    return result;
+  }
+
+  async getLeadDocuments(leadId: string): Promise<LeadDocument[]> {
+    return await db.select().from(leadDocuments).where(eq(leadDocuments.leadId, leadId));
+  }
   // Property CRUD operations
   async getProperty(id: string): Promise<Property | undefined> {
     const [property] = await db.select().from(properties).where(eq(properties.id, id));

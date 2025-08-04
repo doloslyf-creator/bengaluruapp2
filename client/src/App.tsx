@@ -40,7 +40,7 @@ import UserPanel from "@/pages/user-panel";
 import EnhancedUserPanel from "@/pages/enhanced-user-panel";
 import UserDashboardDynamic from "@/pages/user-dashboard-dynamic";
 import UserDashboard from "@/pages/user-dashboard";
-
+import EnhancedLeads from "@/pages/admin/enhanced-leads";
 
 import CustomerHome from "@/pages/customer-home";
 import Home from "@/pages/home";
@@ -122,6 +122,7 @@ function ProtectedRouter() {
 
       <Route path="/admin-panel/settings" component={AdminSettings} />
       <Route path="/admin-panel/team-management" component={TeamManagement} />
+      <Route path="/admin-panel/enhanced-leads" component={EnhancedLeads} />
       <Route path="/admin-panel/rera-management" component={ReraManagement} />
       <Route path="/admin-panel/notifications" component={AdminNotifications} />
       <Route path="/admin-panel/backup-system" component={BackupSystem} />
