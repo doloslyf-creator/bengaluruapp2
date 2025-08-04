@@ -975,61 +975,117 @@ export default function CustomerAccount() {
   );
 
   const renderHelp = () => (
-    <Card className="border-0 shadow-lg">
-      <CardHeader>
-        <CardTitle>Help & Support</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid gap-4">
-          <Button variant="outline" className="w-full justify-start h-auto p-4">
-            <div className="text-left">
-              <div className="flex items-center">
-                <HelpCircle className="h-5 w-5 mr-2" />
-                <span className="font-medium">Frequently Asked Questions</span>
+    <div className="space-y-6">
+      <Card className="border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle>Help & Support</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Button variant="outline" className="h-auto p-6" asChild>
+              <Link href="/faq">
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <HelpCircle className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="font-semibold mb-1">Frequently Asked Questions</p>
+                    <p className="text-sm text-gray-600">Find answers to common questions</p>
+                  </div>
+                </div>
+              </Link>
+            </Button>
+
+            <Button variant="outline" className="h-auto p-6" asChild>
+              <Link href="/report-documentation">
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <FileText className="h-6 w-6 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="font-semibold mb-1">Report Documentation</p>
+                    <p className="text-sm text-gray-600">Learn how to read your reports</p>
+                  </div>
+                </div>
+              </Link>
+            </Button>
+
+            <Button variant="outline" className="h-auto p-6" asChild>
+              <Link href="/contact">
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <Bell className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="font-semibold mb-1">Contact Support</p>
+                    <p className="text-sm text-gray-600">Get help from our team</p>
+                  </div>
+                </div>
+              </Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle>Quick Help Topics</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-3">
+              <h4 className="font-medium text-gray-900">Report Related</h4>
+              <div className="space-y-2">
+                <Button variant="ghost" className="w-full justify-start text-sm" asChild>
+                  <Link href="/faq">How to read Civil & MEP reports</Link>
+                </Button>
+                <Button variant="ghost" className="w-full justify-start text-sm" asChild>
+                  <Link href="/faq">Understanding valuation metrics</Link>
+                </Button>
+                <Button variant="ghost" className="w-full justify-start text-sm" asChild>
+                  <Link href="/faq">Report delivery timeline</Link>
+                </Button>
               </div>
-              <p className="text-sm text-gray-500 mt-1">Find answers to common questions</p>
             </div>
-          </Button>
-
-          <Button variant="outline" className="w-full justify-start h-auto p-4">
-            <div className="text-left">
-              <div className="flex items-center">
-                <FileText className="h-5 w-5 mr-2" />
-                <span className="font-medium">Report Documentation</span>
+            <div className="space-y-3">
+              <h4 className="font-medium text-gray-900">Account & Billing</h4>
+              <div className="space-y-2">
+                <Button variant="ghost" className="w-full justify-start text-sm" asChild>
+                  <Link href="/faq">Managing account settings</Link>
+                </Button>
+                <Button variant="ghost" className="w-full justify-start text-sm" asChild>
+                  <Link href="/faq">Payment and billing questions</Link>
+                </Button>
+                <Button variant="ghost" className="w-full justify-start text-sm" asChild>
+                  <Link href="/faq">Downloading report copies</Link>
+                </Button>
               </div>
-              <p className="text-sm text-gray-500 mt-1">Learn how to read your reports</p>
             </div>
-          </Button>
+          </div>
+        </CardContent>
+      </Card>
 
-          <Button variant="outline" className="w-full justify-start h-auto p-4">
-            <div className="text-left">
-              <div className="flex items-center">
-                <Bell className="h-5 w-5 mr-2" />
-                <span className="font-medium">Contact Support</span>
-              </div>
-              <p className="text-sm text-gray-500 mt-1">Get help from our team</p>
-            </div>
-          </Button>
-        </div>
-
-        <Separator />
-
-        <div className="bg-blue-50 rounded-lg p-4">
-          <h4 className="font-semibold text-blue-900 mb-2">Need immediate help?</h4>
-          <p className="text-blue-700 text-sm mb-3">
+      <Card className="border-0 shadow-lg bg-blue-50 border-blue-200">
+        <CardHeader>
+          <CardTitle className="text-blue-900">Need immediate help?</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-blue-700 mb-4">
             Our support team is available Monday to Friday, 9 AM to 6 PM
           </p>
-          <div className="space-y-2">
-            <p className="text-sm">
-              <strong>Email:</strong> support@ownitright.com
-            </p>
-            <p className="text-sm">
-              <strong>Phone:</strong> +91 98765 43210
-            </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-blue-900">Email Support</p>
+              <p className="text-sm text-blue-700">support@ownitright.com</p>
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-blue-900">Phone Support</p>
+              <p className="text-sm text-blue-700">+91 98765 43210</p>
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 
   const renderContent = () => {

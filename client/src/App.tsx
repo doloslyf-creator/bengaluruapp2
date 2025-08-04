@@ -44,6 +44,8 @@ import CustomerAccount from "@/pages/customer-account";
 import Home from "@/pages/home";
 import About from "@/pages/about";
 import LeadsPage from "@/pages/leads";
+import FAQ from "@/pages/faq";
+import ReportDocumentation from "@/pages/report-documentation";
 
 import AdminSettings from "@/pages/admin/settings";
 import TeamManagement from "@/pages/admin/team-management";
@@ -154,6 +156,10 @@ function ProtectedRouter() {
       
       {/* Customer Account */}
       <Route path="/my-account" component={CustomerAccount} />
+      
+      {/* Help & Support */}
+      <Route path="/faq" component={FAQ} />
+      <Route path="/report-documentation" component={ReportDocumentation} />
 
       
       <Route component={NotFound} />
