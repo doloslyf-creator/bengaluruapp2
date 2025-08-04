@@ -383,10 +383,7 @@ export default function ValuationReportsPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => {
-                              setSelectedReport(report);
-                              setShowViewDialog(true);
-                            }}
+                            onClick={() => navigate(`/admin-panel/valuation-reports/view/${report.id}`)}
                             data-testid={`button-view-${report.id}`}
                           >
                             <Eye className="h-4 w-4" />

@@ -62,6 +62,7 @@ import ValuationReportsPage from "@/pages/admin/valuation-reports";
 import ValuationReportEdit from "@/pages/admin/valuation-report-edit-comprehensive";
 import ValuationReportsCreate from "@/pages/admin/valuation-reports-create";
 import ValuationReportsCreateComprehensive from "@/pages/admin/valuation-reports-create-comprehensive";
+import ValuationReportView from "@/pages/admin/valuation-report-view";
 import SetupWizard from "@/pages/setup-wizard";
 import NotFound from "@/pages/not-found";
 
@@ -117,6 +118,7 @@ function ProtectedRouter() {
       <Route path="/admin-panel/valuation-reports" component={ValuationReportsPage} />
       <Route path="/admin-panel/valuation-reports/create" component={ValuationReportsCreate} />
       <Route path="/admin-panel/valuation-reports/create-comprehensive" component={ValuationReportsCreateComprehensive} />
+      <Route path="/admin-panel/valuation-reports/view/:id" component={ValuationReportView} />
       <Route path="/admin-panel/valuation-reports/edit/:id" component={ValuationReportEdit} />
       <Route path="/admin-panel/property/:id/edit" component={PropertyEdit} />
 
