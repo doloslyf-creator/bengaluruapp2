@@ -45,9 +45,7 @@ export default function AdminDashboard() {
     queryKey: ["/api/bookings"],
   });
 
-  const { data: valuationReports = [] } = useQuery<any[]>({
-    queryKey: ["/api/valuation-reports"],
-  });
+
 
   // Calculate analytics data
   const filteredProperties = properties.filter(property => {
@@ -138,7 +136,7 @@ export default function AdminDashboard() {
             <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl font-bold text-orange-600">{valuationReports.length}</div>
+                  <div className="text-2xl font-bold text-orange-600">0</div>
                   <div className="text-sm text-gray-600">Valuations</div>
                 </div>
                 <div className="p-3 bg-orange-100 rounded-lg">
@@ -416,7 +414,7 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center p-4 bg-blue-50 rounded-lg">
                 <Target className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-blue-600">{valuationReports.length}</div>
+                <div className="text-2xl font-bold text-blue-600">0</div>
                 <p className="text-sm text-gray-600">Valuation Reports</p>
               </div>
               

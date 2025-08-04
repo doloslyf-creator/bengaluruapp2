@@ -27,8 +27,7 @@ import Contact from "@/pages/contact";
 import ContactThankYou from "@/pages/contact-thank-you";
 import Orders from "@/pages/admin/orders";
 import Customers from "@/pages/admin/customers";
-import ValuationReports from "@/pages/admin/valuation-reports";
-import ValuationReportEdit from "@/pages/admin/valuation-report-edit";
+
 import PropertyEdit from "@/pages/property-edit";
 import PropertyDetail from "@/pages/property-detail";
 import FindProperty from "@/pages/find-property";
@@ -41,7 +40,7 @@ import UserPanel from "@/pages/user-panel";
 import EnhancedUserPanel from "@/pages/enhanced-user-panel";
 import UserDashboardDynamic from "@/pages/user-dashboard-dynamic";
 import UserDashboard from "@/pages/user-dashboard";
-import UserValuationReports from "@/pages/user-valuation-reports";
+
 
 import CustomerHome from "@/pages/customer-home";
 import Home from "@/pages/home";
@@ -108,8 +107,7 @@ function ProtectedRouter() {
       <Route path="/admin-panel/orders" component={Orders} />
       <Route path="/admin-panel/customers" component={Customers} />
       <Route path="/admin/customers" component={Customers} />
-      <Route path="/admin-panel/valuation-reports" component={ValuationReports} />
-      <Route path="/admin-panel/valuation-reports/:action/:id?" component={ValuationReportEdit} />
+
       <Route path="/admin-panel/civil-mep-reports" component={AdminCivilMepReports} />
       <Route path="/admin-panel/civil-mep-reports/create" component={AdminCivilMepReportsCreate} />
       <Route path="/civil-mep-report/:id" component={CivilMepReportView} />
@@ -145,12 +143,12 @@ function ProtectedRouter() {
       <Route path="/user-panel" component={UserPanel} />
       <Route path="/user-dashboard" component={UserDashboard} />
       <Route path="/user-dashboard-legacy" component={EnhancedUserPanel} />
-      <Route path="/user-panel/valuation-reports" component={UserValuationReports} />
+
 
       <Route path="/user-panel/legal-tracker" component={UserLegalTracker} />
       
       {/* User Dashboard Routes */}
-      <Route path="/user-dashboard/valuation-reports" component={UserValuationReports} />
+
 
       <Route path="/user-dashboard/legal-tracker" component={UserLegalTracker} />
       <Route path="/user-notifications" component={UserNotifications} />

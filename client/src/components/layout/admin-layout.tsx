@@ -144,12 +144,7 @@ const groupedNavigation: NavigationGroup[] = [
         icon: Wrench,
         description: "Engineering Assessments"
       },
-      { 
-        name: "Valuation Reports", 
-        href: "/admin-panel/valuation-reports", 
-        icon: Calculator,
-        description: "Property Valuations"
-      },
+
       { 
         name: "Legal Tracker", 
         href: "/admin-panel/legal-management", 
