@@ -1,4 +1,4 @@
-import { 
+ import { 
   type Property, 
   type InsertProperty, 
   type PropertyStats, 

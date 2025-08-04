@@ -66,6 +66,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import AdminLayout from "@/components/layout/admin-layout";
+import CreateLeadDialog from "./create-lead-dialog";
 import type { Lead, LeadWithDetails, LeadStats } from "@shared/schema";
 
 // Buyer persona configurations
@@ -519,6 +520,12 @@ export default function EnhancedLeads() {
             </ScrollArea>
           </CardContent>
         </Card>
+
+        {/* Create Lead Dialog */}
+        <CreateLeadDialog 
+          open={showCreateLeadDialog} 
+          onOpenChange={setShowCreateLeadDialog} 
+        />
 
         {/* Lead Details Dialog */}
         <Dialog open={showLeadDialog} onOpenChange={setShowLeadDialog}>
