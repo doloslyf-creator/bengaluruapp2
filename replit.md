@@ -48,6 +48,7 @@ The API follows RESTful principles, providing standard CRUD operations for entit
 - **Modern Admin Panel Enhancement**: Complete transformation of admin panel with Staysaavy-inspired design consistency including promotional banners, hero sections, gradient backgrounds, enhanced typography, and conversion-focused layouts across dashboard, analytics, properties, blog management, orders, CIVIL+MEP reports, and all administrative interfaces for unified user experience.
 - **User Dashboard Restructure**: Complete redesign of user dashboard with sidebar-based navigation, no header design, comprehensive overview with real-time stats, quick actions, property management, reports tracking, and seamless navigation to home page. Features authenticated user sessions, responsive mobile design, and integrated service access.
 - **Enhanced User Panel Design**: Complete transformation of user panel with modern Staysaavy-inspired styling including gradient hero sections, enhanced statistics cards with hover effects, gradient quick action buttons, improved property cards with animations, comprehensive activity tracking, and goal-oriented user journey visualization. Features responsive design with sticky header and professional tab navigation.
+- **Automated Supabase Setup System**: Complete commercial distribution system with automated database setup wizard for buyers. Features web-based onboarding that prompts for Supabase credentials, automatically creates schema/tables, seeds initial data, and saves configuration securely. Includes deployment configurations for Vercel, Netlify, Railway, and Docker with one-click setup capabilities for seamless buyer onboarding experience.
 
 ## External Dependencies
 
@@ -73,3 +74,8 @@ The API follows RESTful principles, providing standard CRUD operations for entit
 
 ### File Upload
 - **Uppy**: Modular file uploader with dashboard, drag-drop, and cloud storage integrations.
+
+### Commercial Distribution
+- **Automated Setup System**: Web-based onboarding wizard with Supabase credential input, automated schema creation, and secure configuration storage.
+- **Deployment Configurations**: Ready-to-use configs for Vercel, Netlify, Railway, and Docker deployment.
+- **One-Click Deploy**: Seamless buyer onboarding with automated database setup and initial data seeding.

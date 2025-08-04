@@ -2858,6 +2858,128 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ============ AUTOMATED SETUP API ============
+  
+  // Initialize Supabase setup
+  app.post("/api/setup/initialize", async (req, res) => {
+    try {
+      const { supabaseUrl, supabaseKey } = req.body;
+      
+      if (!supabaseUrl || !supabaseKey) {
+        return res.status(400).json({ 
+          error: "Supabase URL and service role key are required" 
+        });
+      }
+
+      const { SetupService } = await import('./setupService');
+      const setupService = new SetupService({ supabaseUrl, supabaseKey });
+      
+      await setupService.performCompleteSetup();
+      
+      res.json({
+        success: true,
+        message: "Supabase setup completed successfully",
+        nextSteps: [
+          "Update your DATABASE_URL environment variable",
+          "Restart your application",
+          "Access the admin panel to begin using your platform"
+        ]
+      });
+    } catch (error: any) {
+      console.error("Setup initialization error:", error);
+      res.status(500).json({ 
+        error: error.message || "Failed to initialize setup" 
+      });
+    }
+  });
+
+  // Setup progress streaming endpoint
+  app.get("/api/setup/progress", async (req, res) => {
+    const { url: supabaseUrl, key: supabaseKey } = req.query;
+    
+    if (!supabaseUrl || !supabaseKey) {
+      return res.status(400).json({ error: "Missing credentials" });
+    }
+
+    // Set up Server-Sent Events
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+      'Access-Control-Allow-Origin': '*',
+    });
+
+    try {
+      const { SetupService } = await import('./setupService');
+      const setupService = new SetupService({ 
+        supabaseUrl: supabaseUrl as string, 
+        supabaseKey: supabaseKey as string 
+      });
+      
+      // Set up progress callback
+      setupService.setProgressCallback((progress) => {
+        const eventType = progress.status === 'start' ? 'step_start' : 
+                         progress.status === 'complete' ? 'step_complete' : 'step_error';
+        
+        res.write(`data: ${JSON.stringify({
+          type: eventType,
+          step: progress.step,
+          message: progress.message
+        })}\n\n`);
+      });
+
+      // Perform setup
+      await setupService.performCompleteSetup();
+      
+      // Send completion event
+      res.write(`data: ${JSON.stringify({
+        type: 'complete',
+        message: 'Setup completed successfully'
+      })}\n\n`);
+      
+    } catch (error: any) {
+      res.write(`data: ${JSON.stringify({
+        type: 'error',
+        message: error.message
+      })}\n\n`);
+    } finally {
+      res.end();
+    }
+  });
+
+  // Check if setup is required
+  app.get("/api/setup/status", async (req, res) => {
+    try {
+      // Check if we have Supabase configuration
+      const hasSupabaseUrl = !!process.env.SUPABASE_URL || !!process.env.VITE_SUPABASE_URL;
+      const hasSupabaseKey = !!process.env.SUPABASE_SERVICE_ROLE_KEY;
+      const hasDatabaseUrl = !!process.env.DATABASE_URL;
+      
+      // Check if setup was completed
+      const fs = await import('fs/promises');
+      const path = await import('path');
+      let setupCompleted = false;
+      
+      try {
+        const setupConfigPath = path.join(process.cwd(), '.env.setup');
+        const setupConfig = await fs.readFile(setupConfigPath, 'utf-8');
+        setupCompleted = setupConfig.includes('setup_completed=true');
+      } catch {
+        // Setup config file doesn't exist
+      }
+      
+      res.json({
+        setupRequired: !hasSupabaseUrl || !hasSupabaseKey || !hasDatabaseUrl || !setupCompleted,
+        hasSupabaseUrl,
+        hasSupabaseKey,
+        hasDatabaseUrl,
+        setupCompleted
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: "Failed to check setup status" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

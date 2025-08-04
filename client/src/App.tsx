@@ -61,6 +61,7 @@ import { CivilMepReportView } from "@/pages/civil-mep-report-view";
 import ValuationReportsPage from "@/pages/admin/valuation-reports";
 import ValuationReportEdit from "@/pages/admin/valuation-report-edit-comprehensive";
 import ValuationReportsCreate from "@/pages/admin/valuation-reports-create";
+import SetupWizard from "@/pages/setup-wizard";
 import NotFound from "@/pages/not-found";
 
 // Protected Routes Component that shows auth form for admin routes when not authenticated
@@ -127,6 +128,9 @@ function ProtectedRouter() {
       <Route path="/admin-panel/supabase-migration" component={SupabaseMigration} />
       <Route path="/admin-panel/supabase-status" component={SupabaseStatus} />
       <Route path="/admin-panel/supabase" component={SupabaseStatus} />
+      
+      {/* Setup Wizard */}
+      <Route path="/setup" component={SetupWizard} />
       
       {/* Customer-facing routes */}
       <Route path="/about" component={About} />
