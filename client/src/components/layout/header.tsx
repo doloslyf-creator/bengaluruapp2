@@ -160,6 +160,13 @@ export default function Header() {
 
             {/* Right side buttons */}
             <div className="flex items-center space-x-3">
+              {/* Customer Account */}
+              <Button asChild variant="ghost" size="sm" className="hidden md:flex">
+                <Link href="/my-account">
+                  <User className="h-4 w-4 mr-2" />
+                  My Account
+                </Link>
+              </Button>
 
 
               {/* Admin Panel for admins */}
@@ -266,14 +273,22 @@ export default function Header() {
                           Find Property
                         </Link>
                       </Button>
-                      {isAdmin && (
+                      <div className={`grid gap-3 ${isAdmin ? 'grid-cols-2' : 'grid-cols-1'}`}>
                         <Button asChild variant="outline" size="sm" onClick={() => setIsOpen(false)}>
-                          <Link href="/admin-panel">
-                            <Settings className="h-4 w-4 mr-2" />
-                            Admin Panel
+                          <Link href="/my-account">
+                            <User className="h-4 w-4 mr-2" />
+                            My Account
                           </Link>
                         </Button>
-                      )}
+                        {isAdmin && (
+                          <Button asChild variant="outline" size="sm" onClick={() => setIsOpen(false)}>
+                            <Link href="/admin-panel">
+                              <Settings className="h-4 w-4 mr-2" />
+                              Admin Panel
+                            </Link>
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </SheetContent>

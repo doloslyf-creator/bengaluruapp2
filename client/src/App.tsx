@@ -40,6 +40,7 @@ import Consultation from "@/pages/consultation";
 import EnhancedLeads from "@/pages/admin/enhanced-leads";
 
 import CustomerHome from "@/pages/customer-home";
+import CustomerAccount from "@/pages/customer-account";
 import Home from "@/pages/home";
 import About from "@/pages/about";
 import LeadsPage from "@/pages/leads";
@@ -150,6 +151,9 @@ function ProtectedRouter() {
       <Route path="/contact/thank-you" component={ContactThankYou} />
       <Route path="/book-visit" component={BookVisit} />
       <Route path="/consultation" component={Consultation} />
+      
+      {/* Customer Account */}
+      <Route path="/my-account" component={CustomerAccount} />
 
       
       <Route component={NotFound} />
