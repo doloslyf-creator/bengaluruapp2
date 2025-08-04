@@ -18,8 +18,7 @@ import {
   type Booking,
   type InsertBooking,
 
-  type PropertyValuationReport,
-  type InsertPropertyValuationReport,
+
   type CivilMepReport,
   type InsertCivilMepReport,
   type ReportPayment,
@@ -38,7 +37,7 @@ import {
   leadNotes, 
   bookings,
 
-  propertyValuationReports,
+
   civilMepReports,
   reportPayments,
   customerNotes,
@@ -1668,94 +1667,7 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
-  async getValuationReportStats(): Promise<any> {
-    const allReports = await db.select().from(propertyValuationReports);
-    const valuationPayments = await db.select().from(reportPayments)
-      .where(eq(reportPayments.reportType, "valuation"));
-    
-    return {
-      totalReports: allReports.length,
-      totalRevenue: valuationPayments.reduce((sum, p) => sum + Number(p.amount), 0),
-      pendingPayments: valuationPayments.filter(p => p.paymentStatus === 'pay-later-pending').length
-    };
-  }
 
-  // Valuation report management methods
-  async getAllValuationReports(): Promise<any[]> {
-    const reports = await db.select().from(propertyValuationReports);
-    const result = [];
-    
-    for (const report of reports) {
-      const [property] = await db.select().from(properties)
-        .where(eq(properties.id, report.propertyId));
-      
-      result.push({
-        ...report,
-        propertyName: property?.name || "Unknown Property"
-      });
-    }
-    
-    return result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  }
-
-  async createValuationReport(reportData: any): Promise<any> {
-    const reportId = crypto.randomUUID();
-    
-    const [report] = await db.insert(propertyValuationReports).values({
-      id: reportId,
-      propertyId: reportData.propertyId,
-      reportVersion: reportData.reportVersion || "1.0",
-      generatedBy: reportData.generatedBy,
-      marketAnalysis: reportData.marketAnalysis,
-      propertyAssessment: reportData.propertyAssessment,
-      costBreakdown: reportData.costBreakdown,
-      financialAnalysis: reportData.financialAnalysis,
-      investmentRecommendation: reportData.investmentRecommendation,
-      riskAssessment: reportData.riskAssessment,
-      executiveSummary: reportData.executiveSummary,
-      overallScore: reportData.overallScore?.toString(),
-      keyHighlights: reportData.keyHighlights
-    }).returning();
-    
-    return report;
-  }
-
-  async getValuationReportById(id: string): Promise<any> {
-    const [report] = await db.select().from(propertyValuationReports)
-      .where(eq(propertyValuationReports.id, id));
-    
-    if (!report) return null;
-    
-    const [property] = await db.select().from(properties)
-      .where(eq(properties.id, report.propertyId));
-    
-    return {
-      ...report,
-      propertyName: property?.name || "Unknown Property"
-    };
-  }
-
-  async updateValuationReport(id: string, reportData: any): Promise<any> {
-    const [report] = await db.update(propertyValuationReports)
-      .set({
-        reportVersion: reportData.reportVersion,
-        generatedBy: reportData.generatedBy,
-        marketAnalysis: reportData.marketAnalysis,
-        propertyAssessment: reportData.propertyAssessment,
-        costBreakdown: reportData.costBreakdown,
-        financialAnalysis: reportData.financialAnalysis,
-        investmentRecommendation: reportData.investmentRecommendation,
-        riskAssessment: reportData.riskAssessment,
-        executiveSummary: reportData.executiveSummary,
-        overallScore: reportData.overallScore?.toString(),
-        keyHighlights: reportData.keyHighlights,
-        updatedAt: sql`now()`
-      })
-      .where(eq(propertyValuationReports.id, id))
-      .returning();
-    
-    return report;
-  }
 
   // Orders management methods
   async getAllOrdersWithDetails(): Promise<any[]> {

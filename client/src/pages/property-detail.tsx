@@ -18,7 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { formatPriceDisplay } from "@/lib/utils";
 import { type Property, type PropertyConfiguration } from "@shared/schema";
 
-import { ValuationReportSection } from "@/components/property/valuation-report-section";
+
 import { Skeleton, PropertyDetailHeaderSkeleton } from "@/components/ui/skeleton";
 
 interface PropertyWithConfigurations extends Property {
@@ -88,6 +88,8 @@ export default function PropertyDetail() {
   };
 
   const handleShare = async () => {
+    if (!property) return;
+    
     const propertyUrl = window.location.href;
     const shareText = `🏠 *${property.name}*\n📍 ${property.area}, ${property.zone} Bengaluru\n🏗️ By ${property.developer}\n💰 ${getPriceRange()}\n\nView details: ${propertyUrl}`;
     
@@ -120,6 +122,8 @@ export default function PropertyDetail() {
   };
 
   const handleWhatsAppShare = () => {
+    if (!property) return;
+    
     const propertyUrl = window.location.href;
     const whatsappText = `🏠 *${property.name}*\n📍 ${property.area}, ${property.zone} Bengaluru\n🏗️ By ${property.developer}\n💰 ${getPriceRange()}\n\nView details: ${propertyUrl}`;
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`;
@@ -1063,10 +1067,7 @@ export default function PropertyDetail() {
         </div>
       </section>
 
-      {/* Property Valuation Report Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <ValuationReportSection property={property!} />
-      </section>
+
     </div>
   );
 }

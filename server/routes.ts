@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
-import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertPropertyValuationReportSchema, insertCivilMepReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests } from "@shared/schema";
+import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertCivilMepReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
@@ -933,7 +933,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           success: true, 
           paymentId: payment.id,
           reportId: report.id,
-          reportType: "valuation",
+          reportType: "civil-mep",
           message: "Property Valuation Report access granted for 7 days. Payment due within 7 days.",
           amount: "15000.00"
         });
@@ -1104,59 +1104,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Valuation Reports API - Get valuation report stats
-  app.get("/api/valuation-reports/stats", async (req, res) => {
-    try {
-      const stats = await storage.getValuationReportStats();
-      res.json(stats);
-    } catch (error) {
-      console.error("Error fetching valuation report stats:", error);
-      res.status(500).json({ error: "Failed to fetch valuation report statistics" });
-    }
-  });
 
-  // Valuation Reports API - Create new report
-  app.post("/api/valuation-reports", async (req, res) => {
-    try {
-      const reportData = req.body;
-      const report = await storage.createValuationReport(reportData);
-      res.json(report);
-    } catch (error: any) {
-      console.error("Error creating valuation report:", error);
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  // Valuation Reports API - Get single report
-  app.get("/api/valuation-reports/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const report = await storage.getValuationReportById(id);
-      if (!report) {
-        return res.status(404).json({ error: "Report not found" });
-      }
-      res.json(report);
-    } catch (error) {
-      console.error("Error fetching valuation report:", error);
-      res.status(500).json({ error: "Failed to fetch valuation report" });
-    }
-  });
-
-  // Valuation Reports API - Update report
-  app.put("/api/valuation-reports/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const reportData = req.body;
-      const report = await storage.updateValuationReport(id, reportData);
-      if (!report) {
-        return res.status(404).json({ error: "Report not found" });
-      }
-      res.json(report);
-    } catch (error: any) {
-      console.error("Error updating valuation report:", error);
-      res.status(500).json({ error: error.message });
-    }
-  });
 
   // Customer CRM API - Get all customers with unified data
   app.get("/api/customers", async (req, res) => {
@@ -1222,8 +1170,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         if (key) {
           customerMap.get(key).bookings.push(booking);
-          if (new Date(booking.updatedAt || booking.createdAt) > new Date(customerMap.get(key).lastActivity)) {
-            customerMap.get(key).lastActivity = booking.updatedAt || booking.createdAt;
+          const bookingDate = booking.updatedAt || booking.createdAt;
+          if (bookingDate && new Date(bookingDate) > new Date(customerMap.get(key).lastActivity)) {
+            customerMap.get(key).lastActivity = bookingDate;
           }
         }
       }
@@ -1257,8 +1206,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           customer.totalSpent += parseFloat(payment.amount);
           customer.status = "converted";
           customer.leadScore = Math.max(customer.leadScore, 85);
-          if (new Date(payment.updatedAt || payment.createdAt) > new Date(customer.lastActivity)) {
-            customer.lastActivity = payment.updatedAt || payment.createdAt;
+          const paymentDate = payment.updatedAt || payment.createdAt;
+          if (paymentDate && new Date(paymentDate) > new Date(customer.lastActivity)) {
+            customer.lastActivity = paymentDate;
           }
         }
       }
@@ -1288,7 +1238,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const key = item.email || item.phone;
         if (key && !customerMap.has(key)) {
           customerMap.set(key, { 
-            status: item.leadType || "cold", 
+            status: "leadType" in item ? (item.leadType || "cold") : "cold", 
             totalSpent: 0 
           });
         }
@@ -1834,9 +1784,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { serviceType, customerName, customerEmail, customerPhone, propertyId, propertyName, amount, requirements } = req.body;
       
       // Determine report type based on service
-      let reportType: "civil-mep" | "valuation" | "legal-due-diligence" = "valuation";
+      let reportType: "civil-mep" | "legal-due-diligence" = "civil-mep";
       if (serviceType === "civil-mep-reports") reportType = "civil-mep";
-      if (serviceType === "property-valuation") reportType = "valuation";
       if (serviceType === "legal-due-diligence") reportType = "legal-due-diligence";
       
       const orderData = {
@@ -2172,7 +2121,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
         case "surepass":
           try {
-            const testResult = await reraService.verifyRERA("KA1234567890");
+            const testResult = await reraService.verifyReraProject("KA1234567890");
             res.json({ success: true, message: "Surepass connection successful" });
           } catch (error) {
             res.status(400).json({ error: "Surepass connection failed: " + error.message });
