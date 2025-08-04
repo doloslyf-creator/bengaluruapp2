@@ -53,7 +53,7 @@ export default function ValuationReportEditComprehensive() {
   // Update report mutation
   const updateReportMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest(`/api/valuation-reports/${reportId}`, "PUT", data);
+      return await apiRequest("PUT", `/api/valuation-reports/${reportId}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/valuation-reports"] });
@@ -75,7 +75,7 @@ export default function ValuationReportEditComprehensive() {
   // Configuration mutations
   const createConfigMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest(`/api/valuation-reports/${reportId}/configurations`, "POST", data);
+      return await apiRequest("POST", `/api/valuation-reports/${reportId}/configurations`, data);
     },
     onSuccess: () => {
       refetchConfigurations();
@@ -96,7 +96,7 @@ export default function ValuationReportEditComprehensive() {
 
   const updateConfigMutation = useMutation({
     mutationFn: async ({ configId, data }: { configId: string; data: any }) => {
-      return await apiRequest(`/api/valuation-reports/${reportId}/configurations/${configId}`, "PUT", data);
+      return await apiRequest("PUT", `/api/valuation-reports/${reportId}/configurations/${configId}`, data);
     },
     onSuccess: () => {
       refetchConfigurations();
@@ -117,7 +117,7 @@ export default function ValuationReportEditComprehensive() {
 
   const deleteConfigMutation = useMutation({
     mutationFn: async (configId: string) => {
-      return await apiRequest(`/api/valuation-reports/${reportId}/configurations/${configId}`, "DELETE");
+      return await apiRequest("DELETE", `/api/valuation-reports/${reportId}/configurations/${configId}`);
     },
     onSuccess: () => {
       refetchConfigurations();
@@ -137,7 +137,7 @@ export default function ValuationReportEditComprehensive() {
 
   const setPrimaryConfigMutation = useMutation({
     mutationFn: async (configId: string) => {
-      return await apiRequest(`/api/valuation-reports/${reportId}/configurations/${configId}/set-primary`, "PATCH");
+      return await apiRequest("PATCH", `/api/valuation-reports/${reportId}/configurations/${configId}/set-primary`);
     },
     onSuccess: () => {
       refetchConfigurations();
