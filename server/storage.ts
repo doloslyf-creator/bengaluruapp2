@@ -17,8 +17,8 @@ import {
   type LeadStats,
   type Booking,
   type InsertBooking,
-
-
+  type PropertyValuationReport,
+  type InsertPropertyValuationReport,
   type CivilMepReport,
   type InsertCivilMepReport,
   type ReportPayment,
@@ -36,8 +36,7 @@ import {
   leadActivities, 
   leadNotes, 
   bookings,
-
-
+  propertyValuationReports,
   civilMepReports,
   reportPayments,
   customerNotes,
@@ -132,18 +131,15 @@ export interface IStorage {
 
   
   // Property Valuation Report operations
-  enableValuationReport(propertyId: string): Promise<Property | undefined>;
-  getValuationReport(propertyId: string): Promise<PropertyValuationReport | undefined>;
   createValuationReport(report: InsertPropertyValuationReport): Promise<PropertyValuationReport>;
+  getValuationReport(reportId: string): Promise<PropertyValuationReport | undefined>;
+  getAllValuationReports(): Promise<PropertyValuationReport[]>;
   updateValuationReport(reportId: string, updates: Partial<InsertPropertyValuationReport>): Promise<PropertyValuationReport | undefined>;
-  getPropertiesWithValuationReports(statusFilter?: string): Promise<Array<Property & { valuationReport?: PropertyValuationReport; reportStats?: any }>>;
-  
-  // Report Payment operations (both CIVIL+MEP and Valuation)
-  createReportPayment(payment: InsertReportPayment): Promise<ReportPayment>;
-  getReportPayments(reportId: string, reportType?: string): Promise<ReportPayment[]>;
-  getAllReportPayments(): Promise<ReportPayment[]>;
-  updatePaymentStatus(paymentId: string, status: string): Promise<ReportPayment | undefined>;
-
+  deleteValuationReport(reportId: string): Promise<boolean>;
+  getValuationReportsByProperty(propertyId: string): Promise<PropertyValuationReport[]>;
+  getValuationReportsByCustomer(customerId: string): Promise<PropertyValuationReport[]>;
+  assignReportToCustomer(reportId: string, customerId: string): Promise<PropertyValuationReport | undefined>;
+  updateReportStatus(reportId: string, status: "draft" | "in_progress" | "completed" | "delivered"): Promise<PropertyValuationReport | undefined>;
   getValuationReportStats(): Promise<any>;
 
   // App Settings operations
@@ -1608,25 +1604,22 @@ export class DatabaseStorage implements IStorage {
 
 
   // Property Valuation Report operations
-  async enableValuationReport(propertyId: string): Promise<Property | undefined> {
-    const [property] = await db.update(properties)
-      .set({ hasValuationReport: true })
-      .where(eq(properties.id, propertyId))
-      .returning();
-    return property || undefined;
-  }
-
-  async getValuationReport(propertyId: string): Promise<PropertyValuationReport | undefined> {
-    const [report] = await db.select().from(propertyValuationReports)
-      .where(eq(propertyValuationReports.propertyId, propertyId));
-    return report || undefined;
-  }
-
   async createValuationReport(report: InsertPropertyValuationReport): Promise<PropertyValuationReport> {
     const [newReport] = await db.insert(propertyValuationReports)
       .values(report)
       .returning();
     return newReport;
+  }
+
+  async getValuationReport(reportId: string): Promise<PropertyValuationReport | undefined> {
+    const [report] = await db.select().from(propertyValuationReports)
+      .where(eq(propertyValuationReports.id, reportId));
+    return report || undefined;
+  }
+
+  async getAllValuationReports(): Promise<PropertyValuationReport[]> {
+    return await db.select().from(propertyValuationReports)
+      .orderBy(desc(propertyValuationReports.createdAt));
   }
 
   async updateValuationReport(reportId: string, updates: Partial<InsertPropertyValuationReport>): Promise<PropertyValuationReport | undefined> {
@@ -1637,34 +1630,69 @@ export class DatabaseStorage implements IStorage {
     return report || undefined;
   }
 
-  async getPropertiesWithValuationReports(statusFilter?: string): Promise<Array<Property & { valuationReport?: PropertyValuationReport; reportStats?: any }>> {
-    const allProperties = await db.select().from(properties);
-    
-    const result = [];
-    for (const property of allProperties) {
-      const [report] = await db.select().from(propertyValuationReports)
-        .where(eq(propertyValuationReports.propertyId, property.id));
-      
-      let reportStats = null;
-      if (report) {
-        const payments = await db.select().from(reportPayments)
-          .where(and(eq(reportPayments.reportId, report.id), eq(reportPayments.reportType, "valuation")));
-        
-        reportStats = {
-          totalPayments: payments.length,
-          totalRevenue: payments.reduce((sum, p) => sum + Number(p.amount), 0),
-          pendingPayments: payments.filter(p => p.paymentStatus === 'pay-later-pending').length
-        };
-      }
-      
-      result.push({
-        ...property,
-        valuationReport: report || undefined,
-        reportStats
-      });
+  async deleteValuationReport(reportId: string): Promise<boolean> {
+    const result = await db.delete(propertyValuationReports)
+      .where(eq(propertyValuationReports.id, reportId));
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+
+  async getValuationReportsByProperty(propertyId: string): Promise<PropertyValuationReport[]> {
+    return await db.select().from(propertyValuationReports)
+      .where(eq(propertyValuationReports.propertyId, propertyId))
+      .orderBy(desc(propertyValuationReports.createdAt));
+  }
+
+  async getValuationReportsByCustomer(customerId: string): Promise<PropertyValuationReport[]> {
+    return await db.select().from(propertyValuationReports)
+      .where(eq(propertyValuationReports.customerId, customerId))
+      .orderBy(desc(propertyValuationReports.createdAt));
+  }
+
+  async assignReportToCustomer(reportId: string, customerId: string): Promise<PropertyValuationReport | undefined> {
+    const [report] = await db.update(propertyValuationReports)
+      .set({ customerId, assignedTo: customerId, updatedAt: new Date() })
+      .where(eq(propertyValuationReports.id, reportId))
+      .returning();
+    return report || undefined;
+  }
+
+  async updateReportStatus(reportId: string, status: "draft" | "in_progress" | "completed" | "delivered"): Promise<PropertyValuationReport | undefined> {
+    const updates: any = { reportStatus: status, updatedAt: new Date() };
+    if (status === "delivered") {
+      updates.deliveredAt = new Date();
     }
-    
-    return result;
+
+    const [report] = await db.update(propertyValuationReports)
+      .set(updates)
+      .where(eq(propertyValuationReports.id, reportId))
+      .returning();
+    return report || undefined;
+  }
+
+  async getValuationReportStats(): Promise<any> {
+    const allReports = await this.getAllValuationReports();
+    const totalReports = allReports.length;
+    const completedReports = allReports.filter(r => r.reportStatus === 'completed').length;
+    const deliveredReports = allReports.filter(r => r.reportStatus === 'delivered').length;
+    const inProgressReports = allReports.filter(r => r.reportStatus === 'in_progress').length;
+    const draftReports = allReports.filter(r => r.reportStatus === 'draft').length;
+
+    // Calculate average estimated value
+    const reportsWithValue = allReports.filter(r => r.estimatedMarketValue);
+    const averageValue = reportsWithValue.length > 0 
+      ? reportsWithValue.reduce((sum, r) => sum + Number(r.estimatedMarketValue || 0), 0) / reportsWithValue.length
+      : 0;
+
+    return {
+      totalReports,
+      completedReports,
+      deliveredReports,
+      inProgressReports,
+      draftReports,
+      averageEstimatedValue: Math.round(averageValue),
+      completionRate: totalReports > 0 ? Math.round((completedReports / totalReports) * 100) : 0,
+      deliveryRate: totalReports > 0 ? Math.round((deliveredReports / totalReports) * 100) : 0
+    };
   }
 
 

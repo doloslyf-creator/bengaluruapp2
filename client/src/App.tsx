@@ -60,6 +60,7 @@ import BackupSystem from "@/pages/admin/backup-system";
 import { AdminCivilMepReports } from "@/pages/admin-civil-mep-reports";
 import { AdminCivilMepReportsCreate } from "@/pages/admin-civil-mep-reports-create";
 import { CivilMepReportView } from "@/pages/civil-mep-report-view";
+import ValuationReportsPage from "@/pages/admin/valuation-reports";
 import NotFound from "@/pages/not-found";
 
 // Protected Routes Component that shows auth form for admin routes when not authenticated
@@ -111,6 +112,7 @@ function ProtectedRouter() {
       <Route path="/admin-panel/civil-mep-reports" component={AdminCivilMepReports} />
       <Route path="/admin-panel/civil-mep-reports/create" component={AdminCivilMepReportsCreate} />
       <Route path="/civil-mep-report/:id" component={CivilMepReportView} />
+      <Route path="/admin-panel/valuation-reports" component={ValuationReportsPage} />
       <Route path="/admin-panel/property/:id/edit" component={PropertyEdit} />
 
       <Route path="/admin-panel/legal-management" component={LegalManagement} />

@@ -725,6 +725,117 @@ export const insertValuationRequestSchema = createInsertSchema(valuationRequests
 export type ValuationRequest = typeof valuationRequests.$inferSelect;
 export type InsertValuationRequest = z.infer<typeof insertValuationRequestSchema>;
 
+// Property Valuation Reports Schema - Comprehensive Bengaluru Edition
+export const propertyValuationReports = pgTable("property_valuation_reports", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  propertyId: varchar("property_id").notNull(),
+  customerId: varchar("customer_id"), // Optional - can be assigned to customers
+  
+  // Report metadata
+  reportTitle: text("report_title").notNull(),
+  reportStatus: varchar("report_status", { enum: ["draft", "in_progress", "completed", "delivered"] }).default("draft"),
+  createdBy: text("created_by").notNull(), // Admin who created
+  assignedTo: text("assigned_to"), // Customer assigned to
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  deliveredAt: timestamp("delivered_at"),
+  
+  // Executive Summary
+  estimatedMarketValue: decimal("estimated_market_value", { precision: 12, scale: 2 }),
+  ratePerSqft: decimal("rate_per_sqft", { precision: 8, scale: 2 }),
+  buyerFit: varchar("buyer_fit", { enum: ["end_use", "investor", "both"] }),
+  valuationVerdict: text("valuation_verdict"),
+  appreciationOutlook: text("appreciation_outlook"),
+  riskScore: integer("risk_score").default(0), // 0-10 scale
+  recommendation: text("recommendation"),
+  
+  // Property Profile
+  unitType: varchar("unit_type", { enum: ["apartment", "villa", "rowhouse", "plot"] }),
+  configuration: text("configuration"), // e.g., "3BHK, 1550 sq.ft"
+  udsArea: decimal("uds_area", { precision: 8, scale: 2 }),
+  facing: text("facing"),
+  vastuCompliance: boolean("vastu_compliance").default(false),
+  occcStatus: text("occc_status"),
+  possessionStatus: varchar("possession_status", { enum: ["ready", "under_construction", "completed"] }),
+  khataType: varchar("khata_type", { enum: ["A", "B", "E"] }),
+  landTitleStatus: text("land_title_status"),
+  builderReputationScore: integer("builder_reputation_score").default(0),
+  
+  // Market Valuation
+  builderQuotedPrice: decimal("builder_quoted_price", { precision: 12, scale: 2 }),
+  actualMarketValue: decimal("actual_market_value", { precision: 12, scale: 2 }),
+  pricePerSqftCarpet: decimal("price_per_sqft_carpet", { precision: 8, scale: 2 }),
+  pricePerSqftSba: decimal("price_per_sqft_sba", { precision: 8, scale: 2 }),
+  pricePerSqftUds: decimal("price_per_sqft_uds", { precision: 8, scale: 2 }),
+  landShareValue: decimal("land_share_value", { precision: 12, scale: 2 }),
+  constructionComponent: decimal("construction_component", { precision: 12, scale: 2 }),
+  guidanceValueZoneRate: decimal("guidance_value_zone_rate", { precision: 8, scale: 2 }),
+  pricingAnalysis: text("pricing_analysis"),
+  
+  // Comparable Sales (JSON array)
+  comparableSales: json("comparable_sales"), // Array of comparable properties
+  benchmarkingSources: text("benchmarking_sources"),
+  volatilityIndex: text("volatility_index"),
+  daysOnMarket: integer("days_on_market"),
+  
+  // Location & Infrastructure
+  planningAuthority: varchar("planning_authority", { enum: ["BDA", "BBMP", "BMRDA", "BIAPPA"] }),
+  zonalClassification: varchar("zonal_classification", { enum: ["residential", "mixed", "green"] }),
+  landUseStatus: varchar("land_use_status", { enum: ["converted", "dc_converted", "bda_approved"] }),
+  connectivityScore: integer("connectivity_score").default(0),
+  waterSupply: varchar("water_supply", { enum: ["BWSSB", "borewell", "tanker"] }),
+  drainageSystem: varchar("drainage_system", { enum: ["underground", "open", "none"] }),
+  socialInfraScore: integer("social_infra_score").default(0),
+  futureDevImpact: text("future_dev_impact"),
+  
+  // Legal & Compliance
+  reraRegistration: text("rera_registration"),
+  khataVerified: boolean("khata_verified").default(false),
+  saleDeedTitle: text("sale_deed_title"),
+  dcConversion: boolean("dc_conversion").default(false),
+  planApproval: text("plan_approval"),
+  occcReceived: boolean("occc_received").default(false),
+  loanApprovalBanks: text("loan_approval_banks"),
+  titleClarityNotes: text("title_clarity_notes"),
+  
+  // Rental & Yield
+  expectedMonthlyRent: decimal("expected_monthly_rent", { precision: 8, scale: 2 }),
+  grossRentalYield: decimal("gross_rental_yield", { precision: 5, scale: 2 }),
+  tenantDemand: varchar("tenant_demand", { enum: ["low", "moderate", "high"] }),
+  exitLiquidity: text("exit_liquidity"),
+  yieldScore: decimal("yield_score", { precision: 3, scale: 1 }),
+  
+  // Cost Breakdown (JSON)
+  costBreakdown: json("cost_breakdown"), // Detailed cost components
+  totalAllInPrice: decimal("total_all_in_price", { precision: 12, scale: 2 }),
+  
+  // Pros & Cons
+  pros: json("pros"), // Array of pros
+  cons: json("cons"), // Array of cons
+  
+  // Final Assessment
+  typeFit: text("type_fit"),
+  negotiationAdvice: text("negotiation_advice"),
+  riskSummary: text("risk_summary"),
+  appreciationOutlook5yr: text("appreciation_outlook_5yr"),
+  exitPlan: text("exit_plan"),
+  
+  // Additional data
+  appendices: json("appendices"), // Optional additional documents/data
+  customNotes: text("custom_notes"),
+});
+
+// Export types for Valuation Reports
+export type PropertyValuationReport = typeof propertyValuationReports.$inferSelect;
+export type InsertPropertyValuationReport = typeof propertyValuationReports.$inferInsert;
+
+export const insertPropertyValuationReportSchema = createInsertSchema(propertyValuationReports).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertPropertyValuationReportWithValidation = z.infer<typeof insertPropertyValuationReportSchema>;
+
 // Team members and role management
 export const teamMembers = pgTable("team_members", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

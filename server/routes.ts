@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
-import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertCivilMepReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests } from "@shared/schema";
+import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertCivilMepReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, insertPropertyValuationReportSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
@@ -2621,6 +2621,167 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error cleaning up backups:", error);
       res.status(500).json({ error: "Failed to cleanup old backups" });
+    }
+  });
+
+  // ============ PROPERTY VALUATION REPORTS API ============
+  
+  // Get all valuation reports
+  app.get("/api/valuation-reports", async (req, res) => {
+    try {
+      const reports = await storage.getAllValuationReports();
+      res.json(reports);
+    } catch (error) {
+      console.error("Error fetching valuation reports:", error);
+      res.status(500).json({ error: "Failed to fetch valuation reports" });
+    }
+  });
+
+  // Get valuation report by ID
+  app.get("/api/valuation-reports/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const report = await storage.getValuationReport(id);
+      
+      if (!report) {
+        return res.status(404).json({ error: "Valuation report not found" });
+      }
+      
+      res.json(report);
+    } catch (error) {
+      console.error("Error fetching valuation report:", error);
+      res.status(500).json({ error: "Failed to fetch valuation report" });
+    }
+  });
+
+  // Create new valuation report
+  app.post("/api/valuation-reports", async (req, res) => {
+    try {
+      const validatedData = insertPropertyValuationReportSchema.parse(req.body);
+      const report = await storage.createValuationReport(validatedData);
+      res.status(201).json(report);
+    } catch (error) {
+      console.error("Error creating valuation report:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid data", details: error.errors });
+      }
+      res.status(500).json({ error: "Failed to create valuation report" });
+    }
+  });
+
+  // Update valuation report
+  app.put("/api/valuation-reports/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+      const report = await storage.updateValuationReport(id, updates);
+      
+      if (!report) {
+        return res.status(404).json({ error: "Valuation report not found" });
+      }
+      
+      res.json(report);
+    } catch (error) {
+      console.error("Error updating valuation report:", error);
+      res.status(500).json({ error: "Failed to update valuation report" });
+    }
+  });
+
+  // Delete valuation report
+  app.delete("/api/valuation-reports/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deleteValuationReport(id);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Valuation report not found" });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting valuation report:", error);
+      res.status(500).json({ error: "Failed to delete valuation report" });
+    }
+  });
+
+  // Get reports by property
+  app.get("/api/properties/:propertyId/valuation-reports", async (req, res) => {
+    try {
+      const { propertyId } = req.params;
+      const reports = await storage.getValuationReportsByProperty(propertyId);
+      res.json(reports);
+    } catch (error) {
+      console.error("Error fetching property valuation reports:", error);
+      res.status(500).json({ error: "Failed to fetch property valuation reports" });
+    }
+  });
+
+  // Get reports by customer
+  app.get("/api/customers/:customerId/valuation-reports", async (req, res) => {
+    try {
+      const { customerId } = req.params;
+      const reports = await storage.getValuationReportsByCustomer(customerId);
+      res.json(reports);
+    } catch (error) {
+      console.error("Error fetching customer valuation reports:", error);
+      res.status(500).json({ error: "Failed to fetch customer valuation reports" });
+    }
+  });
+
+  // Assign report to customer
+  app.post("/api/valuation-reports/:id/assign", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { customerId } = req.body;
+      
+      if (!customerId) {
+        return res.status(400).json({ error: "Customer ID is required" });
+      }
+      
+      const report = await storage.assignReportToCustomer(id, customerId);
+      
+      if (!report) {
+        return res.status(404).json({ error: "Valuation report not found" });
+      }
+      
+      res.json(report);
+    } catch (error) {
+      console.error("Error assigning report to customer:", error);
+      res.status(500).json({ error: "Failed to assign report to customer" });
+    }
+  });
+
+  // Update report status
+  app.patch("/api/valuation-reports/:id/status", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+      
+      if (!["draft", "in_progress", "completed", "delivered"].includes(status)) {
+        return res.status(400).json({ error: "Invalid status value" });
+      }
+      
+      const report = await storage.updateReportStatus(id, status);
+      
+      if (!report) {
+        return res.status(404).json({ error: "Valuation report not found" });
+      }
+      
+      res.json(report);
+    } catch (error) {
+      console.error("Error updating report status:", error);
+      res.status(500).json({ error: "Failed to update report status" });
+    }
+  });
+
+  // Get valuation report statistics
+  app.get("/api/valuation-reports/stats", async (req, res) => {
+    try {
+      const stats = await storage.getValuationReportStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching valuation report stats:", error);
+      res.status(500).json({ error: "Failed to fetch valuation report statistics" });
     }
   });
 
