@@ -126,6 +126,7 @@ function ProtectedRouter() {
       <Route path="/admin-panel/backup-system" component={BackupSystem} />
       <Route path="/admin-panel/supabase-migration" component={SupabaseMigration} />
       <Route path="/admin-panel/supabase-status" component={SupabaseStatus} />
+      <Route path="/admin-panel/supabase" component={SupabaseStatus} />
       
       {/* Customer-facing routes */}
       <Route path="/about" component={About} />

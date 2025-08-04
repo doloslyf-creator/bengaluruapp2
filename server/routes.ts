@@ -20,6 +20,7 @@ import { getBlogPosts, getBlogPost, createBlogPost, updateBlogPost, deleteBlogPo
 import { reraService } from "./reraService";
 import { paymentService, apiKeysManager } from "./paymentService";
 import { supabaseMigration } from "./supabaseMigration";
+import { supabaseMigrator } from "./supabaseMigrator";
 import { notificationService } from "./notificationService";
 import { backupService } from "./backupService";
 import * as fs from 'fs';
@@ -2258,6 +2259,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error during leads migration:", error);
       res.status(500).json({ 
         error: "Leads migration failed", 
+        details: error instanceof Error ? error.message : "Unknown error" 
+      });
+    }
+  });
+
+  // Enhanced Supabase Migration Routes
+  app.get("/api/supabase/migration-status", async (req, res) => {
+    try {
+      const connectionStatus = await supabaseMigrator.checkSupabaseConnection();
+      const verification = await supabaseMigrator.verifyMigration();
+      
+      res.json({
+        supabaseConnected: connectionStatus,
+        migrationStatus: verification,
+        message: connectionStatus ? "Supabase ready for migration" : "Supabase connection failed"
+      });
+    } catch (error) {
+      console.error("Error checking migration status:", error);
+      res.status(500).json({ 
+        error: "Failed to check migration status",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  app.post("/api/supabase/migrate-all-data", async (req, res) => {
+    try {
+      console.log("Starting comprehensive Supabase migration...");
+      const migrationResult = await supabaseMigrator.migrateAllData();
+      
+      res.json({
+        success: migrationResult.success,
+        message: migrationResult.success 
+          ? `Migration completed! ${migrationResult.totalMigrated} records migrated.`
+          : "Migration completed with some errors",
+        details: migrationResult.results
+      });
+    } catch (error) {
+      console.error("Error during comprehensive migration:", error);
+      res.status(500).json({ 
+        error: "Comprehensive migration failed", 
+        details: error instanceof Error ? error.message : "Unknown error" 
+      });
+    }
+  });
+
+  app.post("/api/supabase/verify-migration", async (req, res) => {
+    try {
+      const verification = await supabaseMigrator.verifyMigration();
+      res.json(verification);
+    } catch (error) {
+      console.error("Error verifying migration:", error);
+      res.status(500).json({ 
+        error: "Migration verification failed", 
         details: error instanceof Error ? error.message : "Unknown error" 
       });
     }

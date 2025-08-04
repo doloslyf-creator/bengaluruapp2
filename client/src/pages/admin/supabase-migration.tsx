@@ -1,352 +1,383 @@
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { AdminLayout } from "@/components/layout/admin-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
-import { AdminLayout } from "@/components/layout/admin-layout";
 import { 
   Database, 
-  RefreshCw, 
+  Upload, 
   CheckCircle, 
+  XCircle, 
   AlertCircle, 
-  Users, 
-  Building2, 
-  Calendar,
-  Settings
+  RefreshCw,
+  ArrowRight,
+  Server,
+  Users,
+  FileText,
+  Settings,
+  Clock
 } from "lucide-react";
-
-interface DataSummary {
-  supabaseReady: boolean;
-  existingData: {
-    properties: number;
-    leads: number;
-    bookings: number;
-    teamMembers: number;
-  };
-  supabaseData?: {
-    properties: number;
-    leads: number;
-    bookings: number;
-    teamMembers: number;
-  };
-}
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function SupabaseMigration() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [migrationStep, setMigrationStep] = useState<string | null>(null);
 
   // Fetch migration status
-  const { data: status, isLoading: statusLoading, refetch } = useQuery<DataSummary>({
-    queryKey: ["/api/supabase/status"],
-    refetchInterval: 5000, // Refresh every 5 seconds
+  const { data: migrationStatus, isLoading: statusLoading, refetch: refetchStatus } = useQuery({
+    queryKey: ["/api/supabase/migration-status"],
+    refetchInterval: 5000, // Refresh every 5 seconds during migration
   });
 
-  // Migration mutations
-  const migrationMutation = useMutation({
-    mutationFn: async (endpoint: string) => {
-      const response = await fetch(`/api/supabase/${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.details || error.error || 'Migration failed');
-      }
-      
-      return response.json();
-    },
-    onSuccess: (data, endpoint) => {
+  // Fetch existing Supabase status
+  const { data: supabaseStatus } = useQuery({
+    queryKey: ["/api/supabase/status"],
+  });
+
+  // Complete migration mutation
+  const migrateMutation = useMutation({
+    mutationFn: () => apiRequest("POST", "/api/supabase/migrate-all-data"),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/supabase/migration-status"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/supabase/status"] });
       toast({
         title: "Migration Successful",
-        description: data.message,
+        description: data.message || "All data has been migrated to Supabase successfully!",
       });
-      refetch();
+      setMigrationStep(null);
     },
-    onError: (error: Error, endpoint) => {
+    onError: (error: any) => {
       toast({
         title: "Migration Failed",
-        description: error.message,
+        description: error.message || "Failed to migrate data to Supabase",
+        variant: "destructive",
+      });
+      setMigrationStep(null);
+    },
+  });
+
+  // Verify migration mutation
+  const verifyMutation = useMutation({
+    mutationFn: () => apiRequest("POST", "/api/supabase/verify-migration"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/supabase/migration-status"] });
+      toast({
+        title: "Verification Complete",
+        description: "Migration verification completed successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Verification Failed",
+        description: error.message || "Failed to verify migration",
         variant: "destructive",
       });
     },
   });
 
-  const handleMigration = (endpoint: string) => {
-    migrationMutation.mutate(endpoint);
+  const handleMigrateAll = () => {
+    setMigrationStep("migration");
+    migrateMutation.mutate();
   };
 
-  if (statusLoading) {
-    return (
-      <AdminLayout title="Supabase Migration">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center min-h-[400px]">
-          <RefreshCw className="h-8 w-8 animate-spin" />
-          <span className="ml-2">Loading Supabase status...</span>
-        </div>
-      </AdminLayout>
-    );
-  }
+  const handleVerifyMigration = () => {
+    verifyMutation.mutate();
+  };
+
+  const isSupabaseConnected = migrationStatus?.supabaseConnected;
+  const migrationCounts = migrationStatus?.migrationStatus?.counts;
 
   return (
-    <AdminLayout title="Supabase Migration">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-      <div className="flex items-center justify-between">
+    <AdminLayout>
+      <div className="space-y-6">
+        {/* Header */}
         <div>
           <h1 className="text-3xl font-bold">Supabase Migration</h1>
           <p className="text-muted-foreground">
-            Migrate your data from PostgreSQL/Drizzle to Supabase
+            Migrate your data from PostgreSQL to Supabase for unified database management
           </p>
         </div>
-        <Button 
-          variant="outline" 
-          onClick={() => refetch()}
-          disabled={statusLoading}
-        >
-          <RefreshCw className={`h-4 w-4 mr-2 ${statusLoading ? 'animate-spin' : ''}`} />
-          Refresh Status
-        </Button>
-      </div>
 
-      {/* Connection Status */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Database className="h-5 w-5" />
-              <CardTitle>Connection Status</CardTitle>
-            </div>
-            <Badge variant={status?.supabaseReady ? "default" : "secondary"}>
-              {status?.supabaseReady ? (
-                <>
-                  <CheckCircle className="h-3 w-3 mr-1" />
-                  Connected
-                </>
-              ) : (
-                <>
-                  <AlertCircle className="h-3 w-3 mr-1" />
-                  Not Connected
-                </>
-              )}
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {status?.supabaseReady ? (
-            <p className="text-green-600">
-              ✅ Supabase is configured and ready for migration
-            </p>
-          ) : (
-            <div className="space-y-2">
-              <p className="text-orange-600">
-                ⚠️ Supabase not configured. Using existing PostgreSQL database.
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Ensure your Supabase credentials are properly set in the environment variables.
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Data Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Current Data */}
+        {/* Connection Status */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Database className="h-5 w-5" />
-              <span>Current Database</span>
+              <span>Connection Status</span>
             </CardTitle>
             <CardDescription>
-              Data in your existing PostgreSQL/Drizzle setup
+              Current database connections and migration readiness
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Building2 className="h-4 w-4 text-blue-500" />
-                <span>Properties</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Current Database */}
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <Server className="h-8 w-8 text-blue-600" />
+                  <div>
+                    <div className="font-medium">Current PostgreSQL</div>
+                    <div className="text-sm text-muted-foreground">Active database</div>
+                  </div>
+                </div>
+                <Badge variant="default" className="bg-green-600">
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  Connected
+                </Badge>
               </div>
-              <Badge variant="outline">{status?.existingData.properties || 0}</Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Users className="h-4 w-4 text-green-500" />
-                <span>Leads</span>
+
+              {/* Supabase */}
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <Database className="h-8 w-8 text-green-600" />
+                  <div>
+                    <div className="font-medium">Supabase</div>
+                    <div className="text-sm text-muted-foreground">Target database</div>
+                  </div>
+                </div>
+                {statusLoading ? (
+                  <Badge variant="secondary">
+                    <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+                    Checking...
+                  </Badge>
+                ) : isSupabaseConnected ? (
+                  <Badge variant="default" className="bg-green-600">
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                    Ready
+                  </Badge>
+                ) : (
+                  <Badge variant="destructive">
+                    <XCircle className="h-3 w-3 mr-1" />
+                    Not Connected
+                  </Badge>
+                )}
               </div>
-              <Badge variant="outline">{status?.existingData.leads || 0}</Badge>
             </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Calendar className="h-4 w-4 text-purple-500" />
-                <span>Bookings</span>
-              </div>
-              <Badge variant="outline">{status?.existingData.bookings || 0}</Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Settings className="h-4 w-4 text-orange-500" />
-                <span>Team Members</span>
-              </div>
-              <Badge variant="outline">{status?.existingData.teamMembers || 0}</Badge>
-            </div>
+
+            {!isSupabaseConnected && !statusLoading && (
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Supabase connection failed. Please check your SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.
+                </AlertDescription>
+              </Alert>
+            )}
           </CardContent>
         </Card>
 
-        {/* Supabase Data */}
+        {/* Current Data Summary */}
+        {supabaseStatus && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <FileText className="h-5 w-5" />
+                <span>Current Data Summary</span>
+              </CardTitle>
+              <CardDescription>
+                Overview of data in your current database
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600">
+                    {supabaseStatus.existingData?.properties || 0}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Properties</div>
+                </div>
+                <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600">
+                    {supabaseStatus.existingData?.leads || 0}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Leads</div>
+                </div>
+                <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                  <div className="text-2xl font-bold text-purple-600">
+                    {supabaseStatus.existingData?.valuationReports || 0}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Reports</div>
+                </div>
+                <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                  <div className="text-2xl font-bold text-orange-600">
+                    {supabaseStatus.existingData?.settings || 0}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Settings</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Migration Actions */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Database className="h-5 w-5" />
-              <span>Supabase Database</span>
+              <Upload className="h-5 w-5" />
+              <span>Migration Actions</span>
             </CardTitle>
             <CardDescription>
-              {status?.supabaseReady 
-                ? "Data already migrated to Supabase"
-                : "Supabase not available"
-              }
+              Start the data migration process to Supabase
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {status?.supabaseReady && status.supabaseData ? (
-              <>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Building2 className="h-4 w-4 text-blue-500" />
-                    <span>Properties</span>
-                  </div>
-                  <Badge variant="outline">{status.supabaseData.properties}</Badge>
+          <CardContent className="space-y-6">
+            {/* Migration Process Steps */}
+            <div className="space-y-4">
+              <h3 className="font-semibold">Migration Process:</h3>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-3 p-3 bg-muted rounded-lg">
+                  <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">1</div>
+                  <span>Properties & Configurations</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Users className="h-4 w-4 text-green-500" />
-                    <span>Leads</span>
-                  </div>
-                  <Badge variant="outline">{status.supabaseData.leads}</Badge>
+                <div className="flex items-center space-x-3 p-3 bg-muted rounded-lg">
+                  <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">2</div>
+                  <span>Valuation Reports & Data</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="h-4 w-4 text-purple-500" />
-                    <span>Bookings</span>
-                  </div>
-                  <Badge variant="outline">{status.supabaseData.bookings}</Badge>
+                <div className="flex items-center space-x-3 p-3 bg-muted rounded-lg">
+                  <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">3</div>
+                  <span>Application Settings</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Settings className="h-4 w-4 text-orange-500" />
-                    <span>Team Members</span>
-                  </div>
-                  <Badge variant="outline">{status.supabaseData.teamMembers}</Badge>
+                <div className="flex items-center space-x-3 p-3 bg-muted rounded-lg">
+                  <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">4</div>
+                  <span>Verification & Testing</span>
                 </div>
-              </>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <Database className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p>Supabase not configured</p>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Migration Controls */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button
+                onClick={handleMigrateAll}
+                disabled={!isSupabaseConnected || migrateMutation.isPending}
+                size="lg"
+                className="flex-1"
+              >
+                {migrateMutation.isPending ? (
+                  <div className="flex items-center space-x-2">
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    <span>Migrating Data...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <Upload className="h-4 w-4" />
+                    <span>Start Complete Migration</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </div>
+                )}
+              </Button>
+
+              <Button
+                onClick={handleVerifyMigration}
+                disabled={!isSupabaseConnected || verifyMutation.isPending}
+                variant="outline"
+                size="lg"
+              >
+                {verifyMutation.isPending ? (
+                  <div className="flex items-center space-x-2">
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    <span>Verifying...</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="h-4 w-4" />
+                    <span>Verify Migration</span>
+                  </div>
+                )}
+              </Button>
+
+              <Button
+                onClick={() => refetchStatus()}
+                variant="outline"
+                size="lg"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Migration Progress */}
+            {migrationStep && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Migration Progress</span>
+                  <span className="text-sm text-muted-foreground">In Progress...</span>
+                </div>
+                <Progress value={50} className="h-2" />
               </div>
             )}
           </CardContent>
         </Card>
-      </div>
 
-      {/* Migration Actions */}
-      {status?.supabaseReady && (
+        {/* Migration Results */}
+        {migrationCounts && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                <span>Migration Results</span>
+              </CardTitle>
+              <CardDescription>
+                Current data in Supabase after migration
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center p-4 border rounded-lg">
+                  <div className="text-2xl font-bold">{migrationCounts.properties}</div>
+                  <div className="text-sm text-muted-foreground">Properties Migrated</div>
+                </div>
+                <div className="text-center p-4 border rounded-lg">
+                  <div className="text-2xl font-bold">{migrationCounts.valuationReports}</div>
+                  <div className="text-sm text-muted-foreground">Reports Migrated</div>
+                </div>
+                <div className="text-center p-4 border rounded-lg">
+                  <div className="text-2xl font-bold">{migrationCounts.customers}</div>
+                  <div className="text-sm text-muted-foreground">Customers Migrated</div>
+                </div>
+                <div className="text-center p-4 border rounded-lg">
+                  <div className="text-2xl font-bold">{migrationCounts.settings}</div>
+                  <div className="text-sm text-muted-foreground">Settings Migrated</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Instructions */}
         <Card>
           <CardHeader>
-            <CardTitle>Migration Actions</CardTitle>
-            <CardDescription>
-              Migrate your data to Supabase. You can migrate individual data types or all at once.
-            </CardDescription>
+            <CardTitle className="flex items-center space-x-2">
+              <AlertCircle className="h-5 w-5" />
+              <span>Important Instructions</span>
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Button
-                onClick={() => handleMigration('migrate/properties')}
-                disabled={migrationMutation.isPending}
-                variant="outline"
-                className="h-auto py-4 flex flex-col items-center space-y-2"
-              >
-                <Building2 className="h-6 w-6" />
-                <span>Migrate Properties</span>
-                <span className="text-xs text-muted-foreground">
-                  {status.existingData.properties} records
-                </span>
-              </Button>
+          <CardContent className="space-y-4">
+            <Alert>
+              <Clock className="h-4 w-4" />
+              <AlertDescription>
+                <strong>Before Migration:</strong> Ensure you have your Supabase database connection string ready. 
+                After successful migration, you'll need to update your DATABASE_URL environment variable to point to Supabase.
+              </AlertDescription>
+            </Alert>
 
-              <Button
-                onClick={() => handleMigration('migrate/leads')}
-                disabled={migrationMutation.isPending}
-                variant="outline"
-                className="h-auto py-4 flex flex-col items-center space-y-2"
-              >
-                <Users className="h-6 w-6" />
-                <span>Migrate Leads</span>
-                <span className="text-xs text-muted-foreground">
-                  {status.existingData.leads} records
-                </span>
-              </Button>
+            <div className="space-y-2">
+              <h4 className="font-semibold">Post-Migration Steps:</h4>
+              <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground ml-4">
+                <li>Update DATABASE_URL environment variable with your Supabase connection string</li>
+                <li>Restart the application to use the new database connection</li>
+                <li>Verify that all data appears correctly in the application</li>
+                <li>Test key functionality like property management and reports</li>
+                <li>Consider backing up your old PostgreSQL database before removing it</li>
+              </ol>
             </div>
-
-            <Separator className="my-6" />
-
-            <Button
-              onClick={() => handleMigration('migrate')}
-              disabled={migrationMutation.isPending}
-              className="w-full h-12"
-              size="lg"
-            >
-              {migrationMutation.isPending ? (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Migrating...
-                </>
-              ) : (
-                <>
-                  <Database className="h-4 w-4 mr-2" />
-                  Migrate All Data
-                </>
-              )}
-            </Button>
           </CardContent>
         </Card>
-      )}
-
-      {/* Instructions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Migration Instructions</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <h4 className="font-semibold">Before Migration:</h4>
-            <ul className="list-disc list-inside text-sm space-y-1 ml-4">
-              <li>Ensure Supabase credentials are properly configured</li>
-              <li>Create the database schema using the provided SQL file</li>
-              <li>Backup your existing data as a precaution</li>
-            </ul>
-          </div>
-          
-          <div className="space-y-2">
-            <h4 className="font-semibold">During Migration:</h4>
-            <ul className="list-disc list-inside text-sm space-y-1 ml-4">
-              <li>Data is migrated in batches to ensure reliability</li>
-              <li>Existing data is preserved and Supabase data is upserted</li>
-              <li>Progress is logged and errors are handled gracefully</li>
-            </ul>
-          </div>
-
-          <div className="space-y-2">
-            <h4 className="font-semibold">After Migration:</h4>
-            <ul className="list-disc list-inside text-sm space-y-1 ml-4">
-              <li>Verify data integrity by comparing record counts</li>
-              <li>Test key functionality with Supabase</li>
-              <li>Switch storage implementation when ready</li>
-            </ul>
-          </div>
-        </CardContent>
-      </Card>
       </div>
     </AdminLayout>
   );
