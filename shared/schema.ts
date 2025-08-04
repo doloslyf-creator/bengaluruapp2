@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, boolean, timestamp, json, decimal, real, date } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, boolean, timestamp, json, decimal, real, date, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -839,6 +839,24 @@ export const propertyValuationReports = pgTable("property_valuation_reports", {
 
 // Export types for Valuation Reports
 export type PropertyValuationReport = typeof propertyValuationReports.$inferSelect;
+
+// Property Valuation Report Customers (Many-to-Many relationship)
+export const propertyValuationReportCustomers = pgTable("property_valuation_report_customers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  reportId: varchar("report_id").notNull().references(() => propertyValuationReports.id, { onDelete: "cascade" }),
+  customerId: varchar("customer_id").notNull(),
+  assignedAt: timestamp("assigned_at").defaultNow(),
+  assignedBy: varchar("assigned_by").notNull(),
+}, (table) => [
+  index("idx_report_customer").on(table.reportId, table.customerId),
+]);
+
+export const insertPropertyValuationReportCustomerSchema = createInsertSchema(propertyValuationReportCustomers).omit({
+  id: true,
+  assignedAt: true,
+});
+export type InsertPropertyValuationReportCustomer = z.infer<typeof insertPropertyValuationReportCustomerSchema>;
+export type PropertyValuationReportCustomer = typeof propertyValuationReportCustomers.$inferSelect;
 export type InsertPropertyValuationReport = typeof propertyValuationReports.$inferInsert;
 
 export const insertPropertyValuationReportSchema = createInsertSchema(propertyValuationReports).omit({

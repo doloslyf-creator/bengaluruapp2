@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
-import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertCivilMepReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, insertPropertyValuationReportSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests } from "@shared/schema";
+import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertCivilMepReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, insertPropertyValuationReportSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests, propertyValuationReportCustomers } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
@@ -988,7 +988,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Valuation Reports API - Get all valuation reports
+  // Valuation Reports API - Get all valuation reports with customer assignments
   app.get("/api/valuation-reports", async (req, res) => {
     try {
       const reports = await storage.getAllValuationReports();
@@ -996,6 +996,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching valuation reports:", error);
       res.status(500).json({ error: "Failed to fetch valuation reports" });
+    }
+  });
+
+  // Assign multiple customers to a valuation report
+  app.post("/api/valuation-reports/:reportId/customers", async (req, res) => {
+    try {
+      const { reportId } = req.params;
+      const { customerIds, assignedBy = "admin" } = req.body;
+
+      if (!customerIds || !Array.isArray(customerIds) || customerIds.length === 0) {
+        return res.status(400).json({ error: "Customer IDs array is required" });
+      }
+
+      // Insert customer assignments
+      const assignments = customerIds.map(customerId => ({
+        reportId,
+        customerId,
+        assignedBy
+      }));
+
+      for (const assignment of assignments) {
+        await db.insert(propertyValuationReportCustomers)
+          .values(assignment)
+          .onConflictDoNothing(); // Prevent duplicate assignments
+      }
+
+      res.status(201).json({ success: true, assigned: customerIds.length });
+    } catch (error) {
+      console.error("Error assigning customers to report:", error);
+      res.status(500).json({ error: "Failed to assign customers" });
+    }
+  });
+
+  // Remove customers from a valuation report
+  app.delete("/api/valuation-reports/:reportId/customers", async (req, res) => {
+    try {
+      const { reportId } = req.params;
+      const { customerIds } = req.body;
+
+      if (!customerIds || !Array.isArray(customerIds)) {
+        return res.status(400).json({ error: "Customer IDs array is required" });
+      }
+
+      await db.delete(propertyValuationReportCustomers)
+        .where(
+          and(
+            eq(propertyValuationReportCustomers.reportId, reportId),
+            sql`${propertyValuationReportCustomers.customerId} = ANY(${customerIds})`
+          )
+        );
+
+      res.json({ success: true, removed: customerIds.length });
+    } catch (error) {
+      console.error("Error removing customers from report:", error);
+      res.status(500).json({ error: "Failed to remove customers" });
+    }
+  });
+
+  // Get customers assigned to a specific report
+  app.get("/api/valuation-reports/:reportId/customers", async (req, res) => {
+    try {
+      const { reportId } = req.params;
+      
+      const assignments = await db.select()
+        .from(propertyValuationReportCustomers)
+        .where(eq(propertyValuationReportCustomers.reportId, reportId));
+
+      res.json(assignments);
+    } catch (error) {
+      console.error("Error fetching report customers:", error);
+      res.status(500).json({ error: "Failed to fetch report customers" });
     }
   });
 

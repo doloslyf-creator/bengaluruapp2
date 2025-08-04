@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/layout/admin-layout";
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,9 @@ import type { PropertyValuationReport, Property } from "@shared/schema";
 export default function ValuationReportsPage() {
   const [selectedReport, setSelectedReport] = useState<PropertyValuationReport | null>(null);
   const [showViewDialog, setShowViewDialog] = useState(false);
+  const [showAssignDialog, setShowAssignDialog] = useState(false);
+  const [selectedReportId, setSelectedReportId] = useState<string>("");
+  const [reportCustomers, setReportCustomers] = useState<Record<string, any[]>>({});
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, navigate] = useLocation();
@@ -52,6 +55,38 @@ export default function ValuationReportsPage() {
   const { data: properties = [] } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
   });
+
+  // Fetch customers for assignment
+  const { data: customers = [] } = useQuery<any[]>({
+    queryKey: ["/api/customers"],
+  });
+
+  // Fetch customer assignments for each report
+  useEffect(() => {
+    if (reports.length > 0) {
+      Promise.all(
+        reports.map(async (report) => {
+          try {
+            const response = await fetch(`/api/valuation-reports/${report.id}/customers`);
+            if (response.ok) {
+              const assignments = await response.json();
+              return { reportId: report.id, assignments };
+            }
+            return { reportId: report.id, assignments: [] };
+          } catch (error) {
+            console.error(`Error fetching customers for report ${report.id}:`, error);
+            return { reportId: report.id, assignments: [] };
+          }
+        })
+      ).then((results) => {
+        const customersByReport: Record<string, any[]> = {};
+        results.forEach(({ reportId, assignments }) => {
+          customersByReport[reportId] = assignments;
+        });
+        setReportCustomers(customersByReport);
+      });
+    }
+  }, [reports]);
 
   // Fetch stats
   const { data: stats } = useQuery<{
@@ -107,6 +142,42 @@ export default function ValuationReportsPage() {
       toast({
         title: "Error",
         description: error.message || "Failed to update report status",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Assign customers mutation
+  const assignCustomersMutation = useMutation({
+    mutationFn: async ({ reportId, customerIds }: { reportId: string; customerIds: string[] }) => {
+      return await apiRequest(`/api/valuation-reports/${reportId}/customers`, "POST", {
+        customerIds,
+        assignedBy: "admin"
+      });
+    },
+    onSuccess: () => {
+      // Refresh customer assignments
+      const report = reports.find(r => r.id === selectedReportId);
+      if (report) {
+        fetch(`/api/valuation-reports/${selectedReportId}/customers`)
+          .then(res => res.json())
+          .then(assignments => {
+            setReportCustomers(prev => ({
+              ...prev,
+              [selectedReportId]: assignments
+            }));
+          });
+      }
+      setShowAssignDialog(false);
+      toast({
+        title: "Success",
+        description: "Customers assigned to report successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to assign customers",
         variant: "destructive",
       });
     },
@@ -245,6 +316,7 @@ export default function ValuationReportsPage() {
                     <TableRow>
                       <TableHead className="min-w-[200px]">Report Title</TableHead>
                       <TableHead className="min-w-[150px]">Property</TableHead>
+                      <TableHead className="min-w-[140px]">Assigned To</TableHead>
                       <TableHead className="min-w-[120px]">Status</TableHead>
                       <TableHead className="min-w-[100px]">Est. Value</TableHead>
                       <TableHead className="min-w-[100px]">Created</TableHead>
@@ -258,6 +330,27 @@ export default function ValuationReportsPage() {
                         {report.reportTitle}
                       </TableCell>
                       <TableCell className="max-w-[150px] truncate">{getPropertyName(report.propertyId)}</TableCell>
+                      <TableCell className="max-w-[140px]">
+                        <div className="flex items-center space-x-2">
+                          <div className="text-sm text-muted-foreground truncate">
+                            {reportCustomers[report.id]?.length > 0 
+                              ? `${reportCustomers[report.id].length} customer${reportCustomers[report.id].length > 1 ? 's' : ''}`
+                              : "No assignments"
+                            }
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedReportId(report.id);
+                              setShowAssignDialog(true);
+                            }}
+                            data-testid={`button-assign-${report.id}`}
+                          >
+                            <UserPlus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
                       <TableCell>
                         <Select
                           value={report.reportStatus || "draft"}
