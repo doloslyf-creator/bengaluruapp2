@@ -2774,7 +2774,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get valuation report statistics
+  // Get valuation report statistics  
   app.get("/api/valuation-reports/stats", async (req, res) => {
     try {
       const stats = await storage.getValuationReportStats();

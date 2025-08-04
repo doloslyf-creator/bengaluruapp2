@@ -31,6 +31,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Edit, Trash2, Eye, UserPlus, TrendingUp, BarChart3, FileText, Clock } from "lucide-react";
+import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { PropertyValuationReport, Property } from "@shared/schema";
@@ -42,6 +43,7 @@ export default function ValuationReportsPage() {
   const [showViewDialog, setShowViewDialog] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, navigate] = useLocation();
 
   // Fetch valuation reports
   const { data: reports = [], isLoading: reportsLoading } = useQuery<PropertyValuationReport[]>({
@@ -511,10 +513,7 @@ export default function ValuationReportsPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => {
-                              setSelectedReport(report);
-                              setShowEditDialog(true);
-                            }}
+                            onClick={() => navigate(`/admin-panel/valuation-reports/edit/${report.id}`)}
                             data-testid={`button-edit-${report.id}`}
                           >
                             <Edit className="h-4 w-4" />
