@@ -3,6 +3,44 @@ import { storage } from "./storage";
 import { insertLeadSchema, type LeadWithDetails } from "@shared/schema";
 import { z } from "zod";
 
+// Helper functions for enhanced lead processing
+function calculateEnhancedLeadScore(leadData: any): number {
+  let score = 0;
+  
+  // Persona scoring
+  if (leadData.buyerPersona === "end-user-family") score += 25;
+  else if (leadData.buyerPersona === "first-time-buyer") score += 20;
+  else if (leadData.buyerPersona === "nri-investor") score += 15;
+  else if (leadData.buyerPersona === "upgrader") score += 22;
+  else if (leadData.buyerPersona === "investor") score += 18;
+  
+  // Urgency scoring
+  if (leadData.urgency === "immediate") score += 30;
+  else if (leadData.urgency === "3-6-months") score += 20;
+  else if (leadData.urgency === "6-12-months") score += 10;
+  
+  // Budget readiness
+  if (leadData.budgetMin && leadData.budgetMax) score += 15;
+  if (leadData.hasPreApproval) score += 20;
+  
+  // Location preference (specific areas)
+  if (leadData.preferredAreas?.length > 0) score += 10;
+  
+  return Math.min(score, 100); // Cap at 100
+}
+
+function generateSmartTags(leadData: any): string[] {
+  const tags: string[] = [];
+  
+  if (leadData.urgency === "immediate") tags.push("hot-lead");
+  if (leadData.buyerPersona === "first-time-buyer") tags.push("first-time-buyer");
+  if (leadData.hasPreApproval) tags.push("pre-approved");
+  if (leadData.wantsLegalSupport) tags.push("needs-legal-support");
+  if (leadData.budgetMax && parseInt(leadData.budgetMax) > 200) tags.push("premium-budget");
+  
+  return tags;
+}
+
 export function registerEnhancedLeadRoutes(app: Express) {
   
   // Get enhanced leads with smart filtering
@@ -18,7 +56,9 @@ export function registerEnhancedLeadRoutes(app: Express) {
         dateRange: req.query.dateRange as string,
       };
       
+      console.log("Fetching enhanced leads with filters:", filters);
       const leads = await storage.getEnhancedLeads(filters);
+      console.log(`Found ${leads.length} enhanced leads`);
       res.json(leads);
     } catch (error) {
       console.error("Error fetching enhanced leads:", error);
@@ -87,71 +127,60 @@ export function registerEnhancedLeadRoutes(app: Express) {
       // Add enhanced data
       const enhancedLead = {
         ...lead,
-        timeline: await storage.getLeadTimeline(lead.id),
-        documents: await storage.getLeadDocuments(lead.id),
+        score: lead.leadScore || 0,
+        activities: lead.activities || [],
+        notes: lead.notes || []
       };
-      
+
       res.json(enhancedLead);
     } catch (error) {
       console.error("Error fetching enhanced lead:", error);
-      res.status(500).json({ error: "Failed to fetch enhanced lead" });
+      res.status(500).json({ error: "Failed to fetch lead details" });
     }
   });
 
-  // Update lead with enhanced fields
-  app.patch("/api/leads/enhanced/:leadId", async (req, res) => {
+  // Update lead score
+  app.put("/api/leads/enhanced/:leadId/score", async (req, res) => {
     try {
-      const updates = {
-        ...req.body,
-        smartTags: generateSmartTags(req.body),
-        leadScore: req.body.leadScore || calculateEnhancedLeadScore(req.body),
-        updatedAt: new Date(),
-      };
-
-      const lead = await storage.updateLead(req.params.leadId, updates);
+      const { score, notes } = req.body;
+      const lead = await storage.updateLeadScore(req.params.leadId, score, notes);
+      
       if (!lead) {
         return res.status(404).json({ error: "Lead not found" });
       }
 
-      // Add activity for update
-      await storage.addLeadActivity({
-        leadId: lead.id,
-        activityType: "note",
-        subject: "Lead profile updated",
-        description: `Updated lead with enhanced persona data`,
-        outcome: "positive",
-        performedBy: req.body.updatedBy || "admin",
-      });
-
       res.json(lead);
     } catch (error) {
-      console.error("Error updating enhanced lead:", error);
-      res.status(500).json({ error: "Failed to update enhanced lead" });
+      console.error("Error updating lead score:", error);
+      res.status(500).json({ error: "Failed to update lead score" });
     }
   });
 
-  // Add enhanced note with categorization
-  app.post("/api/leads/:leadId/notes", async (req, res) => {
+  // Qualify/disqualify lead
+  app.put("/api/leads/enhanced/:leadId/qualify", async (req, res) => {
     try {
-      const note = await storage.addLeadNote({
-        leadId: req.params.leadId,
-        ...req.body,
-        createdBy: req.body.createdBy || "admin",
-      });
+      const { qualified, notes } = req.body;
+      const lead = await storage.qualifyLead(req.params.leadId, qualified, notes);
+      
+      if (!lead) {
+        return res.status(404).json({ error: "Lead not found" });
+      }
 
-      res.status(201).json(note);
+      res.json(lead);
     } catch (error) {
-      console.error("Error adding lead note:", error);
-      res.status(500).json({ error: "Failed to add lead note" });
+      console.error("Error qualifying lead:", error);
+      res.status(500).json({ error: "Failed to qualify lead" });
     }
   });
 
   // Add timeline milestone
-  app.post("/api/leads/:leadId/timeline", async (req, res) => {
+  app.post("/api/leads/enhanced/:leadId/timeline", async (req, res) => {
     try {
-      const timeline = await storage.addLeadTimeline({
+      const timeline = await storage.addLeadActivity({
         leadId: req.params.leadId,
+        activityType: "milestone",
         ...req.body,
+        performedBy: req.body.performedBy || "admin",
         createdBy: req.body.createdBy || "admin",
       });
 
@@ -177,103 +206,4 @@ export function registerEnhancedLeadRoutes(app: Express) {
       res.status(500).json({ error: "Failed to upload document" });
     }
   });
-}
-
-// Enhanced lead scoring algorithm
-function calculateEnhancedLeadScore(leadData: any): number {
-  let score = 0;
-
-  // Urgency scoring (0-25 points)
-  switch (leadData.urgency) {
-    case "immediate": score += 25; break;
-    case "3-6-months": score += 20; break;
-    case "6-12-months": score += 15; break;
-    case "exploratory": score += 5; break;
-  }
-
-  // Budget scoring (0-20 points)
-  const budgetMin = leadData.budgetMin || 0;
-  if (budgetMin > 200) score += 20; // High budget
-  else if (budgetMin > 100) score += 15; // Medium budget
-  else if (budgetMin > 50) score += 10; // Basic budget
-  else score += 5; // Low budget
-
-  // Persona scoring (0-15 points)
-  switch (leadData.buyerPersona) {
-    case "end-user-family": score += 15; break;
-    case "nri-investor": score += 12; break;
-    case "research-oriented": score += 10; break;
-    case "working-couple": score += 8; break;
-    case "first-time-buyer": score += 6; break;
-    case "senior-buyer": score += 5; break;
-  }
-
-  // Financing readiness (0-10 points)
-  if (leadData.hasPreApproval) score += 10;
-  else if (leadData.financing === "own-funds") score += 8;
-  else if (leadData.financing === "bank-loan") score += 6;
-
-  // Contact preferences (0-10 points)
-  if (leadData.preferredContactTime) score += 5;
-  if (leadData.phone && leadData.email) score += 5;
-
-  // Property specificity (0-10 points)
-  if (leadData.preferredAreas && leadData.preferredAreas.length > 0) score += 5;
-  if (leadData.bhkPreference) score += 3;
-  if (leadData.propertyType) score += 2;
-
-  // Legal needs (0-10 points)
-  if (leadData.wantsLegalSupport) score += 5;
-  if (leadData.interestedInReports && leadData.interestedInReports.length > 0) score += 5;
-
-  return Math.min(score, 100); // Cap at 100
-}
-
-// Generate smart tags based on lead data
-function generateSmartTags(leadData: any): string[] {
-  const tags: string[] = [];
-
-  // Urgency-based tags
-  if (leadData.urgency === "immediate") {
-    tags.push("hot-lead", "urgent");
-  }
-
-  // Budget-based tags
-  if (leadData.budgetMin && leadData.budgetMin > 100) {
-    tags.push("high-budget");
-  }
-
-  // Persona-based tags
-  if (leadData.buyerPersona === "first-time-buyer") {
-    tags.push("first-time-buyer", "needs-guidance");
-  }
-  
-  if (leadData.buyerPersona === "research-oriented") {
-    tags.push("research-intensive", "detail-oriented");
-  }
-
-  if (leadData.buyerPersona === "nri-investor") {
-    tags.push("investment-focused", "nri-client");
-  }
-
-  // Readiness tags
-  if (leadData.hasPreApproval || leadData.financing === "own-funds") {
-    tags.push("ready-to-buy");
-  }
-
-  // Support needs
-  if (leadData.wantsLegalSupport) {
-    tags.push("needs-legal-handholding");
-  }
-
-  if (leadData.seniorCitizenFriendly) {
-    tags.push("senior-friendly");
-  }
-
-  // Site visit readiness
-  if (leadData.urgency === "immediate" && leadData.preferredAreas && leadData.preferredAreas.length > 0) {
-    tags.push("ready-to-visit");
-  }
-
-  return tags;
 }
