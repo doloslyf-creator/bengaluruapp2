@@ -140,15 +140,16 @@ export default function ValuationReportsPage() {
     
     const reportData = {
       propertyId: formData.get("propertyId") as string,
+      customerId: "placeholder-customer", // In real app, get from auth/selection
       reportTitle: formData.get("reportTitle") as string,
       createdBy: "admin", // In a real app, this would come from auth
       reportStatus: "draft" as const,
       // Basic property profile data
       unitType: formData.get("unitType") as string,
       configuration: formData.get("configuration") as string,
-      // Market valuation
-      estimatedMarketValue: formData.get("estimatedMarketValue") ? parseFloat(formData.get("estimatedMarketValue") as string) : undefined,
-      ratePerSqft: formData.get("ratePerSqft") ? parseFloat(formData.get("ratePerSqft") as string) : undefined,
+      // Market valuation - convert to string as per schema
+      estimatedMarketValue: formData.get("estimatedMarketValue") as string,
+      ratePerSqft: formData.get("ratePerSqft") as string,
       // Basic fields for initial creation
       buyerFit: formData.get("buyerFit") as string,
       valuationVerdict: formData.get("valuationVerdict") as string,
