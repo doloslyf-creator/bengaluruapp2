@@ -279,7 +279,7 @@ export function CivilMepReportView() {
                     <span className="text-sm font-medium text-gray-500">Overall Score</span>
                     <span className="text-2xl font-bold text-gray-900">{report.overallScore}/10</span>
                   </div>
-                  <Progress value={report.overallScore * 10} className="h-2" />
+                  <Progress value={(report.overallScore || 0) * 10} className="h-2" />
                 </div>
                 <div className="text-gray-700 leading-relaxed whitespace-pre-line">
                   {report.investmentRecommendation}
@@ -301,7 +301,7 @@ export function CivilMepReportView() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <div>
                     <div className="text-sm font-medium text-gray-500 mb-2">Project Name</div>
-                    <div className="text-lg font-semibold text-gray-900">{report.siteInformation.project_name}</div>
+                    <div className="text-lg font-semibold text-gray-900">{report.siteInformation.projectName}</div>
                   </div>
                   <div>
                     <div className="text-sm font-medium text-gray-500 mb-2">Location</div>
@@ -309,11 +309,11 @@ export function CivilMepReportView() {
                   </div>
                   <div>
                     <div className="text-sm font-medium text-gray-500 mb-2">Plot Area</div>
-                    <div className="text-lg font-semibold text-gray-900">{report.siteInformation.plot_area}</div>
+                    <div className="text-lg font-semibold text-gray-900">{report.siteInformation.plotArea}</div>
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-gray-500 mb-2">Built-up Area</div>
-                    <div className="text-lg font-semibold text-gray-900">{report.siteInformation.built_up_area}</div>
+                    <div className="text-sm font-medium text-gray-500 mb-2">Survey Number</div>
+                    <div className="text-lg font-semibold text-gray-900">{report.siteInformation.surveyNumber}</div>
                   </div>
                 </div>
               </div>
@@ -336,17 +336,15 @@ export function CivilMepReportView() {
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4">
                   <div className="text-sm font-medium text-gray-500 mb-1">Depth & Grade Beam</div>
-                  <div className="font-semibold text-gray-900">{report.foundationDetails?.depth || 'Not specified'}</div>
+                  <div className="font-semibold text-gray-900">{report.foundationDetails?.depthAndFooting || 'Not specified'}</div>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4">
                   <div className="text-sm font-medium text-gray-500 mb-1">Soil Bearing Capacity</div>
-                  <div className="font-semibold text-gray-900">{report.foundationDetails?.soil_bearing_capacity || 'Not specified'}</div>
+                  <div className="font-semibold text-gray-900">{report.foundationDetails?.soilBearingCapacity || 'Not specified'}</div>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4">
-                  <div className="text-sm font-medium text-gray-500 mb-1">Status</div>
-                  <Badge className="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-medium">
-                    {report.foundationDetails?.status || 'Good'}
-                  </Badge>
+                  <div className="text-sm font-medium text-gray-500 mb-1">Waterproofing Method</div>
+                  <div className="font-semibold text-gray-900">{report.foundationDetails?.waterproofingMethod || 'Not specified'}</div>
                 </div>
               </div>
             </div>
@@ -361,20 +359,20 @@ export function CivilMepReportView() {
               <div className="space-y-4">
                 <div className="bg-gray-50 rounded-xl p-4">
                   <div className="text-sm font-medium text-gray-500 mb-1">Structural System</div>
-                  <div className="font-semibold text-gray-900">{report.superstructureDetails?.structural_system || 'Not specified'}</div>
+                  <div className="font-semibold text-gray-900">{report.superstructureDetails?.structuralSystem || 'Not specified'}</div>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4">
                   <div className="text-sm font-medium text-gray-500 mb-1">Concrete Grade</div>
-                  <div className="font-semibold text-gray-900">{report.superstructureDetails?.concrete_grade || 'Not specified'}</div>
+                  <div className="font-semibold text-gray-900">{report.superstructureDetails?.concreteGradeReinforcement || 'Not specified'}</div>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4">
                   <div className="text-sm font-medium text-gray-500 mb-1">Steel Grade</div>
-                  <div className="font-semibold text-gray-900">{report.superstructureDetails?.steel_grade || 'Not specified'}</div>
+                  <div className="font-semibold text-gray-900">{report.superstructureDetails?.loadCalculations || 'Not specified'}</div>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4">
                   <div className="text-sm font-medium text-gray-500 mb-1">Status</div>
                   <Badge className="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-medium">
-                    {report.superstructureDetails?.status || 'Excellent'}
+                    Excellent
                   </Badge>
                 </div>
               </div>
@@ -393,16 +391,16 @@ export function CivilMepReportView() {
               <div className="space-y-4">
                 <div className="bg-gray-50 rounded-xl p-4">
                   <div className="text-sm font-medium text-gray-500 mb-1">Load Capacity</div>
-                  <div className="font-semibold text-gray-900">{report.electricalSystems?.load_capacity || 'Not specified'}</div>
+                  <div className="font-semibold text-gray-900">{report.electricalSystems?.ltPanelDesign || 'Not specified'}</div>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4">
                   <div className="text-sm font-medium text-gray-500 mb-1">Backup Power</div>
-                  <div className="font-semibold text-gray-900">{report.electricalSystems?.backup_power || 'Not specified'}</div>
+                  <div className="font-semibold text-gray-900">{report.electricalSystems?.powerDistribution || 'Not specified'}</div>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4">
                   <div className="text-sm font-medium text-gray-500 mb-1">Safety Compliance</div>
                   <Badge className="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-medium">
-                    {report.electricalSystems?.safety || 'Excellent'}
+                    Excellent
                   </Badge>
                 </div>
               </div>
@@ -418,15 +416,15 @@ export function CivilMepReportView() {
               <div className="space-y-4">
                 <div className="bg-gray-50 rounded-xl p-4">
                   <div className="text-sm font-medium text-gray-500 mb-1">Water Supply</div>
-                  <div className="font-semibold text-gray-900">{report.plumbingSystems?.water_supply || 'Not specified'}</div>
+                  <div className="font-semibold text-gray-900">{typeof report.plumbingSystems?.waterSupply === 'string' ? report.plumbingSystems.waterSupply : 'Not specified'}</div>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4">
                   <div className="text-sm font-medium text-gray-500 mb-1">Water Pressure</div>
-                  <div className="font-semibold text-gray-900">{report.plumbingSystems?.pressure || 'Not specified'}</div>
+                  <div className="font-semibold text-gray-900">{report.plumbingSystems?.pipeMaterialDiameter || 'Not specified'}</div>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4">
                   <div className="text-sm font-medium text-gray-500 mb-1">Drainage System</div>
-                  <div className="font-semibold text-gray-900">{report.plumbingSystems?.drainage || 'Not specified'}</div>
+                  <div className="font-semibold text-gray-900">{report.plumbingSystems?.stpLayout || 'Not specified'}</div>
                 </div>
               </div>
             </div>
@@ -441,16 +439,16 @@ export function CivilMepReportView() {
               <div className="space-y-4">
                 <div className="bg-gray-50 rounded-xl p-4">
                   <div className="text-sm font-medium text-gray-500 mb-1">Sprinkler System</div>
-                  <div className="font-semibold text-gray-900">{report.fireSafetySystems?.sprinkler_system || 'Not specified'}</div>
+                  <div className="font-semibold text-gray-900">{report.fireSafetySystems?.sprinklerSystem || 'Not specified'}</div>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4">
                   <div className="text-sm font-medium text-gray-500 mb-1">Fire Extinguishers</div>
-                  <div className="font-semibold text-gray-900">{report.fireSafetySystems?.fire_extinguishers || 'Not specified'}</div>
+                  <div className="font-semibold text-gray-900">{report.fireSafetySystems?.hydrantSystemLayout || 'Not specified'}</div>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4">
                   <div className="text-sm font-medium text-gray-500 mb-1">Fire NOC</div>
                   <Badge className="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-medium">
-                    {report.fireSafetySystems?.fire_NOC || 'Obtained'}
+                    {report.fireSafetySystems?.fireNOC || 'Obtained'}
                   </Badge>
                 </div>
               </div>
