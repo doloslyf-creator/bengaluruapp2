@@ -329,36 +329,62 @@ export default function ValuationReportEditComprehensive() {
 
         <form onSubmit={handleSubmit} className="max-w-full">
           <Tabs defaultValue="executive" className="w-full">
-            <TabsList className="grid grid-cols-3 sm:grid-cols-7 w-full gap-1">
-              <TabsTrigger value="executive" className="flex items-center text-xs">
-                <FileText className="h-3 w-3 mr-1" />
-                Executive
-              </TabsTrigger>
-              <TabsTrigger value="property" className="flex items-center text-xs">
-                <Home className="h-3 w-3 mr-1" />
-                Property
-              </TabsTrigger>
-              <TabsTrigger value="configurations" className="flex items-center text-xs">
-                <Building className="h-3 w-3 mr-1" />
-                Configs
-              </TabsTrigger>
-              <TabsTrigger value="market" className="flex items-center text-xs">
-                <TrendingUp className="h-3 w-3 mr-1" />
-                Market
-              </TabsTrigger>
-              <TabsTrigger value="location" className="flex items-center text-xs">
-                <MapPin className="h-3 w-3 mr-1" />
-                Location
-              </TabsTrigger>
-              <TabsTrigger value="legal" className="flex items-center text-xs">
-                <Shield className="h-3 w-3 mr-1" />
-                Legal
-              </TabsTrigger>
-              <TabsTrigger value="final" className="flex items-center text-xs">
-                <Scale className="h-3 w-3 mr-1" />
-                Final
-              </TabsTrigger>
-            </TabsList>
+            {/* Enhanced Horizontal Tab Navigation */}
+            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b mb-6">
+              <div className="max-w-full overflow-x-auto">
+                <TabsList className="inline-flex w-auto min-w-full h-12 items-center justify-start rounded-none bg-transparent p-0 gap-0">
+                  <TabsTrigger 
+                    value="executive" 
+                    className="enhanced-tab-trigger flex items-center justify-center gap-2 rounded-none px-4 py-3 text-sm font-medium whitespace-nowrap"
+                  >
+                    <FileText className="h-4 w-4" />
+                    <span className="hidden sm:inline">Executive</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="property" 
+                    className="enhanced-tab-trigger flex items-center justify-center gap-2 rounded-none px-4 py-3 text-sm font-medium whitespace-nowrap"
+                  >
+                    <Home className="h-4 w-4" />
+                    <span className="hidden sm:inline">Property</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="configurations" 
+                    className="enhanced-tab-trigger flex items-center justify-center gap-2 rounded-none px-4 py-3 text-sm font-medium whitespace-nowrap"
+                  >
+                    <Building className="h-4 w-4" />
+                    <span className="hidden sm:inline">Configs</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="market" 
+                    className="enhanced-tab-trigger flex items-center justify-center gap-2 rounded-none px-4 py-3 text-sm font-medium whitespace-nowrap"
+                  >
+                    <TrendingUp className="h-4 w-4" />
+                    <span className="hidden sm:inline">Market</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="location" 
+                    className="enhanced-tab-trigger flex items-center justify-center gap-2 rounded-none px-4 py-3 text-sm font-medium whitespace-nowrap"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    <span className="hidden sm:inline">Location</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="legal" 
+                    className="enhanced-tab-trigger flex items-center justify-center gap-2 rounded-none px-4 py-3 text-sm font-medium whitespace-nowrap"
+                  >
+                    <Shield className="h-4 w-4" />
+                    <span className="hidden sm:inline">Legal</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="final" 
+                    className="enhanced-tab-trigger flex items-center justify-center gap-2 rounded-none px-4 py-3 text-sm font-medium whitespace-nowrap"
+                  >
+                    <Scale className="h-4 w-4" />
+                    <span className="hidden sm:inline">Final</span>
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+            </div>
 
             {/* Basic Information */}
             <Card className="mb-6">
@@ -415,7 +441,7 @@ export default function ValuationReportEditComprehensive() {
             </Card>
 
             {/* 1. Executive Summary */}
-            <TabsContent value="executive">
+            <TabsContent value="executive" className="tab-content-transition">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -526,7 +552,7 @@ export default function ValuationReportEditComprehensive() {
             </TabsContent>
 
             {/* 2. Property Profile */}
-            <TabsContent value="property">
+            <TabsContent value="property" className="tab-content-transition">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -649,7 +675,7 @@ export default function ValuationReportEditComprehensive() {
             </TabsContent>
 
             {/* 2.5 Property Configurations */}
-            <TabsContent value="configurations">
+            <TabsContent value="configurations" className="tab-content-transition">
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
@@ -793,7 +819,7 @@ export default function ValuationReportEditComprehensive() {
             </TabsContent>
 
             {/* 3. Market Valuation */}
-            <TabsContent value="market">
+            <TabsContent value="market" className="tab-content-transition">
               <div className="space-y-6">
                 {/* Market Valuation Estimate */}
                 <Card>
@@ -923,7 +949,7 @@ export default function ValuationReportEditComprehensive() {
             </TabsContent>
 
             {/* 5. Location & Infrastructure */}
-            <TabsContent value="location">
+            <TabsContent value="location" className="tab-content-transition">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -1052,7 +1078,7 @@ export default function ValuationReportEditComprehensive() {
             </TabsContent>
 
             {/* 6. Legal & Compliance */}
-            <TabsContent value="legal">
+            <TabsContent value="legal" className="tab-content-transition">
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
@@ -1279,7 +1305,7 @@ export default function ValuationReportEditComprehensive() {
             </TabsContent>
 
             {/* 10. Final Analysis */}
-            <TabsContent value="final">
+            <TabsContent value="final" className="tab-content-transition">
               <div className="space-y-6">
                 {/* Pros & Cons */}
                 <Card>
