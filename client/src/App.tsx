@@ -61,6 +61,7 @@ import { CivilMepReportView } from "@/pages/civil-mep-report-view";
 import ValuationReportsPage from "@/pages/admin/valuation-reports";
 import ValuationReportEdit from "@/pages/admin/valuation-report-edit-comprehensive";
 import ValuationReportsCreate from "@/pages/admin/valuation-reports-create";
+import ValuationReportsCreateComprehensive from "@/pages/admin/valuation-reports-create-comprehensive";
 import SetupWizard from "@/pages/setup-wizard";
 import NotFound from "@/pages/not-found";
 
@@ -115,6 +116,7 @@ function ProtectedRouter() {
       <Route path="/civil-mep-report/:id" component={CivilMepReportView} />
       <Route path="/admin-panel/valuation-reports" component={ValuationReportsPage} />
       <Route path="/admin-panel/valuation-reports/create" component={ValuationReportsCreate} />
+      <Route path="/admin-panel/valuation-reports/create-comprehensive" component={ValuationReportsCreateComprehensive} />
       <Route path="/admin-panel/valuation-reports/edit/:id" component={ValuationReportEdit} />
       <Route path="/admin-panel/property/:id/edit" component={PropertyEdit} />
 
