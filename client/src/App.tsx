@@ -36,10 +36,7 @@ import PropertyValuationForm from "@/pages/property-valuation-form";
 import PropertyResults from "@/pages/property-results";
 import BookVisit from "@/pages/book-visit";
 import Consultation from "@/pages/consultation";
-import UserPanel from "@/pages/user-panel";
-import EnhancedUserPanel from "@/pages/enhanced-user-panel";
-import UserDashboardDynamic from "@/pages/user-dashboard-dynamic";
-import UserDashboard from "@/pages/user-dashboard";
+
 import EnhancedLeads from "@/pages/admin/enhanced-leads";
 
 import CustomerHome from "@/pages/customer-home";
@@ -53,7 +50,7 @@ import ReraManagement from "@/pages/admin/rera-management";
 import SupabaseMigration from "@/pages/admin/supabase-migration";
 import SupabaseStatus from "@/pages/admin/supabase-status";
 import AdminNotifications from "@/pages/admin/notifications";
-import UserNotifications from "@/pages/user-notifications";
+
 import BackupSystem from "@/pages/admin/backup-system";
 import { AdminCivilMepReports } from "@/pages/admin-civil-mep-reports";
 import { AdminCivilMepReportsCreate } from "@/pages/admin-civil-mep-reports-create";
@@ -153,13 +150,7 @@ function ProtectedRouter() {
       <Route path="/contact/thank-you" component={ContactThankYou} />
       <Route path="/book-visit" component={BookVisit} />
       <Route path="/consultation" component={Consultation} />
-      <Route path="/user-panel" component={UserPanel} />
-      <Route path="/user-dashboard" component={UserDashboard} />
-      <Route path="/user-dashboard-legacy" component={EnhancedUserPanel} />
 
-
-
-      <Route path="/user-notifications" component={UserNotifications} />
       
       <Route component={NotFound} />
     </Switch>

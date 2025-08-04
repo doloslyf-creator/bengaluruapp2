@@ -611,7 +611,7 @@ function CreateNotificationForm({ onSubmit, isLoading, templates }: {
           <Input
             value={formData.actionUrl}
             onChange={(e) => setFormData({ ...formData, actionUrl: e.target.value })}
-            placeholder="/user-dashboard"
+            placeholder="/admin-panel"
           />
         </div>
         <div>
