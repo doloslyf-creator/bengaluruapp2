@@ -38,7 +38,6 @@ import type { PropertyValuationReport, Property } from "@shared/schema";
 
 export default function ValuationReportsPage() {
   const [selectedReport, setSelectedReport] = useState<PropertyValuationReport | null>(null);
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showViewDialog, setShowViewDialog] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -65,28 +64,7 @@ export default function ValuationReportsPage() {
     queryKey: ["/api/valuation-reports/stats"],
   });
 
-  // Create report mutation
-  const createReportMutation = useMutation({
-    mutationFn: async (data: any) => {
-      return await apiRequest("/api/valuation-reports", "POST", data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/valuation-reports"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/valuation-reports/stats"] });
-      setShowCreateDialog(false);
-      toast({
-        title: "Success",
-        description: "Valuation report created successfully",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to create valuation report",
-        variant: "destructive",
-      });
-    },
-  });
+
 
 
 
@@ -134,30 +112,7 @@ export default function ValuationReportsPage() {
     },
   });
 
-  const handleCreateReport = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    
-    const reportData = {
-      propertyId: formData.get("propertyId") as string,
-      customerId: "placeholder-customer", // In real app, get from auth/selection
-      reportTitle: formData.get("reportTitle") as string,
-      createdBy: "admin", // In a real app, this would come from auth
-      reportStatus: "draft" as const,
-      // Basic property profile data
-      unitType: formData.get("unitType") as string,
-      configuration: formData.get("configuration") as string,
-      // Market valuation - convert to string as per schema
-      estimatedMarketValue: formData.get("estimatedMarketValue") as string,
-      ratePerSqft: formData.get("ratePerSqft") as string,
-      // Basic fields for initial creation
-      buyerFit: formData.get("buyerFit") as string,
-      valuationVerdict: formData.get("valuationVerdict") as string,
-      recommendation: formData.get("recommendation") as string,
-    };
 
-    createReportMutation.mutate(reportData);
-  };
 
 
 
@@ -189,143 +144,14 @@ export default function ValuationReportsPage() {
               Manage comprehensive property valuation reports for Bengaluru properties
             </p>
           </div>
-          <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-            <DialogTrigger asChild>
-              <Button data-testid="button-create-report">
-                <Plus className="h-4 w-4 mr-2" />
-                Create Report
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Create New Valuation Report</DialogTitle>
-                <DialogDescription>
-                  Create a comprehensive property valuation report based on Bengaluru market analysis
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleCreateReport} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="propertyId">Property</Label>
-                    <Select name="propertyId" required>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select property" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {properties.map((property) => (
-                          <SelectItem key={property.id} value={property.id}>
-                            {property.name} - {property.area}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="reportTitle">Report Title</Label>
-                    <Input
-                      name="reportTitle"
-                      placeholder="Property Valuation Report - [Property Name]"
-                      required
-                    />
-                  </div>
-                </div>
+          <Button 
+            onClick={() => navigate("/admin-panel/valuation-reports/create")}
+            data-testid="button-create-report"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create Report
+          </Button>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="unitType">Unit Type</Label>
-                    <Select name="unitType">
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select unit type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="apartment">Apartment</SelectItem>
-                        <SelectItem value="villa">Villa</SelectItem>
-                        <SelectItem value="rowhouse">Rowhouse</SelectItem>
-                        <SelectItem value="plot">Plot</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="configuration">Configuration</Label>
-                    <Input
-                      name="configuration"
-                      placeholder="e.g., 3BHK, 1550 sq.ft"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="estimatedMarketValue">Estimated Market Value (₹)</Label>
-                    <Input
-                      name="estimatedMarketValue"
-                      type="number"
-                      step="0.01"
-                      placeholder="7500000.00"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="ratePerSqft">Rate per Sq.ft (₹)</Label>
-                    <Input
-                      name="ratePerSqft"
-                      type="number"
-                      step="0.01"
-                      placeholder="4800.00"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="buyerFit">Buyer Fit</Label>
-                  <Select name="buyerFit">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select buyer fit" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="end_use">End Use</SelectItem>
-                      <SelectItem value="investor">Investor</SelectItem>
-                      <SelectItem value="both">Both</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="valuationVerdict">Valuation Verdict</Label>
-                  <Textarea
-                    name="valuationVerdict"
-                    placeholder="Brief verdict on property valuation..."
-                    rows={3}
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="recommendation">Recommendation</Label>
-                  <Textarea
-                    name="recommendation"
-                    placeholder="Investment recommendation and key insights..."
-                    rows={3}
-                  />
-                </div>
-
-                <div className="flex justify-end space-x-2 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowCreateDialog(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    disabled={createReportMutation.isPending}
-                    data-testid="button-submit-create"
-                  >
-                    {createReportMutation.isPending ? "Creating..." : "Create Report"}
-                  </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
         </div>
 
         {/* Stats Cards */}
