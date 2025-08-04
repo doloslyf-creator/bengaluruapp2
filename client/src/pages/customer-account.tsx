@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import {
   User,
@@ -21,7 +21,14 @@ import {
   Activity,
   Clock,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Edit2,
+  Save,
+  X,
+  Star,
+  TrendingUp,
+  DollarSign,
+  BarChart3
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -35,23 +42,31 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { formatPriceDisplay } from "@/lib/utils";
+import { apiRequest } from "@/lib/queryClient";
 import { type CivilMepReport, type PropertyValuationReport } from "@shared/schema";
 
-// Mock customer data (will be replaced with auth later)
-const mockCustomer = {
-  id: "customer-1",
-  name: "Sri Krishna",
-  email: "srikrishna@timeless.co",
-  phone: "+91 98664 *****",
-  avatar: "",
-  memberSince: "December 2024",
-  address: "No.35 Heavens colony",
-  city: "Chennai",
-  dateOfBirth: "25/03/1993",
-  gender: "Male",
-  investorType: "Resident Indian Citizen",
-  contacts: "+91 98664 *****"
-};
+// Customer profile interface
+interface CustomerProfile {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  avatar?: string;
+  memberSince: string;
+  address: string;
+  city: string;
+  dateOfBirth: string;
+  gender: string;
+  investorType: string;
+  notifications: {
+    email: boolean;
+    sms: boolean;
+  };
+  privacy: {
+    profileVisible: boolean;
+  };
+}
 
 interface CustomerStats {
   totalReports: number;
@@ -63,9 +78,33 @@ interface CustomerStats {
 
 export default function CustomerAccount() {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [profileData, setProfileData] = useState<CustomerProfile>({
+    id: "customer-1",
+    firstName: "Sri",
+    lastName: "Krishna",
+    email: "srikrishna@timeless.co",
+    phone: "+91 98664 43210",
+    avatar: "",
+    memberSince: "December 2024",
+    address: "No.35 Heavens colony",
+    city: "Chennai",
+    dateOfBirth: "25/03/1993",
+    gender: "Male",
+    investorType: "Resident Indian Citizen",
+    notifications: {
+      email: true,
+      sms: true,
+    },
+    privacy: {
+      profileVisible: false,
+    }
+  });
+
   const [location, navigate] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Fetch customer's Civil MEP reports
   const { data: civilMepReports = [], isLoading: civilMepLoading } = useQuery<CivilMepReport[]>({
@@ -79,13 +118,37 @@ export default function CustomerAccount() {
     staleTime: 5 * 60 * 1000,
   });
 
+  // Update profile mutation
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data: Partial<CustomerProfile>) => {
+      // For demo purposes, just simulate success
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/customers"] });
+      setIsEditingProfile(false);
+      toast({
+        title: "Profile Updated",
+        description: "Your profile has been successfully updated.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Update Failed",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Calculate customer statistics
   const customerStats: CustomerStats = {
     totalReports: civilMepReports.length + valuationReports.length,
     civilMepReports: civilMepReports.length,
     valuationReports: valuationReports.length,
     pendingReports: [...civilMepReports, ...valuationReports].filter(report => 
-      ('status' in report && (report.status === 'pending' || report.status === 'in-progress')) ||
+      ('status' in report && (report.status === 'draft' || report.status === 'in-progress')) ||
       (!('status' in report))
     ).length,
     completedReports: [...civilMepReports, ...valuationReports].filter(report => 
@@ -127,13 +190,13 @@ export default function CustomerAccount() {
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome back, {mockCustomer.name}!</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome back, {profileData.firstName} {profileData.lastName}!</h2>
             <p className="text-gray-600">Manage your property reports and account settings</p>
           </div>
           <div className="hidden md:block">
             <div className="bg-white rounded-lg p-4 shadow-sm">
               <p className="text-sm text-gray-500">Member since</p>
-              <p className="font-semibold">{mockCustomer.memberSince}</p>
+              <p className="font-semibold">{profileData.memberSince}</p>
             </div>
           </div>
         </div>
@@ -249,19 +312,57 @@ export default function CustomerAccount() {
     </div>
   );
 
+  const handleProfileUpdate = (field: keyof CustomerProfile, value: any) => {
+    setProfileData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveProfile = () => {
+    updateProfileMutation.mutate(profileData);
+  };
+
   const renderAccount = () => (
     <Card className="border-0 shadow-lg">
       <CardHeader>
-        <CardTitle className="flex items-center space-x-3">
-          <Avatar className="h-16 w-16">
-            <AvatarImage src={mockCustomer.avatar} />
-            <AvatarFallback className="text-lg font-semibold bg-blue-100 text-blue-600">
-              {mockCustomer.name.split(' ').map(n => n[0]).join('')}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <h2 className="text-2xl font-bold">{mockCustomer.name}</h2>
-            <p className="text-gray-500">Edit display image</p>
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <Avatar className="h-16 w-16">
+              <AvatarImage src={profileData.avatar} />
+              <AvatarFallback className="text-lg font-semibold bg-blue-100 text-blue-600">
+                {profileData.firstName[0]}{profileData.lastName[0]}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <h2 className="text-2xl font-bold">{profileData.firstName} {profileData.lastName}</h2>
+              <p className="text-gray-500">Member since {profileData.memberSince}</p>
+            </div>
+          </div>
+          <div className="flex space-x-2">
+            {isEditingProfile ? (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setIsEditingProfile(false)}
+                  disabled={updateProfileMutation.isPending}
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleSaveProfile}
+                  disabled={updateProfileMutation.isPending}
+                >
+                  <Save className="h-4 w-4 mr-1" />
+                  {updateProfileMutation.isPending ? "Saving..." : "Save"}
+                </Button>
+              </>
+            ) : (
+              <Button size="sm" onClick={() => setIsEditingProfile(true)}>
+                <Edit2 className="h-4 w-4 mr-1" />
+                Edit Profile
+              </Button>
+            )}
           </div>
         </CardTitle>
       </CardHeader>
@@ -269,27 +370,61 @@ export default function CustomerAccount() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <Label htmlFor="firstName">First Name</Label>
-            <Input id="firstName" defaultValue="Sri" className="mt-1" />
+            <Input
+              id="firstName"
+              value={profileData.firstName}
+              onChange={(e) => handleProfileUpdate('firstName', e.target.value)}
+              disabled={!isEditingProfile}
+              className="mt-1"
+            />
           </div>
           <div>
             <Label htmlFor="lastName">Last Name</Label>
-            <Input id="lastName" defaultValue="Krishna" className="mt-1" />
+            <Input
+              id="lastName"
+              value={profileData.lastName}
+              onChange={(e) => handleProfileUpdate('lastName', e.target.value)}
+              disabled={!isEditingProfile}
+              className="mt-1"
+            />
           </div>
           <div>
             <Label htmlFor="address">Address</Label>
-            <Input id="address" defaultValue={mockCustomer.address} className="mt-1" />
+            <Input
+              id="address"
+              value={profileData.address}
+              onChange={(e) => handleProfileUpdate('address', e.target.value)}
+              disabled={!isEditingProfile}
+              className="mt-1"
+            />
           </div>
           <div>
             <Label htmlFor="city">City</Label>
-            <Input id="city" defaultValue={mockCustomer.city} className="mt-1" />
+            <Input
+              id="city"
+              value={profileData.city}
+              onChange={(e) => handleProfileUpdate('city', e.target.value)}
+              disabled={!isEditingProfile}
+              className="mt-1"
+            />
           </div>
           <div>
             <Label htmlFor="dob">Date of Birth</Label>
-            <Input id="dob" defaultValue={mockCustomer.dateOfBirth} className="mt-1" />
+            <Input
+              id="dob"
+              value={profileData.dateOfBirth}
+              onChange={(e) => handleProfileUpdate('dateOfBirth', e.target.value)}
+              disabled={!isEditingProfile}
+              className="mt-1"
+            />
           </div>
           <div>
             <Label htmlFor="gender">Gender</Label>
-            <Select defaultValue={mockCustomer.gender.toLowerCase()}>
+            <Select
+              value={profileData.gender.toLowerCase()}
+              onValueChange={(value) => handleProfileUpdate('gender', value.charAt(0).toUpperCase() + value.slice(1))}
+              disabled={!isEditingProfile}
+            >
               <SelectTrigger className="mt-1">
                 <SelectValue />
               </SelectTrigger>
@@ -301,31 +436,46 @@ export default function CustomerAccount() {
             </Select>
           </div>
           <div>
-            <Label htmlFor="contacts">Contacts</Label>
-            <Input id="contacts" defaultValue={mockCustomer.contacts} className="mt-1" />
+            <Label htmlFor="phone">Phone</Label>
+            <Input
+              id="phone"
+              value={profileData.phone}
+              onChange={(e) => handleProfileUpdate('phone', e.target.value)}
+              disabled={!isEditingProfile}
+              className="mt-1"
+            />
           </div>
           <div>
-            <Label htmlFor="email">E-mail Id</Label>
-            <Input id="email" defaultValue={mockCustomer.email} className="mt-1" />
+            <Label htmlFor="email">E-mail</Label>
+            <Input
+              id="email"
+              value={profileData.email}
+              onChange={(e) => handleProfileUpdate('email', e.target.value)}
+              disabled={!isEditingProfile}
+              className="mt-1"
+            />
           </div>
-          <div>
-            <Label htmlFor="investorType">Investor type</Label>
-            <Select defaultValue="resident">
+          <div className="md:col-span-2">
+            <Label htmlFor="investorType">Investor Type</Label>
+            <Select
+              value={profileData.investorType.toLowerCase().replace(/\s+/g, '-')}
+              onValueChange={(value) => {
+                const mappedValue = value === 'resident-indian-citizen' ? 'Resident Indian Citizen' :
+                  value === 'non-resident-indian' ? 'Non-Resident Indian' : 'Foreign National';
+                handleProfileUpdate('investorType', mappedValue);
+              }}
+              disabled={!isEditingProfile}
+            >
               <SelectTrigger className="mt-1">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="resident">Resident Indian Citizen</SelectItem>
-                <SelectItem value="nri">Non-Resident Indian</SelectItem>
-                <SelectItem value="foreign">Foreign National</SelectItem>
+                <SelectItem value="resident-indian-citizen">Resident Indian Citizen</SelectItem>
+                <SelectItem value="non-resident-indian">Non-Resident Indian</SelectItem>
+                <SelectItem value="foreign-national">Foreign National</SelectItem>
               </SelectContent>
             </Select>
           </div>
-        </div>
-
-        <div className="flex justify-end space-x-3 pt-6">
-          <Button variant="outline">Cancel</Button>
-          <Button>Save Changes</Button>
         </div>
       </CardContent>
     </Card>
@@ -341,90 +491,253 @@ export default function CustomerAccount() {
         </TabsList>
 
         <TabsContent value="all" className="space-y-4">
-          <div className="grid gap-4">
+          <div className="grid gap-6">
             {[...civilMepReports, ...valuationReports]
               .sort((a, b) => {
                 const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
                 const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
                 return dateB - dateA;
               })
-              .map((report) => (
-                <Card key={report.id} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                          <FileText className="h-6 w-6 text-blue-600" />
+              .map((report) => {
+                const isCivilMep = 'reportType' in report;
+                const reportData = isCivilMep ? report as CivilMepReport : report as PropertyValuationReport;
+                
+                return (
+                  <Card key={report.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-200 overflow-hidden">
+                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 border-b">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${
+                            isCivilMep ? 'bg-green-100' : 'bg-purple-100'
+                          }`}>
+                            {isCivilMep ? (
+                              <Building className="h-7 w-7 text-green-600" />
+                            ) : (
+                              <Shield className="h-7 w-7 text-purple-600" />
+                            )}
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-xl text-gray-900">
+                              {('propertyName' in report && report.propertyName) || 
+                               (isCivilMep ? 'Civil & MEP Engineering Report' : 'Property Valuation Report')}
+                            </h3>
+                            <p className="text-gray-600 font-medium">
+                              {isCivilMep ? 'Civil & MEP Engineering Analysis' : 'Property Valuation Assessment'}
+                            </p>
+                            <div className="flex items-center space-x-4 mt-1">
+                              <p className="text-sm text-gray-500 flex items-center">
+                                <Calendar className="h-4 w-4 mr-1" />
+                                Created {report.createdAt ? new Date(report.createdAt).toLocaleDateString() : 'Unknown date'}
+                              </p>
+                              {('propertyId' in report && report.propertyId) && (
+                                <p className="text-sm text-gray-500 flex items-center">
+                                  <MapPin className="h-4 w-4 mr-1" />
+                                  Property ID: {report.propertyId.slice(0, 8)}...
+                                </p>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="font-semibold text-lg">
-                            {('propertyName' in report && report.propertyName) || 'Property Report'}
-                          </h3>
-                          <p className="text-gray-500">
-                            {'reportType' in report ? 'Civil & MEP Report' : 'Property Valuation Report'}
-                          </p>
-                          <p className="text-sm text-gray-400">
-                            Created {report.createdAt ? new Date(report.createdAt).toLocaleDateString() : 'Unknown date'}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        {getStatusBadge(report)}
-                        <div className="flex space-x-2">
-                          <Button size="sm" variant="outline" asChild>
-                            <Link href={`/civil-mep-report/${report.id}`}>
-                              <Eye className="h-4 w-4 mr-1" />
-                              View
-                            </Link>
-                          </Button>
-                          <Button size="sm" variant="outline">
-                            <Download className="h-4 w-4 mr-1" />
-                            Download
-                          </Button>
+                        <div className="flex items-center space-x-3">
+                          {getStatusBadge(report)}
                         </div>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
+
+                    <CardContent className="p-6">
+                      {isCivilMep ? (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                          <div className="bg-blue-50 rounded-lg p-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-sm font-medium text-blue-600">Overall Score</p>
+                                <p className="text-2xl font-bold text-blue-900">
+                                  {reportData.overallScore || 'N/A'}
+                                </p>
+                              </div>
+                              <Star className="h-8 w-8 text-blue-500" />
+                            </div>
+                          </div>
+                          <div className="bg-green-50 rounded-lg p-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-sm font-medium text-green-600">Status</p>
+                                <p className="text-lg font-semibold text-green-900 capitalize">
+                                  {('status' in reportData && reportData.status) || 'Available'}
+                                </p>
+                              </div>
+                              <CheckCircle className="h-8 w-8 text-green-500" />
+                            </div>
+                          </div>
+                          <div className="bg-purple-50 rounded-lg p-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-sm font-medium text-purple-600">Report Type</p>
+                                <p className="text-lg font-semibold text-purple-900">
+                                  Standard
+                                </p>
+                              </div>
+                              <BarChart3 className="h-8 w-8 text-purple-500" />
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                          <div className="bg-emerald-50 rounded-lg p-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-sm font-medium text-emerald-600">Market Value</p>
+                                <p className="text-2xl font-bold text-emerald-900">
+                                  {reportData.overallScore || 'N/A'}
+                                </p>
+                              </div>
+                              <DollarSign className="h-8 w-8 text-emerald-500" />
+                            </div>
+                          </div>
+                          <div className="bg-orange-50 rounded-lg p-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-sm font-medium text-orange-600">Growth Potential</p>
+                                <p className="text-lg font-semibold text-orange-900">High</p>
+                              </div>
+                              <TrendingUp className="h-8 w-8 text-orange-500" />
+                            </div>
+                          </div>
+                          <div className="bg-blue-50 rounded-lg p-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-sm font-medium text-blue-600">Investment Grade</p>
+                                <p className="text-lg font-semibold text-blue-900">A+</p>
+                              </div>
+                              <Star className="h-8 w-8 text-blue-500" />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex justify-between items-center">
+                        <div className="flex space-x-2">
+                          <Button variant="default" size="sm" asChild>
+                            <Link href={`/civil-mep-report/${report.id}`}>
+                              <Eye className="h-4 w-4 mr-1" />
+                              View Details
+                            </Link>
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <Download className="h-4 w-4 mr-1" />
+                            Download PDF
+                          </Button>
+                        </div>
+                        <p className="text-sm text-gray-500">
+                          Last updated: {report.updatedAt ? new Date(report.updatedAt).toLocaleDateString() : 'N/A'}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
           </div>
         </TabsContent>
 
         <TabsContent value="civil-mep" className="space-y-4">
-          <div className="grid gap-4">
+          <div className="grid gap-6">
             {civilMepReports.map((report) => (
-              <Card key={report.id} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-                <CardContent className="p-6">
+              <Card key={report.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-200 overflow-hidden">
+                <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 border-b">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                        <Building className="h-6 w-6 text-green-600" />
+                      <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center">
+                        <Building className="h-7 w-7 text-green-600" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-lg">
-                          {('propertyName' in report && report.propertyName) || 'Civil & MEP Report'}
+                        <h3 className="font-bold text-xl text-gray-900">
+                          {('propertyName' in report && report.propertyName) || 'Civil & MEP Engineering Report'}
                         </h3>
-                        <p className="text-gray-500">Civil & MEP Engineering Report</p>
-                        <p className="text-sm text-gray-400">
-                          Created {report.createdAt ? new Date(report.createdAt).toLocaleDateString() : 'Unknown date'}
-                        </p>
+                        <p className="text-green-600 font-medium">Civil & MEP Engineering Analysis</p>
+                        <div className="flex items-center space-x-4 mt-1">
+                          <p className="text-sm text-gray-500 flex items-center">
+                            <Calendar className="h-4 w-4 mr-1" />
+                            Created {report.createdAt ? new Date(report.createdAt).toLocaleDateString() : 'Unknown date'}
+                          </p>
+                          {report.propertyId && (
+                            <p className="text-sm text-gray-500 flex items-center">
+                              <MapPin className="h-4 w-4 mr-1" />
+                              Property ID: {report.propertyId.slice(0, 8)}...
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
                       {getStatusBadge(report)}
-                      <div className="flex space-x-2">
-                        <Button size="sm" variant="outline" asChild>
-                          <Link href={`/civil-mep-report/${report.id}`}>
-                            <Eye className="h-4 w-4 mr-1" />
-                            View
-                          </Link>
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          <Download className="h-4 w-4 mr-1" />
-                          Download
-                        </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <CardContent className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div className="bg-blue-50 rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-blue-600">Overall Score</p>
+                          <p className="text-2xl font-bold text-blue-900">
+                            {report.overallScore || 'N/A'}
+                          </p>
+                        </div>
+                        <Star className="h-8 w-8 text-blue-500" />
                       </div>
                     </div>
+                    <div className="bg-green-50 rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-green-600">Status</p>
+                          <p className="text-lg font-semibold text-green-900 capitalize">
+                            {report.status || 'Available'}
+                          </p>
+                        </div>
+                        <CheckCircle className="h-8 w-8 text-green-500" />
+                      </div>
+                    </div>
+                    <div className="bg-purple-50 rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-purple-600">Report Type</p>
+                          <p className="text-lg font-semibold text-purple-900">
+                            Standard
+                          </p>
+                        </div>
+                        <BarChart3 className="h-8 w-8 text-purple-500" />
+                      </div>
+                    </div>
+                    <div className="bg-orange-50 rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-orange-600">Priority</p>
+                          <p className="text-lg font-semibold text-orange-900">
+                            Medium
+                          </p>
+                        </div>
+                        <AlertCircle className="h-8 w-8 text-orange-500" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <div className="flex space-x-2">
+                      <Button variant="default" size="sm" asChild>
+                        <Link href={`/civil-mep-report/${report.id}`}>
+                          <Eye className="h-4 w-4 mr-1" />
+                          View Details
+                        </Link>
+                      </Button>
+                      <Button variant="outline" size="sm">
+                        <Download className="h-4 w-4 mr-1" />
+                        Download PDF
+                      </Button>
+                    </div>
+                    <p className="text-sm text-gray-500">
+                      Last updated: {report.updatedAt ? new Date(report.updatedAt).toLocaleDateString() : 'N/A'}
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -433,38 +746,96 @@ export default function CustomerAccount() {
         </TabsContent>
 
         <TabsContent value="valuation" className="space-y-4">
-          <div className="grid gap-4">
+          <div className="grid gap-6">
             {valuationReports.map((report) => (
-              <Card key={report.id} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-                <CardContent className="p-6">
+              <Card key={report.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-200 overflow-hidden">
+                <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 border-b">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <Shield className="h-6 w-6 text-purple-600" />
+                      <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center">
+                        <Shield className="h-7 w-7 text-purple-600" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-lg">
+                        <h3 className="font-bold text-xl text-gray-900">
                           {('propertyName' in report && report.propertyName) || 'Property Valuation Report'}
                         </h3>
-                        <p className="text-gray-500">Property Valuation Report</p>
-                        <p className="text-sm text-gray-400">
-                          Created {report.createdAt ? new Date(report.createdAt).toLocaleDateString() : 'Unknown date'}
-                        </p>
+                        <p className="text-purple-600 font-medium">Property Valuation Assessment</p>
+                        <div className="flex items-center space-x-4 mt-1">
+                          <p className="text-sm text-gray-500 flex items-center">
+                            <Calendar className="h-4 w-4 mr-1" />
+                            Created {report.createdAt ? new Date(report.createdAt).toLocaleDateString() : 'Unknown date'}
+                          </p>
+                          {report.propertyId && (
+                            <p className="text-sm text-gray-500 flex items-center">
+                              <MapPin className="h-4 w-4 mr-1" />
+                              Property ID: {report.propertyId.slice(0, 8)}...
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
                       {getStatusBadge(report)}
-                      <div className="flex space-x-2">
-                        <Button size="sm" variant="outline">
-                          <Eye className="h-4 w-4 mr-1" />
-                          View
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          <Download className="h-4 w-4 mr-1" />
-                          Download
-                        </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <CardContent className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div className="bg-emerald-50 rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-emerald-600">Market Value</p>
+                          <p className="text-2xl font-bold text-emerald-900">
+                            {report.overallScore || 'N/A'}
+                          </p>
+                        </div>
+                        <DollarSign className="h-8 w-8 text-emerald-500" />
                       </div>
                     </div>
+                    <div className="bg-orange-50 rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-orange-600">Growth Potential</p>
+                          <p className="text-lg font-semibold text-orange-900">High</p>
+                        </div>
+                        <TrendingUp className="h-8 w-8 text-orange-500" />
+                      </div>
+                    </div>
+                    <div className="bg-blue-50 rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-blue-600">Investment Grade</p>
+                          <p className="text-lg font-semibold text-blue-900">A+</p>
+                        </div>
+                        <Star className="h-8 w-8 text-blue-500" />
+                      </div>
+                    </div>
+                    <div className="bg-red-50 rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-red-600">Risk Level</p>
+                          <p className="text-lg font-semibold text-red-900">Low</p>
+                        </div>
+                        <AlertCircle className="h-8 w-8 text-red-500" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <div className="flex space-x-2">
+                      <Button variant="default" size="sm">
+                        <Eye className="h-4 w-4 mr-1" />
+                        View Details
+                      </Button>
+                      <Button variant="outline" size="sm">
+                        <Download className="h-4 w-4 mr-1" />
+                        Download PDF
+                      </Button>
+                    </div>
+                    <p className="text-sm text-gray-500">
+                      Last updated: {report.updatedAt ? new Date(report.updatedAt).toLocaleDateString() : 'N/A'}
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -475,64 +846,136 @@ export default function CustomerAccount() {
     </div>
   );
 
+  const handleNotificationUpdate = (type: 'email' | 'sms', value: boolean) => {
+    setProfileData(prev => ({
+      ...prev,
+      notifications: {
+        ...prev.notifications,
+        [type]: value
+      }
+    }));
+  };
+
+  const handlePrivacyUpdate = (setting: 'profileVisible', value: boolean) => {
+    setProfileData(prev => ({
+      ...prev,
+      privacy: {
+        ...prev.privacy,
+        [setting]: value
+      }
+    }));
+  };
+
   const renderSettings = () => (
-    <Card className="border-0 shadow-lg">
-      <CardHeader>
-        <CardTitle>Account Settings</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div>
-          <h3 className="text-lg font-semibold mb-4">Notifications</h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      <Card className="border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle>Notification Preferences</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Bell className="h-5 w-5 text-blue-600" />
+              </div>
               <div>
                 <p className="font-medium">Email Notifications</p>
-                <p className="text-sm text-gray-500">Receive updates about your reports</p>
+                <p className="text-sm text-gray-500">Receive updates about your reports via email</p>
               </div>
-              <input type="checkbox" defaultChecked className="rounded" />
             </div>
-            <div className="flex items-center justify-between">
+            <input
+              type="checkbox"
+              checked={profileData.notifications.email}
+              onChange={(e) => handleNotificationUpdate('email', e.target.checked)}
+              className="rounded"
+            />
+          </div>
+          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <Bell className="h-5 w-5 text-green-600" />
+              </div>
               <div>
                 <p className="font-medium">SMS Notifications</p>
                 <p className="text-sm text-gray-500">Get text updates for important changes</p>
               </div>
-              <input type="checkbox" defaultChecked className="rounded" />
             </div>
+            <input
+              type="checkbox"
+              checked={profileData.notifications.sms}
+              onChange={(e) => handleNotificationUpdate('sms', e.target.checked)}
+              className="rounded"
+            />
           </div>
-        </div>
+        </CardContent>
+      </Card>
 
-        <Separator />
-
-        <div>
-          <h3 className="text-lg font-semibold mb-4">Privacy</h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
+      <Card className="border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle>Privacy Settings</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <Eye className="h-5 w-5 text-purple-600" />
+              </div>
               <div>
                 <p className="font-medium">Profile Visibility</p>
                 <p className="text-sm text-gray-500">Make your profile visible to other users</p>
               </div>
-              <input type="checkbox" className="rounded" />
             </div>
+            <input
+              type="checkbox"
+              checked={profileData.privacy.profileVisible}
+              onChange={(e) => handlePrivacyUpdate('profileVisible', e.target.checked)}
+              className="rounded"
+            />
           </div>
-        </div>
+        </CardContent>
+      </Card>
 
-        <Separator />
-
-        <div>
-          <h3 className="text-lg font-semibold mb-4">Security</h3>
-          <div className="space-y-4">
-            <Button variant="outline" className="w-full justify-start">
-              <Shield className="h-4 w-4 mr-2" />
-              Change Password
-            </Button>
-            <Button variant="outline" className="w-full justify-start">
-              <CreditCard className="h-4 w-4 mr-2" />
-              Manage Payment Methods
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+      <Card className="border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle>Security & Account</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button variant="outline" className="w-full justify-start h-auto p-4">
+            <div className="flex items-center">
+              <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                <Shield className="h-5 w-5 text-red-600" />
+              </div>
+              <div className="text-left">
+                <p className="font-medium">Change Password</p>
+                <p className="text-sm text-gray-500">Update your account password</p>
+              </div>
+            </div>
+          </Button>
+          <Button variant="outline" className="w-full justify-start h-auto p-4">
+            <div className="flex items-center">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                <CreditCard className="h-5 w-5 text-blue-600" />
+              </div>
+              <div className="text-left">
+                <p className="font-medium">Payment Methods</p>
+                <p className="text-sm text-gray-500">Manage your payment methods and billing</p>
+              </div>
+            </div>
+          </Button>
+          <Button variant="outline" className="w-full justify-start h-auto p-4">
+            <div className="flex items-center">
+              <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center mr-3">
+                <Settings className="h-5 w-5 text-yellow-600" />
+              </div>
+              <div className="text-left">
+                <p className="font-medium">Account Preferences</p>
+                <p className="text-sm text-gray-500">Customize your account preferences</p>
+              </div>
+            </div>
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
   );
 
   const renderHelp = () => (
@@ -633,12 +1076,12 @@ export default function CustomerAccount() {
               </Button>
               <div className="flex items-center space-x-2">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={mockCustomer.avatar} />
+                  <AvatarImage src={profileData.avatar} />
                   <AvatarFallback className="text-sm bg-blue-100 text-blue-600">
-                    {mockCustomer.name.split(' ').map(n => n[0]).join('')}
+                    {profileData.firstName[0]}{profileData.lastName[0]}
                   </AvatarFallback>
                 </Avatar>
-                <span className="text-sm font-medium hidden md:block">{mockCustomer.name}</span>
+                <span className="text-sm font-medium hidden md:block">{profileData.firstName} {profileData.lastName}</span>
               </div>
             </div>
           </div>
