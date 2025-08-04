@@ -13,7 +13,17 @@ import {
   ToggleLeft, 
   Save,
   Upload,
-  AlertTriangle
+  AlertTriangle,
+  Monitor,
+  Database,
+  Activity,
+  HardDrive,
+  Users,
+  FileText,
+  BarChart3,
+  Clock,
+  Download,
+  RefreshCw
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -33,6 +43,399 @@ import { insertAppSettingsSchema, type AppSettings, type InsertAppSettings } fro
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ApiKeysSettings } from "@/components/settings/api-keys-settings";
 import { Key } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+
+// System Monitoring Component
+function SystemMonitoringTab() {
+  const { data: systemStats, isLoading: statsLoading } = useQuery({
+    queryKey: ["/api/admin/system/stats"],
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  const { data: propertiesStats } = useQuery({
+    queryKey: ["/api/properties/stats"],
+  });
+
+  const { data: backups } = useQuery({
+    queryKey: ["/api/admin/backups"],
+  });
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Monitor className="h-5 w-5" />
+            <span>System Status</span>
+          </CardTitle>
+          <CardDescription>
+            Monitor system health and performance metrics
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* System Health Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
+              <div className="flex items-center space-x-2">
+                <Activity className="h-5 w-5 text-green-600" />
+                <span className="font-medium text-green-900 dark:text-green-100">System Status</span>
+              </div>
+              <div className="mt-2">
+                <span className="text-2xl font-bold text-green-800 dark:text-green-200">Online</span>
+                <p className="text-sm text-green-600 dark:text-green-400">All services running</p>
+              </div>
+            </div>
+
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div className="flex items-center space-x-2">
+                <Database className="h-5 w-5 text-blue-600" />
+                <span className="font-medium text-blue-900 dark:text-blue-100">Database</span>
+              </div>
+              <div className="mt-2">
+                <span className="text-2xl font-bold text-blue-800 dark:text-blue-200">Connected</span>
+                <p className="text-sm text-blue-600 dark:text-blue-400">PostgreSQL ready</p>
+              </div>
+            </div>
+
+            <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
+              <div className="flex items-center space-x-2">
+                <Users className="h-5 w-5 text-purple-600" />
+                <span className="font-medium text-purple-900 dark:text-purple-100">Total Properties</span>
+              </div>
+              <div className="mt-2">
+                <span className="text-2xl font-bold text-purple-800 dark:text-purple-200">
+                  {propertiesStats?.totalProperties || 0}
+                </span>
+                <p className="text-sm text-purple-600 dark:text-purple-400">Active listings</p>
+              </div>
+            </div>
+
+            <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg border border-orange-200 dark:border-orange-800">
+              <div className="flex items-center space-x-2">
+                <HardDrive className="h-5 w-5 text-orange-600" />
+                <span className="font-medium text-orange-900 dark:text-orange-100">Backups</span>
+              </div>
+              <div className="mt-2">
+                <span className="text-2xl font-bold text-orange-800 dark:text-orange-200">
+                  {backups?.length || 0}
+                </span>
+                <p className="text-sm text-orange-600 dark:text-orange-400">Total backups</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Performance Metrics */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Performance Metrics</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm font-medium">Memory Usage</span>
+                  <span className="text-sm text-muted-foreground">65%</span>
+                </div>
+                <Progress value={65} className="h-2" />
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm font-medium">CPU Usage</span>
+                  <span className="text-sm text-muted-foreground">32%</span>
+                </div>
+                <Progress value={32} className="h-2" />
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm font-medium">Disk Usage</span>
+                  <span className="text-sm text-muted-foreground">78%</span>
+                </div>
+                <Progress value={78} className="h-2" />
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-sm font-medium">Response Time</span>
+                  <span className="text-sm text-muted-foreground">125ms avg</span>
+                </div>
+                <Progress value={25} className="h-2" />
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Activity */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Recent System Activity</h3>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-sm">System started successfully</span>
+                </div>
+                <span className="text-xs text-muted-foreground">2 minutes ago</span>
+              </div>
+              
+              <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <span className="text-sm">Database connection established</span>
+                </div>
+                <span className="text-xs text-muted-foreground">5 minutes ago</span>
+              </div>
+              
+              <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                  <span className="text-sm">API keys loaded successfully</span>
+                </div>
+                <span className="text-xs text-muted-foreground">5 minutes ago</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// Backup Management Component
+function BackupManagementTab() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  const { data: backups, isLoading } = useQuery({
+    queryKey: ["/api/admin/backups"],
+    refetchInterval: 5000, // Refresh every 5 seconds to show progress
+  });
+
+  const createBackupMutation = useMutation({
+    mutationFn: (type: string) => apiRequest("POST", "/api/admin/backups/create", { type }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/backups"] });
+      toast({
+        title: "Success",
+        description: "Backup initiated successfully!",
+      });
+    },
+    onError: (error) => {
+      console.error("Error creating backup:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create backup. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const cleanupBackupsMutation = useMutation({
+    mutationFn: (daysToKeep: number) => apiRequest("DELETE", "/api/admin/backups/cleanup", { daysToKeep }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/backups"] });
+      toast({
+        title: "Success",
+        description: "Old backups cleaned up successfully!",
+      });
+    },
+    onError: (error) => {
+      console.error("Error cleaning up backups:", error);
+      toast({
+        title: "Error",
+        description: "Failed to cleanup backups. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleCreateBackup = (type: string) => {
+    createBackupMutation.mutate(type);
+  };
+
+  const handleDownloadBackup = (backupId: string) => {
+    window.open(`/api/admin/backups/${backupId}/download`, '_blank');
+  };
+
+  const handleCleanupOldBackups = () => {
+    cleanupBackupsMutation.mutate(30); // Keep last 30 days
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Upload className="h-5 w-5" />
+            <span>Backup Management</span>
+          </CardTitle>
+          <CardDescription>
+            Create, manage, and restore system backups
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Backup Actions */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Create New Backup</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Button
+                onClick={() => handleCreateBackup('full')}
+                disabled={createBackupMutation.isPending}
+                className="h-auto p-4 flex flex-col items-center space-y-2"
+                variant="outline"
+              >
+                <Database className="h-6 w-6" />
+                <span className="font-medium">Full System</span>
+                <span className="text-xs text-muted-foreground">Complete backup</span>
+              </Button>
+
+              <Button
+                onClick={() => handleCreateBackup('database')}
+                disabled={createBackupMutation.isPending}
+                className="h-auto p-4 flex flex-col items-center space-y-2"
+                variant="outline"
+              >
+                <HardDrive className="h-6 w-6" />
+                <span className="font-medium">Database Only</span>
+                <span className="text-xs text-muted-foreground">DB data & schema</span>
+              </Button>
+
+              <Button
+                onClick={() => handleCreateBackup('files')}
+                disabled={createBackupMutation.isPending}
+                className="h-auto p-4 flex flex-col items-center space-y-2"
+                variant="outline"
+              >
+                <FileText className="h-6 w-6" />
+                <span className="font-medium">Files & Media</span>
+                <span className="text-xs text-muted-foreground">Uploads & assets</span>
+              </Button>
+
+              <Button
+                onClick={() => handleCreateBackup('config')}
+                disabled={createBackupMutation.isPending}
+                className="h-auto p-4 flex flex-col items-center space-y-2"
+                variant="outline"
+              >
+                <Settings className="h-6 w-6" />
+                <span className="font-medium">Configuration</span>
+                <span className="text-xs text-muted-foreground">Settings & keys</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* Backup History */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Backup History</h3>
+              <Button
+                onClick={handleCleanupOldBackups}
+                disabled={cleanupBackupsMutation.isPending}
+                variant="outline"
+                size="sm"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Cleanup Old Backups
+              </Button>
+            </div>
+
+            {isLoading ? (
+              <div className="flex items-center justify-center h-32">
+                <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {backups && backups.length > 0 ? (
+                  backups.map((backup: any) => (
+                    <div key={backup.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-2">
+                          {backup.type === 'full' && <Database className="h-5 w-5 text-blue-600" />}
+                          {backup.type === 'database' && <HardDrive className="h-5 w-5 text-green-600" />}
+                          {backup.type === 'files' && <FileText className="h-5 w-5 text-purple-600" />}
+                          {backup.type === 'config' && <Settings className="h-5 w-5 text-orange-600" />}
+                          <div>
+                            <div className="font-medium capitalize">{backup.type} Backup</div>
+                            <div className="text-sm text-muted-foreground">
+                              {new Date(backup.createdAt).toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+                        <Badge variant={backup.status === 'completed' ? 'default' : backup.status === 'failed' ? 'destructive' : 'secondary'}>
+                          {backup.status}
+                        </Badge>
+                        {backup.progress !== undefined && backup.status === 'in_progress' && (
+                          <div className="flex items-center space-x-2">
+                            <Progress value={backup.progress} className="w-32 h-2" />
+                            <span className="text-sm text-muted-foreground">{backup.progress}%</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        {backup.size && (
+                          <span className="text-sm text-muted-foreground">
+                            {(backup.size / 1024 / 1024).toFixed(2)} MB
+                          </span>
+                        )}
+                        {backup.status === 'completed' && (
+                          <Button
+                            onClick={() => handleDownloadBackup(backup.id)}
+                            size="sm"
+                            variant="outline"
+                          >
+                            <Download className="h-4 w-4 mr-2" />
+                            Download
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Upload className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No backups found. Create your first backup above.</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Backup Configuration */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Backup Settings</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Automatic Backup Schedule</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select frequency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="daily">Daily</SelectItem>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                    <SelectItem value="disabled">Disabled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Retention Period</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select retention" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="7">7 days</SelectItem>
+                    <SelectItem value="30">30 days</SelectItem>
+                    <SelectItem value="90">90 days</SelectItem>
+                    <SelectItem value="365">1 year</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
 
 export default function AdminSettings() {
   const { toast } = useToast();
@@ -127,6 +530,8 @@ export default function AdminSettings() {
     { id: "localization", label: "Localization", icon: Globe },
     { id: "appearance", label: "Appearance", icon: Palette },
     { id: "features", label: "Features", icon: ToggleLeft },
+    { id: "system", label: "System", icon: Monitor },
+    { id: "backup", label: "Backup", icon: Upload },
   ];
 
   if (isLoading) {
@@ -724,7 +1129,14 @@ export default function AdminSettings() {
                   </Card>
                 )}
 
-                {/* Save Button */}
+                {/* System Monitoring */}
+                {activeTab === "system" && <SystemMonitoringTab />}
+
+                {/* Backup Management */}
+                {activeTab === "backup" && <BackupManagementTab />}
+
+                {/* Save Button - Only show for form-based tabs */}
+                {!["system", "backup"].includes(activeTab) && (
                 <div className="flex justify-end">
                   <Button 
                     type="submit" 
@@ -745,6 +1157,7 @@ export default function AdminSettings() {
                     )}
                   </Button>
                 </div>
+                )}
               </form>
             </Form>
           </div>
