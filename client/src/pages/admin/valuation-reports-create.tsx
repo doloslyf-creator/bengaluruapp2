@@ -66,8 +66,8 @@ export default function ValuationReportsCreate() {
       projectName: formData.get("projectName") as string,
       unitType: formData.get("unitType") as string,
       configuration: formData.get("configuration") as string,
-      // Market valuation - using new field names
-      estimatedMarketValue: formData.get("estimatedMarketValue") as string,
+      // Market valuation - convert string to number for existing decimal field
+      estimatedMarketValue: formData.get("estimatedMarketValue") ? parseFloat(formData.get("estimatedMarketValue") as string) : null,
       ratePerSqftSbaUds: formData.get("ratePerSqftSbaUds") as string,
       // Basic fields for initial creation
       buyerFit: formData.get("buyerFit") as string,

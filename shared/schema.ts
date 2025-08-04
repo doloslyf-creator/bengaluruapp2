@@ -740,28 +740,32 @@ export const propertyValuationReports = pgTable("property_valuation_reports", {
   updatedAt: timestamp("updated_at").defaultNow(),
   deliveredAt: timestamp("delivered_at"),
   
-  // 1. Executive Summary
-  projectName: text("project_name"), // e.g., "Assetz Marq 3.0, 3BHK, Tower B"
+  // 1. Executive Summary (new fields)
+  projectName: text("project_name"), // e.g., "Assetz Marq 3.0, 3BHK, Tower B"  
   towerUnit: text("tower_unit"),
-  estimatedMarketValue: text("estimated_market_value"), // ₹2.2 Cr
   ratePerSqftSbaUds: text("rate_per_sqft_sba_uds"), // ₹10,200/sqft
+  // Keep existing field for market value
+  estimatedMarketValue: decimal("estimated_market_value", { precision: 12, scale: 2 }),
   buyerFit: varchar("buyer_fit", { enum: ["end_use", "investor", "both"] }),
   valuationVerdict: text("valuation_verdict"), // Slightly Overpriced (₹1,000/sqft above resale)
   appreciationOutlook: text("appreciation_outlook"), // Moderate – 7% CAGR expected
   riskScore: integer("risk_score").default(0), // 0-10 scale (3 = Low)
   recommendation: text("recommendation"), // ✅ Buy if negotiated ~₹10L lower
   
-  // 2. Property Profile
+  // 2. Property Profile (mix of existing and new fields)
   unitType: varchar("unit_type", { enum: ["apartment", "villa", "rowhouse", "plot"] }),
   configuration: text("configuration"), // 3BHK, 1550 sq.ft
-  undividedLandShare: text("undivided_land_share"), // UDS
+  undividedLandShare: text("undivided_land_share"), // UDS - new field
+  udsArea: decimal("uds_area", { precision: 8, scale: 2 }), // Keep existing
   facing: text("facing"), // e.g., East
   vastuCompliance: boolean("vastu_compliance").default(false),
-  ocCcStatus: text("oc_cc_status"), // OC/CC Status
+  ocCcStatus: text("oc_cc_status"), // OC/CC Status - new field
+  occcStatus: text("occc_status"), // Keep existing field for compatibility
   possessionStatus: varchar("possession_status", { enum: ["ready", "under_construction", "completed"] }),
   khataType: varchar("khata_type", { enum: ["A", "B", "E"] }),
   landTitleStatus: text("land_title_status"),
-  builderReputationScore: text("builder_reputation_score"), // Based on delivery record, delays, complaints
+  builderReputationScore: integer("builder_reputation_score").default(0), // Keep existing numeric
+  builderReputationScoreText: text("builder_reputation_score_text"), // New text field
   
   // 3. Market Valuation Estimate
   builderQuotedPrice: text("builder_quoted_price"), // vs Actual Market Value
