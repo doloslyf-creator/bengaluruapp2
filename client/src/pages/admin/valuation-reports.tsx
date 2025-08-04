@@ -135,71 +135,71 @@ export default function ValuationReportsPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-8">
+      <div className="space-y-6 max-w-full overflow-hidden">
         {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 data-testid="page-title" className="text-3xl font-bold tracking-tight">Property Valuation Reports</h1>
-            <p className="text-muted-foreground">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 data-testid="page-title" className="text-2xl font-bold tracking-tight truncate">Property Valuation Reports</h1>
+            <p className="text-sm text-muted-foreground">
               Manage comprehensive property valuation reports for Bengaluru properties
             </p>
           </div>
           <Button 
             onClick={() => navigate("/admin-panel/valuation-reports/create")}
             data-testid="button-create-report"
+            className="whitespace-nowrap shrink-0"
           >
             <Plus className="h-4 w-4 mr-2" />
             Create Report
           </Button>
-
         </div>
 
         {/* Stats Cards */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="min-w-0">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Reports</CardTitle>
-                <FileText className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium truncate">Total Reports</CardTitle>
+                <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.totalReports}</div>
                 <p className="text-xs text-muted-foreground">
-                  Comprehensive valuation reports
+                  Comprehensive reports
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="min-w-0">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Completed</CardTitle>
-                <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium truncate">Completed</CardTitle>
+                <BarChart3 className="h-4 w-4 text-muted-foreground shrink-0" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.completedReports}</div>
                 <p className="text-xs text-muted-foreground">
-                  {stats.completionRate}% completion rate
+                  {stats.completionRate}% completion
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="min-w-0">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">In Progress</CardTitle>
-                <Clock className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium truncate">In Progress</CardTitle>
+                <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.inProgressReports}</div>
                 <p className="text-xs text-muted-foreground">
-                  Currently being processed
+                  Currently processing
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="min-w-0">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Avg. Value</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium truncate">Avg. Value</CardTitle>
+                <TrendingUp className="h-4 w-4 text-muted-foreground shrink-0" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">₹{(stats.averageEstimatedValue / 100000).toFixed(1)}L</div>
@@ -239,24 +239,25 @@ export default function ValuationReportsPage() {
                 </div>
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Report Title</TableHead>
-                    <TableHead>Property</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Est. Value</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
+              <div className="overflow-x-auto">
+                <Table className="min-w-full">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="min-w-[200px]">Report Title</TableHead>
+                      <TableHead className="min-w-[150px]">Property</TableHead>
+                      <TableHead className="min-w-[120px]">Status</TableHead>
+                      <TableHead className="min-w-[100px]">Est. Value</TableHead>
+                      <TableHead className="min-w-[100px]">Created</TableHead>
+                      <TableHead className="min-w-[120px]">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
                 <TableBody>
                   {reports.map((report) => (
                     <TableRow key={report.id}>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium max-w-[200px] truncate">
                         {report.reportTitle}
                       </TableCell>
-                      <TableCell>{getPropertyName(report.propertyId)}</TableCell>
+                      <TableCell className="max-w-[150px] truncate">{getPropertyName(report.propertyId)}</TableCell>
                       <TableCell>
                         <Select
                           value={report.reportStatus || "draft"}
@@ -322,7 +323,8 @@ export default function ValuationReportsPage() {
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+                </Table>
+              </div>
             )}
           </CardContent>
         </Card>

@@ -80,35 +80,35 @@ export default function ValuationReportsCreate() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className="space-y-6 max-w-full overflow-hidden">
         {/* Header */}
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/admin-panel/valuation-reports")}>
+        <div className="flex flex-col sm:flex-row items-start gap-4">
+          <Button variant="ghost" size="sm" onClick={() => navigate("/admin-panel/valuation-reports")} className="shrink-0">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Reports
           </Button>
-          <div>
-            <h1 className="text-2xl font-bold">Create Valuation Report</h1>
-            <p className="text-muted-foreground">
-              Create a comprehensive property valuation report based on Bengaluru market analysis
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl font-bold">Create Valuation Report</h1>
+            <p className="text-sm text-muted-foreground">
+              Create a comprehensive property valuation report
             </p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-6 max-w-full">
           {/* Basic Information */}
-          <Card>
+          <Card className="w-full">
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <FileText className="h-5 w-5 mr-2" />
+              <CardTitle className="flex items-center text-lg">
+                <FileText className="h-4 w-4 mr-2" />
                 Basic Information
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-sm">
                 Essential details for the valuation report
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="propertyId">Property *</Label>
                   <Select name="propertyId" required>

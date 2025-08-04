@@ -214,51 +214,51 @@ export default function ValuationReportEditComprehensive() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className="space-y-6 max-w-full overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/admin-panel/valuation-reports")}>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-start gap-4 min-w-0 flex-1">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/admin-panel/valuation-reports")} className="shrink-0">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Reports
             </Button>
-            <div>
-              <h1 className="text-2xl font-bold">Edit Valuation Report</h1>
-              <p className="text-muted-foreground">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl font-bold truncate">Edit Valuation Report</h1>
+              <p className="text-sm text-muted-foreground truncate">
                 {getPropertyName(report.propertyId)} • {report.reportStatus}
               </p>
             </div>
           </div>
-          <Badge variant={report.reportStatus === "completed" ? "default" : "secondary"}>
+          <Badge variant={report.reportStatus === "completed" ? "default" : "secondary"} className="shrink-0">
             {report.reportStatus}
           </Badge>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="max-w-full">
           <Tabs defaultValue="executive" className="w-full">
-            <TabsList className="grid grid-cols-6 w-full">
-              <TabsTrigger value="executive" className="flex items-center">
-                <FileText className="h-4 w-4 mr-1" />
+            <TabsList className="grid grid-cols-3 sm:grid-cols-6 w-full gap-1">
+              <TabsTrigger value="executive" className="flex items-center text-xs">
+                <FileText className="h-3 w-3 mr-1" />
                 Executive
               </TabsTrigger>
-              <TabsTrigger value="property" className="flex items-center">
-                <Home className="h-4 w-4 mr-1" />
+              <TabsTrigger value="property" className="flex items-center text-xs">
+                <Home className="h-3 w-3 mr-1" />
                 Property
               </TabsTrigger>
-              <TabsTrigger value="market" className="flex items-center">
-                <TrendingUp className="h-4 w-4 mr-1" />
+              <TabsTrigger value="market" className="flex items-center text-xs">
+                <TrendingUp className="h-3 w-3 mr-1" />
                 Market
               </TabsTrigger>
-              <TabsTrigger value="location" className="flex items-center">
-                <MapPin className="h-4 w-4 mr-1" />
+              <TabsTrigger value="location" className="flex items-center text-xs">
+                <MapPin className="h-3 w-3 mr-1" />
                 Location
               </TabsTrigger>
-              <TabsTrigger value="legal" className="flex items-center">
-                <Shield className="h-4 w-4 mr-1" />
+              <TabsTrigger value="legal" className="flex items-center text-xs">
+                <Shield className="h-3 w-3 mr-1" />
                 Legal
               </TabsTrigger>
-              <TabsTrigger value="final" className="flex items-center">
-                <Scale className="h-4 w-4 mr-1" />
+              <TabsTrigger value="final" className="flex items-center text-xs">
+                <Scale className="h-3 w-3 mr-1" />
                 Final
               </TabsTrigger>
             </TabsList>

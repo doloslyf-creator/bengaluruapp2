@@ -101,16 +101,16 @@ export function AdminCivilMepReports() {
 
   return (
     <AdminLayout>
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="space-y-6 max-w-full overflow-hidden">
         {/* Header Section */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Civil+MEP Reports</h1>
-            <p className="text-muted-foreground">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl font-bold tracking-tight truncate">Civil+MEP Reports</h1>
+            <p className="text-sm text-muted-foreground">
               Comprehensive engineering assessments for properties
             </p>
           </div>
-          <Button asChild data-testid="button-create-report">
+          <Button asChild data-testid="button-create-report" className="whitespace-nowrap shrink-0">
             <Link href="/admin-panel/civil-mep-reports/create">
               <Plus className="w-4 h-4 mr-2" />
               Create Report
@@ -225,35 +225,35 @@ export function AdminCivilMepReports() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <Table>
+                <Table className="min-w-full">
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Report Details</TableHead>
-                      <TableHead>Engineer</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Score</TableHead>
-                      <TableHead>Recommendation</TableHead>
-                      <TableHead>Dates</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
+                      <TableHead className="min-w-[200px]">Report Details</TableHead>
+                      <TableHead className="min-w-[120px]">Engineer</TableHead>
+                      <TableHead className="min-w-[100px]">Status</TableHead>
+                      <TableHead className="min-w-[80px]">Score</TableHead>
+                      <TableHead className="min-w-[120px]">Recommendation</TableHead>
+                      <TableHead className="min-w-[100px]">Dates</TableHead>
+                      <TableHead className="text-right min-w-[120px]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredReports.map((report: CivilMepReport) => (
                       <TableRow key={report.id} data-testid={`row-report-${report.id}`}>
-                        <TableCell>
+                        <TableCell className="max-w-[200px]">
                           <div>
-                            <div className="font-medium" data-testid={`text-title-${report.id}`}>
+                            <div className="font-medium truncate" data-testid={`text-title-${report.id}`}>
                               {report.reportTitle}
                             </div>
-                            <div className="text-sm text-muted-foreground">
+                            <div className="text-sm text-muted-foreground truncate">
                               Property ID: {report.propertyId}
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="max-w-[120px]">
                           <div>
-                            <div className="font-medium">{report.engineerName}</div>
-                            <div className="text-sm text-muted-foreground">
+                            <div className="font-medium truncate">{report.engineerName}</div>
+                            <div className="text-sm text-muted-foreground truncate">
                               License: {report.engineerLicense}
                             </div>
                           </div>
