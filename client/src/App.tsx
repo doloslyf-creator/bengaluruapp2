@@ -114,6 +114,8 @@ function ProtectedRouter() {
 
       <Route path="/admin-panel/civil-mep-reports" component={AdminCivilMepReports} />
       <Route path="/admin-panel/civil-mep-reports/create" component={AdminCivilMepReportsCreate} />
+      <Route path="/admin-panel/civil-mep-reports/:id/edit" component={AdminCivilMepReportsCreate} />
+      <Route path="/admin/civil-mep-reports/:id/edit" component={AdminCivilMepReportsCreate} />
       <Route path="/civil-mep-report/:id" component={CivilMepReportView} />
       <Route path="/admin-panel/valuation-reports" component={ValuationReportsPage} />
       <Route path="/admin-panel/valuation-reports/create" component={ValuationReportsCreate} />

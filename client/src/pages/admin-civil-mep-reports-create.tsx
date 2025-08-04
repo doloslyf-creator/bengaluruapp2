@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
@@ -59,10 +59,22 @@ export function AdminCivilMepReportsCreate() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("basic");
+  
+  // Extract report ID from URL if in edit mode
+  const currentPath = window.location.pathname;
+  const editMatch = currentPath.match(/\/edit$/) && currentPath.includes('/civil-mep-reports/');
+  const reportId = editMatch ? currentPath.split('/').slice(-2, -1)[0] : null;
+  const isEditMode = !!reportId;
 
   // Fetch properties for dropdown
   const { data: properties = [] } = useQuery({
     queryKey: ["/api/properties"],
+  });
+
+  // Fetch existing report data if in edit mode
+  const { data: existingReport, isLoading: isLoadingReport } = useQuery({
+    queryKey: [`/api/civil-mep-reports/${reportId}`],
+    enabled: isEditMode && !!reportId,
   });
 
   const form = useForm<FormData>({
@@ -100,29 +112,78 @@ export function AdminCivilMepReportsCreate() {
     },
   });
 
-  // Create report mutation
-  const createReportMutation = useMutation({
+  // Populate form with existing data when in edit mode
+  useEffect(() => {
+    if (existingReport && isEditMode) {
+      const formatDateForInput = (dateString: string) => {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        return date.toISOString().split('T')[0];
+      };
+
+      form.reset({
+        propertyId: existingReport.propertyId || "",
+        reportTitle: existingReport.reportTitle || "",
+        engineerName: existingReport.engineerName || "",
+        engineerLicense: existingReport.engineerLicense || "",
+        inspectionDate: formatDateForInput(existingReport.inspectionDate) || "",
+        reportDate: formatDateForInput(existingReport.reportDate) || "",
+        status: existingReport.status || "draft",
+        overallScore: existingReport.overallScore || 0,
+        executiveSummary: existingReport.executiveSummary || "",
+        recommendations: existingReport.recommendations || "",
+        conclusions: existingReport.conclusions || "",
+        investmentRecommendation: existingReport.investmentRecommendation || "conditional",
+        // Populate JSON fields with existing data or empty objects
+        siteInformation: existingReport.siteInformation || {},
+        foundationDetails: existingReport.foundationDetails || {},
+        superstructureDetails: existingReport.superstructureDetails || {},
+        wallsFinishes: existingReport.wallsFinishes || {},
+        roofingDetails: existingReport.roofingDetails || {},
+        doorsWindows: existingReport.doorsWindows || {},
+        flooringDetails: existingReport.flooringDetails || {},
+        staircasesElevators: existingReport.staircasesElevators || {},
+        externalWorks: existingReport.externalWorks || {},
+        mechanicalSystems: existingReport.mechanicalSystems || {},
+        electricalSystems: existingReport.electricalSystems || {},
+        plumbingSystems: existingReport.plumbingSystems || {},
+        fireSafetySystems: existingReport.fireSafetySystems || {},
+        bmsAutomation: existingReport.bmsAutomation || {},
+        greenSustainability: existingReport.greenSustainability || {},
+        documentation: existingReport.documentation || {},
+      });
+    }
+  }, [existingReport, isEditMode, form]);
+
+  // Create/Update report mutation
+  const saveReportMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const response = await fetch("/api/civil-mep-reports", {
-        method: "POST",
+      const url = isEditMode ? `/api/civil-mep-reports/${reportId}` : "/api/civil-mep-reports";
+      const method = isEditMode ? "PUT" : "POST";
+      
+      const response = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to create report");
+        throw new Error(error.error || `Failed to ${isEditMode ? 'update' : 'create'} report`);
       }
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/civil-mep-reports"] });
       queryClient.invalidateQueries({ queryKey: ["/api/civil-mep-reports-stats"] });
-      toast({ title: "Civil+MEP Report created successfully" });
+      if (isEditMode) {
+        queryClient.invalidateQueries({ queryKey: [`/api/civil-mep-reports/${reportId}`] });
+      }
+      toast({ title: `Civil+MEP Report ${isEditMode ? 'updated' : 'created'} successfully` });
       setLocation("/admin-panel/civil-mep-reports");
     },
     onError: (error: any) => {
       toast({
-        title: "Error creating report",
+        title: `Error ${isEditMode ? 'updating' : 'creating'} report`,
         description: error.message,
         variant: "destructive",
       });
@@ -161,8 +222,24 @@ export function AdminCivilMepReportsCreate() {
       greenSustainability: data.greenSustainability,
       documentation: data.documentation,
     };
-    createReportMutation.mutate(submitData);
+    saveReportMutation.mutate(submitData);
   };
+
+  // Show loading state when in edit mode and report is being fetched
+  if (isEditMode && isLoadingReport) {
+    return (
+      <AdminLayout>
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading report data...</p>
+            </div>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
@@ -185,10 +262,10 @@ export function AdminCivilMepReportsCreate() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="w-5 h-5" />
-                New Civil+MEP Engineering Report
+                {isEditMode ? "Edit Civil+MEP Engineering Report" : "New Civil+MEP Engineering Report"}
               </CardTitle>
               <CardDescription>
-                Create a comprehensive engineering assessment report for a property
+                {isEditMode ? "Update the comprehensive engineering assessment report" : "Create a comprehensive engineering assessment report for a property"}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -1884,11 +1961,11 @@ export function AdminCivilMepReportsCreate() {
                 <div className="flex gap-2">
                   <Button
                     type="submit"
-                    disabled={createReportMutation.isPending}
+                    disabled={saveReportMutation.isPending}
                     data-testid="button-create-report"
                   >
                     <Save className="w-4 h-4 mr-2" />
-                    {createReportMutation.isPending ? "Creating..." : "Create Report"}
+                    {saveReportMutation.isPending ? (isEditMode ? "Updating..." : "Creating...") : (isEditMode ? "Update Report" : "Create Report")}
                   </Button>
                 </div>
               </div>
