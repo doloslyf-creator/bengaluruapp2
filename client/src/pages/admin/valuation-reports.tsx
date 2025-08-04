@@ -303,7 +303,7 @@ export default function ValuationReportsPage() {
                   <p className="text-muted-foreground mb-4">
                     Create your first property valuation report to get started.
                   </p>
-                  <Button onClick={() => setShowCreateDialog(true)}>
+                  <Button onClick={() => navigate('/admin-panel/valuation-reports/create')}>
                     <Plus className="h-4 w-4 mr-2" />
                     Create First Report
                   </Button>
@@ -547,7 +547,285 @@ export default function ValuationReportsPage() {
             )}
           </DialogContent>
         </Dialog>
+
+        {/* Customer Assignment Dialog */}
+        <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Assign Customers to Report</DialogTitle>
+              <DialogDescription>
+                Select customers to assign to this valuation report
+              </DialogDescription>
+            </DialogHeader>
+            <CustomerAssignmentDialog
+              reportId={selectedReportId}
+              customers={customers}
+              onAssignmentChange={() => {
+                // Refresh the customer assignments
+                if (reports.length > 0) {
+                  Promise.all(
+                    reports.map(async (report) => {
+                      try {
+                        const response = await fetch(`/api/valuation-reports/${report.id}/customers`);
+                        if (response.ok) {
+                          const assignments = await response.json();
+                          return { reportId: report.id, assignments };
+                        }
+                        return { reportId: report.id, assignments: [] };
+                      } catch (error) {
+                        console.error(`Error fetching customers for report ${report.id}:`, error);
+                        return { reportId: report.id, assignments: [] };
+                      }
+                    })
+                  ).then((results) => {
+                    const customersByReport: Record<string, any[]> = {};
+                    results.forEach(({ reportId, assignments }) => {
+                      customersByReport[reportId] = assignments;
+                    });
+                    setReportCustomers(customersByReport);
+                  });
+                }
+              }}
+              onClose={() => setShowAssignDialog(false)}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     </AdminLayout>
+  );
+}
+
+// Customer Assignment Dialog Component
+function CustomerAssignmentDialog({ 
+  reportId, 
+  customers, 
+  onAssignmentChange, 
+  onClose 
+}: {
+  reportId: string;
+  customers: any[];
+  onAssignmentChange: () => void;
+  onClose: () => void;
+}) {
+  const [selectedCustomers, setSelectedCustomers] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [assignedCustomers, setAssignedCustomers] = useState<any[]>([]);
+  const [isLoadingAssignments, setIsLoadingAssignments] = useState(true);
+  const { toast } = useToast();
+
+  // Fetch current assignments when dialog opens
+  useEffect(() => {
+    if (reportId) {
+      setIsLoadingAssignments(true);
+      fetch(`/api/valuation-reports/${reportId}/customers`)
+        .then(response => response.json())
+        .then(assignments => {
+          setAssignedCustomers(assignments);
+          setIsLoadingAssignments(false);
+        })
+        .catch(error => {
+          console.error('Error fetching assignments:', error);
+          setIsLoadingAssignments(false);
+        });
+    }
+  }, [reportId]);
+
+  // Filter customers based on search term
+  const filteredCustomers = customers.filter(customer =>
+    customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (customer.phone && customer.phone.includes(searchTerm))
+  );
+
+  // Get customers that are not yet assigned
+  const availableCustomers = filteredCustomers.filter(customer => 
+    !assignedCustomers.some(assignment => assignment.customerId === customer.id)
+  );
+
+  // Handle customer selection
+  const handleCustomerToggle = (customerId: string) => {
+    setSelectedCustomers(prev => 
+      prev.includes(customerId) 
+        ? prev.filter(id => id !== customerId)
+        : [...prev, customerId]
+    );
+  };
+
+  // Handle assignment submission
+  const handleAssign = async () => {
+    if (selectedCustomers.length === 0) {
+      toast({
+        title: "No customers selected",
+        description: "Please select at least one customer to assign.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/valuation-reports/${reportId}/customers`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customerIds: selectedCustomers,
+          assignedBy: 'admin'
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        toast({
+          title: "Success",
+          description: `Successfully assigned ${result.assigned} customer(s) to the report.`,
+        });
+        setSelectedCustomers([]);
+        onAssignmentChange();
+        onClose();
+      } else {
+        throw new Error('Failed to assign customers');
+      }
+    } catch (error) {
+      console.error('Error assigning customers:', error);
+      toast({
+        title: "Error",
+        description: "Failed to assign customers. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Handle customer removal
+  const handleRemoveCustomer = async (customerId: string) => {
+    try {
+      const response = await fetch(`/api/valuation-reports/${reportId}/customers/${customerId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Customer removed from report successfully.",
+        });
+        // Refresh assignments
+        const updatedResponse = await fetch(`/api/valuation-reports/${reportId}/customers`);
+        const updatedAssignments = await updatedResponse.json();
+        setAssignedCustomers(updatedAssignments);
+        onAssignmentChange();
+      } else {
+        throw new Error('Failed to remove customer');
+      }
+    } catch (error) {
+      console.error('Error removing customer:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove customer. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getCustomerName = (customerId: string) => {
+    const customer = customers.find(c => c.id === customerId);
+    return customer ? customer.name : customerId;
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Currently Assigned Customers */}
+      <div>
+        <h3 className="text-lg font-semibold mb-3">Currently Assigned Customers</h3>
+        {isLoadingAssignments ? (
+          <div className="text-center py-4">
+            <div className="text-muted-foreground">Loading assignments...</div>
+          </div>
+        ) : assignedCustomers.length === 0 ? (
+          <div className="text-center py-4">
+            <div className="text-muted-foreground">No customers assigned yet</div>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {assignedCustomers.map((assignment) => (
+              <div key={assignment.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div>
+                  <div className="font-medium">{getCustomerName(assignment.customerId)}</div>
+                  <div className="text-sm text-muted-foreground">
+                    Assigned by {assignment.assignedBy} on {new Date(assignment.assignedAt).toLocaleDateString()}
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleRemoveCustomer(assignment.customerId)}
+                >
+                  Remove
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Add New Customers */}
+      <div>
+        <h3 className="text-lg font-semibold mb-3">Add New Customers</h3>
+        
+        {/* Search */}
+        <div className="mb-4">
+          <Input
+            placeholder="Search customers by name, email, or phone..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        {/* Available Customers */}
+        {availableCustomers.length === 0 ? (
+          <div className="text-center py-4">
+            <div className="text-muted-foreground">
+              {searchTerm ? "No customers found matching your search" : "All customers are already assigned"}
+            </div>
+          </div>
+        ) : (
+          <div className="max-h-60 overflow-y-auto space-y-2">
+            {availableCustomers.map((customer) => (
+              <div
+                key={customer.id}
+                className={`flex items-center space-x-3 p-3 border rounded-lg cursor-pointer hover:bg-muted/50 ${
+                  selectedCustomers.includes(customer.id) ? 'bg-muted border-primary' : ''
+                }`}
+                onClick={() => handleCustomerToggle(customer.id)}
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedCustomers.includes(customer.id)}
+                  onChange={() => handleCustomerToggle(customer.id)}
+                  className="rounded"
+                />
+                <div className="flex-1">
+                  <div className="font-medium">{customer.name}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {customer.email} • {customer.phone}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        {selectedCustomers.length > 0 && (
+          <div className="flex justify-end space-x-3 mt-4">
+            <Button variant="outline" onClick={() => setSelectedCustomers([])}>
+              Clear Selection
+            </Button>
+            <Button onClick={handleAssign}>
+              Assign {selectedCustomers.length} Customer{selectedCustomers.length > 1 ? 's' : ''}
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
