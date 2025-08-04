@@ -1,0 +1,139 @@
+🧾 Final Structure: Property Valuation Report (Bengaluru Edition)
+Purpose: Deliver a standalone, insight-rich document estimating a property's financial value, legal risk, and suitability for different buyer intents.
+
+1. 📌 Executive Summary
+Field	Value
+Project Name & Unit	e.g., Assetz Marq 3.0, 3BHK, Tower B
+Estimated Market Value	₹2.2 Cr
+Rate per Sqft (SBA & UDS)	₹10,200/sqft
+Buyer Fit	End Use / Investor / Both
+Valuation Verdict	Slightly Overpriced (₹1,000/sqft above resale)
+Appreciation Outlook	Moderate – 7% CAGR expected
+Risk Score (0–10)	3 (Low)
+Recommendation	✅ Buy if negotiated ~₹10L lower
+
+2. 🏠 Property Profile
+Project Name, Tower/Unit
+
+Unit Type: Apartment / Villa / Rowhouse / Plot
+
+Configuration: 3BHK, 1550 sq.ft
+
+UDS (Undivided Land Share)
+
+Facing (e.g., East), Vastu Compliance
+
+OC/CC Status
+
+Possession Status: Ready / Under Construction / Completed
+
+Khata Type: A / B / E
+
+Land Title Status
+
+Builder Reputation Score (based on delivery record, delays, complaints)
+
+3. 💸 Market Valuation Estimate
+Builder Quoted Price vs Actual Market Value
+
+Total Estimated Value (₹)
+
+Price per Sqft Analysis (Carpet, SBA, UDS)
+
+Land Share Value vs Construction Component
+
+Guidance Value Zone Rate (BDA/BBMP/BIAPPA)
+
+Unit is priced 14% above the average resale rate of similar units in the area.
+
+4. 📊 Comparable Sales Analysis
+Project	Config	Area (sqft)	Date	Rate/sqft	Source
+Brigade Utopia	3BHK	1640	Jan 2025	₹9,100	MagicBricks
+Prestige Elm Park	3BHK	1505	Apr 2025	₹10,000	Broker
+Sowparnika Indraprastha	3BHK	1430	Mar 2025	₹8,950	Resident Sale
+
+Benchmarking from: MagicBricks, 99acres, local brokers
+
+Volatility Index: 6-month price trend
+
+Days on Market Avg: 72 days for resale units nearby
+
+5. 🌇 Location & Infrastructure Assessment
+🔹 Zoning & Authority
+Planning Authority: BDA / BBMP / BMRDA / BIAPPA
+
+Zonal Classification: Residential / Mixed / Green
+
+Land Use Status: Converted / DC Converted / BDA Approved
+
+🔹 Physical & Social Infrastructure
+Connectivity: Distance to Metro, ORR, Whitefield Station
+
+Water Supply: BWSSB / Borewell / Tanker
+
+Drainage: Underground / Open / None
+
+Social Infra: Schools, Hospitals, Malls within 5 km
+
+🔹 Future Developments (Impact on Appreciation)
+Peripheral Ring Road Plan
+
+Metro Phase 3 Extensions
+
+Planned SEZs / Tech Parks nearby
+
+6. 🧾 Legal & Compliance Snapshot
+Checkpoint	Status
+RERA Registration	PRM/KA/RERA/xxx
+Khata	A (verified from BBMP)
+Sale Deed Title	Clear (no encumbrance)
+DC Conversion	Yes
+Plan Approval	From BDA/BMRDA
+OC/CC	Received / In Progress
+Loan Approval	HDFC, ICICI, SBI confirmed
+
+Verified via: RERA portal, EC records, Builder documents
+
+Title Clarity Notes: No ongoing disputes / pending litigations
+
+7. 📈 Rental & Yield Potential
+Expected Monthly Rent: ₹45,000–₹48,000
+
+Gross Rental Yield: ~2.5% p.a.
+
+Tenant Demand: High in 3–4 km radius (IT catchment)
+
+Exit Liquidity (for resale): Moderate, 3–6 months
+
+Yield Score: 6.5/10
+
+8. 📝 Cost Sheet Breakdown
+Component	Amount
+Base Unit Cost	₹1.95 Cr
+Clubhouse + Amenities + Corpus	₹5.5 L
+Floor Rise Charges	₹2.4 L
+GST @5%	₹9.75 L
+Stamp Duty + Registration	₹13 L (approx)
+Total All-In Price	₹2.26 Cr
+
+Registration varies: 5% (stamp) + 1% (registration)
+
+Khata Transfer (if resale): ₹30–50K
+
+9. ⚖️ Pros & Cons Summary
+✅ Pros	⚠️ Cons
+Legally Clear Property	Slightly overpriced
+High UDS (42%)	Some areas still rely on tanker
+Strong Social Infra	Rental yield not investor-attractive
+OC Received	Project resale cycle still slow
+
+10. 🧠 Final Recommendation
+Type Fit: Ideal for End Users prioritizing legal clarity and social infra
+
+Negotiation Advice: Ask builder for ₹1,000/sqft discount due to oversupply in area
+
+Risk Summary: Low legal risk, moderate infra dependency
+
+Appreciation Outlook (5 yr): ₹2.6–2.8 Cr expected
+
+Exit Plan (for investor): Hold minimum 5–6 years for ROI

@@ -66,9 +66,9 @@ export default function ValuationReportsCreate() {
       projectName: formData.get("projectName") as string,
       unitType: formData.get("unitType") as string,
       configuration: formData.get("configuration") as string,
-      // Market valuation - convert to string as per schema
+      // Market valuation - using new field names
       estimatedMarketValue: formData.get("estimatedMarketValue") as string,
-      ratePerSqft: formData.get("ratePerSqft") as string,
+      ratePerSqftSbaUds: formData.get("ratePerSqftSbaUds") as string,
       // Basic fields for initial creation
       buyerFit: formData.get("buyerFit") as string,
       valuationVerdict: formData.get("valuationVerdict") as string,
@@ -188,12 +188,10 @@ export default function ValuationReportsCreate() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="ratePerSqft">Rate per Sq.ft (₹)</Label>
+                  <Label htmlFor="ratePerSqftSbaUds">Rate per Sq.ft (SBA & UDS)</Label>
                   <Input
-                    name="ratePerSqft"
-                    type="number"
-                    step="0.01"
-                    placeholder="10200.00"
+                    name="ratePerSqftSbaUds"
+                    placeholder="₹10,200/sqft"
                   />
                 </div>
               </div>

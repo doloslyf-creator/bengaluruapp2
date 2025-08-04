@@ -61,7 +61,7 @@ import { AdminCivilMepReports } from "@/pages/admin-civil-mep-reports";
 import { AdminCivilMepReportsCreate } from "@/pages/admin-civil-mep-reports-create";
 import { CivilMepReportView } from "@/pages/civil-mep-report-view";
 import ValuationReportsPage from "@/pages/admin/valuation-reports";
-import ValuationReportEdit from "@/pages/admin/valuation-report-edit";
+import ValuationReportEdit from "@/pages/admin/valuation-report-edit-comprehensive";
 import ValuationReportsCreate from "@/pages/admin/valuation-reports-create";
 import NotFound from "@/pages/not-found";
 

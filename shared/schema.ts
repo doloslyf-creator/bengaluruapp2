@@ -740,87 +740,95 @@ export const propertyValuationReports = pgTable("property_valuation_reports", {
   updatedAt: timestamp("updated_at").defaultNow(),
   deliveredAt: timestamp("delivered_at"),
   
-  // Executive Summary
-  estimatedMarketValue: decimal("estimated_market_value", { precision: 12, scale: 2 }),
-  ratePerSqft: decimal("rate_per_sqft", { precision: 8, scale: 2 }),
+  // 1. Executive Summary
+  projectName: text("project_name"), // e.g., "Assetz Marq 3.0, 3BHK, Tower B"
+  towerUnit: text("tower_unit"),
+  estimatedMarketValue: text("estimated_market_value"), // ₹2.2 Cr
+  ratePerSqftSbaUds: text("rate_per_sqft_sba_uds"), // ₹10,200/sqft
   buyerFit: varchar("buyer_fit", { enum: ["end_use", "investor", "both"] }),
-  valuationVerdict: text("valuation_verdict"),
-  appreciationOutlook: text("appreciation_outlook"),
-  riskScore: integer("risk_score").default(0), // 0-10 scale
-  recommendation: text("recommendation"),
+  valuationVerdict: text("valuation_verdict"), // Slightly Overpriced (₹1,000/sqft above resale)
+  appreciationOutlook: text("appreciation_outlook"), // Moderate – 7% CAGR expected
+  riskScore: integer("risk_score").default(0), // 0-10 scale (3 = Low)
+  recommendation: text("recommendation"), // ✅ Buy if negotiated ~₹10L lower
   
-  // Property Profile
+  // 2. Property Profile
   unitType: varchar("unit_type", { enum: ["apartment", "villa", "rowhouse", "plot"] }),
-  configuration: text("configuration"), // e.g., "3BHK, 1550 sq.ft"
-  udsArea: decimal("uds_area", { precision: 8, scale: 2 }),
-  facing: text("facing"),
+  configuration: text("configuration"), // 3BHK, 1550 sq.ft
+  undividedLandShare: text("undivided_land_share"), // UDS
+  facing: text("facing"), // e.g., East
   vastuCompliance: boolean("vastu_compliance").default(false),
-  occcStatus: text("occc_status"),
+  ocCcStatus: text("oc_cc_status"), // OC/CC Status
   possessionStatus: varchar("possession_status", { enum: ["ready", "under_construction", "completed"] }),
   khataType: varchar("khata_type", { enum: ["A", "B", "E"] }),
   landTitleStatus: text("land_title_status"),
-  builderReputationScore: integer("builder_reputation_score").default(0),
+  builderReputationScore: text("builder_reputation_score"), // Based on delivery record, delays, complaints
   
-  // Market Valuation
-  builderQuotedPrice: decimal("builder_quoted_price", { precision: 12, scale: 2 }),
-  actualMarketValue: decimal("actual_market_value", { precision: 12, scale: 2 }),
-  pricePerSqftCarpet: decimal("price_per_sqft_carpet", { precision: 8, scale: 2 }),
-  pricePerSqftSba: decimal("price_per_sqft_sba", { precision: 8, scale: 2 }),
-  pricePerSqftUds: decimal("price_per_sqft_uds", { precision: 8, scale: 2 }),
-  landShareValue: decimal("land_share_value", { precision: 12, scale: 2 }),
-  constructionComponent: decimal("construction_component", { precision: 12, scale: 2 }),
-  guidanceValueZoneRate: decimal("guidance_value_zone_rate", { precision: 8, scale: 2 }),
-  pricingAnalysis: text("pricing_analysis"),
+  // 3. Market Valuation Estimate
+  builderQuotedPrice: text("builder_quoted_price"), // vs Actual Market Value
+  totalEstimatedValue: text("total_estimated_value"),
+  pricePerSqftAnalysis: text("price_per_sqft_analysis"), // Carpet, SBA, UDS
+  landShareValue: text("land_share_value"), // vs Construction Component
+  constructionValue: text("construction_value"),
+  guidanceValueZoneRate: text("guidance_value_zone_rate"), // BDA/BBMP/BIAPPA
+  marketPremiumDiscount: text("market_premium_discount"), // Unit is priced 14% above average resale
   
-  // Comparable Sales (JSON array)
-  comparableSales: json("comparable_sales"), // Array of comparable properties
-  benchmarkingSources: text("benchmarking_sources"),
-  volatilityIndex: text("volatility_index"),
-  daysOnMarket: integer("days_on_market"),
+  // 4. Comparable Sales Analysis
+  comparableSales: json("comparable_sales"), // Array of {project, config, area, date, rate, source}
+  benchmarkingSources: text("benchmarking_sources"), // MagicBricks, 99acres, local brokers
+  volatilityIndex: text("volatility_index"), // 6-month price trend
+  averageDaysOnMarket: integer("average_days_on_market"), // 72 days for resale units nearby
   
-  // Location & Infrastructure
+  // 5. Location & Infrastructure Assessment
+  // Zoning & Authority
   planningAuthority: varchar("planning_authority", { enum: ["BDA", "BBMP", "BMRDA", "BIAPPA"] }),
-  zonalClassification: varchar("zonal_classification", { enum: ["residential", "mixed", "green"] }),
+  zonalClassification: varchar("zonal_classification", { enum: ["residential", "mixed", "green", "commercial"] }),
   landUseStatus: varchar("land_use_status", { enum: ["converted", "dc_converted", "bda_approved"] }),
-  connectivityScore: integer("connectivity_score").default(0),
-  waterSupply: varchar("water_supply", { enum: ["BWSSB", "borewell", "tanker"] }),
-  drainageSystem: varchar("drainage_system", { enum: ["underground", "open", "none"] }),
-  socialInfraScore: integer("social_infra_score").default(0),
-  futureDevImpact: text("future_dev_impact"),
+  // Physical & Social Infrastructure
+  connectivity: text("connectivity"), // Distance to Metro, ORR, Whitefield Station
+  waterSupply: varchar("water_supply", { enum: ["bwssb", "borewell", "tanker", "mixed"] }),
+  drainage: varchar("drainage", { enum: ["underground", "open", "none"] }),
+  socialInfrastructure: text("social_infrastructure"), // Schools, Hospitals, Malls within 5 km
+  // Future Developments
+  futureInfrastructure: json("future_infrastructure"), // PRR Plan, Metro Phase 3, SEZs/Tech Parks
   
-  // Legal & Compliance
-  reraRegistration: text("rera_registration"),
-  khataVerified: boolean("khata_verified").default(false),
-  saleDeedTitle: text("sale_deed_title"),
-  dcConversion: boolean("dc_conversion").default(false),
-  planApproval: text("plan_approval"),
-  occcReceived: boolean("occc_received").default(false),
-  loanApprovalBanks: text("loan_approval_banks"),
-  titleClarityNotes: text("title_clarity_notes"),
+  // 6. Legal & Compliance Snapshot
+  reraRegistration: text("rera_registration"), // PRM/KA/RERA/xxx
+  khataVerification: text("khata_verification"), // A (verified from BBMP)
+  titleClearance: text("title_clearance"), // Clear (no encumbrance)
+  dcConversion: varchar("dc_conversion", { enum: ["yes", "no", "in_progress", "not_required"] }),
+  planApproval: text("plan_approval"), // From BDA/BMRDA
+  loanApproval: json("loan_approval"), // HDFC, ICICI, SBI confirmed
+  titleClarityNotes: text("title_clarity_notes"), // No ongoing disputes / pending litigations
   
-  // Rental & Yield
-  expectedMonthlyRent: decimal("expected_monthly_rent", { precision: 8, scale: 2 }),
-  grossRentalYield: decimal("gross_rental_yield", { precision: 5, scale: 2 }),
-  tenantDemand: varchar("tenant_demand", { enum: ["low", "moderate", "high"] }),
-  exitLiquidity: text("exit_liquidity"),
-  yieldScore: decimal("yield_score", { precision: 3, scale: 1 }),
+  // 7. Rental & Yield Potential
+  expectedMonthlyRent: text("expected_monthly_rent"), // ₹45,000–₹48,000
+  grossRentalYield: text("gross_rental_yield"), // ~2.5% p.a.
+  tenantDemand: varchar("tenant_demand", { enum: ["high", "moderate", "low"] }), // High in 3–4 km radius
+  exitLiquidity: text("exit_liquidity"), // Moderate, 3–6 months
+  yieldScore: text("yield_score"), // 6.5/10
   
-  // Cost Breakdown (JSON)
-  costBreakdown: json("cost_breakdown"), // Detailed cost components
-  totalAllInPrice: decimal("total_all_in_price", { precision: 12, scale: 2 }),
+  // 8. Cost Sheet Breakdown
+  baseUnitCost: text("base_unit_cost"), // ₹1.95 Cr
+  amenitiesCharges: text("amenities_charges"), // Clubhouse + Amenities + Corpus ₹5.5 L
+  floorRiseCharges: text("floor_rise_charges"), // ₹2.4 L
+  gstAmount: text("gst_amount"), // GST @5% ₹9.75 L
+  stampDutyRegistration: text("stamp_duty_registration"), // ₹13 L (approx)
+  totalAllInPrice: text("total_all_in_price"), // ₹2.26 Cr
+  khataTransferCosts: text("khata_transfer_costs"), // ₹30–50K
   
-  // Pros & Cons
+  // 9. Pros & Cons Summary
   pros: json("pros"), // Array of pros
   cons: json("cons"), // Array of cons
   
-  // Final Assessment
-  typeFit: text("type_fit"),
-  negotiationAdvice: text("negotiation_advice"),
-  riskSummary: text("risk_summary"),
-  appreciationOutlook5yr: text("appreciation_outlook_5yr"),
-  exitPlan: text("exit_plan"),
+  // 10. Final Recommendation
+  buyerTypeFit: text("buyer_type_fit"), // Ideal for End Users prioritizing legal clarity
+  negotiationAdvice: text("negotiation_advice"), // Ask builder for ₹1,000/sqft discount
+  riskSummary: text("risk_summary"), // Low legal risk, moderate infra dependency
+  appreciationOutlook5yr: text("appreciation_outlook_5yr"), // ₹2.6–2.8 Cr expected
+  exitPlan: text("exit_plan"), // Hold minimum 5–6 years for ROI
+  overallScore: text("overall_score"),
   
-  // Additional data
+  // Additional Optional Fields
   appendices: json("appendices"), // Optional additional documents/data
   customNotes: text("custom_notes"),
 });
