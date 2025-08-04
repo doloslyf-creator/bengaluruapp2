@@ -138,7 +138,7 @@ export default function FindProperty() {
       </div>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-20">
+      <section className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-12">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div 
             className="text-center max-w-4xl mx-auto"
@@ -146,34 +146,13 @@ export default function FindProperty() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="mb-6 text-sm px-4 py-2 bg-blue-100 text-blue-800 border border-blue-200 rounded-full inline-block">
-              🎯 Find properties that match your exact lifestyle and budget
-            </div>
-            
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Find your perfect{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-                dream home
-              </span>{" "}
-              in minutes
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
+              Find Your Perfect Property
             </h1>
             
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
-              Smart AI-powered matching finds properties that fit your lifestyle, budget, and future goals. 
-              No more endless scrolling through mismatched options.
+            <p className="text-lg text-gray-600 mb-6 leading-relaxed max-w-2xl mx-auto">
+              Search through our curated collection of {properties.length}+ verified properties in Bengaluru
             </p>
-
-            {/* Social Proof */}
-            <div className="flex items-center justify-center space-x-8 text-sm text-gray-600 mb-12">
-              <div className="flex items-center space-x-2">
-                <div className="text-blue-500">🏠</div>
-                <span><strong>{properties.length}+</strong> verified properties</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="text-green-500">✅</div>
-                <span><strong>Zero</strong> broker fees</span>
-              </div>
-            </div>
           </motion.div>
         </div>
       </section>
@@ -193,30 +172,30 @@ export default function FindProperty() {
       </div>
 
       {/* Main Form */}
-      <main className="max-w-4xl mx-auto px-4 py-8">
+      <main className="max-w-4xl mx-auto px-4 py-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="grid gap-6"
+          className="grid gap-4"
         >
           {/* Essential Preferences - Row 1 */}
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 gap-4">
             {/* Property Type */}
             <Card className="bg-white/80 backdrop-blur">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center space-x-2 text-lg">
-                  <Home className="h-5 w-5 text-primary" />
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center space-x-2 text-base">
+                  <Home className="h-4 w-4 text-primary" />
                   <span>Property Type</span>
                   <span className="text-red-500 text-sm">*</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <div className="grid gap-2">
                   {displayPropertyTypes.map((type) => (
                     <motion.div
                       key={type.value}
                       whileHover={{ scale: 1.01 }}
-                      className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                      className={`p-2 rounded-lg border cursor-pointer transition-all duration-200 ${
                         preferences.propertyType === type.value
                           ? 'border-primary bg-primary/10 text-primary'
                           : 'border-gray-200 bg-white hover:border-primary/50'
@@ -238,20 +217,20 @@ export default function FindProperty() {
 
             {/* Location Zone */}
             <Card className="bg-white/80 backdrop-blur">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center space-x-2 text-lg">
-                  <MapPin className="h-5 w-5 text-primary" />
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center space-x-2 text-base">
+                  <MapPin className="h-4 w-4 text-primary" />
                   <span>Preferred Zone</span>
                   <span className="text-red-500 text-sm">*</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <div className="grid gap-2">
                   {displayZones.map((zone) => (
                     <motion.div
                       key={zone}
                       whileHover={{ scale: 1.01 }}
-                      className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                      className={`p-2 rounded-lg border cursor-pointer transition-all duration-200 ${
                         preferences.zone === zone
                           ? 'border-primary bg-primary/10 text-primary'
                           : 'border-gray-200 bg-white hover:border-primary/50'
@@ -273,23 +252,23 @@ export default function FindProperty() {
           </div>
 
           {/* BHK Configuration and Budget - Row 2 */}
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 gap-4">
             {/* BHK Type */}
             <Card className="bg-white/80 backdrop-blur">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center space-x-2 text-lg">
-                  <Building2 className="h-5 w-5 text-primary" />
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center space-x-2 text-base">
+                  <Building2 className="h-4 w-4 text-primary" />
                   <span>Configuration</span>
                   <span className="text-red-500 text-sm">*</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <div className="grid grid-cols-2 gap-2">
                   {bhkOptions.map((bhk) => (
                     <motion.div
                       key={bhk}
                       whileHover={{ scale: 1.02 }}
-                      className={`p-3 rounded-lg border-2 cursor-pointer text-center transition-all duration-200 ${
+                      className={`p-2 rounded-lg border cursor-pointer text-center transition-all duration-200 ${
                         preferences.bhkType.includes(bhk)
                           ? 'border-primary bg-primary/10 text-primary'
                           : 'border-gray-200 bg-white hover:border-primary/50'
@@ -307,16 +286,16 @@ export default function FindProperty() {
 
             {/* Budget Range */}
             <Card className="bg-white/80 backdrop-blur">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center space-x-2 text-lg">
-                  <IndianRupee className="h-5 w-5 text-primary" />
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center space-x-2 text-base">
+                  <IndianRupee className="h-4 w-4 text-primary" />
                   <span>Budget Range</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+              <CardContent className="pt-0">
+                <div className="space-y-3">
                   <div className="text-center">
-                    <div className="text-xl font-semibold text-gray-900 mb-1">
+                    <div className="text-lg font-semibold text-gray-900 mb-1">
                       {formatBudget(preferences.budgetRange[0])} - {formatBudget(preferences.budgetRange[1])}
                     </div>
                     <p className="text-sm text-gray-600">Your comfortable investment range</p>
@@ -344,18 +323,18 @@ export default function FindProperty() {
 
           {/* Optional Preferences - Row 3 */}
           <Card className="bg-white/80 backdrop-blur">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center space-x-2 text-lg">
-                <Sparkles className="h-5 w-5 text-primary" />
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center space-x-2 text-base">
+                <Sparkles className="h-4 w-4 text-primary" />
                 <span>Amenities & Features</span>
                 <span className="text-sm text-gray-500 font-normal">(Optional)</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
+            <CardContent className="pt-0">
+              <div className="space-y-4">
                 {/* Amenities */}
                 <div>
-                  <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
                     Amenities you'd love to have
                   </Label>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -380,7 +359,7 @@ export default function FindProperty() {
                 {/* Special Features */}
                 {tags.length > 0 && (
                   <div>
-                    <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                    <Label className="text-sm font-medium text-gray-700 mb-2 block">
                       Special features that matter
                     </Label>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
