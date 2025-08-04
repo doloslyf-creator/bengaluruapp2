@@ -2777,7 +2777,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get valuation report statistics  
   app.get("/api/valuation-reports/stats", async (req, res) => {
     try {
-      const stats = await storage.getValuationReportStats();
+      const reports = await storage.getValuationReports();
+      const stats = {
+        totalReports: reports.length,
+        draftReports: reports.filter(r => r.reportStatus === 'draft').length,
+        inProgressReports: reports.filter(r => r.reportStatus === 'in_progress').length,
+        completedReports: reports.filter(r => r.reportStatus === 'completed').length,
+        deliveredReports: reports.filter(r => r.reportStatus === 'delivered').length,
+        averageValue: reports.length > 0 ? reports.reduce((sum, r) => sum + (r.estimatedMarketValue || 0), 0) / reports.length : 0
+      };
       res.json(stats);
     } catch (error) {
       console.error("Error fetching valuation report stats:", error);

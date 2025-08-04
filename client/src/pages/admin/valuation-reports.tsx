@@ -39,7 +39,6 @@ import type { PropertyValuationReport, Property } from "@shared/schema";
 export default function ValuationReportsPage() {
   const [selectedReport, setSelectedReport] = useState<PropertyValuationReport | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [showEditDialog, setShowEditDialog] = useState(false);
   const [showViewDialog, setShowViewDialog] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -89,29 +88,7 @@ export default function ValuationReportsPage() {
     },
   });
 
-  // Update report mutation
-  const updateReportMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      return await apiRequest(`/api/valuation-reports/${id}`, "PUT", data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/valuation-reports"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/valuation-reports/stats"] });
-      setShowEditDialog(false);
-      setSelectedReport(null);
-      toast({
-        title: "Success",
-        description: "Valuation report updated successfully",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update valuation report",
-        variant: "destructive",
-      });
-    },
-  });
+
 
   // Delete report mutation
   const deleteReportMutation = useMutation({
@@ -181,24 +158,7 @@ export default function ValuationReportsPage() {
     createReportMutation.mutate(reportData);
   };
 
-  const handleUpdateReport = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!selectedReport) return;
 
-    const formData = new FormData(e.currentTarget);
-    
-    const updateData = {
-      reportTitle: formData.get("reportTitle") as string,
-      estimatedMarketValue: formData.get("estimatedMarketValue") ? parseFloat(formData.get("estimatedMarketValue") as string) : undefined,
-      ratePerSqft: formData.get("ratePerSqft") ? parseFloat(formData.get("ratePerSqft") as string) : undefined,
-      buyerFit: formData.get("buyerFit") as string,
-      valuationVerdict: formData.get("valuationVerdict") as string,
-      recommendation: formData.get("recommendation") as string,
-      configuration: formData.get("configuration") as string,
-    };
-
-    updateReportMutation.mutate({ id: selectedReport.id, data: updateData });
-  };
 
   const getStatusBadge = (status: string) => {
     const statusMap = {
@@ -540,112 +500,7 @@ export default function ValuationReportsPage() {
           </CardContent>
         </Card>
 
-        {/* Edit Dialog */}
-        <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Edit Valuation Report</DialogTitle>
-              <DialogDescription>
-                Update the valuation report details
-              </DialogDescription>
-            </DialogHeader>
-            {selectedReport && (
-              <form onSubmit={handleUpdateReport} className="space-y-4">
-                <div>
-                  <Label htmlFor="reportTitle">Report Title</Label>
-                  <Input
-                    name="reportTitle"
-                    defaultValue={selectedReport.reportTitle}
-                    required
-                  />
-                </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="estimatedMarketValue">Estimated Market Value (₹)</Label>
-                    <Input
-                      name="estimatedMarketValue"
-                      type="number"
-                      step="0.01"
-                      defaultValue={selectedReport.estimatedMarketValue || ""}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="ratePerSqft">Rate per Sq.ft (₹)</Label>
-                    <Input
-                      name="ratePerSqft"
-                      type="number"
-                      step="0.01"
-                      defaultValue={selectedReport.ratePerSqft || ""}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="buyerFit">Buyer Fit</Label>
-                    <Select name="buyerFit" defaultValue={selectedReport.buyerFit || ""}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select buyer fit" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="end_use">End Use</SelectItem>
-                        <SelectItem value="investor">Investor</SelectItem>
-                        <SelectItem value="both">Both</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="configuration">Configuration</Label>
-                    <Input
-                      name="configuration"
-                      defaultValue={selectedReport.configuration || ""}
-                      placeholder="e.g., 3BHK, 1550 sq.ft"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="valuationVerdict">Valuation Verdict</Label>
-                  <Textarea
-                    name="valuationVerdict"
-                    defaultValue={selectedReport.valuationVerdict || ""}
-                    rows={3}
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="recommendation">Recommendation</Label>
-                  <Textarea
-                    name="recommendation"
-                    defaultValue={selectedReport.recommendation || ""}
-                    rows={3}
-                  />
-                </div>
-
-                <div className="flex justify-end space-x-2 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setShowEditDialog(false);
-                      setSelectedReport(null);
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    disabled={updateReportMutation.isPending}
-                    data-testid="button-submit-update"
-                  >
-                    {updateReportMutation.isPending ? "Updating..." : "Update Report"}
-                  </Button>
-                </div>
-              </form>
-            )}
-          </DialogContent>
-        </Dialog>
 
         {/* View Dialog */}
         <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
