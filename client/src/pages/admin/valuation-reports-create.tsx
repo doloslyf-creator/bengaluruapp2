@@ -32,7 +32,7 @@ export default function ValuationReportsCreate() {
   // Create report mutation
   const createReportMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("/api/valuation-reports", "POST", data);
+      return await apiRequest("POST", "/api/valuation-reports", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/valuation-reports"] });
@@ -58,21 +58,31 @@ export default function ValuationReportsCreate() {
     
     const reportData = {
       propertyId: formData.get("propertyId") as string,
-      customerId: "placeholder-customer", // In real app, get from auth/selection
+      customerId: null, // Will be assigned later
       reportTitle: formData.get("reportTitle") as string,
       createdBy: "admin", // In a real app, this would come from auth
       reportStatus: "draft" as const,
-      // Basic property profile data
+      
+      // 1. Property Profile - Basic Information
       projectName: formData.get("projectName") as string,
       unitType: formData.get("unitType") as string,
       configuration: formData.get("configuration") as string,
-      // Market valuation - convert string to number for existing decimal field
+      
+      // 3. Market Valuation - using correct decimal field
       estimatedMarketValue: formData.get("estimatedMarketValue") ? parseFloat(formData.get("estimatedMarketValue") as string) : null,
       ratePerSqftSbaUds: formData.get("ratePerSqftSbaUds") as string,
-      // Basic fields for initial creation
-      buyerFit: formData.get("buyerFit") as string,
-      valuationVerdict: formData.get("valuationVerdict") as string,
-      recommendation: formData.get("recommendation") as string,
+      
+      // 10. Final Recommendation - using correct field names
+      buyerTypeFit: formData.get("buyerFit") as string, // Updated field name
+      overallVerdict: formData.get("valuationVerdict") as string, // Updated to match schema
+      finalRecommendation: formData.get("recommendation") as string, // Updated field name
+      
+      // Set other required fields to null/empty for draft
+      assignedTo: null,
+      propertyAddress: null,
+      inspectionDate: null,
+      // Initialize all other comprehensive fields as null for draft creation
+      // They will be filled in during the edit process
     };
 
     createReportMutation.mutate(reportData);
@@ -197,15 +207,15 @@ export default function ValuationReportsCreate() {
               </div>
 
               <div>
-                <Label htmlFor="buyerFit">Buyer Fit</Label>
+                <Label htmlFor="buyerFit">Buyer Type Fit</Label>
                 <Select name="buyerFit">
                   <SelectTrigger>
-                    <SelectValue placeholder="Select buyer fit" />
+                    <SelectValue placeholder="Select buyer type fit" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="end_use">End Use</SelectItem>
-                    <SelectItem value="investor">Investor</SelectItem>
-                    <SelectItem value="both">Both</SelectItem>
+                    <SelectItem value="End Users prioritizing legal clarity">End Users</SelectItem>
+                    <SelectItem value="Investors seeking rental yield">Investors</SelectItem>
+                    <SelectItem value="Both end users and investors">Both</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -222,19 +232,19 @@ export default function ValuationReportsCreate() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <Label htmlFor="valuationVerdict">Valuation Verdict</Label>
+                <Label htmlFor="valuationVerdict">Overall Verdict</Label>
                 <Textarea
                   name="valuationVerdict"
-                  placeholder="e.g., Slightly Overpriced (₹1,000/sqft above resale)"
+                  placeholder="e.g., Slightly Overpriced (₹1,000/sqft above resale market rate)"
                   rows={3}
                 />
               </div>
 
               <div>
-                <Label htmlFor="recommendation">Initial Recommendation</Label>
+                <Label htmlFor="recommendation">Final Recommendation</Label>
                 <Textarea
                   name="recommendation"
-                  placeholder="e.g., ✅ Buy if negotiated ~₹10L lower"
+                  placeholder="e.g., ✅ Buy if negotiated ~₹10L lower. Ideal for end users prioritizing legal clarity."
                   rows={3}
                 />
               </div>
