@@ -131,12 +131,6 @@ const groupedNavigation: NavigationGroup[] = [
         icon: Briefcase,
         description: "Manage Team Members"
       },
-      { 
-        name: "Enhanced Leads", 
-        href: "/admin-panel/enhanced-leads", 
-        icon: Target,
-        description: "Advanced Lead Management & Analytics"
-      },
     ]
   },
   {
