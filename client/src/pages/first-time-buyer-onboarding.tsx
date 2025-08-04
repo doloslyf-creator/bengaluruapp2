@@ -49,8 +49,8 @@ const onboardingSchema = z.object({
   urgency: z.enum(["immediate", "3-6-months", "6-12-months", "exploratory"]),
   
   // Budget & Financing
-  budgetMin: z.number().min(10, "Minimum budget should be at least 10 lakhs"),
-  budgetMax: z.number().min(10, "Maximum budget should be at least 10 lakhs"),
+  budgetMin: z.number().min(0.5, "Minimum budget should be at least 0.5 crores"),
+  budgetMax: z.number().min(0.5, "Maximum budget should be at least 0.5 crores"),
   financing: z.enum(["own-funds", "bank-loan", "inheritance", "mixed"]),
   hasPreApproval: z.boolean().optional(),
   
@@ -125,11 +125,16 @@ export default function FirstTimeBuyerOnboarding() {
   const form = useForm<OnboardingFormData>({
     resolver: zodResolver(onboardingSchema),
     defaultValues: {
+      customerName: "",
+      phone: "",
+      email: "",
       preferredContactTime: "evening",
       buyingFor: "self",
       urgency: "3-6-months",
       financing: "bank-loan",
       hasPreApproval: false,
+      budgetMin: 1,
+      budgetMax: 2,
       propertyType: "apartment",
       bhkPreference: "2bhk",
       gatedPreference: "gated",
@@ -139,6 +144,12 @@ export default function FirstTimeBuyerOnboarding() {
       greenZonesPreference: false,
       wantsLegalSupport: false,
       interestedInReports: [],
+      commuteRequirements: "",
+      schoolWorkplaceConsiderations: "",
+      floorPreference: "",
+      vastuFacingRequirements: "",
+      petsChildrenConsideration: "",
+      specificRequirements: "",
     },
   });
 
@@ -150,8 +161,8 @@ export default function FirstTimeBuyerOnboarding() {
         priority: "high" as const,
         buyerPersona: "first-time-buyer" as const,
         ...data,
-        budgetMin: Number(data.budgetMin),
-        budgetMax: Number(data.budgetMax),
+        budgetMin: Math.round(Number(data.budgetMin) * 100), // Convert crores to lakhs for storage
+        budgetMax: Math.round(Number(data.budgetMax) * 100), // Convert crores to lakhs for storage
       };
       
       const response = await fetch("/api/leads", {
@@ -241,7 +252,11 @@ export default function FirstTimeBuyerOnboarding() {
                   <FormItem>
                     <FormLabel>Full Name *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter your full name" {...field} />
+                      <Input 
+                        placeholder="Enter your full name" 
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -255,7 +270,11 @@ export default function FirstTimeBuyerOnboarding() {
                   <FormItem>
                     <FormLabel>Phone Number *</FormLabel>
                     <FormControl>
-                      <Input placeholder="+91 98765 43210" {...field} />
+                      <Input 
+                        placeholder="+91 98765 43210" 
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -269,7 +288,11 @@ export default function FirstTimeBuyerOnboarding() {
                   <FormItem>
                     <FormLabel>Email Address *</FormLabel>
                     <FormControl>
-                      <Input placeholder="your.email@example.com" {...field} />
+                      <Input 
+                        placeholder="your.email@example.com" 
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -316,15 +339,17 @@ export default function FirstTimeBuyerOnboarding() {
                 name="budgetMin"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Minimum Budget (in Lakhs) *</FormLabel>
+                    <FormLabel>Minimum Budget (in Crores) *</FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
-                        placeholder="30" 
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        step="0.1"
+                        placeholder="1.5" 
+                        value={field.value || ""}
+                        onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : "")}
                       />
                     </FormControl>
+                    <p className="text-xs text-gray-500 mt-1">For budgets below 1 Cr, use decimals (e.g., 0.8 for 80 Lakhs)</p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -335,15 +360,17 @@ export default function FirstTimeBuyerOnboarding() {
                 name="budgetMax"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Maximum Budget (in Lakhs) *</FormLabel>
+                    <FormLabel>Maximum Budget (in Crores) *</FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
-                        placeholder="50" 
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        step="0.1"
+                        placeholder="2.5" 
+                        value={field.value || ""}
+                        onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : "")}
                       />
                     </FormControl>
+                    <p className="text-xs text-gray-500 mt-1">For budgets below 1 Cr, use decimals (e.g., 0.9 for 90 Lakhs)</p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -501,7 +528,8 @@ export default function FirstTimeBuyerOnboarding() {
                     <FormControl>
                       <Textarea 
                         placeholder="e.g., Near Whitefield for work, metro connectivity preferred"
-                        {...field}
+                        value={field.value || ""}
+                        onChange={field.onChange}
                       />
                     </FormControl>
                   </FormItem>
@@ -517,7 +545,8 @@ export default function FirstTimeBuyerOnboarding() {
                     <FormControl>
                       <Textarea 
                         placeholder="e.g., Near good schools, IT parks, hospitals"
-                        {...field}
+                        value={field.value || ""}
+                        onChange={field.onChange}
                       />
                     </FormControl>
                   </FormItem>
@@ -626,7 +655,11 @@ export default function FirstTimeBuyerOnboarding() {
                   <FormItem>
                     <FormLabel>Floor Preference</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., Ground floor, Top floor, Mid floors" {...field} />
+                      <Input 
+                        placeholder="e.g., Ground floor, Top floor, Mid floors" 
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -679,7 +712,11 @@ export default function FirstTimeBuyerOnboarding() {
                   <FormItem>
                     <FormLabel>Vastu/Facing Requirements</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., East facing, North facing" {...field} />
+                      <Input 
+                        placeholder="e.g., East facing, North facing" 
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -694,7 +731,8 @@ export default function FirstTimeBuyerOnboarding() {
                     <FormControl>
                       <Textarea 
                         placeholder="e.g., Pet-friendly, child-safe balconies, play areas"
-                        {...field}
+                        value={field.value || ""}
+                        onChange={field.onChange}
                       />
                     </FormControl>
                   </FormItem>
@@ -818,7 +856,8 @@ export default function FirstTimeBuyerOnboarding() {
                     <Textarea 
                       placeholder="Tell us about any specific needs, concerns, or questions you have..."
                       rows={4}
-                      {...field}
+                      value={field.value || ""}
+                      onChange={field.onChange}
                     />
                   </FormControl>
                 </FormItem>
