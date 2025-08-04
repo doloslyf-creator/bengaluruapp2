@@ -125,33 +125,33 @@ export default function ValuationReportView() {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="min-h-screen bg-gray-50">
         {/* Header */}
-        <div className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="bg-white shadow-sm">
+          <div className="max-w-7xl mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <Button 
                   variant="ghost" 
                   size="sm" 
                   onClick={() => navigate("/admin-panel/valuation-reports")}
-                  className="shrink-0"
+                  className="text-gray-600 hover:text-gray-900"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Reports
                 </Button>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Property Valuation Report</h1>
-                  <p className="text-sm text-gray-600 mt-1">Bengaluru Edition • Comprehensive Analysis</p>
+                  <h1 className="text-xl font-semibold text-gray-900">Property Valuation Report</h1>
+                  <p className="text-sm text-gray-500">Bengaluru Edition</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Badge className={`${getStatusColor(report.reportStatus || "")} text-white`}>
+                <Badge className={`${getStatusColor(report.reportStatus || "")} text-white px-3 py-1 rounded-full text-xs font-medium`}>
                   {report.reportStatus?.toUpperCase() || "DRAFT"}
                 </Badge>
                 <Button 
                   onClick={() => navigate(`/admin-panel/valuation-reports/edit/${reportId}`)}
-                  className="bg-primary hover:bg-primary/90"
+                  className="bg-gray-900 hover:bg-gray-800 text-white rounded-lg px-4 py-2 text-sm font-medium"
                 >
                   <Edit className="h-4 w-4 mr-2" />
                   Edit Report
@@ -161,41 +161,47 @@ export default function ValuationReportView() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-6 py-6">
           {/* Executive Summary - Hero Section */}
-          <div className="mb-8">
-            <Card className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0 shadow-xl">
-              <CardContent className="p-8">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="mb-6">
+            <Card className="bg-white rounded-2xl shadow-sm border-0 overflow-hidden">
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div className="lg:col-span-2">
-                    <div className="flex items-center gap-3 mb-4">
-                      <Building className="h-8 w-8" />
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
+                        <Building className="h-6 w-6 text-gray-600" />
+                      </div>
                       <div>
-                        <h2 className="text-3xl font-bold">{report.projectName || "Property Analysis"}</h2>
-                        <p className="text-blue-100 text-lg">{report.towerUnit}</p>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-1">{report.projectName || "Property Analysis"}</h2>
+                        <p className="text-gray-500 text-sm">{report.towerUnit}</p>
                       </div>
                     </div>
                     <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-5 w-5 text-blue-200" />
-                        <span className="text-lg">{report.unitType} • {report.configuration}</span>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                          <MapPin className="h-4 w-4 text-gray-600" />
+                        </div>
+                        <span className="text-gray-700 font-medium">{report.unitType} • {report.configuration}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-5 w-5 text-blue-200" />
-                        <span>Report Status: {report.reportStatus}</span>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                          <Calendar className="h-4 w-4 text-gray-600" />
+                        </div>
+                        <span className="text-gray-700">Created by: {report.createdBy || "Property Analyst"}</span>
                       </div>
                     </div>
                   </div>
                   <div className="text-center lg:text-right">
-                    <div className="bg-white/20 rounded-lg p-6 backdrop-blur-sm">
-                      <div className="text-4xl font-bold mb-2">
+                    <div className="bg-gray-50 rounded-xl p-6">
+                      <div className="text-3xl font-bold text-gray-900 mb-2">
                         {formatAmount(report.estimatedMarketValue)}
                       </div>
-                      <div className="text-blue-100 text-sm mb-3">Estimated Market Value</div>
-                      <div className="text-lg font-semibold">
+                      <div className="text-gray-500 text-sm mb-4">Estimated Market Value</div>
+                      <div className="text-lg font-semibold text-gray-800">
                         {report.ratePerSqftSbaUds || "₹18,500/sq.ft"}
                       </div>
-                      <div className="text-blue-100 text-sm">Rate per Sq.Ft (SBA + UDS)</div>
+                      <div className="text-gray-500 text-sm">Rate per Sq.Ft (SBA + UDS)</div>
                     </div>
                   </div>
                 </div>
@@ -204,65 +210,91 @@ export default function ValuationReportView() {
           </div>
 
           {/* Key Metrics Dashboard */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Card className="bg-green-50 border-green-200">
-              <CardContent className="p-6 text-center">
-                <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mx-auto mb-4">
-                  <TrendingUp className="h-6 w-6 text-green-600" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <Card className="bg-white rounded-2xl shadow-sm border-0">
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                    <TrendingUp className="h-5 w-5 text-green-600" />
+                  </div>
+                  <Badge className="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-medium">
+                    Positive
+                  </Badge>
                 </div>
-                <div className="text-2xl font-bold text-green-700 mb-1">
+                <div className="text-xl font-bold text-gray-900 mb-1">
                   {report.appreciationOutlook || "Good"}
                 </div>
-                <div className="text-sm text-green-600">Appreciation Outlook</div>
+                <div className="text-sm text-gray-500">Appreciation Outlook</div>
               </CardContent>
             </Card>
 
-            <Card className="bg-blue-50 border-blue-200">
-              <CardContent className="p-6 text-center">
-                <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mx-auto mb-4">
-                  <Users className="h-6 w-6 text-blue-600" />
+            <Card className="bg-white rounded-2xl shadow-sm border-0">
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <Users className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <Badge className="bg-blue-100 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium">
+                    Target
+                  </Badge>
                 </div>
-                <div className="text-2xl font-bold text-blue-700 mb-1">
+                <div className="text-xl font-bold text-gray-900 mb-1">
                   {report.buyerFit || "End Users"}
                 </div>
-                <div className="text-sm text-blue-600">Buyer Fit</div>
+                <div className="text-sm text-gray-500">Buyer Fit</div>
               </CardContent>
             </Card>
 
-            <Card className="bg-purple-50 border-purple-200">
-              <CardContent className="p-6 text-center">
-                <div className="flex items-center justify-center w-12 h-12 bg-purple-100 rounded-full mx-auto mb-4">
-                  <Star className="h-6 w-6 text-purple-600" />
+            <Card className="bg-white rounded-2xl shadow-sm border-0">
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                    <Star className="h-5 w-5 text-purple-600" />
+                  </div>
+                  <Badge className="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg text-xs font-medium">
+                    Score
+                  </Badge>
                 </div>
-                <div className="text-2xl font-bold text-purple-700 mb-1">
+                <div className="text-xl font-bold text-gray-900 mb-1">
                   {parseScore(report.overallScore || "7")}/10
                 </div>
-                <div className="text-sm text-purple-600">Overall Score</div>
+                <div className="text-sm text-gray-500">Overall Score</div>
               </CardContent>
             </Card>
 
-            <Card className={`border-2 ${getRiskColor(report.riskScore || 5)}`}>
-              <CardContent className="p-6 text-center">
-                <div className="flex items-center justify-center w-12 h-12 rounded-full mx-auto mb-4">
-                  <Shield className="h-6 w-6" />
+            <Card className="bg-white rounded-2xl shadow-sm border-0">
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
+                    <Shield className="h-5 w-5 text-orange-600" />
+                  </div>
+                  <Badge className={`px-2 py-1 rounded-lg text-xs font-medium ${
+                    (report.riskScore || 5) <= 3 ? 'bg-green-100 text-green-700' :
+                    (report.riskScore || 5) <= 6 ? 'bg-yellow-100 text-yellow-700' :
+                    'bg-red-100 text-red-700'
+                  }`}>
+                    {(report.riskScore || 5) <= 3 ? 'Low' : (report.riskScore || 5) <= 6 ? 'Medium' : 'High'}
+                  </Badge>
                 </div>
-                <div className="text-2xl font-bold mb-1">
+                <div className="text-xl font-bold text-gray-900 mb-1">
                   {report.riskScore || 5}/10
                 </div>
-                <div className="text-sm">Risk Score</div>
+                <div className="text-sm text-gray-500">Risk Score</div>
               </CardContent>
             </Card>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main Content Column */}
-            <div className="lg:col-span-2 space-y-8">
+            <div className="lg:col-span-2 space-y-6">
               
               {/* Property Profile */}
-              <Card className="border-l-4 border-l-blue-500">
-                <CardHeader className="bg-blue-50">
-                  <CardTitle className="flex items-center text-xl">
-                    <Home className="h-6 w-6 mr-3 text-blue-600" />
+              <Card className="bg-white rounded-2xl shadow-sm border-0">
+                <CardHeader className="border-b border-gray-100">
+                  <CardTitle className="flex items-center text-lg font-semibold text-gray-900">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                      <Home className="h-4 w-4 text-blue-600" />
+                    </div>
                     Property Profile & Specifications
                   </CardTitle>
                 </CardHeader>
@@ -338,24 +370,26 @@ export default function ValuationReportView() {
               </Card>
 
               {/* Market Analysis */}
-              <Card className="border-l-4 border-l-green-500">
-                <CardHeader className="bg-green-50">
-                  <CardTitle className="flex items-center text-xl">
-                    <TrendingUp className="h-6 w-6 mr-3 text-green-600" />
+              <Card className="bg-white rounded-2xl shadow-sm border-0">
+                <CardHeader className="border-b border-gray-100">
+                  <CardTitle className="flex items-center text-lg font-semibold text-gray-900">
+                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                      <TrendingUp className="h-4 w-4 text-green-600" />
+                    </div>
                     Market Valuation Analysis
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg">
-                      <div className="text-sm text-gray-600 mb-1">Builder Quoted Price</div>
-                      <div className="text-2xl font-bold text-gray-800">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div className="bg-gray-50 p-4 rounded-xl">
+                      <div className="text-sm text-gray-500 mb-1">Builder Quoted Price</div>
+                      <div className="text-xl font-bold text-gray-900">
                         {formatAmount(report.builderQuotedPrice)}
                       </div>
                     </div>
-                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg">
-                      <div className="text-sm text-gray-600 mb-1">Our Estimated Value</div>
-                      <div className="text-2xl font-bold text-gray-800">
+                    <div className="bg-gray-50 p-4 rounded-xl">
+                      <div className="text-sm text-gray-500 mb-1">Our Estimated Value</div>
+                      <div className="text-xl font-bold text-gray-900">
                         {formatAmount(report.totalEstimatedValue)}
                       </div>
                     </div>
@@ -392,55 +426,57 @@ export default function ValuationReportView() {
               </Card>
 
               {/* Location & Infrastructure */}
-              <Card className="border-l-4 border-l-purple-500">
-                <CardHeader className="bg-purple-50">
-                  <CardTitle className="flex items-center text-xl">
-                    <MapPin className="h-6 w-6 mr-3 text-purple-600" />
+              <Card className="bg-white rounded-2xl shadow-sm border-0">
+                <CardHeader className="border-b border-gray-100">
+                  <CardTitle className="flex items-center text-lg font-semibold text-gray-900">
+                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                      <MapPin className="h-4 w-4 text-purple-600" />
+                    </div>
                     Location & Infrastructure
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                     <div className="text-center">
-                      <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <Building className="h-6 w-6 text-purple-600" />
+                      <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <Building className="h-5 w-5 text-purple-600" />
                       </div>
-                      <div className="text-sm font-medium">{report.planningAuthority || "BDA"}</div>
-                      <div className="text-xs text-gray-600">Authority</div>
+                      <div className="text-sm font-semibold text-gray-900">{report.planningAuthority || "BDA"}</div>
+                      <div className="text-xs text-gray-500">Authority</div>
                     </div>
                     <div className="text-center">
-                      <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <Home className="h-6 w-6 text-purple-600" />
+                      <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <Home className="h-5 w-5 text-purple-600" />
                       </div>
-                      <div className="text-sm font-medium">{report.zonalClassification || "Residential"}</div>
-                      <div className="text-xs text-gray-600">Zone</div>
+                      <div className="text-sm font-semibold text-gray-900">{report.zonalClassification || "Residential"}</div>
+                      <div className="text-xs text-gray-500">Zone</div>
                     </div>
                     <div className="text-center">
-                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <DollarSign className="h-6 w-6 text-blue-600" />
+                      <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <DollarSign className="h-5 w-5 text-blue-600" />
                       </div>
-                      <div className="text-sm font-medium">{report.waterSupply || "Corporation"}</div>
-                      <div className="text-xs text-gray-600">Water</div>
+                      <div className="text-sm font-semibold text-gray-900">{report.waterSupply || "Corporation"}</div>
+                      <div className="text-xs text-gray-500">Water</div>
                     </div>
                     <div className="text-center">
-                      <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                        <CheckCircle className="h-6 w-6 text-green-600" />
+                      <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                        <CheckCircle className="h-5 w-5 text-green-600" />
                       </div>
-                      <div className="text-sm font-medium">{report.drainage || "Good"}</div>
-                      <div className="text-xs text-gray-600">Drainage</div>
+                      <div className="text-sm font-semibold text-gray-900">{report.drainage || "Good"}</div>
+                      <div className="text-xs text-gray-500">Drainage</div>
                     </div>
                   </div>
 
                   {report.connectivity && (
-                    <div className="bg-purple-50 p-4 rounded-lg mb-4">
-                      <h4 className="font-semibold text-gray-800 mb-2">Connectivity</h4>
+                    <div className="bg-gray-50 p-4 rounded-xl mb-4">
+                      <h4 className="font-semibold text-gray-900 mb-2">Connectivity</h4>
                       <p className="text-sm text-gray-700">{report.connectivity}</p>
                     </div>
                   )}
 
                   {report.socialInfrastructure && (
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                      <h4 className="font-semibold text-gray-800 mb-2">Social Infrastructure</h4>
+                    <div className="bg-gray-50 p-4 rounded-xl">
+                      <h4 className="font-semibold text-gray-900 mb-2">Social Infrastructure</h4>
                       <p className="text-sm text-gray-700">{report.socialInfrastructure}</p>
                     </div>
                   )}
@@ -448,10 +484,12 @@ export default function ValuationReportView() {
               </Card>
 
               {/* Legal & Compliance */}
-              <Card className="border-l-4 border-l-red-500">
-                <CardHeader className="bg-red-50">
-                  <CardTitle className="flex items-center text-xl">
-                    <Shield className="h-6 w-6 mr-3 text-red-600" />
+              <Card className="bg-white rounded-2xl shadow-sm border-0">
+                <CardHeader className="border-b border-gray-100">
+                  <CardTitle className="flex items-center text-lg font-semibold text-gray-900">
+                    <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                      <Shield className="h-4 w-4 text-red-600" />
+                    </div>
                     Legal & Compliance Status
                   </CardTitle>
                 </CardHeader>
@@ -488,25 +526,29 @@ export default function ValuationReportView() {
                       </div>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800 mb-4">Rental & Yield Assessment</h4>
-                      <div className="text-center mb-4">
+                      <h4 className="font-semibold text-gray-900 mb-4">Rental & Yield Assessment</h4>
+                      <div className="text-center mb-4 bg-gray-50 p-4 rounded-xl">
                         <div className="text-2xl font-bold text-green-600 mb-1">
                           {report.grossRentalYield || "3.2%"}
                         </div>
-                        <div className="text-sm text-gray-600">Gross Rental Yield</div>
+                        <div className="text-sm text-gray-500">Gross Rental Yield</div>
                       </div>
-                      <div className="space-y-2">
-                        <div className="flex justify-between">
-                          <span className="text-sm">Monthly Rent</span>
-                          <span className="font-medium">{report.expectedMonthlyRent || "₹45,000"}</span>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">Monthly Rent</span>
+                          <span className="font-semibold text-gray-900">{report.expectedMonthlyRent || "₹45,000"}</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm">Tenant Demand</span>
-                          <Badge variant="outline">{report.tenantDemand || "High"}</Badge>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">Tenant Demand</span>
+                          <Badge className="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-medium">
+                            {report.tenantDemand || "High"}
+                          </Badge>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm">Exit Liquidity</span>
-                          <Badge variant="outline">{report.exitLiquidity || "Moderate"}</Badge>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">Exit Liquidity</span>
+                          <Badge className="bg-blue-100 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium">
+                            {report.exitLiquidity || "Moderate"}
+                          </Badge>
                         </div>
                       </div>
                     </div>
@@ -530,10 +572,12 @@ export default function ValuationReportView() {
             <div className="space-y-6">
               
               {/* Cost Breakdown */}
-              <Card className="border-l-4 border-l-orange-500">
-                <CardHeader className="bg-orange-50">
-                  <CardTitle className="flex items-center text-lg">
-                    <Calculator className="h-5 w-5 mr-2 text-orange-600" />
+              <Card className="bg-white rounded-2xl shadow-sm border-0">
+                <CardHeader className="border-b border-gray-100">
+                  <CardTitle className="flex items-center text-lg font-semibold text-gray-900">
+                    <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mr-3">
+                      <Calculator className="h-4 w-4 text-orange-600" />
+                    </div>
                     Cost Breakdown
                   </CardTitle>
                 </CardHeader>
@@ -562,9 +606,9 @@ export default function ValuationReportView() {
               </Card>
 
               {/* Pros & Cons */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Pros & Cons</CardTitle>
+              <Card className="bg-white rounded-2xl shadow-sm border-0">
+                <CardHeader className="border-b border-gray-100">
+                  <CardTitle className="text-lg font-semibold text-gray-900">Pros & Cons</CardTitle>
                 </CardHeader>
                 <CardContent className="p-4">
                   <div className="space-y-4">
@@ -601,30 +645,30 @@ export default function ValuationReportView() {
               </Card>
 
               {/* Final Verdict */}
-              <Card className="bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200">
-                <CardHeader>
-                  <CardTitle className="text-lg text-blue-800">Investment Verdict</CardTitle>
+              <Card className="bg-white rounded-2xl shadow-sm border-0">
+                <CardHeader className="border-b border-gray-100">
+                  <CardTitle className="text-lg font-semibold text-gray-900">Investment Verdict</CardTitle>
                 </CardHeader>
                 <CardContent className="p-4">
                   <div className="text-center mb-4">
-                    <div className="text-2xl font-bold text-blue-700 mb-2">
+                    <div className="text-xl font-bold text-gray-900 mb-2">
                       {report.valuationVerdict || "Fairly Priced"}
                     </div>
-                    <Badge className="bg-blue-600 text-white">
+                    <Badge className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
                       {report.buyerTypeFit || "End User Family"}
                     </Badge>
                   </div>
                   
                   {report.recommendation && (
-                    <div className="bg-white/70 p-3 rounded-lg">
-                      <p className="text-sm text-gray-800">{report.recommendation}</p>
+                    <div className="bg-gray-50 p-4 rounded-xl mb-4">
+                      <p className="text-sm text-gray-700">{report.recommendation}</p>
                     </div>
                   )}
 
                   {report.negotiationAdvice && (
-                    <div className="mt-3 bg-yellow-50 border border-yellow-200 p-3 rounded-lg">
-                      <h5 className="font-semibold text-yellow-800 text-xs mb-1">NEGOTIATION ADVICE</h5>
-                      <p className="text-xs text-yellow-700">{report.negotiationAdvice}</p>
+                    <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-xl">
+                      <h5 className="font-semibold text-yellow-800 text-sm mb-2">Negotiation Advice</h5>
+                      <p className="text-sm text-yellow-700">{report.negotiationAdvice}</p>
                     </div>
                   )}
                 </CardContent>
@@ -635,15 +679,17 @@ export default function ValuationReportView() {
 
           {/* Bottom Summary */}
           {report.customNotes && (
-            <Card className="mt-8 border-2 border-dashed border-gray-300">
-              <CardHeader>
-                <CardTitle className="flex items-center text-lg">
-                  <FileText className="h-5 w-5 mr-2" />
+            <Card className="mt-6 bg-white rounded-2xl shadow-sm border-0">
+              <CardHeader className="border-b border-gray-100">
+                <CardTitle className="flex items-center text-lg font-semibold text-gray-900">
+                  <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
+                    <FileText className="h-4 w-4 text-gray-600" />
+                  </div>
                   Additional Notes
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-gray-700">{report.customNotes}</p>
+              <CardContent className="p-6">
+                <p className="text-gray-700 leading-relaxed">{report.customNotes}</p>
               </CardContent>
             </Card>
           )}
