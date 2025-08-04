@@ -19,35 +19,27 @@
   transform: translateY(0);
 }
 
-/* Enhanced tab navigation styles */
-.enhanced-tab-trigger {
+/* Vertical sidebar navigation styles */
+.vertical-nav-trigger {
   position: relative;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 0;
 }
 
-.enhanced-tab-trigger::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  width: 0;
-  height: 2px;
-  background: hsl(var(--primary));
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: translateX(-50%);
-}
-
-.enhanced-tab-trigger[data-state="active"]::before {
-  width: 100%;
-}
-
-.enhanced-tab-trigger:hover {
+.vertical-nav-trigger:hover {
   background: hsl(var(--muted));
+  transform: translateX(2px);
 }
 
-.enhanced-tab-trigger[data-state="active"] {
+.vertical-nav-trigger[data-state="active"] {
+  background: hsl(var(--primary) / 0.1);
   color: hsl(var(--primary));
-  background: hsl(var(--primary) / 0.05);
+  border-left: 4px solid hsl(var(--primary));
+  font-weight: 500;
+}
+
+.vertical-nav-trigger[data-state="active"]:hover {
+  background: hsl(var(--primary) / 0.15);
 }
 
 /* OwnItRight Logo Styles */

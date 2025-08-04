@@ -329,62 +329,183 @@ export default function ValuationReportEditComprehensive() {
 
         <form onSubmit={handleSubmit} className="max-w-full">
           <Tabs defaultValue="executive" className="w-full">
-            {/* Enhanced Horizontal Tab Navigation */}
-            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b mb-6">
-              <div className="max-w-full overflow-x-auto">
-                <TabsList className="inline-flex w-auto min-w-full h-12 items-center justify-start rounded-none bg-transparent p-0 gap-0">
-                  <TabsTrigger 
-                    value="executive" 
-                    className="enhanced-tab-trigger flex items-center justify-center gap-2 rounded-none px-4 py-3 text-sm font-medium whitespace-nowrap"
-                  >
-                    <FileText className="h-4 w-4" />
-                    <span className="hidden sm:inline">Executive</span>
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="property" 
-                    className="enhanced-tab-trigger flex items-center justify-center gap-2 rounded-none px-4 py-3 text-sm font-medium whitespace-nowrap"
-                  >
-                    <Home className="h-4 w-4" />
-                    <span className="hidden sm:inline">Property</span>
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="configurations" 
-                    className="enhanced-tab-trigger flex items-center justify-center gap-2 rounded-none px-4 py-3 text-sm font-medium whitespace-nowrap"
-                  >
-                    <Building className="h-4 w-4" />
-                    <span className="hidden sm:inline">Configs</span>
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="market" 
-                    className="enhanced-tab-trigger flex items-center justify-center gap-2 rounded-none px-4 py-3 text-sm font-medium whitespace-nowrap"
-                  >
-                    <TrendingUp className="h-4 w-4" />
-                    <span className="hidden sm:inline">Market</span>
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="location" 
-                    className="enhanced-tab-trigger flex items-center justify-center gap-2 rounded-none px-4 py-3 text-sm font-medium whitespace-nowrap"
-                  >
-                    <MapPin className="h-4 w-4" />
-                    <span className="hidden sm:inline">Location</span>
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="legal" 
-                    className="enhanced-tab-trigger flex items-center justify-center gap-2 rounded-none px-4 py-3 text-sm font-medium whitespace-nowrap"
-                  >
-                    <Shield className="h-4 w-4" />
-                    <span className="hidden sm:inline">Legal</span>
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="final" 
-                    className="enhanced-tab-trigger flex items-center justify-center gap-2 rounded-none px-4 py-3 text-sm font-medium whitespace-nowrap"
-                  >
-                    <Scale className="h-4 w-4" />
-                    <span className="hidden sm:inline">Final</span>
-                  </TabsTrigger>
-                </TabsList>
+            <div className="flex gap-6">
+              {/* Vertical Sidebar Navigation */}
+              <div className="w-64 shrink-0 hidden lg:block">
+                <div className="sticky top-6">
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-lg">Report Sections</CardTitle>
+                      <CardDescription>Navigate through report sections</CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      <nav className="space-y-1">
+                        <TabsTrigger 
+                          value="executive" 
+                          className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
+                        >
+                          <div className="flex items-center gap-3">
+                            <FileText className="h-5 w-5" />
+                            <div className="text-left">
+                              <div className="font-medium">Executive Summary</div>
+                              <div className="text-xs text-muted-foreground">Key findings & overview</div>
+                            </div>
+                          </div>
+                        </TabsTrigger>
+                        
+                        <TabsTrigger 
+                          value="property" 
+                          className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Home className="h-5 w-5" />
+                            <div className="text-left">
+                              <div className="font-medium">Property Details</div>
+                              <div className="text-xs text-muted-foreground">Specifications & features</div>
+                            </div>
+                          </div>
+                        </TabsTrigger>
+                        
+                        <TabsTrigger 
+                          value="configurations" 
+                          className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Building className="h-5 w-5" />
+                            <div className="text-left">
+                              <div className="font-medium">Configurations</div>
+                              <div className="text-xs text-muted-foreground">Unit types & pricing</div>
+                            </div>
+                          </div>
+                        </TabsTrigger>
+                        
+                        <TabsTrigger 
+                          value="market" 
+                          className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
+                        >
+                          <div className="flex items-center gap-3">
+                            <TrendingUp className="h-5 w-5" />
+                            <div className="text-left">
+                              <div className="font-medium">Market Analysis</div>
+                              <div className="text-xs text-muted-foreground">Valuation & trends</div>
+                            </div>
+                          </div>
+                        </TabsTrigger>
+                        
+                        <TabsTrigger 
+                          value="location" 
+                          className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
+                        >
+                          <div className="flex items-center gap-3">
+                            <MapPin className="h-5 w-5" />
+                            <div className="text-left">
+                              <div className="font-medium">Location & Infrastructure</div>
+                              <div className="text-xs text-muted-foreground">Area assessment</div>
+                            </div>
+                          </div>
+                        </TabsTrigger>
+                        
+                        <TabsTrigger 
+                          value="legal" 
+                          className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Shield className="h-5 w-5" />
+                            <div className="text-left">
+                              <div className="font-medium">Legal & Compliance</div>
+                              <div className="text-xs text-muted-foreground">Documentation status</div>
+                            </div>
+                          </div>
+                        </TabsTrigger>
+                        
+                        <TabsTrigger 
+                          value="final" 
+                          className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Scale className="h-5 w-5" />
+                            <div className="text-left">
+                              <div className="font-medium">Final Recommendation</div>
+                              <div className="text-xs text-muted-foreground">Summary & verdict</div>
+                            </div>
+                          </div>
+                        </TabsTrigger>
+                      </nav>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
-            </div>
+
+              {/* Mobile Navigation - Show above content on small screens */}
+              <div className="lg:hidden w-full mb-6">
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg">Report Sections</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-1">
+                      <TabsTrigger 
+                        value="executive" 
+                        className="vertical-nav-trigger flex flex-col items-center gap-1 p-3 text-xs bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all"
+                      >
+                        <FileText className="h-4 w-4" />
+                        <span>Executive</span>
+                      </TabsTrigger>
+                      
+                      <TabsTrigger 
+                        value="property" 
+                        className="vertical-nav-trigger flex flex-col items-center gap-1 p-3 text-xs bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all"
+                      >
+                        <Home className="h-4 w-4" />
+                        <span>Property</span>
+                      </TabsTrigger>
+                      
+                      <TabsTrigger 
+                        value="configurations" 
+                        className="vertical-nav-trigger flex flex-col items-center gap-1 p-3 text-xs bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all"
+                      >
+                        <Building className="h-4 w-4" />
+                        <span>Configs</span>
+                      </TabsTrigger>
+                      
+                      <TabsTrigger 
+                        value="market" 
+                        className="vertical-nav-trigger flex flex-col items-center gap-1 p-3 text-xs bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all"
+                      >
+                        <TrendingUp className="h-4 w-4" />
+                        <span>Market</span>
+                      </TabsTrigger>
+                      
+                      <TabsTrigger 
+                        value="location" 
+                        className="vertical-nav-trigger flex flex-col items-center gap-1 p-3 text-xs bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all"
+                      >
+                        <MapPin className="h-4 w-4" />
+                        <span>Location</span>
+                      </TabsTrigger>
+                      
+                      <TabsTrigger 
+                        value="legal" 
+                        className="vertical-nav-trigger flex flex-col items-center gap-1 p-3 text-xs bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all"
+                      >
+                        <Shield className="h-4 w-4" />
+                        <span>Legal</span>
+                      </TabsTrigger>
+                      
+                      <TabsTrigger 
+                        value="final" 
+                        className="vertical-nav-trigger flex flex-col items-center gap-1 p-3 text-xs bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all"
+                      >
+                        <Scale className="h-4 w-4" />
+                        <span>Final</span>
+                      </TabsTrigger>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Main Content */}
+              <div className="flex-1 min-w-0">
 
             {/* Basic Information */}
             <Card className="mb-6">
@@ -1425,6 +1546,8 @@ Project resale cycle still slow"
                 </Card>
               </div>
             </TabsContent>
+              </div>
+            </div>
           </Tabs>
 
           {/* Submit Button */}
