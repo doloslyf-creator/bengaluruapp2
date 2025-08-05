@@ -199,8 +199,8 @@ export default function PropertyDetailMinimal() {
       const shortId = Math.random().toString(36).substring(2, 8);
       const receipt = `${orderData.reportType === 'civil-mep' ? 'CM' : 'VR'}_${shortId}_${Date.now().toString().slice(-8)}`;
       
-      // Now attempt payment
-      const success = await processPayment({
+      // Now attempt payment - processPayment will handle success/failure
+      const paymentInitiated = await processPayment({
         amount: baseAmount,
         currency: 'INR',
         receipt,
@@ -220,29 +220,35 @@ export default function PropertyDetailMinimal() {
           name: orderData.customerName,
           email: orderData.email,
           contact: orderData.phone,
+        },
+        // Custom handlers for this specific order
+        onSuccess: async () => {
+          // Update order status to completed only on successful payment
+          await fetch(`/api/orders/${order.orderId}/status`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'completed' })
+          });
+          
+          setShowOrderForm(false);
+          toast({
+            title: "Payment Successful",
+            description: `Your ${orderData.reportType === 'civil-mep' ? 'Civil & MEP Report' : 'Property Valuation Report'} will be prepared and delivered within 24 hours.`,
+          });
+        },
+        onFailure: () => {
+          // Payment failed - order remains pending in admin panel
+          setShowOrderForm(false);
+          toast({
+            title: "Payment Incomplete",
+            description: "Your order has been saved. You can complete payment later. Our team will contact you shortly.",
+            variant: "default",
+          });
         }
       });
 
-      if (success) {
-        // Update order status to completed
-        await fetch(`/api/orders/${order.orderId}/status`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: 'completed' })
-        });
-        
-        setShowOrderForm(false);
-        toast({
-          title: "Payment Successful",
-          description: `Your ${orderData.reportType === 'civil-mep' ? 'Civil & MEP Report' : 'Property Valuation Report'} will be prepared and delivered within 24 hours.`,
-        });
-      } else {
-        // Payment failed but order record exists - it will show as pending in admin panel
-        toast({
-          title: "Order Created",
-          description: "Your order has been recorded. You can complete payment later from your account.",
-          variant: "default",
-        });
+      // If payment modal was closed without completion, just close the form
+      if (!paymentInitiated) {
         setShowOrderForm(false);
       }
     } catch (error) {

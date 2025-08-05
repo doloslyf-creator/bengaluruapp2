@@ -128,8 +128,8 @@ export function usePayment() {
   };
 
   const processPayment = async (
-    orderData: CreateOrderData & { reportType?: string; propertyId?: string; customerName?: string; customerEmail?: string; customerPhone?: string },
-    options: Partial<RazorpayOptions> = {}
+    orderData: CreateOrderData & { reportType?: string; propertyId?: string; customerName?: string; customerEmail?: string; customerPhone?: string; orderId?: string },
+    options: Partial<RazorpayOptions> & { onSuccess?: () => void; onFailure?: () => void } = {}
   ): Promise<boolean> => {
     try {
       setIsProcessing(true);
@@ -170,9 +170,29 @@ export function usePayment() {
               customerName: orderData.customerName,
               customerEmail: orderData.customerEmail,
               customerPhone: orderData.customerPhone,
+              orderId: orderData.orderId,
             });
+            
+            // Call success handler if provided
+            if (options.onSuccess) {
+              options.onSuccess();
+            } else {
+              toast({
+                title: 'Payment Successful',
+                description: 'Your payment has been processed successfully',
+              });
+            }
           } catch (error) {
             console.error('Payment verification failed:', error);
+            if (options.onFailure) {
+              options.onFailure();
+            } else {
+              toast({
+                title: 'Payment Verification Failed',
+                description: 'Payment verification failed, but your order is recorded',
+                variant: 'destructive',
+              });
+            }
           }
         },
         theme: {
@@ -185,11 +205,15 @@ export function usePayment() {
       const rzp = new window.Razorpay(razorpayOptions);
       
       rzp.on('payment.failed', (response: any) => {
-        toast({
-          title: 'Payment Failed',
-          description: response.error.description || 'Payment failed. Please try again.',
-          variant: 'destructive',
-        });
+        if (options.onFailure) {
+          options.onFailure();
+        } else {
+          toast({
+            title: 'Payment Failed',
+            description: response.error.description || 'Payment failed. Please try again.',
+            variant: 'destructive',
+          });
+        }
       });
 
       rzp.open();

@@ -2232,7 +2232,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         reportType,
         customerName,
         customerEmail,
-        customerPhone
+        customerPhone,
+        orderId
       } = req.body;
       
       if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -2246,7 +2247,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       if (isValid) {
-        // Create payment record in database
+        // If we have an existing order ID, update its status instead of creating new record
+        if (orderId) {
+          try {
+            const updatedOrder = await storage.updatePaymentStatus(orderId, "completed");
+            if (updatedOrder) {
+              console.log(`✅ Payment verified and order updated: ${orderId} - Status: completed`);
+              return res.json({ 
+                success: true, 
+                message: "Payment verified successfully",
+                orderId: orderId,
+                reportType,
+                propertyId,
+                accessGranted: true
+              });
+            }
+          } catch (error) {
+            console.error("Error updating existing order:", error);
+            // Fall back to creating new payment record
+          }
+        }
+
+        // Create new payment record in database (fallback or for orders without ID)
         const paymentData = {
           reportId: null, // Will be linked when report is created
           reportType: reportType === "valuation" ? "property-valuation" as const : "civil-mep" as const,
@@ -2272,6 +2294,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           accessGranted: true
         });
       } else {
+        // Payment verification failed - if we have order ID, update status to failed
+        if (orderId) {
+          try {
+            await storage.updatePaymentStatus(orderId, "failed");
+            console.log(`❌ Payment verification failed for order: ${orderId} - Status: failed`);
+          } catch (error) {
+            console.error("Error updating failed order status:", error);
+          }
+        }
+        
         res.status(400).json({ error: "Payment verification failed" });
       }
     } catch (error) {

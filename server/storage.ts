@@ -2028,7 +2028,11 @@ export class DatabaseStorage implements IStorage {
     
     return {
       totalOrders: allPayments.length,
-      pendingPayments: allPayments.filter(p => p.paymentStatus === 'pay-later-pending').length,
+      pendingPayments: allPayments.filter(p => 
+        p.paymentStatus === 'pending' || 
+        p.paymentStatus === 'processing' || 
+        p.paymentStatus === 'pay-later-pending'
+      ).length,
       completedPayments: allPayments.filter(p => p.paymentStatus === 'completed').length,
       totalRevenue: allPayments.filter(p => p.paymentStatus === 'completed').reduce((sum, p) => sum + Number(p.amount), 0),
       overduePayments: overduePayments.length
