@@ -14,7 +14,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import AdminLayout from "@/components/layout/admin-layout";
-import { Save, ArrowLeft, Plus, Trash2, FileText, Wrench, Zap, Building2 } from "lucide-react";
+import { Save, ArrowLeft, Plus, Trash2, FileText, Wrench, Zap, Building2, Home, Settings, Layers, CheckCircle } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { insertCivilMepReportSchema } from "@shared/schema";
@@ -271,17 +271,125 @@ export function AdminCivilMepReportsCreate() {
             </CardHeader>
           </Card>
 
-          {/* Main Form Content */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="basic">Basic Information</TabsTrigger>
-              <TabsTrigger value="civil">Civil Engineering</TabsTrigger>
-              <TabsTrigger value="mep">MEP Systems</TabsTrigger>
-              <TabsTrigger value="summary">Summary & Assessment</TabsTrigger>
-            </TabsList>
+          {/* Main Form Content with Vertical Navigation */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <div className="flex gap-6">
+              {/* Vertical Sidebar Navigation */}
+              <div className="w-64 shrink-0 hidden lg:block">
+                <div className="sticky top-6">
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-lg">Report Sections</CardTitle>
+                      <CardDescription>Navigate through report sections</CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      <TabsList className="flex flex-col h-auto p-1 bg-transparent space-y-1">
+                        <TabsTrigger 
+                          value="basic" 
+                          className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
+                        >
+                          <div className="flex items-center gap-3">
+                            <FileText className="h-5 w-5" />
+                            <div className="text-left">
+                              <div className="font-medium">Basic Information</div>
+                              <div className="text-xs text-muted-foreground">Report details & setup</div>
+                            </div>
+                          </div>
+                        </TabsTrigger>
+                        
+                        <TabsTrigger 
+                          value="civil" 
+                          className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Building2 className="h-5 w-5" />
+                            <div className="text-left">
+                              <div className="font-medium">Civil Engineering</div>
+                              <div className="text-xs text-muted-foreground">Structure & construction</div>
+                            </div>
+                          </div>
+                        </TabsTrigger>
+                        
+                        <TabsTrigger 
+                          value="mep" 
+                          className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Zap className="h-5 w-5" />
+                            <div className="text-left">
+                              <div className="font-medium">MEP Systems</div>
+                              <div className="text-xs text-muted-foreground">Mechanical, electrical & plumbing</div>
+                            </div>
+                          </div>
+                        </TabsTrigger>
+                        
+                        <TabsTrigger 
+                          value="summary" 
+                          className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
+                        >
+                          <div className="flex items-center gap-3">
+                            <CheckCircle className="h-5 w-5" />
+                            <div className="text-left">
+                              <div className="font-medium">Summary & Assessment</div>
+                              <div className="text-xs text-muted-foreground">Final analysis & recommendations</div>
+                            </div>
+                          </div>
+                        </TabsTrigger>
+                      </TabsList>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+
+              {/* Mobile Navigation - Show above content on small screens */}
+              <div className="lg:hidden w-full mb-6">
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg">Report Sections</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <TabsList className="grid grid-cols-2 sm:grid-cols-4 gap-1 h-auto bg-transparent p-1">
+                      <TabsTrigger 
+                        value="basic" 
+                        className="flex flex-col items-center gap-1 p-3 text-xs bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all"
+                      >
+                        <FileText className="h-4 w-4" />
+                        <span>Basic</span>
+                      </TabsTrigger>
+                      
+                      <TabsTrigger 
+                        value="civil" 
+                        className="flex flex-col items-center gap-1 p-3 text-xs bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all"
+                      >
+                        <Building2 className="h-4 w-4" />
+                        <span>Civil</span>
+                      </TabsTrigger>
+                      
+                      <TabsTrigger 
+                        value="mep" 
+                        className="flex flex-col items-center gap-1 p-3 text-xs bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all"
+                      >
+                        <Zap className="h-4 w-4" />
+                        <span>MEP</span>
+                      </TabsTrigger>
+                      
+                      <TabsTrigger 
+                        value="summary" 
+                        className="flex flex-col items-center gap-1 p-3 text-xs bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all"
+                      >
+                        <CheckCircle className="h-4 w-4" />
+                        <span>Summary</span>
+                      </TabsTrigger>
+                    </TabsList>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Main Content Area */}
+              <div className="flex-1 space-y-6">
 
             {/* Basic Information Tab */}
-            <TabsContent value="basic" className="space-y-6">
+            <TabsContent value="basic" className="tab-content-transition space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle>Report Details</CardTitle>
@@ -463,7 +571,7 @@ export function AdminCivilMepReportsCreate() {
             </TabsContent>
 
             {/* Civil Engineering Tab */}
-            <TabsContent value="civil" className="space-y-6">
+            <TabsContent value="civil" className="tab-content-transition space-y-6">
               {/* Site Information */}
               <Card>
                 <CardHeader>
@@ -1256,7 +1364,7 @@ export function AdminCivilMepReportsCreate() {
             </TabsContent>
 
             {/* MEP Systems Tab */}
-            <TabsContent value="mep" className="space-y-6">
+            <TabsContent value="mep" className="tab-content-transition space-y-6">
               {/* Mechanical Systems */}
               <Card>
                 <CardHeader>
@@ -1858,7 +1966,7 @@ export function AdminCivilMepReportsCreate() {
             </TabsContent>
 
             {/* Summary & Assessment Tab */}
-            <TabsContent value="summary" className="space-y-6">
+            <TabsContent value="summary" className="tab-content-transition space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle>Executive Summary & Assessment</CardTitle>
@@ -1953,6 +2061,8 @@ export function AdminCivilMepReportsCreate() {
                 </CardContent>
               </Card>
             </TabsContent>
+              </div>
+            </div>
           </Tabs>
 
           {/* Form Actions */}
