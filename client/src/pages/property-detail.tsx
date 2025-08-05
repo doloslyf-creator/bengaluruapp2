@@ -623,13 +623,11 @@ export default function PropertyDetail() {
             <Card>
               <CardContent className="p-0">
                 <Tabs defaultValue="overview" className="w-full">
-                  <TabsList className="grid w-full grid-cols-6 rounded-none border-b">
+                  <TabsList className="grid w-full grid-cols-4 rounded-none border-b">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="amenities">Amenities</TabsTrigger>
                     <TabsTrigger value="location">Location</TabsTrigger>
                     <TabsTrigger value="legal">Legal</TabsTrigger>
-                    <TabsTrigger value="civil-mep">Civil+MEP Report</TabsTrigger>
-                    <TabsTrigger value="valuation">Valuation Report</TabsTrigger>
                   </TabsList>
                   
                   <TabsContent value="overview" className="p-6 space-y-4">
@@ -887,69 +885,131 @@ export default function PropertyDetail() {
                       </Card>
                     )}
                   </TabsContent>
-
-                  {/* Civil+MEP Report Tab */}
-                  <TabsContent value="civil-mep" className="p-6 space-y-6">
-                    <ReportPreview 
-                      reportType="civil-mep"
-                      propertyId={property.id}
-                      propertyName={property.name}
-                      price={2499}
-                      title="Civil + MEP Engineering Report"
-                      description="Comprehensive structural and MEP systems analysis with safety recommendations"
-                      features={[
-                        "Structural integrity assessment",
-                        "Foundation and load-bearing analysis", 
-                        "Electrical systems evaluation",
-                        "Plumbing and water supply review",
-                        "HVAC systems inspection",
-                        "Safety compliance check",
-                        "Maintenance recommendations",
-                        "Cost estimation for repairs"
-                      ]}
-                      sampleData={{
-                        "Structural Assessment": "Grade A - Excellent structural integrity",
-                        "Foundation Score": "9.2/10 - Strong foundation with minor settlements",
-                        "Electrical Safety": "Compliant - All systems meet safety standards",
-                        "Plumbing Grade": "B+ - Good condition with recommended upgrades",
-                        "HVAC Efficiency": "85% - Well-maintained systems",
-                        "Overall Rating": "8.7/10 - Excellent property condition"
-                      }}
-                    />
-                  </TabsContent>
-
-                  {/* Property Valuation Report Tab */}
-                  <TabsContent value="valuation" className="p-6 space-y-6">
-                    <ReportPreview 
-                      reportType="property-valuation"
-                      propertyId={property.id}
-                      propertyName={property.name}
-                      price={2499}
-                      title="Professional Property Valuation Report"
-                      description="Independent market valuation with investment analysis and recommendations"
-                      features={[
-                        "Current market value assessment",
-                        "Comparable properties analysis",
-                        "Location premium evaluation",
-                        "Rental yield calculations",
-                        "Investment potential scoring",
-                        "Market trend analysis",
-                        "Risk assessment matrix",
-                        "Future value projections"
-                      ]}
-                      sampleData={{
-                        "Market Value": `₹${((selectedConfig?.pricePerSqft || 8500) * (selectedConfig?.builtUpArea || 1200)).toLocaleString()}`,
-                        "Price Per Sq Ft": `₹${selectedConfig?.pricePerSqft || 8500}`,
-                        "Location Premium": "15% above area average",
-                        "Rental Yield": "3.2% annually", 
-                        "Investment Score": "8.5/10 - Excellent investment potential",
-                        "Market Trend": "Appreciating at 8% annually"
-                      }}
-                    />
-                  </TabsContent>
                 </Tabs>
               </CardContent>
             </Card>
+
+            {/* Professional Reports Section - Action-Provoking Design */}
+            <div className="space-y-8 mt-8">
+              {/* Section Header */}
+              <div className="text-center bg-gradient-to-r from-blue-50 to-indigo-50 p-8 rounded-xl border">
+                <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                  Professional Property Reports
+                </h2>
+                <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+                  Make informed decisions with our comprehensive analysis reports. Get insights that could save you thousands.
+                </p>
+                <div className="mt-4 flex items-center justify-center gap-4 text-sm text-gray-500">
+                  <div className="flex items-center">
+                    <CheckCircle className="h-4 w-4 text-green-500 mr-1" />
+                    Professional Analysis
+                  </div>
+                  <div className="flex items-center">
+                    <CheckCircle className="h-4 w-4 text-green-500 mr-1" />
+                    Instant Download
+                  </div>
+                  <div className="flex items-center">
+                    <CheckCircle className="h-4 w-4 text-green-500 mr-1" />
+                    Expert Recommendations
+                  </div>
+                </div>
+              </div>
+
+              {/* Report Cards */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Civil + MEP Report */}
+                <div className="relative">
+                  <ReportCard 
+                    reportType="civil-mep"
+                    propertyId={property.id}
+                    propertyName={property.name}
+                    price={2499}
+                    title="Civil + MEP Engineering Report"
+                    subtitle="Structural & Systems Analysis"
+                    description="Avoid costly surprises with our comprehensive structural and MEP systems evaluation."
+                    urgencyText="Essential before finalizing any property purchase"
+                    features={[
+                      "Structural integrity assessment",
+                      "Foundation stability analysis", 
+                      "Electrical systems safety check",
+                      "Plumbing infrastructure review",
+                      "HVAC efficiency evaluation",
+                      "Maintenance cost estimation"
+                    ]}
+                    sampleData={{
+                      "Structural Grade": "A+ Excellent",
+                      "Foundation Score": "9.2/10",
+                      "Electrical Safety": "Fully Compliant",
+                      "Plumbing Status": "Good Condition",
+                      "HVAC Efficiency": "85% Optimal",
+                      "Risk Assessment": "Low Risk"
+                    }}
+                    highlights={[
+                      "Could save ₹2-5 lakhs in unexpected repairs",
+                      "Identifies safety issues before move-in",
+                      "Provides negotiation leverage with seller"
+                    ]}
+                  />
+                </div>
+
+                {/* Property Valuation Report */}
+                <div className="relative">
+                  <ReportCard 
+                    reportType="property-valuation"
+                    propertyId={property.id}
+                    propertyName={property.name}
+                    price={2499}
+                    title="Professional Property Valuation"
+                    subtitle="Independent Market Analysis"
+                    description="Ensure you're paying the right price with our expert valuation and investment analysis."
+                    urgencyText="Critical for smart investment decisions"
+                    features={[
+                      "Current market value assessment",
+                      "Comparable properties analysis",
+                      "Location premium calculation",
+                      "Future appreciation forecast",
+                      "Rental yield projections",
+                      "Investment risk evaluation"
+                    ]}
+                    sampleData={{
+                      "Market Value": `₹${((Number(selectedConfig?.pricePerSqft) || 8500) * (Number(selectedConfig?.builtUpArea) || 1200)).toLocaleString()}`,
+                      "Price Per Sq Ft": `₹${Number(selectedConfig?.pricePerSqft) || 8500}`,
+                      "Location Premium": "+15% vs Area Avg",
+                      "Annual Appreciation": "8.2% Expected",
+                      "Rental Yield": "3.4% Annually",
+                      "Investment Grade": "A- Excellent"
+                    }}
+                    highlights={[
+                      "Avoid overpaying by 10-15% on average",
+                      "Identifies best ROI potential areas",
+                      "Professional bank-grade valuation"
+                    ]}
+                  />
+                </div>
+              </div>
+
+              {/* Trust Indicators */}
+              <div className="bg-white border rounded-xl p-6 mt-8">
+                <div className="text-center mb-6">
+                  <h3 className="text-xl font-semibold mb-2">Why Property Buyers Trust Our Reports</h3>
+                  <p className="text-gray-600">Join 2,500+ smart property buyers who made informed decisions</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                  <div className="space-y-2">
+                    <div className="text-2xl font-bold text-blue-600">2,500+</div>
+                    <div className="text-sm text-gray-600">Properties Analyzed</div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="text-2xl font-bold text-green-600">₹12 Cr+</div>
+                    <div className="text-sm text-gray-600">Saved for Clients</div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="text-2xl font-bold text-purple-600">98%</div>
+                    <div className="text-sm text-gray-600">Client Satisfaction</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Right Sidebar */}
@@ -1138,19 +1198,22 @@ export default function PropertyDetail() {
   );
 }
 
-// Report Preview Component with Payment Integration
-interface ReportPreviewProps {
+// Report Card Component with Payment Integration - Action-Provoking Design
+interface ReportCardProps {
   reportType: 'civil-mep' | 'property-valuation';
   propertyId: string;
   propertyName: string;
   price: number;
   title: string;
+  subtitle: string;
   description: string;
+  urgencyText: string;
   features: string[];
   sampleData: Record<string, string>;
+  highlights: string[];
 }
 
-function ReportPreview({ reportType, propertyId, propertyName, price, title, description, features, sampleData }: ReportPreviewProps) {
+function ReportCard({ reportType, propertyId, propertyName, price, title, subtitle, description, urgencyText, features, sampleData, highlights }: ReportCardProps) {
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
@@ -1313,141 +1376,186 @@ function ReportPreview({ reportType, propertyId, propertyName, price, title, des
   const hasAccess = accessData?.hasAccess || false;
 
   return (
-    <div className="space-y-6">
-      {/* Report Header */}
-      <div className="text-center">
-        <div className="flex items-center justify-center mb-4">
-          <FileText className="h-8 w-8 text-primary mr-3" />
-          <div>
-            <h2 className="text-2xl font-bold">{title}</h2>
-            <p className="text-gray-600">{description}</p>
-          </div>
-        </div>
-        
+    <Card className="relative overflow-hidden border-2 hover:border-blue-200 transition-all duration-300 group">
+      {/* Urgency Badge */}
+      <div className="absolute top-4 right-4 z-10">
         {hasAccess ? (
-          <Badge className="bg-success text-white">
-            <Unlock className="h-4 w-4 mr-1" />
-            Report Unlocked
+          <Badge className="bg-green-500 text-white">
+            <Unlock className="h-3 w-3 mr-1" />
+            Unlocked
           </Badge>
         ) : (
-          <Badge variant="outline" className="border-warning text-warning">
-            <Lock className="h-4 w-4 mr-1" />
-            Premium Report - ₹{price.toLocaleString()}
+          <Badge className="bg-orange-500 text-white pulse">
+            <Clock className="h-3 w-3 mr-1" />
+            Limited Time
           </Badge>
         )}
       </div>
 
-      {/* Sample Data Preview */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <BarChart3 className="h-5 w-5 mr-2" />
-            Report Preview
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {Object.entries(sampleData).map(([key, value]) => (
-              <div key={key} className="p-3 bg-gray-50 rounded-lg">
-                <div className="text-sm font-medium text-gray-700">{key}</div>
-                <div className="text-lg font-semibold">{value}</div>
+      <CardHeader className="pb-4">
+        <div className="flex items-start space-x-3">
+          <div className="p-2 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-lg">
+            <FileText className="h-6 w-6 text-blue-600" />
+          </div>
+          <div className="flex-1">
+            <CardTitle className="text-xl font-bold mb-1">{title}</CardTitle>
+            <p className="text-sm font-medium text-blue-600 mb-2">{subtitle}</p>
+            <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
+            <div className="mt-2 px-3 py-1 bg-red-50 border border-red-200 rounded-full inline-block">
+              <p className="text-xs font-medium text-red-700">{urgencyText}</p>
+            </div>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-6">
+        {/* Key Insights Preview */}
+        <div>
+          <h4 className="font-semibold mb-3 text-gray-900">Report Insights</h4>
+          <div className="grid grid-cols-2 gap-3">
+            {Object.entries(sampleData).slice(0, 6).map(([key, value]) => (
+              <div key={key} className="p-3 bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg border">
+                <div className="text-xs font-medium text-gray-600 mb-1">{key}</div>
+                <div className="text-sm font-bold text-gray-900">{value}</div>
               </div>
             ))}
           </div>
-          
           {!hasAccess && (
-            <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-l-4 border-primary">
-              <p className="text-sm text-gray-600 mb-2">
-                <Lock className="h-4 w-4 inline mr-1" />
-                This is a preview. Unlock the full report to access:
+            <div className="mt-3 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border-l-4 border-orange-400">
+              <p className="text-xs text-orange-700 font-medium flex items-center">
+                <Lock className="h-3 w-3 mr-1" />
+                Preview only - Full report contains 25+ detailed insights
               </p>
-              <ul className="grid grid-cols-1 md:grid-cols-2 gap-1 text-sm text-gray-700">
-                {features.map((feature, index) => (
-                  <li key={index} className="flex items-center">
-                    <CheckCircle className="h-3 w-3 text-success mr-2" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Action Button */}
-      {!hasAccess ? (
-        <div className="text-center">
-          <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
-            <DialogTrigger asChild>
-              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
-                <CreditCard className="h-5 w-5 mr-2" />
-                Unlock Full Report - ₹{price.toLocaleString()}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Unlock {title}</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <p className="text-sm text-gray-600">
-                  Get instant access to the complete {title.toLowerCase()} for {propertyName}.
-                </p>
-                
-                <div className="space-y-3">
-                  <div>
-                    <Label htmlFor="name">Full Name *</Label>
-                    <Input
-                      id="name"
-                      value={customerInfo.name}
-                      onChange={(e) => setCustomerInfo(prev => ({...prev, name: e.target.value}))}
-                      placeholder="Enter your full name"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="email">Email Address *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={customerInfo.email}
-                      onChange={(e) => setCustomerInfo(prev => ({...prev, email: e.target.value}))}
-                      placeholder="Enter your email"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input
-                      id="phone"
-                      value={customerInfo.phone}
-                      onChange={(e) => setCustomerInfo(prev => ({...prev, phone: e.target.value}))}
-                      placeholder="Enter your phone number"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between pt-2">
-                  <div className="text-lg font-semibold">Total: ₹{price.toLocaleString()}</div>
-                  <Button 
-                    onClick={handlePayment}
-                    disabled={isProcessing || !customerInfo.name || !customerInfo.email}
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                  >
-                    {isProcessing ? "Processing..." : "Pay Now"}
-                  </Button>
-                </div>
+        {/* Value Propositions */}
+        <div>
+          <h4 className="font-semibold mb-3 text-gray-900 flex items-center">
+            <TrendingUp className="h-4 w-4 mr-2 text-green-600" />
+            Why This Report Matters
+          </h4>
+          <div className="space-y-2">
+            {highlights.map((highlight, index) => (
+              <div key={index} className="flex items-start space-x-2">
+                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-gray-700 font-medium">{highlight}</p>
               </div>
-            </DialogContent>
-          </Dialog>
+            ))}
+          </div>
         </div>
-      ) : (
-        <div className="text-center">
-          <Button size="lg" className="bg-success hover:bg-success/90">
-            <Download className="h-5 w-5 mr-2" />
-            Download Full Report
-          </Button>
+
+        {/* Features List */}
+        <div>
+          <h4 className="font-semibold mb-3 text-gray-900">Complete Analysis Includes</h4>
+          <div className="grid grid-cols-1 gap-1">
+            {features.map((feature, index) => (
+              <div key={index} className="flex items-center space-x-2 py-1">
+                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0"></div>
+                <p className="text-sm text-gray-700">{feature}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      )}
-    </div>
+
+        {/* Action Section */}
+        <div className="pt-4 border-t">
+          {!hasAccess ? (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-lg font-bold text-gray-900">₹{price.toLocaleString()}</div>
+                  <div className="text-xs text-gray-500">One-time payment • Instant access</div>
+                </div>
+                <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      size="lg" 
+                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 font-semibold px-6 group-hover:scale-105 transition-transform"
+                    >
+                      <CreditCard className="h-4 w-4 mr-2" />
+                      Get Report Now
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="text-xl">Unlock {title}</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="p-4 bg-blue-50 rounded-lg">
+                        <p className="text-sm text-blue-800 font-medium">
+                          Get instant access to the complete {title.toLowerCase()} for {propertyName}
+                        </p>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <div>
+                          <Label htmlFor="name">Full Name *</Label>
+                          <Input
+                            id="name"
+                            value={customerInfo.name}
+                            onChange={(e) => setCustomerInfo(prev => ({...prev, name: e.target.value}))}
+                            placeholder="Enter your full name"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="email">Email Address *</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            value={customerInfo.email}
+                            onChange={(e) => setCustomerInfo(prev => ({...prev, email: e.target.value}))}
+                            placeholder="Enter your email"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="phone">Phone Number</Label>
+                          <Input
+                            id="phone"
+                            value={customerInfo.phone}
+                            onChange={(e) => setCustomerInfo(prev => ({...prev, phone: e.target.value}))}
+                            placeholder="Enter your phone number"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-4 border-t">
+                        <div>
+                          <div className="text-xl font-bold">₹{price.toLocaleString()}</div>
+                          <div className="text-xs text-gray-500">Secure payment via Razorpay</div>
+                        </div>
+                        <Button 
+                          onClick={handlePayment}
+                          disabled={isProcessing || !customerInfo.name || !customerInfo.email}
+                          size="lg"
+                          className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                        >
+                          {isProcessing ? "Processing..." : "Pay Now"}
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+              
+              <div className="text-center">
+                <p className="text-xs text-gray-500">💳 Secure payment • 📱 Instant download • 🔒 100% confidential</p>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center space-y-3">
+              <Button size="lg" className="w-full bg-green-600 hover:bg-green-700">
+                <Download className="h-4 w-4 mr-2" />
+                Download Full Report
+              </Button>
+              <p className="text-xs text-green-600">✅ Report unlocked and ready for download</p>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
