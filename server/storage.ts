@@ -1104,10 +1104,34 @@ export class MemStorage implements IStorage {
     return this.appSettings!;
   }
 
-  // Placeholder implementations for Valuation reports
+  // Valuation report implementations for MemStorage
 
   async enableValuationReport(propertyId: string): Promise<Property | undefined> {
     return undefined;
+  }
+
+  async getAllValuationReports(): Promise<PropertyValuationReport[]> {
+    throw new Error("Valuation reports not implemented in MemStorage");
+  }
+
+  async deleteValuationReport(reportId: string): Promise<boolean> {
+    throw new Error("Valuation reports not implemented in MemStorage");
+  }
+
+  async getValuationReportsByProperty(propertyId: string): Promise<PropertyValuationReport[]> {
+    throw new Error("Valuation reports not implemented in MemStorage");
+  }
+
+  async getValuationReportsByCustomer(customerId: string): Promise<PropertyValuationReport[]> {
+    throw new Error("Valuation reports not implemented in MemStorage");
+  }
+
+  async assignReportToCustomer(reportId: string, customerId: string): Promise<PropertyValuationReport | undefined> {
+    throw new Error("Valuation reports not implemented in MemStorage");
+  }
+
+  async updateReportStatus(reportId: string, status: "draft" | "in_progress" | "completed" | "delivered"): Promise<PropertyValuationReport | undefined> {
+    throw new Error("Valuation reports not implemented in MemStorage");
   }
 
   async getValuationReport(propertyId: string): Promise<PropertyValuationReport | undefined> {
@@ -1142,7 +1166,42 @@ export class MemStorage implements IStorage {
     return undefined;
   }
 
+  async getAllOrdersWithDetails(): Promise<any[]> {
+    throw new Error("Orders not implemented in MemStorage");
+  }
 
+  async getOrderStats(): Promise<any> {
+    throw new Error("Orders not implemented in MemStorage");
+  }
+
+  // Team Management operations
+  async getAllTeamMembers(): Promise<any[]> {
+    throw new Error("Team management not implemented in MemStorage");
+  }
+
+  async getTeamMember(id: string): Promise<any> {
+    throw new Error("Team management not implemented in MemStorage");
+  }
+
+  async createTeamMember(member: any): Promise<any> {
+    throw new Error("Team management not implemented in MemStorage");
+  }
+
+  async updateTeamMember(id: string, updates: any): Promise<any> {
+    throw new Error("Team management not implemented in MemStorage");
+  }
+
+  async deleteTeamMember(id: string): Promise<boolean> {
+    throw new Error("Team management not implemented in MemStorage");
+  }
+
+  async getTeamMembersByDepartment(department: string): Promise<any[]> {
+    throw new Error("Team management not implemented in MemStorage");
+  }
+
+  async getActiveTeamMembers(): Promise<any[]> {
+    throw new Error("Team management not implemented in MemStorage");
+  }
 
   async getValuationReportStats(): Promise<any> {
     return {};
@@ -1772,13 +1831,7 @@ export class DatabaseStorage implements IStorage {
     return newPayment;
   }
 
-  // Report Payment operations
-  async createReportPayment(payment: InsertReportPayment): Promise<ReportPayment> {
-    const [newPayment] = await db.insert(reportPayments)
-      .values(payment)
-      .returning();
-    return newPayment;
-  }
+
 
   async getReportPayment(paymentId: string): Promise<ReportPayment | undefined> {
     const [payment] = await db.select().from(reportPayments)
@@ -2328,4 +2381,4 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
