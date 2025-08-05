@@ -78,78 +78,80 @@ function PropertyReportCard({ property, onOrderReport }: PropertyReportCardProps
   };
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-      {/* Property Image */}
-      <div className="h-48 bg-gray-100 relative">
-        {property.images && property.images.length > 0 ? (
-          <img 
-            src={property.images[0]} 
-            alt={property.name}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <Building2 className="w-16 h-16 text-gray-400" />
+    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 bg-white border-0 shadow-lg">
+      {/* Property Header Card */}
+      <div className="bg-blue-50 p-6 border-b">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              {property.name}
+            </h3>
+            <p className="text-gray-600 mb-2">by {property.developer}</p>
+            <div className="flex items-center text-sm text-gray-600 mb-3">
+              <MapPin className="w-4 h-4 mr-1" />
+              {property.locality}, {property.location}
+            </div>
+            <div className="text-2xl font-bold text-blue-600">
+              {property.priceRange}
+            </div>
           </div>
-        )}
+          
+          <div className="text-right">
+            <Badge className="bg-white text-gray-900 font-semibold mb-2">
+              <Star className="w-3 h-3 mr-1 fill-yellow-400 text-yellow-400" />
+              {property.qualityScore}/10
+            </Badge>
+            {property.reraRegistered && (
+              <div>
+                <Badge className="bg-green-100 text-green-800 text-xs">
+                  <CheckCircle className="w-3 h-3 mr-1" />
+                  RERA Certified
+                </Badge>
+              </div>
+            )}
+          </div>
+        </div>
         
-        {/* Quality Score Badge */}
-        <div className="absolute top-4 right-4">
-          <Badge className="bg-white/90 text-gray-900 font-semibold">
-            <Star className="w-3 h-3 mr-1 fill-yellow-400 text-yellow-400" />
-            {property.qualityScore}/10
-          </Badge>
+        {/* Configuration Tags */}
+        <div className="flex flex-wrap gap-2">
+          {property.configurations?.slice(0, 4).map((config, index) => (
+            <Badge key={index} variant="outline" className="bg-white border-gray-300">
+              {config}
+            </Badge>
+          ))}
         </div>
       </div>
 
       <CardContent className="p-0">
-        {/* Property Info Header */}
-        <div className="p-6 pb-4">
-          <div className="space-y-3">
-            {/* Property Name & Developer */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                {property.name}
-              </h3>
-              <p className="text-sm text-gray-600">by {property.developer}</p>
-            </div>
-
-            {/* Location */}
-            <div className="flex items-center text-sm text-gray-600">
-              <MapPin className="w-4 h-4 mr-1" />
-              {property.locality}, {property.location}
-            </div>
-
-            {/* Price Range */}
-            <div className="text-lg font-bold text-green-600">
-              {property.priceRange}
-            </div>
-          </div>
-        </div>
 
         {/* Report Type Tabs */}
-        <div className="border-t border-gray-200">
+        <div>
           <Tabs value={activeReport} onValueChange={(value) => setActiveReport(value as "valuation" | "civil-mep")}>
-            <TabsList className="w-full grid grid-cols-2 h-12 bg-gray-50 rounded-none">
+            <TabsList className="w-full grid grid-cols-2 h-14 bg-gray-100 rounded-none">
               <TabsTrigger 
                 value="valuation" 
-                className="text-sm font-medium data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+                className="text-base font-medium data-[state=active]:bg-blue-600 data-[state=active]:text-white h-full"
               >
+                <FileText className="w-4 h-4 mr-2" />
                 Property Valuation
               </TabsTrigger>
               <TabsTrigger 
                 value="civil-mep"
-                className="text-sm font-medium data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+                className="text-base font-medium data-[state=active]:bg-blue-600 data-[state=active]:text-white h-full"
               >
+                <TrendingUp className="w-4 h-4 mr-2" />
                 Civil MEP Analysis
               </TabsTrigger>
             </TabsList>
 
             {/* Valuation Report Content */}
-            <TabsContent value="valuation" className="p-6 pt-4 space-y-4">
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="text-lg font-semibold text-blue-600">Property Valuation Report</h4>
-                <Badge className="bg-red-100 text-red-800 text-xs">Critical</Badge>
+            <TabsContent value="valuation" className="p-8 space-y-6">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h4 className="text-xl font-bold text-blue-600 mb-1">Property Valuation Report</h4>
+                  <p className="text-sm text-gray-600">Comprehensive market analysis and investment insights</p>
+                </div>
+                <Badge className="bg-red-100 text-red-800 px-3 py-1">Critical</Badge>
               </div>
 
               <div className="grid grid-cols-2 gap-4 text-sm">
@@ -207,19 +209,22 @@ function PropertyReportCard({ property, onOrderReport }: PropertyReportCardProps
               </div>
 
               <Button 
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white h-14 text-lg font-medium"
                 onClick={() => onOrderReport(property, "valuation")}
               >
-                <Shield className="w-4 h-4 mr-2" />
-                Get Full Valuation Report - ₹2,499
+                <Shield className="w-5 h-5 mr-3" />
+                Get Complete Valuation Report - ₹2,499
               </Button>
             </TabsContent>
 
             {/* Civil MEP Content */}
-            <TabsContent value="civil-mep" className="p-6 pt-4 space-y-4">
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="text-lg font-semibold text-purple-600">Civil MEP Analysis</h4>
-                <Badge className="bg-green-100 text-green-800 text-xs">Certified</Badge>
+            <TabsContent value="civil-mep" className="p-8 space-y-6">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h4 className="text-xl font-bold text-blue-600 mb-1">Civil MEP Analysis</h4>
+                  <p className="text-sm text-gray-600">Engineering assessment of structural and MEP systems</p>
+                </div>
+                <Badge className="bg-green-100 text-green-800 px-3 py-1">Certified</Badge>
               </div>
 
               <div className="grid grid-cols-2 gap-4 text-sm">
@@ -277,11 +282,11 @@ function PropertyReportCard({ property, onOrderReport }: PropertyReportCardProps
               </div>
 
               <Button 
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white h-14 text-lg font-medium"
                 onClick={() => onOrderReport(property, "civil-mep")}
               >
-                <TrendingUp className="w-4 h-4 mr-2" />
-                Get Full Civil MEP Report - ₹2,499
+                <TrendingUp className="w-5 h-5 mr-3" />
+                Get Complete Civil MEP Report - ₹2,499
               </Button>
             </TabsContent>
           </Tabs>
@@ -444,99 +449,107 @@ export default function PropertyReports() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Header />
       
-      {/* Simple Header */}
-      <section className="bg-white py-12 border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Property Reports
+      {/* Integrated Header with Search */}
+      <section className="bg-white py-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              Professional Property Reports
             </h1>
-            <p className="text-lg text-gray-600 mb-6">
-              Get professional property valuation and civil engineering reports
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Get independent, engineer-certified property analysis to make informed investment decisions. 
+              Our detailed reports help you avoid costly mistakes and negotiate better deals.
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-700">
-              <div className="flex items-center">
-                <CheckCircle className="w-4 h-4 mr-2 text-green-600" />
-                <span>Independent Analysis</span>
-              </div>
-              <div className="flex items-center">
-                <CheckCircle className="w-4 h-4 mr-2 text-green-600" />
-                <span>Engineer Certified</span>
-              </div>
-              <div className="flex items-center">
-                <CheckCircle className="w-4 h-4 mr-2 text-green-600" />
-                <span>48-Hour Delivery</span>
-              </div>
-            </div>
           </div>
-        </div>
-      </section>
 
-      {/* Search & Filter Section */}
-      <section className="py-8 bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row gap-4 items-center">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-              <Input
-                placeholder="Search by property name or developer..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  if (e.target.value.length > 0) {
-                    setHasSearched(true);
-                  }
-                }}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleSearch();
-                  }
-                }}
-                className="pl-10 h-12"
-              />
+          {/* Search Section */}
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-gray-50 p-8 rounded-2xl border">
+              <div className="flex flex-col lg:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
+                  <Input
+                    placeholder="Search by property name or developer (e.g., Prestige, Brigade, Sobha...)"
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      if (e.target.value.length > 0) {
+                        setHasSearched(true);
+                      }
+                    }}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleSearch();
+                      }
+                    }}
+                    className="pl-12 h-14 text-lg border-white"
+                  />
+                </div>
+                <div className="lg:w-64">
+                  <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+                    <SelectTrigger className="h-14 border-white">
+                      <SelectValue placeholder="Select location" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Locations</SelectItem>
+                      {locations.map((location) => (
+                        <SelectItem key={location} value={location.toLowerCase()}>
+                          {location}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button 
+                  onClick={handleSearch}
+                  className="h-14 px-8 bg-blue-600 hover:bg-blue-700 text-white text-lg font-medium"
+                >
+                  Find Reports
+                </Button>
+              </div>
+              
+              {/* Quick Stats */}
+              <div className="grid grid-cols-3 gap-4 mt-8 pt-6 border-t border-gray-200">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">₹2,499</div>
+                  <div className="text-sm text-gray-600">Per Report</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">48 Hours</div>
+                  <div className="text-sm text-gray-600">Delivery Time</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">100%</div>
+                  <div className="text-sm text-gray-600">Independent</div>
+                </div>
+              </div>
             </div>
-            <Button 
-              onClick={handleSearch}
-              className="h-12 px-6 bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              Search Properties
-            </Button>
-            <div className="w-full md:w-64">
-              <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                <SelectTrigger className="h-12">
-                  <SelectValue placeholder="Filter by location" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Locations</SelectItem>
-                  {locations.map((location) => (
-                    <SelectItem key={location} value={location.toLowerCase()}>
-                      {location}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+
+            {/* Status Messages */}
+            {hasSearched && filteredProperties.length > 0 && (
+              <div className="mt-6 text-center">
+                <Badge className="bg-green-100 text-green-800 px-4 py-2">
+                  Found {filteredProperties.length} properties matching your search
+                </Badge>
+              </div>
+            )}
+            
+            {!hasSearched && (
+              <div className="mt-6 text-center">
+                <p className="text-gray-600">
+                  Browse sample reports below or search for specific properties
+                </p>
+              </div>
+            )}
           </div>
-          
-          {hasSearched && filteredProperties.length > 0 && (
-            <div className="mt-4 text-sm text-gray-600">
-              Found {filteredProperties.length} properties
-            </div>
-          )}
-          
-          {!hasSearched && (
-            <div className="mt-4 text-sm text-gray-600">
-              Enter property name or developer to search. Sample properties shown below.
-            </div>
-          )}
         </div>
       </section>
 
       {/* Properties Grid */}
-      <section className="py-12">
+      <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {!hasSearched ? (
             // Show sample properties before search
