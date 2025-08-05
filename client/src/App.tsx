@@ -152,7 +152,7 @@ function ProtectedRouter() {
       {/* Customer-facing routes */}
       <Route path="/about" component={About} />
       <Route path="/find-property" component={FindProperty} />
-      <Route path="/find-property/results" component={PropertyResults} />
+      <Route path="/property-results" component={PropertyResults} />
       <Route path="/property/:id" component={PropertyDetailMinimal} />
       <Route path="/property/:id/:slug" component={PropertyDetailMinimal} />
       <Route path="/property-valuation" component={PropertyValuation} />

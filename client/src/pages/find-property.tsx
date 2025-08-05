@@ -111,7 +111,7 @@ export default function FindProperty() {
   const handleSearch = () => {
     // Cache preferences before navigating
     localStorage.setItem('propertyPreferences', JSON.stringify(preferences));
-    navigate('/find-property/results', { state: { preferences } });
+    navigate('/property-results', { state: { preferences } });
   };
 
   const formatBudget = (value: number) => {
