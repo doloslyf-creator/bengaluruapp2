@@ -320,9 +320,31 @@ export default function PropertyDetailMinimal() {
 
   // Property Card Component
   const PropertyCard = ({ property: prop }: { property: Property }) => {
-    const minPrice = prop.configurations?.length ? Math.min(...prop.configurations.map(c => c.price)) : 0;
-    const maxPrice = prop.configurations?.length ? Math.max(...prop.configurations.map(c => c.price)) : 0;
-    const priceRange = minPrice === maxPrice ? formatPriceDisplay(minPrice) : `${formatPriceDisplay(minPrice)} - ${formatPriceDisplay(maxPrice)}`;
+    // Helper function for price formatting within the component
+    const formatPrice = (price: number) => {
+      if (price >= 10000000) {
+        return `₹${(price / 10000000).toFixed(2)} Cr`;
+      } else if (price >= 100000) {
+        return `₹${(price / 100000).toFixed(2)} L`;
+      } else {
+        return `₹${price.toLocaleString()}`;
+      }
+    };
+
+    const getPriceRange = () => {
+      if (!prop.configurations?.length) return "Price on request";
+      
+      const prices = prop.configurations.map(c => c.price).filter(p => p && p > 0);
+      if (!prices.length) return "Price on request";
+      
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      
+      if (minPrice === maxPrice) {
+        return formatPrice(minPrice);
+      }
+      return `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`;
+    };
 
     return (
       <Link href={`/property/${prop.id}`} className="block group">
@@ -363,14 +385,14 @@ export default function PropertyDetailMinimal() {
               
               <div className="flex items-center justify-between">
                 <div className="text-lg font-bold text-blue-600">
-                  {priceRange}
+                  {getPriceRange()}
                 </div>
                 <div className="text-sm text-gray-500">
                   {prop.type}
                 </div>
               </div>
 
-              {prop.tags.slice(0, 2).map(tag => (
+              {prop.tags?.slice(0, 2).map(tag => (
                 <Badge key={tag} variant="secondary" className="text-xs mr-1">
                   {tag.replace('-', ' ')}
                 </Badge>
