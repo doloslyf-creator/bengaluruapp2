@@ -375,7 +375,7 @@ export default function CivilMepReports() {
                             data-testid={`button-buy-report-${property.id}`}
                           >
                             <ShoppingCart className="w-4 h-4 mr-2" />
-                            Order Assessment
+                            Buy Civil MEP Analysis Report
                           </Button>
                         </div>
                       )}
@@ -594,10 +594,66 @@ export default function CivilMepReports() {
             setShowOrderForm(false);
             setSelectedProperty(null);
           }}
+          onSubmit={async (orderData) => {
+            try {
+              const response = await fetch("/api/orders/service", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  serviceType: "civil-mep-assessment",
+                  reportType: "civil-mep-report",
+                  propertyId: selectedProperty.id,
+                  customerName: orderData.customerName,
+                  customerEmail: orderData.email,
+                  customerPhone: orderData.phone,
+                  customerAddress: orderData.address,
+                  additionalRequirements: orderData.additionalRequirements,
+                  amount: 2499
+                }),
+              });
+              
+              if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || "Failed to create order");
+              }
+              
+              const result = await response.json();
+              
+              // Process payment using Razorpay
+              await processPayment({
+                amount: 2499,
+                orderId: result.orderId,
+                customerName: orderData.customerName,
+                customerEmail: orderData.email,
+                customerPhone: orderData.phone,
+                onSuccess: () => {
+                  toast({
+                    title: "Order created successfully!",
+                    description: `Your Civil+MEP assessment order has been created. You'll receive the report within 48 hours.`,
+                  });
+                  queryClient.invalidateQueries({ queryKey: ["/api/civil-mep-reports"] });
+                  setShowOrderForm(false);
+                  setSelectedProperty(null);
+                },
+                onError: (error: string) => {
+                  toast({
+                    title: "Payment Failed",
+                    description: error,
+                    variant: "destructive",
+                  });
+                }
+              });
+            } catch (error: any) {
+              toast({
+                title: "Error creating order",
+                description: error.message,
+                variant: "destructive",
+              });
+            }
+          }}
           property={selectedProperty}
-          reportType="civil-mep-report"
-          serviceType="civil-mep-assessment"
-          amount={2499}
+          reportType="civil-mep"
+          isProcessing={isProcessing}
         />
       )}
     </div>
