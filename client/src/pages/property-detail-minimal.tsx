@@ -48,6 +48,7 @@ export default function PropertyDetailMinimal() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [selectedConfig, setSelectedConfig] = useState<any>(null);
   const [showVideo, setShowVideo] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   const { data: property, isLoading, error } = useQuery<Property>({
     queryKey: [`/api/properties/${params.id}/with-configurations`],
@@ -63,6 +64,38 @@ export default function PropertyDetailMinimal() {
       setSelectedConfig(property.configurations[0]);
     }
   }, [property]);
+
+  // Scroll progress tracking
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = ['configurations', 'reports', 'pros-cons', 'buyer-match', 'property-score'];
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight - windowHeight;
+      const scrollTop = window.scrollY;
+      
+      // Calculate overall progress
+      const overallProgress = Math.min((scrollTop / documentHeight) * 100, 100);
+      setScrollProgress(overallProgress);
+
+      // Update active section based on scroll position
+      sections.forEach((sectionId, index) => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          const isInView = rect.top <= windowHeight / 2 && rect.bottom >= windowHeight / 2;
+          
+          if (isInView) {
+            // Update progress based on current section
+            const sectionProgress = ((index + 1) / sections.length) * 100;
+            setScrollProgress(Math.max(sectionProgress, overallProgress));
+          }
+        }
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const formatPriceDisplay = (price: number) => {
     if (price >= 10000000) {
@@ -360,6 +393,52 @@ export default function PropertyDetailMinimal() {
                   {tag.replace('-', ' ').toUpperCase()}
                 </Badge>
               ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Navigation - Sticky Progress Bar */}
+        <div className="sticky top-16 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 mb-8">
+          <div className="py-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold text-gray-900">Quick Navigation</h3>
+              <span className="text-sm text-gray-500">Jump to sections</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <a href="#configurations" className="flex items-center px-3 py-2 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors border border-blue-200">
+                <Building2 className="h-4 w-4 mr-2" />
+                Configurations
+              </a>
+              <a href="#reports" className="flex items-center px-3 py-2 text-sm bg-orange-50 text-orange-700 rounded-lg hover:bg-orange-100 transition-colors border border-orange-200">
+                <Shield className="h-4 w-4 mr-2" />
+                Analysis Reports
+              </a>
+              <a href="#pros-cons" className="flex items-center px-3 py-2 text-sm bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors border border-green-200">
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Highlights & Considerations
+              </a>
+              <a href="#buyer-match" className="flex items-center px-3 py-2 text-sm bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors border border-purple-200">
+                <Users className="h-4 w-4 mr-2" />
+                Buyer Suitability
+              </a>
+              <a href="#property-score" className="flex items-center px-3 py-2 text-sm bg-yellow-50 text-yellow-700 rounded-lg hover:bg-yellow-100 transition-colors border border-yellow-200">
+                <Award className="h-4 w-4 mr-2" />
+                Property Score
+              </a>
+            </div>
+            {/* Progress Bar */}
+            <div className="mt-3">
+              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-blue-500 via-orange-500 via-green-500 via-purple-500 to-yellow-500 rounded-full transition-all duration-300" 
+                  style={{width: `${Math.max(scrollProgress, 5)}%`}}
+                ></div>
+              </div>
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>Start</span>
+                <span>{Math.round(scrollProgress)}% Complete</span>
+                <span>Complete</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1035,35 +1114,7 @@ export default function PropertyDetailMinimal() {
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 space-y-6">
-              {/* Quick Navigation */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Quick Navigation</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <a href="#configurations" className="flex items-center text-sm text-blue-600 hover:text-blue-800 transition-colors">
-                    <Building2 className="h-4 w-4 mr-2" />
-                    Configurations
-                  </a>
-                  <a href="#reports" className="flex items-center text-sm text-blue-600 hover:text-blue-800 transition-colors">
-                    <Shield className="h-4 w-4 mr-2" />
-                    Analysis Reports
-                  </a>
-                  <a href="#pros-cons" className="flex items-center text-sm text-blue-600 hover:text-blue-800 transition-colors">
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Pros & Cons
-                  </a>
-                  <a href="#buyer-match" className="flex items-center text-sm text-blue-600 hover:text-blue-800 transition-colors">
-                    <Users className="h-4 w-4 mr-2" />
-                    Buyer Suitability
-                  </a>
-                  <a href="#property-score" className="flex items-center text-sm text-blue-600 hover:text-blue-800 transition-colors">
-                    <Award className="h-4 w-4 mr-2" />
-                    Property Score
-                  </a>
-                </CardContent>
-              </Card>
+            <div className="sticky top-32 space-y-6">
 
               {/* Key Highlights */}
               <Card>
