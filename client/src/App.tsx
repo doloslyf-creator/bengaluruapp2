@@ -7,6 +7,7 @@ import { useAnalyticsInit, useAnalytics } from "@/hooks/use-analytics";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import PerformanceOptimizer from "@/components/seo/PerformanceOptimizer";
 import MobileOptimization from "@/components/seo/MobileOptimization";
+import { ScrollRestoration } from "@/hooks/use-scroll-restoration";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { AdminAuthForm } from "@/components/auth/AdminAuthForm";
 import AdminDashboard from "@/pages/admin/dashboard";
@@ -196,6 +197,7 @@ function App() {
         <TooltipProvider>
           <PerformanceOptimizer />
           <MobileOptimization />
+          <ScrollRestoration />
           <Toaster />
           <ProtectedRouter />
         </TooltipProvider>
