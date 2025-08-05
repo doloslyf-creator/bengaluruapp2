@@ -30,7 +30,8 @@ import {
   Factory,
   Database,
   Archive,
-  Wrench
+  Wrench,
+  Globe
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -173,6 +174,12 @@ const groupedNavigation: NavigationGroup[] = [
     name: "Property Management",
     icon: Building2,
     items: [
+      { 
+        name: "Cities", 
+        href: "/admin-panel/cities", 
+        icon: Globe,
+        description: "City Management"
+      },
       { 
         name: "Properties", 
         href: "/admin-panel/properties", 

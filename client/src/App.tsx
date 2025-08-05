@@ -63,6 +63,8 @@ import { AdminCivilMepReportsCreate } from "@/pages/admin-civil-mep-reports-crea
 import { CivilMepReportView } from "@/pages/civil-mep-report-view";
 import AdminLegalAuditReports from "@/pages/admin/legal-audit-reports";
 import AdminLegalAuditReportsCreate from "@/pages/admin/legal-audit-reports-create";
+import AdminCities from "@/pages/admin/cities";
+import AdminCitiesCreate from "@/pages/admin/cities-create";
 
 import Reports from "@/pages/reports";
 import PropertyReports from "@/pages/property-reports";
@@ -119,6 +121,9 @@ function ProtectedRouter() {
       <Route path="/admin-panel/developers" component={AdminDevelopers} />
       <Route path="/admin-panel/developers/view" component={DevelopersView} />
       <Route path="/admin-panel/developers/add" component={DevelopersAdd} />
+      <Route path="/admin-panel/cities" component={AdminCities} />
+      <Route path="/admin-panel/cities/create" component={AdminCitiesCreate} />
+      <Route path="/admin-panel/cities/:id/edit" component={AdminCitiesCreate} />
       <Route path="/admin-panel/zones" component={AdminZones} />
       <Route path="/admin-panel/zones/view" component={ZonesView} />
       <Route path="/admin-panel/zones/add" component={ZonesAdd} />
