@@ -1072,43 +1072,7 @@ export default function PropertyDetailMinimal() {
           </CardContent>
         </Card>
 
-        {/* Property Scoring */}
-        <Card className="mb-8" id="property-score">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Award className="h-5 w-5 mr-2 text-yellow-500" />
-              Property Score
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-yellow-500">
-                  {property.overallScore ? Number(property.overallScore).toFixed(1) : '4.3'}
-                </div>
-                <div className="text-sm text-gray-600">Overall</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-500">
-                  {property.locationScore || 4}/5
-                </div>
-                <div className="text-sm text-gray-600">Location</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-500">
-                  {property.amenitiesScore || 5}/5
-                </div>
-                <div className="text-sm text-gray-600">Amenities</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-500">
-                  {property.valueScore || 4}/5
-                </div>
-                <div className="text-sm text-gray-600">Value</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+
 
           </div>
 
@@ -1116,80 +1080,57 @@ export default function PropertyDetailMinimal() {
           <div className="lg:col-span-1">
             <div className="sticky top-32 space-y-6">
 
-              {/* Key Highlights */}
+              {/* Property Score - Moved to Sidebar */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Key Highlights</CardTitle>
+                  <CardTitle className="flex items-center">
+                    <Award className="h-5 w-5 mr-2 text-yellow-500" />
+                    Property Score
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center text-sm">
-                      <Shield className="h-4 w-4 mr-2 text-green-600" />
-                      <span className="text-gray-600">RERA:</span>
-                      <span className="ml-1 font-medium text-green-600">
-                        {property.reraApproved ? 'Verified' : 'Pending'}
-                      </span>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-4 text-center">
+                    <div>
+                      <div className="text-2xl font-bold text-blue-600 mb-1">
+                        {property.locationScore || 4}/5
+                      </div>
+                      <div className="text-sm text-gray-600">Location</div>
                     </div>
-                    <div className="flex items-center text-sm">
-                      <Calendar className="h-4 w-4 mr-2 text-blue-600" />
-                      <span className="text-gray-600">Possession:</span>
-                      <span className="ml-1 font-medium">{property.possessionDate || 'TBA'}</span>
+                    <div>
+                      <div className="text-2xl font-bold text-green-600 mb-1">
+                        {property.amenitiesScore || 5}/5
+                      </div>
+                      <div className="text-sm text-gray-600">Amenities</div>
                     </div>
-                    <div className="flex items-center text-sm">
-                      <Building className="h-4 w-4 mr-2 text-purple-600" />
-                      <span className="text-gray-600">Developer:</span>
-                      <span className="ml-1 font-medium">{property.developer}</span>
+                    <div>
+                      <div className="text-2xl font-bold text-orange-600 mb-1">
+                        {property.amenitiesScore || 4}/5
+                      </div>
+                      <div className="text-sm text-gray-600">Quality</div>
                     </div>
-                    <div className="flex items-center text-sm">
-                      <Star className="h-4 w-4 mr-2 text-yellow-600" />
-                      <span className="text-gray-600">Overall Score:</span>
-                      <span className="ml-1 font-medium">{property.overallScore || '4.3'}/5</span>
+                    <div>
+                      <div className="text-2xl font-bold text-purple-600 mb-1">
+                        {property.valueScore || 4}/5
+                      </div>
+                      <div className="text-sm text-gray-600">Value</div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-gray-900 mb-1">
+                        {property.overallScore || '4.3'}/5
+                      </div>
+                      <div className="text-sm text-gray-600 mb-2">Overall Score</div>
+                      <Badge className="bg-yellow-100 text-yellow-800">
+                        {(property.overallScore || 4.3) >= 4.5 ? 'Excellent' : 
+                         (property.overallScore || 4.3) >= 4.0 ? 'Very Good' : 
+                         (property.overallScore || 4.3) >= 3.5 ? 'Good' : 'Average'}
+                      </Badge>
                     </div>
                   </div>
                 </CardContent>
               </Card>
-
-              {/* Price Summary for Selected Config */}
-              {selectedConfig && (
-                <Card className="border-blue-200 bg-blue-50">
-                  <CardHeader>
-                    <CardTitle className="text-lg text-blue-900">Selected Configuration</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="text-center">
-                      <div className="font-semibold text-blue-900">{selectedConfig.configuration}</div>
-                      <div className="text-2xl font-bold text-blue-600 mt-1">
-                        {formatPriceDisplay(selectedConfig.price)}
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-700">Area:</span>
-                        <span className="font-medium">{selectedConfig.builtUpArea} sq ft</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-700">Rate:</span>
-                        <span className="font-medium">₹{Number(selectedConfig.pricePerSqft).toLocaleString()}/sq ft</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-700">Status:</span>
-                        <Badge variant={selectedConfig.availabilityStatus === 'available' ? 'default' : 
-                                       selectedConfig.availabilityStatus === 'limited' ? 'secondary' : 'destructive'}>
-                          {selectedConfig.availabilityStatus}
-                        </Badge>
-                      </div>
-                    </div>
-
-                    <div className="pt-2 border-t border-blue-200">
-                      <div className="text-xs text-blue-700 space-y-1">
-                        <div>EMI: ₹{Math.round(selectedConfig.price * 0.008).toLocaleString()}/month</div>
-                        <div>Expected Rent: ₹{Math.round(selectedConfig.price * 0.003).toLocaleString()}/month</div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
 
               {/* Action Panel */}
               <Card>
