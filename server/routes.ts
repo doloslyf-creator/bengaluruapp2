@@ -2050,7 +2050,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const testOrder = await paymentService.createOrder({
               amount: 100, // 1 rupee
               currency: "INR",
-              receipt: "test_" + Date.now(),
+              receipt: "test_" + Date.now().toString().slice(-8),
               notes: { test: "connection_test" }
             });
             res.json({ success: true, message: "Razorpay connection successful", orderId: testOrder.id });
@@ -2093,7 +2093,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const order = await paymentService.createOrder({
         amount,
         currency,
-        receipt: receipt || `order_${Date.now()}`,
+        receipt: receipt || `ord_${Date.now().toString().slice(-10)}`,
         notes
       });
 
@@ -2148,7 +2148,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const amount = 249900; // ₹2,499 in paise
-      const receipt = `${reportType}_${propertyId}_${Date.now()}`;
+      // Generate a short receipt ID (max 40 chars for Razorpay)
+      const shortId = Math.random().toString(36).substring(2, 8);
+      const reportCode = reportType === 'civil-mep' ? 'CM' : 'VR';
+      const receipt = `${reportCode}_${shortId}_${Date.now().toString().slice(-8)}`;
       
       const order = await paymentService.createOrder({
         amount,
