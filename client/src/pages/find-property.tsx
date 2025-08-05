@@ -23,7 +23,8 @@ import { motion } from "framer-motion";
 
 interface PropertyPreferences {
   propertyType: string;
-  zone: string;
+  cityId: string;
+  zoneId: string;
   budgetRange: [number, number];
   bhkType: string[];
   amenities: string[];
@@ -47,7 +48,8 @@ export default function FindProperty() {
     }
     return {
       propertyType: "",
-      zone: "",
+      cityId: "",
+      zoneId: "",
       budgetRange: [50, 500], // in lakhs
       bhkType: [],
       amenities: [],
@@ -65,8 +67,28 @@ export default function FindProperty() {
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
+  // Fetch cities and zones for dropdowns
+  const { data: cities = [] } = useQuery({
+    queryKey: ["/api/cities"],
+    queryFn: async () => {
+      const response = await fetch("/api/cities");
+      if (!response.ok) throw new Error("Failed to fetch cities");
+      return response.json();
+    },
+  });
+
+  const { data: zones = [] } = useQuery({
+    queryKey: ["/api/zones/city", preferences.cityId],
+    queryFn: async () => {
+      if (!preferences.cityId) return [];
+      const response = await fetch(`/api/zones/city/${preferences.cityId}`);
+      if (!response.ok) throw new Error("Failed to fetch zones");
+      return response.json();
+    },
+    enabled: !!preferences.cityId,
+  });
+
   // Extract real options from properties data  
-  const zones = Array.from(new Set(properties.map(p => p.zone).filter(Boolean))).sort();
   const propertyTypes = Array.from(new Set(properties.map(p => p.type).filter(Boolean))).map(type => ({
     value: type,
     label: type.charAt(0).toUpperCase() + type.slice(1)
@@ -78,12 +100,11 @@ export default function FindProperty() {
     label: tag.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())
   }));
 
-  // Display options with fallbacks
-  const displayZones = zones.length > 0 ? zones : ["north", "south", "east", "west", "central"];
+  // Enhanced property types for display
   const displayPropertyTypes = propertyTypes.length > 0 ? propertyTypes : [
-    { value: "apartment", label: "Apartment" },
-    { value: "villa", label: "Villa" },
-    { value: "plot", label: "Plot" }
+    { value: 'apartment', label: 'Apartment' },
+    { value: 'villa', label: 'Villa' },
+    { value: 'plot', label: 'Plot' }
   ];
 
   // Static options
@@ -124,10 +145,11 @@ export default function FindProperty() {
 
   const isFormValid = () => {
     const hasPropertyType = preferences.propertyType !== "";
-    const hasZone = preferences.zone !== "";
+    const hasCity = preferences.cityId !== "";
+    const hasZone = preferences.zoneId !== "";
     const hasBhkType = preferences.propertyType === "plot" || preferences.bhkType.length > 0;
     
-    return hasPropertyType && hasZone && hasBhkType;
+    return hasPropertyType && hasCity && hasZone && hasBhkType;
   };
 
   return (
@@ -223,27 +245,59 @@ export default function FindProperty() {
                     </Select>
                   </div>
 
-                  {/* Location Zone */}
+                  {/* City Selection */}
+                  <div>
+                    <label className="block text-lg font-semibold text-gray-900 mb-4">
+                      City <span className="text-red-500">*</span>
+                    </label>
+                    <Select 
+                      value={preferences.cityId} 
+                      onValueChange={(value) => {
+                        handlePreferenceChange('cityId', value);
+                        handlePreferenceChange('zoneId', ''); // Reset zone when city changes
+                      }}
+                    >
+                      <SelectTrigger className="h-14 text-lg border-2 border-gray-200 focus:border-blue-600" data-testid="select-city">
+                        <div className="flex items-center space-x-3">
+                          <Building2 className="w-5 h-5 text-gray-600" />
+                          <SelectValue placeholder="Select city" />
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {cities.map((city: any) => (
+                          <SelectItem key={city.id} value={city.id} data-testid={`option-city-${city.id}`}>
+                            <div className="flex items-center space-x-3">
+                              <Building2 className="w-4 h-4" />
+                              <span>{city.name}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Zone Selection */}
                   <div>
                     <label className="block text-lg font-semibold text-gray-900 mb-4">
                       Preferred Zone <span className="text-red-500">*</span>
                     </label>
                     <Select 
-                      value={preferences.zone} 
-                      onValueChange={(value) => handlePreferenceChange('zone', value)}
+                      value={preferences.zoneId} 
+                      onValueChange={(value) => handlePreferenceChange('zoneId', value)}
+                      disabled={!preferences.cityId}
                     >
                       <SelectTrigger className="h-14 text-lg border-2 border-gray-200 focus:border-blue-600" data-testid="select-zone">
                         <div className="flex items-center space-x-3">
                           <MapPin className="w-5 h-5 text-gray-600" />
-                          <SelectValue placeholder="Select preferred zone" />
+                          <SelectValue placeholder={preferences.cityId ? "Select preferred zone" : "First select a city"} />
                         </div>
                       </SelectTrigger>
                       <SelectContent>
-                        {displayZones.map((zone) => (
-                          <SelectItem key={zone} value={zone} data-testid={`option-zone-${zone}`}>
+                        {zones.map((zone: any) => (
+                          <SelectItem key={zone.id} value={zone.id} data-testid={`option-zone-${zone.id}`}>
                             <div className="flex items-center space-x-3">
                               <MapPin className="w-4 h-4" />
-                              <span className="capitalize">{zone} Bengaluru</span>
+                              <span className="capitalize">{zone.name}</span>
                             </div>
                           </SelectItem>
                         ))}

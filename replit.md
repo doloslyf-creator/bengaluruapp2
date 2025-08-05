@@ -20,8 +20,8 @@ The frontend is a React-based single-page application built with TypeScript, uti
 ### Backend Architecture
 The backend is an Express.js RESTful API server implemented in TypeScript. It includes middleware for logging, error handling, and request parsing. Database integration is managed via Drizzle ORM for PostgreSQL. The system includes an abstracted storage interface with both in-memory and cloud storage capabilities. Development uses Vite for hot module replacement.
 
-### Database Design
-PostgreSQL is the primary database, accessed through Drizzle ORM for type-safe queries. The schema includes comprehensive fields for properties, covering location, specifications, legal compliance, and media storage. Data validation is ensured by shared Zod schemas between the frontend and backend, and Drizzle Kit is used for database schema migrations.
+### Database Design - City-Wise Architecture (Updated August 2025)
+PostgreSQL is the primary database with a hierarchical city-wise structure: City > Zones > Properties. The schema includes comprehensive fields for properties, covering location, specifications, legal compliance, and media storage. Cities contain zones, and properties are linked to both cityId and zoneId for geographical organization and scalability. Data validation is ensured by shared Zod schemas between the frontend and backend, and Drizzle Kit is used for database schema migrations.
 
 ### API Structure
 The API follows RESTful principles, providing standard CRUD operations for entities like properties. It supports advanced property search and filtering. Request validation is implemented using Zod schemas, and a centralized error handling system provides appropriate HTTP status codes.

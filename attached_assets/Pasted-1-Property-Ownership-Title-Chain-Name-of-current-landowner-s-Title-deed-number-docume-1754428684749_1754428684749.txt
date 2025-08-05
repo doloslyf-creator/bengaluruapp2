@@ -1,0 +1,85 @@
+1. 🪪 Property Ownership & Title Chain
+✅ Name of current landowner(s)
+
+🧾 Title deed number / document reference
+
+🔄 Ownership history (last 2–3 transfers)
+
+🧬 Whether the title is clear, marketable, and unencumbered
+
+⚠️ Any gaps in chain (e.g., missing probate, unregistered gift deeds)
+
+Flag: If ownership documents are not in builder's name or under GPA
+
+2. 🧾 Land & Property Documents
+📜 Sale deed / conveyance deed availability
+
+🏞️ RTC / Khata / Patta / Phodi details (state-specific)
+
+🧱 Conversion Certificate (DC conversion – for agricultural land)
+
+🏛️ Encumbrance Certificate (EC) – 15–30 years
+
+📘 GPA or JDA agreements if applicable
+
+🧯 Mutation extract (where applicable)
+
+Flag: Check if land was originally farmland and not converted
+
+3. 🧠 Builder Legal Status
+📍 RERA registration (number, status, and link to RERA portal)
+
+📁 Company registration (CIN, LLP, or Pvt Ltd)
+
+⚖️ Past litigation cases (search via eCourts / Judis / builder name)
+
+💰 Past delivery delays or complaints (via RERA, forums, legal portals)
+
+Flag: Active consumer court or NCLT cases
+
+4. 🏗️ Approvals & Permissions
+🏛️ Building Plan Sanction (BBMP / BDA / BMRDA / DTCP)
+
+🚒 Fire NOC
+
+💧 BWSSB / KSPCB NOC (water & sewage)
+
+🛗 Lift license (if applicable)
+
+🧱 Commencement Certificate (CC)
+
+🏁 Occupancy Certificate (OC) – mention date / pending status
+
+Flag: Missing OC is critical — affects resale and loanability
+
+5. 🧭 Zoning, Land Use & Environmental
+🗺️ Zoning classification (Residential / Commercial / Green belt)
+
+🛣️ Check proximity to buffer zones (lakes, rajakaluves, STPs)
+
+🌱 Environmental clearance (for large layouts or villas >20,000 sq.m)
+
+🧯 KSPCB NOC for projects near industrial or water-sensitive zones
+
+Flag: If within 30m of lake, STP, or storm drain — major red flag
+
+6. 🏛️ Litigation or Disputes
+⚖️ Active cases against property (search builder + project name)
+
+📝 FIRs or land disputes (local police or tahsildar records)
+
+👥 GPA-related disputes with landowners
+
+🪧 Any stay orders or notices issued on site
+
+Flag: If project is under NGT, court stay, or NCLT freeze
+
+7. 💼 Loanability & Bank Approvals
+🏦 Banks that have approved the project (SBI, HDFC, Axis, etc.)
+
+🛑 Banks that have rejected or blacklisted project (mention if found)
+
+🔐 Whether individual units are eligible for loan
+
+🔍 Common loan rejections due to missing OC or builder delay
+

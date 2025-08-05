@@ -48,7 +48,7 @@ export default function PropertyDetail() {
 
   const propertyId = params?.id;
 
-  // Fetch property with configurations
+  // Fetch property with configurations and location data
   const { data: property, isLoading } = useQuery<PropertyWithConfigurations>({
     queryKey: ["/api/properties", propertyId, "with-configurations"],
     queryFn: async () => {
@@ -59,6 +59,29 @@ export default function PropertyDetail() {
       return response.json();
     },
     enabled: !!propertyId,
+  });
+
+  // Fetch city and zone data for the property
+  const { data: cityData } = useQuery({
+    queryKey: ["/api/cities", property?.cityId],
+    queryFn: async () => {
+      if (!property?.cityId) return null;
+      const response = await fetch(`/api/cities/${property.cityId}`);
+      if (!response.ok) return null;
+      return response.json();
+    },
+    enabled: !!property?.cityId,
+  });
+
+  const { data: zoneData } = useQuery({
+    queryKey: ["/api/zones", property?.zoneId],
+    queryFn: async () => {
+      if (!property?.zoneId) return null;
+      const response = await fetch(`/api/zones/${property.zoneId}`);
+      if (!response.ok) return null;
+      return response.json();
+    },
+    enabled: !!property?.zoneId,
   });
 
   // Fetch all properties for similar properties logic

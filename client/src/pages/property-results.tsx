@@ -18,7 +18,8 @@ import { PropertyCardSkeleton } from "@/components/ui/skeleton";
 
 interface PropertyPreferences {
   propertyType: string;
-  zone: string;
+  cityId: string;
+  zoneId: string;
   budgetRange: [number, number];
   bhkType: string[];
   amenities: string[];
@@ -49,7 +50,8 @@ export default function PropertyResults() {
     }
     return {
       propertyType: "",
-      zone: "",
+      cityId: "",
+      zoneId: "",
       budgetRange: [50, 500],
       bhkType: [],
       amenities: [],

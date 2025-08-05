@@ -45,6 +45,7 @@ export default function PropertyArchive() {
   const [, navigate] = useLocation();
   const [userIntent, setUserIntent] = useState<UserIntent>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCity, setSelectedCity] = useState<string>("all");
   const [selectedZone, setSelectedZone] = useState<string>("all");
   const [selectedType, setSelectedType] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("relevance");
