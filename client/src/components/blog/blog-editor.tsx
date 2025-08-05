@@ -78,20 +78,14 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
 
   const createMutation = useMutation({
     mutationFn: (data: InsertBlogPost) => {
-      return apiRequest("/api/blog", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
+      return apiRequest("POST", "/api/blog", data);
     },
     onSuccess: onSave,
   });
 
   const updateMutation = useMutation({
     mutationFn: (data: InsertBlogPost) => {
-      return apiRequest(`/api/blog/${post?.id}`, {
-        method: "PATCH",
-        body: JSON.stringify(data),
-      });
+      return apiRequest("PATCH", `/api/blog/${post?.id}`, data);
     },
     onSuccess: onSave,
   });
