@@ -9,8 +9,8 @@ Project approach: User appreciates comprehensive solutions that integrate real d
 Focus areas: Customer-facing features, real data integration, and seamless user workflows.
 UI Design preferences: Clean, minimal design without unnecessary panels or borders. Prefer simple layouts that encourage clicking to view details rather than multiple action buttons. Match labels should be displayed in brackets at the top of cards. Strongly prefers compact, table-based interfaces over verbose card layouts for admin panels - values data density and efficiency. NEVER show "Price on request" - always display actual pricing using configurations, valuation reports, or calculated estimates based on market rates.
 Messaging preference: Personalized messaging that makes customers "feel us, our message" rather than sounding like an organization. Content should be human-centered and relatable.
-Admin Layout Consistency: ALL admin pages MUST maintain admin sidebar and topbar using AdminLayout component. This includes RERA management, Supabase Migration, and all future admin pages.
-Admin Sidebar Organization: Grouped menu structure with collapsible sections - Customer Relations (customers, developers, team management, enhanced leads), Reports (civil/MEP reports, valuation reports, legal tracker, property scoring, analytics), Property Management (properties, zones), with single items (dashboard, blog, orders, RERA, settings, database migration) remaining ungrouped.
+Admin Layout Consistency: ALL admin pages MUST maintain admin sidebar and topbar using AdminLayout component. This includes Supabase Migration and all future admin pages.
+Admin Sidebar Organization: Grouped menu structure with collapsible sections - Customer Relations (customers, developers, team management, enhanced leads), Reports (civil/MEP reports, valuation reports, legal tracker, property scoring, analytics), Property Management (properties, zones), with single items (dashboard, blog, orders, settings, database migration) remaining ungrouped.
 
 ## System Architecture
 
@@ -29,7 +29,7 @@ The API follows RESTful principles, providing standard CRUD operations for entit
 ### Key Features
 - **Property Management**: Full CRUD operations for detailed property specifications.
 - **Customer Property Discovery**: Advanced property finder with intelligent matching, filtering, and persistent search preferences.
-- **Indian Market Focus**: RERA compliance tracking, zone-based categorization, and regional pricing.
+- **Indian Market Focus**: Zone-based categorization and regional pricing.
 - **Media Support**: Image and video upload capabilities for property listings, with a combined media slider.
 - **Booking System**: Site visit and consultation booking with confirmation workflows.
 - **Legal Due Diligence**: A 12-step tracker for legal verification, with admin and user panel interfaces, document management, and progress visualization.

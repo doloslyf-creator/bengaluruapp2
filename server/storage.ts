@@ -59,9 +59,7 @@
   customerNotes,
   appSettings,
   teamMembers,
-  reraData,
-  type ReraData,
-  type InsertReraData
+
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, ilike, gte, lte, desc, sql } from "drizzle-orm";
@@ -190,13 +188,7 @@ export interface IStorage {
   getTeamMembersByDepartment(department: string): Promise<TeamMember[]>;
   getActiveTeamMembers(): Promise<TeamMember[]>;
 
-  // RERA Data operations
-  createReraData(reraInfo: InsertReraData): Promise<ReraData>;
-  getReraData(reraId: string): Promise<ReraData | undefined>;
-  getReraDataByProperty(propertyId: string): Promise<ReraData | undefined>;
-  getAllReraData(): Promise<ReraData[]>;
-  updateReraData(reraId: string, updates: Partial<InsertReraData>): Promise<ReraData | undefined>;
-  deleteReraData(reraId: string): Promise<boolean>;
+
 
   // Civil+MEP Report operations
   createCivilMepReport(report: InsertCivilMepReport): Promise<CivilMepReport>;
@@ -1207,30 +1199,7 @@ export class MemStorage implements IStorage {
     return {};
   }
 
-  // RERA Data operations - MemStorage stub implementations
-  async createReraData(reraInfo: InsertReraData): Promise<ReraData> {
-    throw new Error("RERA data not implemented in MemStorage");
-  }
 
-  async getReraData(reraId: string): Promise<ReraData | undefined> {
-    return undefined;
-  }
-
-  async getReraDataByProperty(propertyId: string): Promise<ReraData | undefined> {
-    return undefined;
-  }
-
-  async getAllReraData(): Promise<ReraData[]> {
-    return [];
-  }
-
-  async updateReraData(reraId: string, updates: Partial<InsertReraData>): Promise<ReraData | undefined> {
-    return undefined;
-  }
-
-  async deleteReraData(reraId: string): Promise<boolean> {
-    return false;
-  }
 
   // Civil+MEP Report operations - MemStorage stub implementations  
   async createCivilMepReport(report: InsertCivilMepReport): Promise<CivilMepReport> {

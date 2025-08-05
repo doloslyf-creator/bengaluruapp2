@@ -19,7 +19,7 @@ const leadTable = leads;
 const bookingTable = bookings;
 import { z } from "zod";
 
-import { reraService } from "./reraService";
+
 import { paymentService, apiKeysManager } from "./paymentService";
 import { supabaseMigration } from "./supabaseMigration";
 import { supabaseMigrator } from "./supabaseMigrator";
@@ -1886,143 +1886,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // RERA Data Integration API Routes
-  // Get all RERA data with optional filtering
-  app.get("/api/rera-data", async (req, res) => {
-    try {
-      const { verificationStatus, complianceStatus, projectStatus } = req.query;
-      
-      const filters: any = {};
-      if (verificationStatus) filters.verificationStatus = verificationStatus;
-      if (complianceStatus) filters.complianceStatus = complianceStatus;
-      if (projectStatus) filters.projectStatus = projectStatus;
-      
-      const reraData = await reraService.getAllReraData(filters);
-      res.json(reraData);
-    } catch (error) {
-      console.error("Error fetching RERA data:", error);
-      res.status(500).json({ error: "Failed to fetch RERA data" });
-    }
-  });
 
-  // Get RERA data for a specific property
-  app.get("/api/properties/:propertyId/rera-data", async (req, res) => {
-    try {
-      const { propertyId } = req.params;
-      const reraData = await reraService.getReraDataForProperty(propertyId);
-      res.json(reraData);
-    } catch (error) {
-      console.error("Error fetching property RERA data:", error);
-      res.status(500).json({ error: "Failed to fetch property RERA data" });
-    }
-  });
-
-  // Verify and sync RERA data for a specific RERA ID
-  app.post("/api/rera-data/verify", async (req, res) => {
-    try {
-      const { reraId, propertyId } = req.body;
-      
-      if (!reraId) {
-        return res.status(400).json({ error: "RERA ID is required" });
-      }
-
-      const reraData = await reraService.syncReraData(reraId, propertyId);
-      res.json({
-        success: true,
-        message: "RERA data verified and synced successfully",
-        data: reraData
-      });
-    } catch (error) {
-      console.error("Error verifying RERA data:", error);
-      res.status(500).json({ 
-        error: "Failed to verify RERA data", 
-        details: error.message 
-      });
-    }
-  });
-
-  // Auto-sync RERA data for all properties with RERA numbers
-  app.post("/api/rera-data/auto-sync", async (req, res) => {
-    try {
-      const results = await reraService.autoSyncPropertiesWithReraNumbers();
-      
-      const successCount = results.filter(r => r.success).length;
-      const failureCount = results.filter(r => !r.success).length;
-      
-      res.json({
-        success: true,
-        message: `Auto-sync completed. ${successCount} properties synced successfully, ${failureCount} failed.`,
-        results: results
-      });
-    } catch (error) {
-      console.error("Error in auto-sync:", error);
-      res.status(500).json({ 
-        error: "Failed to auto-sync RERA data", 
-        details: error.message 
-      });
-    }
-  });
-
-  // Bulk verify multiple RERA IDs
-  app.post("/api/rera-data/bulk-verify", async (req, res) => {
-    try {
-      const { reraIds } = req.body;
-      
-      if (!Array.isArray(reraIds) || reraIds.length === 0) {
-        return res.status(400).json({ error: "Array of RERA IDs is required" });
-      }
-
-      const results = await reraService.bulkSyncReraData(reraIds);
-      
-      const successCount = results.filter(r => r.success).length;
-      const failureCount = results.filter(r => !r.success).length;
-      
-      res.json({
-        success: true,
-        message: `Bulk verification completed. ${successCount} RERA IDs verified successfully, ${failureCount} failed.`,
-        results: results
-      });
-    } catch (error) {
-      console.error("Error in bulk verification:", error);
-      res.status(500).json({ 
-        error: "Failed to bulk verify RERA data", 
-        details: error.message 
-      });
-    }
-  });
-
-  // Get RERA verification status summary
-  app.get("/api/rera-data/status-summary", async (req, res) => {
-    try {
-      const allRera = await reraService.getAllReraData();
-      
-      const summary = {
-        total: allRera.length,
-        verified: allRera.filter(r => r.verificationStatus === "verified").length,
-        pending: allRera.filter(r => r.verificationStatus === "pending").length,
-        failed: allRera.filter(r => r.verificationStatus === "failed").length,
-        outdated: allRera.filter(r => r.verificationStatus === "outdated").length,
-        byComplianceStatus: {
-          active: allRera.filter(r => r.complianceStatus === "active").length,
-          nonCompliant: allRera.filter(r => r.complianceStatus === "non-compliant").length,
-          suspended: allRera.filter(r => r.complianceStatus === "suspended").length,
-          cancelled: allRera.filter(r => r.complianceStatus === "cancelled").length,
-        },
-        byProjectStatus: {
-          underConstruction: allRera.filter(r => r.projectStatus === "under-construction").length,
-          completed: allRera.filter(r => r.projectStatus === "completed").length,
-          delayed: allRera.filter(r => r.projectStatus === "delayed").length,
-          cancelled: allRera.filter(r => r.projectStatus === "cancelled").length,
-          approved: allRera.filter(r => r.projectStatus === "approved").length,
-        }
-      };
-      
-      res.json(summary);
-    } catch (error) {
-      console.error("Error fetching RERA status summary:", error);
-      res.status(500).json({ error: "Failed to fetch RERA status summary" });
-    }
-  });
 
   // API Keys Settings Routes
   app.get("/api/settings/api-keys", async (req, res) => {

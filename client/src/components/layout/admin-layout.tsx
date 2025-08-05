@@ -72,12 +72,7 @@ const singleNavigation: NavigationItem[] = [
     description: "Order Management"
   },
 
-  { 
-    name: "RERA Management", 
-    href: "/admin-panel/rera-management", 
-    icon: Shield,
-    description: "RERA Compliance & Verification"
-  },
+
   { 
     name: "Settings", 
     href: "/admin-panel/settings", 

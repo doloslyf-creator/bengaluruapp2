@@ -167,68 +167,8 @@ export const properties = pgTable("properties", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// RERA Data Integration - Store verified RERA project information
-export const reraData = pgTable("rera_data", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  reraId: text("rera_id").notNull().unique(), // RERA project registration ID
-  propertyId: varchar("property_id").references(() => properties.id), // Link to property if applicable
-  
-  // Basic Project Information
-  projectName: text("project_name").notNull(),
-  promoterName: text("promoter_name").notNull(),
-  location: text("location").notNull(),
-  district: text("district").notNull(),
-  state: text("state").default("Karnataka"),
-  
-  // Project Details
-  projectType: varchar("project_type", { 
-    enum: ["residential", "commercial", "mixed", "plotted-development", "other"] 
-  }).default("residential"),
-  totalUnits: integer("total_units"),
-  projectArea: text("project_area"), // in acres/sq ft
-  builtUpArea: text("built_up_area"), // total built-up area
-  
-  // Legal and Compliance Status
-  registrationDate: text("registration_date"), // RERA registration date
-  approvalDate: text("approval_date"), // Initial approval date  
-  completionDate: text("completion_date"), // Expected/actual completion
-  registrationValidTill: text("registration_valid_till"), // RERA validity
-  projectStatus: varchar("project_status", {
-    enum: ["under-construction", "completed", "delayed", "cancelled", "approved"]
-  }).default("under-construction"),
-  complianceStatus: varchar("compliance_status", {
-    enum: ["active", "non-compliant", "suspended", "cancelled"]
-  }).default("active"),
-  
-  // Financial Information  
-  projectCost: text("project_cost"), // Total project cost
-  amountCollected: text("amount_collected"), // Amount collected from buyers
-  percentageCollected: real("percentage_collected"), // Calculated percentage
-  
-  // Contact and Additional Info
-  website: text("website"),
-  contactPhone: text("contact_phone"),
-  contactEmail: text("contact_email"),
-  promoterAddress: text("promoter_address"),
-  
-  // RERA Portal Links
-  reraPortalLink: text("rera_portal_link"), // Direct link to RERA record
-  
-  // Verification and Sync Status
-  verificationStatus: varchar("verification_status", {
-    enum: ["verified", "pending", "failed", "outdated"] 
-  }).default("pending"),
-  lastVerifiedAt: timestamp("last_verified_at"),
-  lastSyncAt: timestamp("last_sync_at"),
-  syncFailureReason: text("sync_failure_reason"),
-  
-  // Raw API Response (for debugging and future enhancement)
-  rawApiResponse: json("raw_api_response").$type<Record<string, any>>(),
-  
-  // Timestamps
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+
+
 
 
 
@@ -1175,7 +1115,7 @@ export const insertSiteVisitBookingSchema = createInsertSchema(siteVisitBookings
   updatedAt: true,
   completedAt: true,
   cancelledAt: true,
-  conversionDate: true,
+
 });
 
 export const insertBookingTimeSlotSchema = createInsertSchema(bookingTimeSlots).omit({
@@ -1353,9 +1293,7 @@ export const users = pgTable("users", {
 });
 
 // RERA Data types
-export const insertReraDataSchema = createInsertSchema(reraData);
-export type InsertReraData = typeof reraData.$inferInsert;
-export type ReraData = typeof reraData.$inferSelect;
+
 
 // User types - keeping existing ones
 export const insertUserSchema = createInsertSchema(users).omit({
