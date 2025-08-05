@@ -126,291 +126,300 @@ export default function FindProperty() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       <Header />
       
-      {/* Promotional Banner */}
-      <div className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-3">
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-center space-x-4 text-sm">
-          <span className="font-semibold">🏠 Find Your Dream Home: AI-Powered Property Matching</span>
-          <span>• {properties.length}+ curated properties • Zero broker fees</span>
-        </div>
-      </div>
-
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-12">
-        <div className="max-w-7xl mx-auto px-4">
-          <motion.div 
-            className="text-center max-w-4xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
+      {/* Integrated Header */}
+      <section className="bg-white py-16 border-b">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               Find Your Perfect Property
             </h1>
-            
-            <p className="text-lg text-gray-600 mb-6 leading-relaxed max-w-2xl mx-auto">
-              Search through our curated collection of {properties.length}+ verified properties in Bengaluru
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Answer a few questions about your preferences and we'll match you with properties 
+              that fit your lifestyle and budget. Our AI-powered matching saves you time and effort.
             </p>
-          </motion.div>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="grid grid-cols-3 gap-6 max-w-2xl mx-auto">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-blue-600">{properties.length}+</div>
+              <div className="text-sm text-gray-600 mt-1">Verified Properties</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-green-600">Zero</div>
+              <div className="text-sm text-gray-600 mt-1">Broker Fees</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-purple-600">AI</div>
+              <div className="text-sm text-gray-600 mt-1">Powered Matching</div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Navigation Back */}
-      <div className="max-w-4xl mx-auto px-4 pt-8">
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={() => navigate('/')}
-          className="flex items-center space-x-2"
-          data-testid="button-back-home"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span>Back to Home</span>
-        </Button>
-      </div>
-
-      {/* Main Form */}
-      <main className="max-w-4xl mx-auto px-4 py-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="grid gap-4"
-        >
-          {/* Essential Preferences - Row 1 */}
-          <div className="grid md:grid-cols-2 gap-4">
-            {/* Property Type */}
-            <Card className="bg-white/80 backdrop-blur">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center space-x-2 text-base">
-                  <Home className="h-4 w-4 text-primary" />
-                  <span>Property Type</span>
-                  <span className="text-red-500 text-sm">*</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="grid gap-2">
-                  {displayPropertyTypes.map((type) => (
-                    <motion.div
-                      key={type.value}
-                      whileHover={{ scale: 1.01 }}
-                      className={`p-2 rounded-lg border cursor-pointer transition-all duration-200 ${
-                        preferences.propertyType === type.value
-                          ? 'border-primary bg-primary/10 text-primary'
-                          : 'border-gray-200 bg-white hover:border-primary/50'
-                      }`}
-                      onClick={() => handlePreferenceChange('propertyType', type.value)}
-                      data-testid={`select-property-type-${type.value}`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">{type.label}</span>
-                        {preferences.propertyType === type.value && (
-                          <div className="w-2 h-2 bg-primary rounded-full" />
-                        )}
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Location Zone */}
-            <Card className="bg-white/80 backdrop-blur">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center space-x-2 text-base">
-                  <MapPin className="h-4 w-4 text-primary" />
-                  <span>Preferred Zone</span>
-                  <span className="text-red-500 text-sm">*</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="grid gap-2">
-                  {displayZones.map((zone) => (
-                    <motion.div
-                      key={zone}
-                      whileHover={{ scale: 1.01 }}
-                      className={`p-2 rounded-lg border cursor-pointer transition-all duration-200 ${
-                        preferences.zone === zone
-                          ? 'border-primary bg-primary/10 text-primary'
-                          : 'border-gray-200 bg-white hover:border-primary/50'
-                      }`}
-                      onClick={() => handlePreferenceChange('zone', zone)}
-                      data-testid={`select-zone-${zone}`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium capitalize">{zone} Bengaluru</span>
-                        {preferences.zone === zone && (
-                          <div className="w-2 h-2 bg-primary rounded-full" />
-                        )}
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+      {/* Progress & Form Container */}
+      <section className="py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Progress Indicator */}
+          <div className="mb-12">
+            <div className="flex items-center justify-center space-x-4 mb-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">1</div>
+                <span className="text-sm font-medium text-gray-900">Preferences</span>
+              </div>
+              <div className="w-16 h-1 bg-gray-200 rounded"></div>
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center text-sm font-medium">2</div>
+                <span className="text-sm text-gray-500">Results</span>
+              </div>
+            </div>
+            <p className="text-center text-gray-600">Tell us what you're looking for</p>
           </div>
 
-          {/* BHK Configuration and Budget - Row 2 */}
-          <div className="grid md:grid-cols-2 gap-4">
-            {/* BHK Type */}
-            <Card className="bg-white/80 backdrop-blur">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center space-x-2 text-base">
-                  <Building2 className="h-4 w-4 text-primary" />
-                  <span>Configuration</span>
-                  <span className="text-red-500 text-sm">*</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="grid grid-cols-2 gap-2">
-                  {bhkOptions.map((bhk) => (
-                    <motion.div
-                      key={bhk}
-                      whileHover={{ scale: 1.02 }}
-                      className={`p-2 rounded-lg border cursor-pointer text-center transition-all duration-200 ${
-                        preferences.bhkType.includes(bhk)
-                          ? 'border-primary bg-primary/10 text-primary'
-                          : 'border-gray-200 bg-white hover:border-primary/50'
-                      }`}
-                      onClick={() => handleArrayToggle('bhkType', bhk)}
-                      data-testid={`select-bhk-${bhk}`}
-                    >
-                      <span className="font-medium text-sm">{bhk}</span>
-                    </motion.div>
-                  ))}
+          {/* Main Form */}
+          <div className="bg-white rounded-3xl shadow-lg p-8 md:p-12">
+            <div className="space-y-10">
+              {/* Step 1: Property Type & Location */}
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">What are you looking for?</h2>
+                  <p className="text-gray-600">Choose your property type and preferred area</p>
                 </div>
-                <p className="text-xs text-gray-500 mt-2 text-center">Select all that work for you</p>
-              </CardContent>
-            </Card>
-
-            {/* Budget Range */}
-            <Card className="bg-white/80 backdrop-blur">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center space-x-2 text-base">
-                  <IndianRupee className="h-4 w-4 text-primary" />
-                  <span>Budget Range</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-3">
-                  <div className="text-center">
-                    <div className="text-lg font-semibold text-gray-900 mb-1">
-                      {formatBudget(preferences.budgetRange[0])} - {formatBudget(preferences.budgetRange[1])}
-                    </div>
-                    <p className="text-sm text-gray-600">Your comfortable investment range</p>
-                  </div>
-                  
-                  <div className="px-2">
-                    <Slider
-                      value={preferences.budgetRange}
-                      onValueChange={(value) => handlePreferenceChange('budgetRange', value as [number, number])}
-                      max={500}
-                      min={10}
-                      step={10}
-                      className="w-full"
-                      data-testid="slider-budget-range"
-                    />
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
-                      <span>₹10L</span>
-                      <span>₹5Cr</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Optional Preferences - Row 3 */}
-          <Card className="bg-white/80 backdrop-blur">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center space-x-2 text-base">
-                <Sparkles className="h-4 w-4 text-primary" />
-                <span>Amenities & Features</span>
-                <span className="text-sm text-gray-500 font-normal">(Optional)</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="space-y-4">
-                {/* Amenities */}
-                <div>
-                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                    Amenities you'd love to have
-                  </Label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {amenities.map((amenity) => (
-                      <motion.div
-                        key={amenity}
-                        whileHover={{ scale: 1.02 }}
-                        className={`p-2 rounded-lg border cursor-pointer text-xs text-center transition-all duration-200 ${
-                          preferences.amenities.includes(amenity)
-                            ? 'border-primary bg-primary/10 text-primary'
-                            : 'border-gray-200 bg-white hover:border-primary/50'
-                        }`}
-                        onClick={() => handleArrayToggle('amenities', amenity)}
-                        data-testid={`select-amenity-${amenity.toLowerCase().replace(/\s+/g, '-')}`}
-                      >
-                        {amenity}
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Special Features */}
-                {tags.length > 0 && (
+                
+                <div className="grid md:grid-cols-2 gap-8">
+                  {/* Property Type */}
                   <div>
-                    <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                      Special features that matter
-                    </Label>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      {tags.map((tag) => (
-                        <motion.div
-                          key={tag.value}
-                          whileHover={{ scale: 1.02 }}
-                          className={`p-2 rounded-lg border cursor-pointer text-xs text-center transition-all duration-200 ${
-                            preferences.tags.includes(tag.value)
-                              ? 'border-primary bg-primary/10 text-primary'
-                              : 'border-gray-200 bg-white hover:border-primary/50'
+                    <label className="block text-lg font-semibold text-gray-900 mb-4">
+                      Property Type <span className="text-red-500">*</span>
+                    </label>
+                    <div className="grid gap-3">
+                      {displayPropertyTypes.map((type) => (
+                        <button
+                          key={type.value}
+                          onClick={() => handlePreferenceChange('propertyType', type.value)}
+                          data-testid={`select-property-type-${type.value}`}
+                          className={`p-4 rounded-xl border-2 text-left transition-all duration-200 ${
+                            preferences.propertyType === type.value
+                              ? 'border-blue-600 bg-blue-50 text-blue-600'
+                              : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
                           }`}
-                          onClick={() => handleArrayToggle('tags', tag.value)}
-                          data-testid={`select-tag-${tag.value}`}
                         >
-                          {tag.label}
-                        </motion.div>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                              <Home className="w-5 h-5" />
+                              <span className="font-medium text-lg">{type.label}</span>
+                            </div>
+                            {preferences.propertyType === type.value && (
+                              <div className="w-3 h-3 bg-blue-600 rounded-full" />
+                            )}
+                          </div>
+                        </button>
                       ))}
                     </div>
                   </div>
+
+                  {/* Location Zone */}
+                  <div>
+                    <label className="block text-lg font-semibold text-gray-900 mb-4">
+                      Preferred Zone <span className="text-red-500">*</span>
+                    </label>
+                    <div className="grid gap-3">
+                      {displayZones.map((zone) => (
+                        <button
+                          key={zone}
+                          onClick={() => handlePreferenceChange('zone', zone)}
+                          data-testid={`select-zone-${zone}`}
+                          className={`p-4 rounded-xl border-2 text-left transition-all duration-200 ${
+                            preferences.zone === zone
+                              ? 'border-blue-600 bg-blue-50 text-blue-600'
+                              : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                              <MapPin className="w-5 h-5" />
+                              <span className="font-medium text-lg capitalize">{zone} Bengaluru</span>
+                            </div>
+                            {preferences.zone === zone && (
+                              <div className="w-3 h-3 bg-blue-600 rounded-full" />
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 2: Configuration & Budget */}
+              <div className="space-y-6 pt-8 border-t border-gray-100">
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Configuration & Budget</h2>
+                  <p className="text-gray-600">Select your preferred configuration and budget range</p>
+                </div>
+                
+                <div className="grid md:grid-cols-2 gap-8">
+                  {/* BHK Configuration */}
+                  <div>
+                    <label className="block text-lg font-semibold text-gray-900 mb-4">
+                      Configuration <span className="text-red-500">*</span>
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {bhkOptions.map((bhk) => (
+                        <button
+                          key={bhk}
+                          className={`p-4 rounded-xl border-2 text-center transition-all duration-200 ${
+                            preferences.bhkType.includes(bhk)
+                              ? 'border-blue-600 bg-blue-50 text-blue-600'
+                              : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                          }`}
+                          onClick={() => handleArrayToggle('bhkType', bhk)}
+                          data-testid={`select-bhk-${bhk.toLowerCase().replace('+', 'plus')}`}
+                        >
+                          <div className="flex items-center justify-center space-x-2">
+                            <Building2 className="w-4 h-4" />
+                            <span className="font-medium">{bhk}</span>
+                          </div>
+                          {preferences.bhkType.includes(bhk) && (
+                            <div className="w-2 h-2 bg-blue-600 rounded-full mx-auto mt-2" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-3 text-center">Select all that work for you</p>
+                  </div>
+
+                  {/* Budget Range */}
+                  <div>
+                    <label className="block text-lg font-semibold text-gray-900 mb-4">
+                      Budget Range
+                    </label>
+                    <div className="bg-gray-50 p-6 rounded-xl">
+                      <div className="mb-6">
+                        <Slider
+                          value={preferences.budgetRange}
+                          onValueChange={(value) => handlePreferenceChange('budgetRange', value)}
+                          max={1000}
+                          min={20}
+                          step={10}
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="flex justify-between text-sm text-gray-600 mb-4">
+                        <span>{formatBudget(preferences.budgetRange[0])}</span>
+                        <span>{formatBudget(preferences.budgetRange[1])}</span>
+                      </div>
+                      <div className="text-center">
+                        <div className="inline-flex items-center space-x-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full font-medium">
+                          <IndianRupee className="w-4 h-4" />
+                          <span>{formatBudget(preferences.budgetRange[0])} - {formatBudget(preferences.budgetRange[1])}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 3: Optional Preferences */}
+              <div className="space-y-6 pt-8 border-t border-gray-100">
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Additional Preferences</h2>
+                  <p className="text-gray-600">Tell us about amenities and features you'd love to have (optional)</p>
+                </div>
+                
+                <div className="space-y-6">
+                  {/* Amenities */}
+                  <div>
+                    <label className="block text-lg font-semibold text-gray-900 mb-4">
+                      Preferred Amenities
+                    </label>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {amenities.map((amenity) => (
+                        <button
+                          key={amenity}
+                          onClick={() => handleArrayToggle('amenities', amenity)}
+                          data-testid={`select-amenity-${amenity.toLowerCase().replace(/\s+/g, '-')}`}
+                          className={`p-3 rounded-xl border-2 text-center transition-all duration-200 ${
+                            preferences.amenities.includes(amenity)
+                              ? 'border-blue-600 bg-blue-50 text-blue-600'
+                              : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                          }`}
+                        >
+                          <div className="flex items-center justify-center space-x-2">
+                            <Sparkles className="w-4 h-4" />
+                            <span className="font-medium text-sm">{amenity}</span>
+                          </div>
+                          {preferences.amenities.includes(amenity) && (
+                            <div className="w-2 h-2 bg-blue-600 rounded-full mx-auto mt-2" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Special Features */}
+                  {tags.length > 0 && (
+                    <div>
+                      <label className="block text-lg font-semibold text-gray-900 mb-4">
+                        Special Features
+                      </label>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {tags.slice(0, 9).map((tag) => (
+                          <button
+                            key={tag.value}
+                            onClick={() => handleArrayToggle('tags', tag.value)}
+                            data-testid={`select-tag-${tag.value}`}
+                            className={`p-3 rounded-xl border-2 text-center transition-all duration-200 ${
+                              preferences.tags.includes(tag.value)
+                                ? 'border-blue-600 bg-blue-50 text-blue-600'
+                                : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                            }`}
+                          >
+                            <div className="flex items-center justify-center space-x-2">
+                              <Filter className="w-4 h-4" />
+                              <span className="font-medium text-sm">{tag.label}</span>
+                            </div>
+                            {preferences.tags.includes(tag.value) && (
+                              <div className="w-2 h-2 bg-blue-600 rounded-full mx-auto mt-2" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Search Button */}
+              <div className="text-center pt-8">
+                <Button
+                  onClick={handleSearch}
+                  disabled={!isFormValid()}
+                  className={`px-12 py-4 text-lg font-semibold rounded-2xl transition-all duration-200 ${
+                    isFormValid()
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                  data-testid="button-search-properties"
+                >
+                  <Search className="h-5 w-5 mr-3" />
+                  Find My Perfect Properties
+                  <Sparkles className="h-5 w-5 ml-3" />
+                </Button>
+                
+                {!isFormValid() && (
+                  <p className="text-sm text-red-500 mt-4">
+                    Please select property type, zone, and at least one configuration to continue
+                  </p>
                 )}
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Search Button */}
-          <div className="text-center">
-            <Button
-              onClick={handleSearch}
-              disabled={!isFormValid()}
-              size="lg"
-              className={`px-8 py-3 text-lg font-semibold rounded-xl transition-all duration-200 ${
-                isFormValid()
-                  ? 'bg-gradient-to-r from-primary to-primary/80 hover:shadow-lg text-white'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
-              data-testid="button-search-properties"
-            >
-              <Search className="h-5 w-5 mr-2" />
-              Find My Perfect Home
-              <Sparkles className="h-5 w-5 ml-2" />
-            </Button>
-            
-            {!isFormValid() && (
-              <p className="text-sm text-red-500 mt-2">
-                Please select property type, zone, and at least one configuration to continue
-              </p>
-            )}
+            </div>
           </div>
-        </motion.div>
-      </main>
+        </div>
+      </section>
     </div>
   );
 }
