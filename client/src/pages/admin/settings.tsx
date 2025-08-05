@@ -42,6 +42,7 @@ import AdminLayout from "@/components/layout/admin-layout";
 import { insertAppSettingsSchema, type AppSettings, type InsertAppSettings } from "@shared/schema";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ApiKeysSettings } from "@/components/settings/api-keys-settings";
+import GoogleAnalyticsSettings from "@/components/settings/GoogleAnalyticsSettings";
 import { Key } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
