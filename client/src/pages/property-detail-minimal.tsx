@@ -137,10 +137,14 @@ export default function PropertyDetailMinimal() {
   const handleCivilMepReport = async () => {
     if (!property) return;
     
+    // Generate short receipt ID (max 40 chars for Razorpay)
+    const shortId = Math.random().toString(36).substring(2, 8);
+    const receipt = `CM_${shortId}_${Date.now().toString().slice(-8)}`;
+    
     const success = await processPayment({
       amount: 249900, // ₹2,499 in paise
       currency: 'INR',
-      receipt: `civil_mep_${property.id}_${Date.now()}`,
+      receipt,
       notes: {
         reportType: 'civil-mep',
         propertyId: property.id,
@@ -166,10 +170,14 @@ export default function PropertyDetailMinimal() {
   const handleValuationReport = async () => {
     if (!property) return;
     
+    // Generate short receipt ID (max 40 chars for Razorpay)
+    const shortId = Math.random().toString(36).substring(2, 8);
+    const receipt = `VR_${shortId}_${Date.now().toString().slice(-8)}`;
+    
     const success = await processPayment({
       amount: 249900, // ₹2,499 in paise
       currency: 'INR',
-      receipt: `valuation_${property.id}_${Date.now()}`,
+      receipt,
       notes: {
         reportType: 'valuation',
         propertyId: property.id,  
