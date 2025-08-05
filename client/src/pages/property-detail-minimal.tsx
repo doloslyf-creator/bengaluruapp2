@@ -364,13 +364,38 @@ export default function PropertyDetailMinimal() {
           </div>
         </div>
 
-        {/* Configuration Cards */}
+        {/* Property Video Section */}
+        {property.youtubeVideoUrl && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Play className="h-5 w-5 mr-2" />
+                Property Walkthrough & Review
+              </CardTitle>
+              <p className="text-gray-600">Expert review and virtual tour of the property</p>
+            </CardHeader>
+            <CardContent>
+              <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
+                <iframe 
+                  src={`https://www.youtube.com/embed/${property.youtubeVideoUrl.split('v=')[1]?.split('&')[0]}`}
+                  className="w-full h-full"
+                  allowFullScreen
+                  title="Property Walkthrough Video"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Enhanced Configuration Cards */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle>Available Configurations</CardTitle>
+            <p className="text-gray-600">Select a configuration to view detailed information</p>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Configuration Selection Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
               {property.configurations.map((config, index) => (
                 <div 
                   key={index} 
@@ -409,6 +434,116 @@ export default function PropertyDetailMinimal() {
                 </div>
               ))}
             </div>
+
+            {/* Selected Configuration Details */}
+            {selectedConfig && (
+              <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
+                <h3 className="text-xl font-bold text-blue-900 mb-4">
+                  {selectedConfig.configuration} - Detailed Information
+                </h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {/* Pricing Details */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-blue-800">Pricing Breakdown</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">Built-up Area</span>
+                        <span className="font-medium">{selectedConfig.builtUpArea} sq ft</span>
+                      </div>
+                      {selectedConfig.plotSize && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">Plot Size</span>
+                          <span className="font-medium">{selectedConfig.plotSize} sq ft</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">Rate per sq ft</span>
+                        <span className="font-medium">₹{Number(selectedConfig.pricePerSqft).toLocaleString()}</span>
+                      </div>
+                      <Separator />
+                      <div className="flex justify-between">
+                        <span className="text-blue-800 font-semibold">Base Price</span>
+                        <span className="font-bold text-blue-600">{formatPriceDisplay(selectedConfig.price)}</span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-600">
+                        <span>Additional charges may apply</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Availability */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-blue-800">Availability Status</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">Status</span>
+                        <Badge variant={selectedConfig.availabilityStatus === 'available' ? 'default' : 
+                                       selectedConfig.availabilityStatus === 'limited' ? 'secondary' : 'destructive'}>
+                          {selectedConfig.availabilityStatus}
+                        </Badge>
+                      </div>
+                      {selectedConfig.totalUnits && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">Total Units</span>
+                          <span className="font-medium">{selectedConfig.totalUnits}</span>
+                        </div>
+                      )}
+                      {selectedConfig.availableUnits && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">Available</span>
+                          <span className="font-medium text-green-600">{selectedConfig.availableUnits} units left</span>
+                        </div>
+                      )}
+                      {selectedConfig.availabilityStatus === 'limited' && (
+                        <div className="bg-yellow-100 p-2 rounded text-xs text-yellow-800">
+                          ⚡ Limited availability - High demand configuration
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Investment Analysis */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-blue-800">Investment Insights</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">EMI (20 years)</span>
+                        <span className="font-medium">₹{Math.round(selectedConfig.price * 0.008).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">Expected Rental</span>
+                        <span className="font-medium">₹{Math.round(selectedConfig.price * 0.003).toLocaleString()}/month</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">Rental Yield</span>
+                        <span className="font-medium text-green-600">3.6% annually</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">5-year Appreciation</span>
+                        <span className="font-medium text-green-600">+45-65%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Actions for Selected Config */}
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <Button onClick={handleBookVisit} className="flex-1 min-w-48">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Book Site Visit for {selectedConfig.configuration}
+                  </Button>
+                  <Button variant="outline" onClick={handleConsult} className="flex-1 min-w-48">
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Get Expert Advice
+                  </Button>
+                  <Button variant="outline" className="flex-1 min-w-48">
+                    <Download className="h-4 w-4 mr-2" />
+                    Download Brochure
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -487,7 +622,7 @@ export default function PropertyDetailMinimal() {
                   <div className="space-y-3 mb-4">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Market Value</span>
-                      <span className="font-semibold">₹{((Number(selectedConfig?.pricePerSqft) || 8500) * (Number(selectedConfig?.builtUpArea) || 1200)).toLocaleString()}</span>
+                      <span className="font-semibold">₹{selectedConfig ? ((Number(selectedConfig.pricePerSqft) * Number(selectedConfig.builtUpArea))).toLocaleString() : '1,02,00,000'}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Location Premium</span>
@@ -620,7 +755,9 @@ export default function PropertyDetailMinimal() {
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
             <div className="font-semibold">{property.name}</div>
-            <div className="text-sm text-gray-600">{getPriceRange()}</div>
+            <div className="text-sm text-gray-600">
+              {selectedConfig ? `${selectedConfig.configuration} - ${formatPriceDisplay(selectedConfig.price)}` : getPriceRange()}
+            </div>
           </div>
           <div className="flex space-x-3">
             <Button variant="outline" onClick={handleConsult}>
@@ -629,7 +766,7 @@ export default function PropertyDetailMinimal() {
             </Button>
             <Button onClick={handleBookVisit}>
               <Calendar className="h-4 w-4 mr-2" />
-              Book Site Visit
+              {selectedConfig ? `Book Visit - ${selectedConfig.configuration}` : 'Book Site Visit'}
             </Button>
           </div>
         </div>
