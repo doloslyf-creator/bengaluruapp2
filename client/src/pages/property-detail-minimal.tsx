@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { usePayment } from '@/hooks/use-payment';
 import { updateMetaTags, generatePropertySchema, generatePropertySlug, injectSchema } from '@/utils/seo';
 import OrderFormDialog from '@/components/order-form-dialog';
+import { ExpertCredentials } from '@/components/expert-credentials';
 
 interface Property {
   id: string;
@@ -1083,6 +1084,11 @@ export default function PropertyDetailMinimal() {
                   <p className="text-xs text-yellow-800">Civil & MEP analysis could save ₹2-5 lakhs in unexpected repairs</p>
                 </div>
 
+                {/* Expert Credentials for Civil & MEP */}
+                <div className="mb-4">
+                  <ExpertCredentials reportType="civil-mep" compact={true} />
+                </div>
+
                 <Button 
                   className="w-full" 
                   size="sm"
@@ -1160,6 +1166,11 @@ export default function PropertyDetailMinimal() {
                   <p className="text-xs text-blue-800">Professional valuation prevents overpaying by 10-15% on average</p>
                 </div>
 
+                {/* Expert Credentials for Valuation */}
+                <div className="mb-4">
+                  <ExpertCredentials reportType="valuation" compact={true} />
+                </div>
+
                 <Button 
                   className="w-full" 
                   size="sm"
@@ -1167,7 +1178,7 @@ export default function PropertyDetailMinimal() {
                   disabled={isProcessing}
                 >
                   <Lock className="h-4 w-4 mr-2" />
-                  {isProcessing ? 'Processing...' : 'Get Full Valuation Report - ₹2,499'}
+                  {isProcessing ? 'Processing...' : 'Get Full Valuation Report - ₹1,499'}
                 </Button>
               </CardContent>
             </Card>

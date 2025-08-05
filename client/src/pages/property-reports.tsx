@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/layout/header";
+import { ExpertCredentials } from "@/components/expert-credentials";
 import Footer from "@/components/layout/footer";
 import OrderFormDialog from "@/components/order-form-dialog";
 import { usePayment } from "@/hooks/use-payment";
@@ -210,12 +211,15 @@ function PropertyReportCard({ property, onOrderReport }: PropertyReportCardProps
                 </p>
               </div>
 
+              {/* Expert Credentials for Valuation */}
+              <ExpertCredentials reportType="valuation" compact={true} />
+
               <Button 
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white h-14 text-lg font-medium"
                 onClick={() => onOrderReport(property, "valuation")}
               >
                 <Shield className="w-5 h-5 mr-3" />
-                Get Complete Valuation Report - ₹2,499
+                Get Complete Valuation Report - ₹1,499
               </Button>
             </TabsContent>
 
@@ -282,6 +286,9 @@ function PropertyReportCard({ property, onOrderReport }: PropertyReportCardProps
                   Engineering analysis prevents costly structural issues post-purchase
                 </p>
               </div>
+
+              {/* Expert Credentials for Civil MEP */}
+              <ExpertCredentials reportType="civil-mep" compact={true} />
 
               <Button 
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white h-14 text-lg font-medium"
