@@ -80,7 +80,7 @@ function PropertyReportCard({ property, onOrderReport }: PropertyReportCardProps
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
       {/* Property Image */}
-      <div className="h-48 bg-gradient-to-r from-blue-500 to-purple-500 relative">
+      <div className="h-48 bg-gray-100 relative">
         {property.images && property.images.length > 0 ? (
           <img 
             src={property.images[0]} 
@@ -89,7 +89,7 @@ function PropertyReportCard({ property, onOrderReport }: PropertyReportCardProps
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <Building2 className="w-16 h-16 text-white/80" />
+            <Building2 className="w-16 h-16 text-gray-400" />
           </div>
         )}
         
@@ -135,11 +135,11 @@ function PropertyReportCard({ property, onOrderReport }: PropertyReportCardProps
                 value="valuation" 
                 className="text-sm font-medium data-[state=active]:bg-blue-600 data-[state=active]:text-white"
               >
-                Property Valuation Report
+                Property Valuation
               </TabsTrigger>
               <TabsTrigger 
                 value="civil-mep"
-                className="text-sm font-medium data-[state=active]:bg-purple-600 data-[state=active]:text-white"
+                className="text-sm font-medium data-[state=active]:bg-blue-600 data-[state=active]:text-white"
               >
                 Civil MEP Analysis
               </TabsTrigger>
@@ -270,14 +270,14 @@ function PropertyReportCard({ property, onOrderReport }: PropertyReportCardProps
                 </div>
               </div>
 
-              <div className="bg-purple-50 p-3 rounded-lg">
-                <p className="text-purple-700 text-sm font-medium">
+              <div className="bg-blue-50 p-3 rounded-lg">
+                <p className="text-blue-700 text-sm font-medium">
                   Engineering analysis prevents costly structural issues post-purchase
                 </p>
               </div>
 
               <Button 
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white h-12"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12"
                 onClick={() => onOrderReport(property, "civil-mep")}
               >
                 <TrendingUp className="w-4 h-4 mr-2" />
@@ -447,27 +447,27 @@ export default function PropertyReports() {
     <div className="min-h-screen bg-gray-50">
       <Header />
       
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+      {/* Simple Header */}
+      <section className="bg-white py-12 border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Property Reports Hub
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Property Reports
             </h1>
-            <p className="text-xl md:text-2xl mb-8 opacity-90">
-              Professional Property Valuation & Civil+MEP Engineering Reports
+            <p className="text-lg text-gray-600 mb-6">
+              Get professional property valuation and civil engineering reports
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-lg">
+            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-700">
               <div className="flex items-center">
-                <CheckCircle className="w-6 h-6 mr-2" />
-                <span>Independent & Unbiased</span>
+                <CheckCircle className="w-4 h-4 mr-2 text-green-600" />
+                <span>Independent Analysis</span>
               </div>
               <div className="flex items-center">
-                <CheckCircle className="w-6 h-6 mr-2" />
+                <CheckCircle className="w-4 h-4 mr-2 text-green-600" />
                 <span>Engineer Certified</span>
               </div>
               <div className="flex items-center">
-                <CheckCircle className="w-6 h-6 mr-2" />
+                <CheckCircle className="w-4 h-4 mr-2 text-green-600" />
                 <span>48-Hour Delivery</span>
               </div>
             </div>
