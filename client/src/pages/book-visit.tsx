@@ -54,7 +54,7 @@ export default function BookVisit() {
         customerName: data.name,
         customerPhone: data.phone,
         customerEmail: data.email,
-        propertyId: property.id,
+        propertyId: property.id || "c570cacc-7cbf-4ae7-840c-20cc5ca46117", // Use default property if none selected
         visitType: data.visitType,
         preferredDate: data.preferredDate,
         preferredTime: data.preferredTime,
@@ -63,13 +63,26 @@ export default function BookVisit() {
         source: "website",
       };
       
-      return apiRequest("/api/bookings", {
+      console.log("Submitting booking data:", bookingData);
+      
+      const response = await fetch("/api/bookings", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(bookingData),
       });
+      
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`Booking failed: ${error}`);
+      }
+      
+      return response.json();
     },
-    onSuccess: (data) => {
-      setBookingId(data.bookingId || `BK${Date.now()}`);
+    onSuccess: (data: any) => {
+      console.log("Booking response:", data);
+      setBookingId(data.bookingId || data.booking?.id || `BK${Date.now()}`);
       setBookingComplete(true);
       toast({
         title: "Booking Confirmed!",
