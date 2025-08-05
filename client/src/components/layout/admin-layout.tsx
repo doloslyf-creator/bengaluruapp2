@@ -71,12 +71,7 @@ const singleNavigation: NavigationItem[] = [
     icon: ShoppingCart,
     description: "Order Management"
   },
-  { 
-    name: "Notifications", 
-    href: "/admin-panel/notifications", 
-    icon: Bell,
-    description: "Notification Management"
-  },
+
   { 
     name: "RERA Management", 
     href: "/admin-panel/rera-management", 
