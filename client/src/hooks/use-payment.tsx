@@ -60,22 +60,22 @@ export function usePayment() {
     mutationFn: async (orderData: CreateOrderData & { reportType?: string; propertyId?: string; customerName?: string; customerEmail?: string; customerPhone?: string }): Promise<RazorpayOrder> => {
       // If it's a report payment, use the specific reports endpoint
       if (orderData.reportType && orderData.propertyId) {
-        return apiRequest('/api/payments/reports/create-order', {
-          method: 'POST',
-          body: JSON.stringify({
+        const response = await apiRequest(
+          'POST',
+          '/api/payments/reports/create-order',
+          {
             propertyId: orderData.propertyId,
             reportType: orderData.reportType,
             customerName: orderData.customerName || 'Customer Name',
             customerEmail: orderData.customerEmail || 'customer@example.com',
             customerPhone: orderData.customerPhone || '',
-          }),
-        });
+          }
+        );
+        return await response.json();
       }
       
-      return apiRequest('/api/payments/create-order', {
-        method: 'POST',
-        body: JSON.stringify(orderData),
-      });
+      const response = await apiRequest('POST', '/api/payments/create-order', orderData);
+      return await response.json();
     },
     onError: (error: any) => {
       toast({
@@ -90,16 +90,12 @@ export function usePayment() {
     mutationFn: async (verificationData: PaymentVerificationData & { reportType?: string; propertyId?: string; customerName?: string; customerEmail?: string; customerPhone?: string }) => {
       // If it's a report payment, verify with additional data
       if (verificationData.reportType && verificationData.propertyId) {
-        return apiRequest('/api/payments/reports/verify', {
-          method: 'POST',
-          body: JSON.stringify(verificationData),
-        });
+        const response = await apiRequest('POST', '/api/payments/reports/verify', verificationData);
+        return await response.json();
       }
       
-      return apiRequest('/api/payments/verify', {
-        method: 'POST',
-        body: JSON.stringify(verificationData),
-      });
+      const response = await apiRequest('POST', '/api/payments/verify', verificationData);
+      return await response.json();
     },
     onSuccess: () => {
       toast({
@@ -144,12 +140,20 @@ export function usePayment() {
         throw new Error('Failed to load Razorpay SDK');
       }
 
+      // Fetch Razorpay key from backend
+      const settingsResponse = await apiRequest('GET', '/api/settings/api-keys');
+      const settings = await settingsResponse.json();
+      
+      if (!settings.razorpayKeyId) {
+        throw new Error('Razorpay key not configured');
+      }
+
       // Create order
       const order = await createOrderMutation.mutateAsync(orderData);
 
       // Setup Razorpay options
       const razorpayOptions: RazorpayOptions = {
-        key: process.env.VITE_RAZORPAY_KEY_ID || '',
+        key: settings.razorpayKeyId,
         amount: order.amount,
         currency: order.currency,
         name: 'OwnItRight',
