@@ -23,8 +23,7 @@ import DevelopersView from "@/pages/admin/developers-view";
 import DevelopersAdd from "@/pages/admin/developers-add";
 
 
-import LegalDueDiligencePage from "@/pages/legal-due-diligence";
-import LegalDueDiligenceForm from "@/pages/legal-due-diligence-form";
+
 import Contact from "@/pages/contact";
 import ContactThankYou from "@/pages/contact-thank-you";
 import Orders from "@/pages/admin/orders";
@@ -33,8 +32,7 @@ import Customers from "@/pages/admin/customers";
 import PropertyEdit from "@/pages/property-edit";
 import PropertyDetailMinimal from "@/pages/property-detail-minimal";
 import FindProperty from "@/pages/find-property";
-import PropertyValuation from "@/pages/property-valuation";
-import PropertyValuationForm from "@/pages/property-valuation-form";
+
 import PropertyResults from "@/pages/property-results";
 import BookVisit from "@/pages/book-visit";
 import Consultation from "@/pages/consultation";
@@ -62,8 +60,7 @@ import BackupSystem from "@/pages/admin/backup-system";
 import { AdminCivilMepReports } from "@/pages/admin-civil-mep-reports";
 import { AdminCivilMepReportsCreate } from "@/pages/admin-civil-mep-reports-create";
 import { CivilMepReportView } from "@/pages/civil-mep-report-view";
-import CivilMepReports from "@/pages/civil-mep-reports";
-import CivilMepReportsLanding from "@/pages/civil-mep-reports-landing";
+
 import Reports from "@/pages/reports";
 import ValuationReportsPage from "@/pages/admin/valuation-reports";
 import ValuationReportEdit from "@/pages/admin/valuation-report-edit-comprehensive";
@@ -74,7 +71,7 @@ import SetupWizard from "@/pages/setup-wizard";
 import PrivacyPolicy from "@/pages/privacy-policy";
 import TermsOfUse from "@/pages/terms-of-use";
 import RefundPolicy from "@/pages/refund-policy";
-import Services from "@/pages/services";
+
 import PropertiesLocation from "@/pages/properties-location";
 import NotFound from "@/pages/not-found";
 
@@ -128,8 +125,6 @@ function ProtectedRouter() {
       <Route path="/admin-panel/civil-mep-reports/create" component={AdminCivilMepReportsCreate} />
       <Route path="/admin-panel/civil-mep-reports/:id/edit" component={AdminCivilMepReportsCreate} />
       <Route path="/admin/civil-mep-reports/:id/edit" component={AdminCivilMepReportsCreate} />
-      <Route path="/civil-mep-assessment" component={CivilMepReportsLanding} />
-      <Route path="/civil-mep-reports" component={CivilMepReports} />
       <Route path="/civil-mep-report/:id" component={CivilMepReportView} />
       <Route path="/admin-panel/valuation-reports" component={ValuationReportsPage} />
       <Route path="/admin-panel/valuation-reports/create" component={ValuationReportsCreate} />
@@ -160,11 +155,7 @@ function ProtectedRouter() {
       <Route path="/property-results" component={PropertyResults} />
       <Route path="/property/:id" component={PropertyDetailMinimal} />
       <Route path="/property/:id/:slug" component={PropertyDetailMinimal} />
-      <Route path="/property-valuation" component={PropertyValuation} />
-      <Route path="/property-valuation-form" component={PropertyValuationForm} />
 
-      <Route path="/legal-due-diligence" component={LegalDueDiligencePage} />
-      <Route path="/legal-due-diligence-form" component={LegalDueDiligenceForm} />
       <Route path="/contact" component={Contact} />
       <Route path="/contact/thank-you" component={ContactThankYou} />
       <Route path="/book-visit" component={BookVisit} />
@@ -181,7 +172,6 @@ function ProtectedRouter() {
       <Route path="/first-time-buyer" component={FirstTimeBuyerOnboarding} />
 
       {/* Services */}
-      <Route path="/services" component={Services} />
       <Route path="/reports" component={Reports} />
       
       {/* Properties by Location */}

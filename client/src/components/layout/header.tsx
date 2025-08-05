@@ -17,8 +17,9 @@ import {
   X,
   MapPin,
   TrendingUp,
-
-  UserCircle
+  UserCircle,
+  MessageCircle,
+  Calendar
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -53,18 +54,11 @@ export default function Header() {
   const navigation = [
     { name: "Home", href: "/", icon: Home },
     { name: "Find Property", href: "/find-property", icon: Search },
-    { name: "Services", href: "/services", icon: TrendingUp, hasDropdown: true },
+    { name: "Reports", href: "/reports", icon: FileText },
+    { name: "Consultation", href: "/consultation", icon: MessageCircle },
+    { name: "Book Visit", href: "/book-visit", icon: Calendar },
     { name: "About Us", href: "/about", icon: UserCircle },
-
     { name: "Contact", href: "/contact", icon: Phone },
-  ];
-
-  const services = [
-    { name: "All Reports", href: "/reports", description: "Comprehensive property reports hub" },
-    { name: "Property Valuation", href: "/property-valuation", description: "Professional property assessment" },
-    { name: "CIVIL+MEP Reports", href: "/civil-mep-reports", description: "Engineering analysis reports" },
-    { name: "Legal Due Diligence", href: "/legal-due-diligence", description: "Complete legal verification" },
-    { name: "Site Visit Booking", href: "/book-visit", description: "Schedule property visits" },
   ];
 
   const adminLinks = [
@@ -112,43 +106,16 @@ export default function Header() {
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-1">
               {navigation.map((item) => (
-                <div key={item.name} className="relative">
-                  {item.hasDropdown ? (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          className={`px-4 py-2 text-sm font-medium transition-colors hover:text-primary hover:bg-primary/5 ${
-                            isActive(item.href) ? "text-primary bg-primary/10" : "text-gray-700"
-                          }`}
-                        >
-                          {item.name}
-                          <ChevronDown className="h-3 w-3 ml-1" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="w-64">
-                        {services.map((service) => (
-                          <DropdownMenuItem key={service.name} asChild>
-                            <Link href={service.href} className="flex flex-col items-start">
-                              <span className="font-medium">{service.name}</span>
-                              <span className="text-xs text-gray-500">{service.description}</span>
-                            </Link>
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  ) : (
-                    <Button 
-                      asChild 
-                      variant="ghost" 
-                      className={`px-4 py-2 text-sm font-medium transition-colors hover:text-primary hover:bg-primary/5 ${
-                        isActive(item.href) ? "text-primary bg-primary/10" : "text-gray-700"
-                      }`}
-                    >
-                      <Link href={item.href}>{item.name}</Link>
-                    </Button>
-                  )}
-                </div>
+                <Button 
+                  key={item.name}
+                  asChild 
+                  variant="ghost" 
+                  className={`px-4 py-2 text-sm font-medium transition-colors hover:text-primary hover:bg-primary/5 ${
+                    isActive(item.href) ? "text-primary bg-primary/10" : "text-gray-700"
+                  }`}
+                >
+                  <Link href={item.href}>{item.name}</Link>
+                </Button>
               ))}
             </nav>
 
@@ -227,35 +194,19 @@ export default function Header() {
                     {/* Mobile Navigation */}
                     <div className="flex-1 px-6 py-4 space-y-1">
                       {navigation.map((item) => (
-                        <div key={item.name}>
-                          <Link
-                            href={item.href}
-                            className={`flex items-center space-x-3 px-3 py-3 text-base font-medium rounded-lg transition-colors ${
-                              isActive(item.href)
-                                ? "text-primary bg-primary/10"
-                                : "text-gray-700 hover:text-primary hover:bg-gray-50"
-                            }`}
-                            onClick={() => setIsOpen(false)}
-                          >
-                            <item.icon className="h-5 w-5" />
-                            <span>{item.name}</span>
-                          </Link>
-                          
-                          {item.hasDropdown && (
-                            <div className="ml-8 mt-2 space-y-1">
-                              {services.map((service) => (
-                                <Link
-                                  key={service.name}
-                                  href={service.href}
-                                  className="block px-3 py-2 text-sm text-gray-600 hover:text-primary hover:bg-gray-50 rounded-md"
-                                  onClick={() => setIsOpen(false)}
-                                >
-                                  {service.name}
-                                </Link>
-                              ))}
-                            </div>
-                          )}
-                        </div>
+                        <Link
+                          key={item.name}
+                          href={item.href}
+                          className={`flex items-center space-x-3 px-3 py-3 text-base font-medium rounded-lg transition-colors ${
+                            isActive(item.href)
+                              ? "text-primary bg-primary/10"
+                              : "text-gray-700 hover:text-primary hover:bg-gray-50"
+                          }`}
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <item.icon className="h-5 w-5" />
+                          <span>{item.name}</span>
+                        </Link>
                       ))}
                     </div>
 
