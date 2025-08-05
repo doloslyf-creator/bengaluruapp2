@@ -54,11 +54,9 @@ export default function CustomerHome() {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-      
-
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-20">
+      <section className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 pt-16 pb-20">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div 
             className="text-center max-w-4xl mx-auto"
@@ -70,7 +68,7 @@ export default function CustomerHome() {
               🎉 Save 30-50% on property investment mistakes with expert guidance
             </Badge>
             
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
               Never overpay for{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-600">
                 property investments
@@ -102,17 +100,6 @@ export default function CustomerHome() {
               >
                 <Search className="h-5 w-5 mr-2" />
                 Find Your Perfect Home
-              </Button>
-              
-              <Button
-                onClick={() => navigate('/contact')}
-                variant="outline"
-                size="lg"
-                className="px-8 py-4 text-lg font-semibold rounded-xl border-2"
-                data-testid="button-get-consultation"
-              >
-                <Calendar className="h-5 w-5 mr-2" />
-                Get Free Consultation →
               </Button>
             </div>
 
