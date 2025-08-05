@@ -63,6 +63,7 @@ import { AdminCivilMepReportsCreate } from "@/pages/admin-civil-mep-reports-crea
 import { CivilMepReportView } from "@/pages/civil-mep-report-view";
 import AdminLegalAuditReports from "@/pages/admin/legal-audit-reports";
 import AdminLegalAuditReportsCreate from "@/pages/admin/legal-audit-reports-create";
+import { LegalAuditReportView } from "@/pages/legal-audit-report-view";
 import AdminCities from "@/pages/admin/cities";
 import AdminCitiesCreate from "@/pages/admin/cities-create";
 
@@ -141,6 +142,7 @@ function ProtectedRouter() {
       <Route path="/admin-panel/legal-audit-reports" component={AdminLegalAuditReports} />
       <Route path="/admin-panel/legal-audit-reports/create" component={AdminLegalAuditReportsCreate} />
       <Route path="/admin-panel/legal-audit-reports/:id/edit" component={AdminLegalAuditReportsCreate} />
+      <Route path="/legal-audit-report/:id" component={LegalAuditReportView} />
       <Route path="/admin-panel/valuation-reports" component={ValuationReportsPage} />
       <Route path="/admin-panel/valuation-reports/create" component={ValuationReportsCreate} />
       <Route path="/admin-panel/valuation-reports/create-comprehensive" component={ValuationReportsCreateComprehensive} />
