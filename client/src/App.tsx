@@ -154,6 +154,7 @@ function ProtectedRouter() {
       <Route path="/find-property" component={FindProperty} />
       <Route path="/find-property/results" component={PropertyResults} />
       <Route path="/property/:id" component={PropertyDetailMinimal} />
+      <Route path="/property/:id/:slug" component={PropertyDetailMinimal} />
       <Route path="/property-valuation" component={PropertyValuation} />
       <Route path="/property-valuation-form" component={PropertyValuationForm} />
 

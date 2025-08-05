@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
-import { updateMetaTags, generateBreadcrumbSchema, injectSchema } from '@/utils/seo';
+import { updateMetaTags, generateBreadcrumbSchema, generateSlug, injectSchema } from '@/utils/seo';
 import { MapPin, Building, TrendingUp, Star, ArrowRight } from 'lucide-react';
 
 interface Property {
@@ -217,7 +217,7 @@ export default function PropertiesLocation() {
                         </div>
                         
                         <Button asChild className="w-full">
-                          <Link href={`/property/${property.id}`}>
+                          <Link href={`/property/${property.id}/${generateSlug(property.name)}`}>
                             View Details
                             <ArrowRight className="h-4 w-4 ml-2" />
                           </Link>

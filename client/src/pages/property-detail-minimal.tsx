@@ -464,7 +464,7 @@ export default function PropertyDetailMinimal() {
     };
 
     return (
-      <Link href={`/property/${prop.id}`} className="block group">
+      <Link href={`/property/${prop.id}/${generateSlug(prop.name)}`} className="block group">
         <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 group-hover:scale-105">
           <div className="relative">
             {prop.images?.[0] ? (
