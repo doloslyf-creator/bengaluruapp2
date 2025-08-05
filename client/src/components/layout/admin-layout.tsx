@@ -9,7 +9,7 @@ import {
   FileText, 
   Building2, 
   UserCheck,
-  PenTool,
+
   Settings,
   ArrowLeft,
   ShoppingCart,
@@ -64,12 +64,7 @@ const singleNavigation: NavigationItem[] = [
     icon: Home,
     description: "Overview & Analytics"
   },
-  { 
-    name: "Blog", 
-    href: "/admin-panel/blog", 
-    icon: PenTool,
-    description: "Content Management"
-  },
+
   { 
     name: "Orders", 
     href: "/admin-panel/orders", 

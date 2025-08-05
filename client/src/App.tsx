@@ -21,7 +21,7 @@ import ZonesAdd from "@/pages/admin/zones-add";
 import AdminDevelopers from "@/pages/admin/developers";
 import DevelopersView from "@/pages/admin/developers-view";
 import DevelopersAdd from "@/pages/admin/developers-add";
-import BlogManagement from "@/pages/admin/blog";
+
 
 import LegalDueDiligencePage from "@/pages/legal-due-diligence";
 import LegalDueDiligenceForm from "@/pages/legal-due-diligence-form";
@@ -115,7 +115,7 @@ function ProtectedRouter() {
       <Route path="/admin-panel/zones" component={AdminZones} />
       <Route path="/admin-panel/zones/view" component={ZonesView} />
       <Route path="/admin-panel/zones/add" component={ZonesAdd} />
-      <Route path="/admin-panel/blog" component={BlogManagement} />
+
 
       <Route path="/admin-panel/orders" component={Orders} />
       <Route path="/admin-panel/customers" component={Customers} />

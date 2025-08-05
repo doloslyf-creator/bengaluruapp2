@@ -106,7 +106,7 @@ function SystemMonitoringTab() {
               </div>
               <div className="mt-2">
                 <span className="text-2xl font-bold text-purple-800 dark:text-purple-200">
-                  {propertiesStats?.totalProperties || 0}
+                  {(propertiesStats as any)?.totalProperties || 0}
                 </span>
                 <p className="text-sm text-purple-600 dark:text-purple-400">Active listings</p>
               </div>
@@ -119,7 +119,7 @@ function SystemMonitoringTab() {
               </div>
               <div className="mt-2">
                 <span className="text-2xl font-bold text-orange-800 dark:text-orange-200">
-                  {backups?.length || 0}
+                  {(backups as any)?.length || 0}
                 </span>
                 <p className="text-sm text-orange-600 dark:text-orange-400">Total backups</p>
               </div>
@@ -343,8 +343,8 @@ function BackupManagementTab() {
               </div>
             ) : (
               <div className="space-y-2">
-                {backups && backups.length > 0 ? (
-                  backups.map((backup: any) => (
+                {backups && (backups as any).length > 0 ? (
+                  (backups as any).map((backup: any) => (
                     <div key={backup.id} className="flex items-center justify-between p-4 border rounded-lg">
                       <div className="flex items-center space-x-4">
                         <div className="flex items-center space-x-2">

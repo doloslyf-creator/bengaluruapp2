@@ -18,7 +18,7 @@ const db = drizzle(pool);
 const leadTable = leads;
 const bookingTable = bookings;
 import { z } from "zod";
-import { getBlogPosts, getBlogPost, createBlogPost, updateBlogPost, deleteBlogPost } from "./blog";
+
 import { reraService } from "./reraService";
 import { paymentService, apiKeysManager } from "./paymentService";
 import { supabaseMigration } from "./supabaseMigration";
@@ -740,12 +740,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all bookings (for admin review)
   // GET /api/bookings route handled by registerBookingRoutes in bookingRoutes.ts
 
-  // Blog management routes
-  app.get("/api/blog", getBlogPosts);
-  app.get("/api/blog/:id", getBlogPost);
-  app.post("/api/blog", createBlogPost);
-  app.patch("/api/blog/:id", updateBlogPost);
-  app.delete("/api/blog/:id", deleteBlogPost);
+
 
 
 

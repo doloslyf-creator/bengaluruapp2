@@ -268,39 +268,7 @@ export const reportPayments = pgTable("report_payments", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Blog posts table for content management
-export const blogPosts = pgTable("blog_posts", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  title: text("title").notNull(),
-  slug: text("slug").notNull().unique(),
-  excerpt: text("excerpt"),
-  content: text("content").notNull(),
-  
-  // SEO and metadata
-  metaTitle: text("meta_title"),
-  metaDescription: text("meta_description"),
-  tags: json("tags").$type<string[]>().notNull().default([]),
-  category: varchar("category", { enum: ["market-insights", "property-guide", "investment-tips", "legal-updates", "company-news"] }).notNull(),
-  
-  // Publishing
-  status: varchar("status", { enum: ["draft", "published", "archived"] }).notNull().default("draft"),
-  publishedAt: timestamp("published_at"),
-  
-  // Content media
-  featuredImage: text("featured_image"),
-  images: json("images").$type<string[]>().notNull().default([]),
-  
-  // Author and attribution
-  author: text("author").notNull(),
-  
-  // Engagement metrics
-  readingTime: integer("reading_time").default(5), // estimated reading time in minutes
-  views: integer("views").default(0),
-  
-  // Timestamps
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+
 
 // Property configurations table for multiple unit types per project
 export const propertyConfigurations = pgTable("property_configurations", {
@@ -688,15 +656,7 @@ export type PropertyStats = {
   avgPrice: number;
 };
 
-// Blog schemas
-export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
 
-export type BlogPost = typeof blogPosts.$inferSelect;
-export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
 
 // Customer notes for CRM
 export const customerNotes = pgTable("customer_notes", {

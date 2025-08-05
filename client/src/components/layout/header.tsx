@@ -17,7 +17,7 @@ import {
   X,
   MapPin,
   TrendingUp,
-  BookOpen,
+
   UserCircle
 } from "lucide-react";
 import {
@@ -55,7 +55,7 @@ export default function Header() {
     { name: "Find Property", href: "/find-property", icon: Search },
     { name: "Services", href: "/services", icon: TrendingUp, hasDropdown: true },
     { name: "About Us", href: "/about", icon: UserCircle },
-    { name: "Insights", href: "/blog", icon: BookOpen },
+
     { name: "Contact", href: "/contact", icon: Phone },
   ];
 
@@ -72,7 +72,7 @@ export default function Header() {
     { name: "Leads Management", href: "/admin-panel/leads", icon: UserCircle },
     { name: "CIVIL+MEP Reports", href: "/admin-panel/civil-mep-reports", icon: FileText },
     { name: "Orders & Revenue", href: "/admin-panel/orders", icon: TrendingUp },
-    { name: "Blog Management", href: "/admin-panel/blog", icon: BookOpen },
+
   ];
 
   const isActive = (href: string) => {
