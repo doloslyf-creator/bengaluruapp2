@@ -982,7 +982,7 @@ export const siteVisitBookings = pgTable("site_visit_bookings", {
   
   // Property Information
   propertyId: varchar("property_id").notNull().references(() => properties.id),
-  configurationId: varchar("configuration_id").references(() => propertyConfigurations.id),
+  // configurationId: varchar("configuration_id").references(() => propertyConfigurations.id), // Optional field, removed from actual DB
   
   // Visit Details
   visitType: varchar("visit_type", { enum: ["site-visit", "virtual-tour", "model-unit"] }).notNull().default("site-visit"),

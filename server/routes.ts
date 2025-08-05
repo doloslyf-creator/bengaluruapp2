@@ -408,72 +408,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Customer-facing booking routes with lead management
-  app.post("/api/bookings", async (req, res) => {
-    try {
-      const bookingData = {
-        ...req.body,
-        bookingId: `BK${Date.now()}${Math.floor(Math.random() * 1000)}`,
-        bookingType: "site-visit"
-      };
-      
-      const validatedData = insertBookingSchema.parse(bookingData);
-      const booking = await storage.createBooking(validatedData);
-      
-      console.log("📅 New booking request:", booking);
-      
-      // Automatically create a lead from the booking
-      const leadId = `LD${Date.now()}${Math.floor(Math.random() * 1000)}`;
-      const lead = await storage.createLead({
-        leadId,
-        source: "site-visit",
-        customerName: booking.name,
-        phone: booking.phone,
-        email: booking.email,
-        propertyName: booking.propertyName,
-        propertyId: booking.propertyId,
-        leadDetails: {
-          visitType: booking.visitType,
-          numberOfVisitors: booking.numberOfVisitors,
-          preferredDate: booking.preferredDate,
-          preferredTime: booking.preferredTime,
-          specialRequests: booking.specialRequests,
-        },
-        leadType: "warm",
-        priority: "medium",
-        leadScore: 60,
-        status: "new",
-      });
-
-      // Add initial activity
-      await storage.addLeadActivity({
-        leadId: lead.id,
-        activityType: "site-visit",
-        subject: `Site visit scheduled for ${booking.propertyName}`,
-        description: `Customer ${booking.name} scheduled a site visit for ${booking.propertyName}`,
-        outcome: "positive",
-        nextAction: `Contact customer on ${booking.preferredDate} at ${booking.preferredTime}`,
-        scheduledAt: booking.preferredDate && booking.preferredTime ? 
-          new Date(`${booking.preferredDate}T${booking.preferredTime}:00`) : undefined,
-        performedBy: "system",
-      });
-
-      console.log(`🎯 Auto-created lead: ${lead.leadId} from booking ${booking.bookingId}`);
-      
-      res.status(201).json({ 
-        success: true,
-        bookingId: booking.bookingId,
-        leadId: lead.leadId,
-        message: "Booking confirmed successfully" 
-      });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: "Invalid booking data", details: error.errors });
-      }
-      console.error("Error creating booking:", error);
-      res.status(500).json({ error: "Failed to create booking" });
-    }
-  });
+  // Booking routes are now handled by registerBookingRoutes in bookingRoutes.ts
 
   app.post("/api/consultations", async (req, res) => {
     try {
@@ -803,15 +738,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all bookings (for admin review)
-  app.get("/api/bookings", async (req, res) => {
-    try {
-      const bookings = await storage.getAllBookings();
-      res.json(bookings);
-    } catch (error) {
-      console.error("Error fetching bookings:", error);
-      res.status(500).json({ error: "Failed to fetch bookings" });
-    }
-  });
+  // GET /api/bookings route handled by registerBookingRoutes in bookingRoutes.ts
 
   // Blog management routes
   app.get("/api/blog", getBlogPosts);
