@@ -90,10 +90,14 @@ export const properties = pgTable("properties", {
   developer: text("developer").notNull(),
   status: varchar("status", { enum: ["pre-launch", "active", "under-construction", "completed", "sold-out"] }).notNull(),
   
-  // Location details
+  // Location details - Updated for city-wise hierarchy
+  cityId: varchar("city_id").notNull(),
+  zoneId: varchar("zone_id").notNull(),
   area: text("area").notNull(),
-  zone: varchar("zone", { enum: ["north", "south", "east", "west", "central"] }).notNull(),
   address: text("address").notNull(),
+  
+  // Legacy fields (kept for backward compatibility)
+  zone: varchar("zone", { enum: ["north", "south", "east", "west", "central"] }),
   
   // Property specifications (simplified - detailed configs in separate table)
   possessionDate: text("possession_date"), // YYYY-MM format
@@ -253,6 +257,7 @@ export type Property = typeof properties.$inferSelect;
 export type PropertyConfiguration = typeof propertyConfigurations.$inferSelect;
 export type InsertPropertyConfiguration = z.infer<typeof insertPropertyConfigurationSchema>;
 export type PropertyScore = typeof propertyScores.$inferSelect;
+
 export type InsertPropertyScore = z.infer<typeof insertPropertyScoreSchema>;
 
 export interface PropertyWithConfigurations extends Property {
@@ -690,6 +695,71 @@ export const appSettings = pgTable("app_settings", {
   enableConsultations: boolean("enable_consultations").default(true),
   enableReports: boolean("enable_reports").default(true),
 
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Cities table - For city-wise data organization (City > Zones > Properties)
+export const cities = pgTable("cities", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull().unique(),
+  state: text("state").notNull(),
+  country: text("country").notNull().default("India"),
+  
+  // Basic information
+  description: text("description"),
+  population: integer("population"),
+  area: decimal("area", { precision: 10, scale: 2 }), // in sq km
+  
+  // Economic indicators
+  averagePropertyPrice: integer("average_property_price"), // in lakhs
+  priceAppreciationRate: decimal("price_appreciation_rate", { precision: 5, scale: 2 }), // percentage
+  rentalYieldRange: text("rental_yield_range"), // e.g., "3-5%"
+  
+  // Infrastructure scores
+  transportScore: integer("transport_score").default(0), // 1-10
+  educationScore: integer("education_score").default(0), // 1-10
+  healthcareScore: integer("healthcare_score").default(0), // 1-10
+  employmentScore: integer("employment_score").default(0), // 1-10
+  
+  // Status and settings
+  isActive: boolean("is_active").default(true),
+  displayOrder: integer("display_order").default(0),
+  
+  // Metadata
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Zones table - For city-wise zone organization (North, South, East, West, Central per city)
+export const zones = pgTable("zones", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description"),
+  cityId: varchar("city_id").notNull(),
+  locationType: varchar("location_type", { enum: ["urban", "suburban", "rural"] }).default("urban"),
+  
+  // Price and market data
+  priceRangeMin: integer("price_range_min"), // in lakhs
+  priceRangeMax: integer("price_range_max"), // in lakhs
+  appreciationRate: decimal("appreciation_rate", { precision: 5, scale: 2 }), // percentage per year
+  rentalYield: decimal("rental_yield", { precision: 5, scale: 2 }), // percentage
+  
+  // Infrastructure and development scores (1-10)
+  infrastructureScore: integer("infrastructure_score").default(5),
+  connectivityScore: integer("connectivity_score").default(5),
+  amenitiesScore: integer("amenities_score").default(5),
+  educationScore: integer("education_score").default(5),
+  
+  // Geographic and administrative data
+  area: decimal("area", { precision: 10, scale: 2 }), // in sq km
+  population: integer("population"),
+  pincodesServed: json("pincodes_served").$type<string[]>().default([]),
+  
+  // Status
+  isActive: boolean("is_active").default(true),
+  displayOrder: integer("display_order").default(0),
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -1586,3 +1656,36 @@ export const insertCivilMepReportSchema = createInsertSchema(civilMepReports).om
 });
 
 export type InsertCivilMepReport = z.infer<typeof insertCivilMepReportSchema>;
+
+// City and Zone schemas - Added at the end to avoid initialization issues
+export const insertCitySchema = createInsertSchema(cities).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertZoneSchema = createInsertSchema(zones).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type City = typeof cities.$inferSelect;
+export type InsertCity = z.infer<typeof insertCitySchema>;
+export type Zone = typeof zones.$inferSelect;
+export type InsertZone = z.infer<typeof insertZoneSchema>;
+
+// Extended types for city-wise property data
+export interface CityWithZones extends City {
+  zones: Zone[];
+}
+
+export interface ZoneWithProperties extends Zone {
+  city?: City;
+  properties?: Property[];
+}
+
+export interface PropertyWithLocation extends Property {
+  city?: City;
+  zone?: Zone;
+}

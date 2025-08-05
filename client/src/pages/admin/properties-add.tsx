@@ -45,6 +45,8 @@ export default function PropertiesAdd() {
       developer: "",
       area: "",
       zone: "",
+      cityId: "",
+      zoneId: "",
       type: "apartment",
       status: "active",
       startingPrice: 0,
@@ -58,14 +60,28 @@ export default function PropertiesAdd() {
     },
   });
 
-  // Fetch zones for dropdown
-  const { data: zones = [] } = useQuery({
-    queryKey: ["/api/zones"],
+  // Fetch cities for dropdown
+  const { data: cities = [] } = useQuery({
+    queryKey: ["/api/cities"],
     queryFn: async () => {
-      const response = await fetch("/api/zones");
+      const response = await fetch("/api/cities");
+      if (!response.ok) throw new Error("Failed to fetch cities");
+      return response.json();
+    },
+  });
+
+  const [selectedCityId, setSelectedCityId] = useState<string>("");
+  
+  // Fetch zones based on selected city
+  const { data: zones = [] } = useQuery({
+    queryKey: ["/api/zones/city", selectedCityId],
+    queryFn: async () => {
+      if (!selectedCityId) return [];
+      const response = await fetch(`/api/zones/city/${selectedCityId}`);
       if (!response.ok) throw new Error("Failed to fetch zones");
       return response.json();
     },
+    enabled: !!selectedCityId,
   });
 
   // Fetch developers for dropdown
@@ -237,19 +253,55 @@ export default function PropertiesAdd() {
 
                       <FormField
                         control={form.control}
-                        name="zone"
+                        name="cityId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>City *</FormLabel>
+                            <Select 
+                              onValueChange={(value) => {
+                                field.onChange(value);
+                                setSelectedCityId(value);
+                                form.setValue("zoneId", ""); // Reset zone when city changes
+                              }} 
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select city" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {cities.map((city: any) => (
+                                  <SelectItem key={city.id} value={city.id}>
+                                    {city.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="zoneId"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Zone *</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <Select 
+                              onValueChange={field.onChange} 
+                              defaultValue={field.value}
+                              disabled={!selectedCityId}
+                            >
                               <FormControl>
                                 <SelectTrigger>
-                                  <SelectValue placeholder="Select zone" />
+                                  <SelectValue placeholder={selectedCityId ? "Select zone" : "First select a city"} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
                                 {zones.map((zone: any) => (
-                                  <SelectItem key={zone.id} value={zone.name}>
+                                  <SelectItem key={zone.id} value={zone.id}>
                                     {zone.name}
                                   </SelectItem>
                                 ))}

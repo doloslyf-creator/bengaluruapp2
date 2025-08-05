@@ -107,6 +107,117 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Firebase authentication - no server-side auth routes needed
   // Authentication is handled entirely by Firebase
 
+  // City routes
+  app.get("/api/cities", async (req, res) => {
+    try {
+      const cities = await storage.getAllCities();
+      res.json(cities);
+    } catch (error) {
+      console.error("Error fetching cities:", error);
+      res.status(500).json({ error: "Failed to fetch cities" });
+    }
+  });
+
+  app.get("/api/cities/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const city = await storage.getCity(id);
+      if (!city) {
+        return res.status(404).json({ error: "City not found" });
+      }
+      res.json(city);
+    } catch (error) {
+      console.error("Error fetching city:", error);
+      res.status(500).json({ error: "Failed to fetch city" });
+    }
+  });
+
+  app.get("/api/cities/:id/with-zones", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const cityWithZones = await storage.getCityWithZones(id);
+      if (!cityWithZones) {
+        return res.status(404).json({ error: "City not found" });
+      }
+      res.json(cityWithZones);
+    } catch (error) {
+      console.error("Error fetching city with zones:", error);
+      res.status(500).json({ error: "Failed to fetch city with zones" });
+    }
+  });
+
+  // Zone routes
+  app.get("/api/zones", async (req, res) => {
+    try {
+      const zones = await storage.getAllZones();
+      res.json(zones);
+    } catch (error) {
+      console.error("Error fetching zones:", error);
+      res.status(500).json({ error: "Failed to fetch zones" });
+    }
+  });
+
+  app.get("/api/zones/city/:cityId", async (req, res) => {
+    try {
+      const { cityId } = req.params;
+      const zones = await storage.getZonesByCity(cityId);
+      res.json(zones);
+    } catch (error) {
+      console.error("Error fetching zones by city:", error);
+      res.status(500).json({ error: "Failed to fetch zones" });
+    }
+  });
+
+  app.get("/api/zones/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const zone = await storage.getZone(id);
+      if (!zone) {
+        return res.status(404).json({ error: "Zone not found" });
+      }
+      res.json(zone);
+    } catch (error) {
+      console.error("Error fetching zone:", error);
+      res.status(500).json({ error: "Failed to fetch zone" });
+    }
+  });
+
+  app.get("/api/zones/:id/with-properties", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const zoneWithProperties = await storage.getZoneWithProperties(id);
+      if (!zoneWithProperties) {
+        return res.status(404).json({ error: "Zone not found" });
+      }
+      res.json(zoneWithProperties);
+    } catch (error) {
+      console.error("Error fetching zone with properties:", error);
+      res.status(500).json({ error: "Failed to fetch zone with properties" });
+    }
+  });
+
+  // Property routes - City-wise filtering
+  app.get("/api/properties/city/:cityId", async (req, res) => {
+    try {
+      const { cityId } = req.params;
+      const properties = await storage.getPropertiesByCity(cityId);
+      res.json(properties);
+    } catch (error) {
+      console.error("Error fetching properties by city:", error);
+      res.status(500).json({ error: "Failed to fetch properties" });
+    }
+  });
+
+  app.get("/api/properties/zone/:zoneId", async (req, res) => {
+    try {
+      const { zoneId } = req.params;
+      const properties = await storage.getPropertiesByZone(zoneId);
+      res.json(properties);
+    } catch (error) {
+      console.error("Error fetching properties by zone:", error);
+      res.status(500).json({ error: "Failed to fetch properties" });
+    }
+  });
 
   // Get all properties
   app.get("/api/properties", async (req, res) => {

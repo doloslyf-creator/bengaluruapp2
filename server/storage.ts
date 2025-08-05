@@ -5,8 +5,15 @@
   type PropertyConfiguration,
   type InsertPropertyConfiguration,
   type PropertyWithConfigurations,
+  type PropertyWithLocation,
   type PropertyScore,
   type InsertPropertyScore,
+  type City,
+  type InsertCity,
+  type CityWithZones,
+  type Zone,
+  type InsertZone,
+  type ZoneWithProperties,
   type Lead,
   type InsertLead,
   type LeadWithDetails,
@@ -44,6 +51,8 @@
   properties, 
   propertyConfigurations,
   propertyScores,
+  cities,
+  zones,
   leads, 
   leadActivities, 
   leadNotes,
@@ -66,9 +75,29 @@ import { eq, and, ilike, gte, lte, desc, sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
-  // Property CRUD operations
+  // City CRUD operations
+  getCity(id: string): Promise<City | undefined>;
+  getAllCities(): Promise<City[]>;
+  getCityWithZones(id: string): Promise<CityWithZones | undefined>;
+  createCity(city: InsertCity): Promise<City>;
+  updateCity(id: string, city: Partial<InsertCity>): Promise<City | undefined>;
+  deleteCity(id: string): Promise<boolean>;
+
+  // Zone CRUD operations
+  getZone(id: string): Promise<Zone | undefined>;
+  getAllZones(): Promise<Zone[]>;
+  getZonesByCity(cityId: string): Promise<Zone[]>;
+  getZoneWithProperties(id: string): Promise<ZoneWithProperties | undefined>;
+  createZone(zone: InsertZone): Promise<Zone>;
+  updateZone(id: string, zone: Partial<InsertZone>): Promise<Zone | undefined>;
+  deleteZone(id: string): Promise<boolean>;
+
+  // Property CRUD operations - Updated for city-wise structure
   getProperty(id: string): Promise<Property | undefined>;
   getAllProperties(): Promise<Property[]>;
+  getPropertyWithLocation(id: string): Promise<PropertyWithLocation | undefined>;
+  getPropertiesByCity(cityId: string): Promise<Property[]>;
+  getPropertiesByZone(zoneId: string): Promise<Property[]>;
   getPropertyWithConfigurations(id: string): Promise<PropertyWithConfigurations | undefined>;
   createProperty(property: InsertProperty): Promise<Property>;
   updateProperty(id: string, property: Partial<InsertProperty>): Promise<Property | undefined>;
@@ -1313,10 +1342,100 @@ export class DatabaseStorage implements IStorage {
   async getLeadDocuments(leadId: string): Promise<LeadDocument[]> {
     return await db.select().from(leadDocuments).where(eq(leadDocuments.leadId, leadId));
   }
-  // Property CRUD operations
+  // City CRUD operations
+  async getCity(id: string): Promise<City | undefined> {
+    const result = await db.select().from(cities).where(eq(cities.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getAllCities(): Promise<City[]> {
+    return await db.select().from(cities).where(eq(cities.isActive, true)).orderBy(cities.displayOrder, cities.name);
+  }
+
+  async getCityWithZones(id: string): Promise<CityWithZones | undefined> {
+    const city = await this.getCity(id);
+    if (!city) return undefined;
+
+    const cityZones = await this.getZonesByCity(id);
+    return { ...city, zones: cityZones };
+  }
+
+  async createCity(city: InsertCity): Promise<City> {
+    const result = await db.insert(cities).values(city).returning();
+    return result[0];
+  }
+
+  async updateCity(id: string, city: Partial<InsertCity>): Promise<City | undefined> {
+    const result = await db.update(cities).set(city).where(eq(cities.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteCity(id: string): Promise<boolean> {
+    const result = await db.delete(cities).where(eq(cities.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Zone CRUD operations
+  async getZone(id: string): Promise<Zone | undefined> {
+    const result = await db.select().from(zones).where(eq(zones.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getAllZones(): Promise<Zone[]> {
+    return await db.select().from(zones).where(eq(zones.isActive, true)).orderBy(zones.displayOrder, zones.name);
+  }
+
+  async getZonesByCity(cityId: string): Promise<Zone[]> {
+    return await db.select().from(zones).where(and(eq(zones.cityId, cityId), eq(zones.isActive, true))).orderBy(zones.displayOrder, zones.name);
+  }
+
+  async getZoneWithProperties(id: string): Promise<ZoneWithProperties | undefined> {
+    const zone = await this.getZone(id);
+    if (!zone) return undefined;
+
+    const city = await this.getCity(zone.cityId);
+    const zoneProperties = await this.getPropertiesByZone(id);
+    
+    return { ...zone, city, properties: zoneProperties };
+  }
+
+  async createZone(zone: InsertZone): Promise<Zone> {
+    const result = await db.insert(zones).values(zone).returning();
+    return result[0];
+  }
+
+  async updateZone(id: string, zone: Partial<InsertZone>): Promise<Zone | undefined> {
+    const result = await db.update(zones).set(zone).where(eq(zones.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteZone(id: string): Promise<boolean> {
+    const result = await db.delete(zones).where(eq(zones.id, id));
+    return result.rowCount > 0;
+  }
+
+  // Property CRUD operations - Updated for city-wise structure
   async getProperty(id: string): Promise<Property | undefined> {
     const [property] = await db.select().from(properties).where(eq(properties.id, id));
     return property || undefined;
+  }
+
+  async getPropertyWithLocation(id: string): Promise<PropertyWithLocation | undefined> {
+    const property = await this.getProperty(id);
+    if (!property) return undefined;
+
+    const city = property.cityId ? await this.getCity(property.cityId) : undefined;
+    const zone = property.zoneId ? await this.getZone(property.zoneId) : undefined;
+
+    return { ...property, city, zone };
+  }
+
+  async getPropertiesByCity(cityId: string): Promise<Property[]> {
+    return await db.select().from(properties).where(eq(properties.cityId, cityId)).orderBy(desc(properties.createdAt));
+  }
+
+  async getPropertiesByZone(zoneId: string): Promise<Property[]> {
+    return await db.select().from(properties).where(eq(properties.zoneId, zoneId)).orderBy(desc(properties.createdAt));
   }
 
   async getAllProperties(): Promise<Property[]> {
