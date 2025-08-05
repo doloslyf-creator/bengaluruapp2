@@ -63,6 +63,7 @@ import { AdminCivilMepReports } from "@/pages/admin-civil-mep-reports";
 import { AdminCivilMepReportsCreate } from "@/pages/admin-civil-mep-reports-create";
 import { CivilMepReportView } from "@/pages/civil-mep-report-view";
 import CivilMepReports from "@/pages/civil-mep-reports";
+import CivilMepReportsLanding from "@/pages/civil-mep-reports-landing";
 import ValuationReportsPage from "@/pages/admin/valuation-reports";
 import ValuationReportEdit from "@/pages/admin/valuation-report-edit-comprehensive";
 import ValuationReportsCreate from "@/pages/admin/valuation-reports-create";
@@ -126,6 +127,7 @@ function ProtectedRouter() {
       <Route path="/admin-panel/civil-mep-reports/create" component={AdminCivilMepReportsCreate} />
       <Route path="/admin-panel/civil-mep-reports/:id/edit" component={AdminCivilMepReportsCreate} />
       <Route path="/admin/civil-mep-reports/:id/edit" component={AdminCivilMepReportsCreate} />
+      <Route path="/civil-mep-assessment" component={CivilMepReportsLanding} />
       <Route path="/civil-mep-reports" component={CivilMepReports} />
       <Route path="/civil-mep-report/:id" component={CivilMepReportView} />
       <Route path="/admin-panel/valuation-reports" component={ValuationReportsPage} />

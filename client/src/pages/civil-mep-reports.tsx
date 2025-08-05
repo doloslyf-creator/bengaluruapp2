@@ -1,30 +1,90 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Search, Filter, Eye, Calendar, CheckCircle, Clock, AlertCircle, Building2, Wrench, Zap } from "lucide-react";
+import { FileText, Search, Filter, Eye, Calendar, CheckCircle, Clock, AlertCircle, Building2, Wrench, Zap, MapPin, IndianRupee, ShoppingCart, User } from "lucide-react";
 import { Link } from "wouter";
-import type { CivilMepReport } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
+import type { CivilMepReport, Property } from "@shared/schema";
 
 export default function CivilMepReports() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [areaFilter, setAreaFilter] = useState("all");
+  const [developerFilter, setDeveloperFilter] = useState("all");
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  // Fetch Civil+MEP reports
-  const { data: reports = [], isLoading } = useQuery({
+  // Fetch properties for which users can buy civil+MEP reports
+  const { data: properties = [], isLoading } = useQuery({
+    queryKey: ["/api/properties"],
+  });
+
+  // Fetch existing Civil+MEP reports to show which properties already have reports
+  const { data: existingReports = [] } = useQuery({
     queryKey: ["/api/civil-mep-reports"],
   });
 
-  // Filter reports based on search and status - only show completed and approved reports for public view
-  const filteredReports = (reports as CivilMepReport[]).filter((report: CivilMepReport) => {
-    const isPublicReport = report.status === "completed" || report.status === "approved";
-    const matchesSearch = report.reportTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         report.engineerName?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "all" || report.status === statusFilter;
-    return isPublicReport && matchesSearch && matchesStatus;
+  // Create a mutation for ordering civil+MEP reports
+  const orderReportMutation = useMutation({
+    mutationFn: async (propertyId: string) => {
+      const response = await fetch("/api/orders/service", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          serviceType: "civil-mep-assessment",
+          reportType: "civil-mep-report",
+          propertyId,
+          customerName: "Guest User", // In a real app, this would come from auth
+          customerEmail: "guest@example.com",
+          customerPhone: "+91-0000000000",
+          amount: 2499
+        }),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to create order");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/civil-mep-reports"] });
+      toast({
+        title: "Order created successfully!",
+        description: `Your Civil+MEP assessment order (ID: ${data.orderId}) has been created. You'll receive the report within 48 hours.`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error creating order",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Get unique areas and developers for filters
+  const areas = Array.from(new Set((properties as Property[]).map(p => p.area).filter(Boolean)));
+  const developers = Array.from(new Set((properties as Property[]).map(p => p.developer).filter(Boolean)));
+
+  // Check if a property already has a completed/approved report
+  const hasExistingReport = (propertyId: string) => {
+    return (existingReports as CivilMepReport[]).some(
+      report => report.propertyId === propertyId && 
+      (report.status === "completed" || report.status === "approved")
+    );
+  };
+
+  // Filter properties based on search, area, and developer
+  const filteredProperties = (properties as Property[]).filter((property: Property) => {
+    const matchesSearch = property.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         property.area?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         property.developer?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesArea = areaFilter === "all" || property.area === areaFilter;
+    const matchesDeveloper = developerFilter === "all" || property.developer === developerFilter;
+    return matchesSearch && matchesArea && matchesDeveloper;
   });
 
   const getStatusBadge = (status: string) => {
@@ -97,32 +157,46 @@ export default function CivilMepReports() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Search className="w-5 h-5" />
-              Search Reports
+              Find Properties for Civil+MEP Assessment
             </CardTitle>
             <CardDescription>
-              Find engineering reports by property, engineer, or report details
+              Search properties by name, area, or developer to order your engineering assessment report
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="md:col-span-2">
                 <Input
-                  placeholder="Search by report title, engineer name..."
+                  placeholder="Search by property name, area, or developer..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full"
-                  data-testid="input-search-reports"
+                  data-testid="input-search-properties"
                 />
               </div>
-              <div className="w-full sm:w-48">
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger data-testid="select-status-filter">
-                    <SelectValue placeholder="Filter by status" />
+              <div>
+                <Select value={areaFilter} onValueChange={setAreaFilter}>
+                  <SelectTrigger data-testid="select-area-filter">
+                    <SelectValue placeholder="Filter by area" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Reports</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="approved">Approved</SelectItem>
+                    <SelectItem value="all">All Areas</SelectItem>
+                    {areas.map(area => (
+                      <SelectItem key={area} value={area}>{area}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Select value={developerFilter} onValueChange={setDeveloperFilter}>
+                  <SelectTrigger data-testid="select-developer-filter">
+                    <SelectValue placeholder="Filter by developer" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Developers</SelectItem>
+                    {developers.map(developer => (
+                      <SelectItem key={developer} value={developer}>{developer}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -130,26 +204,27 @@ export default function CivilMepReports() {
           </CardContent>
         </Card>
 
-        {/* Reports Grid */}
-        {filteredReports.length === 0 ? (
+        {/* Properties Grid */}
+        {filteredProperties.length === 0 ? (
           <Card className="text-center py-12">
             <CardContent>
-              <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <Building2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                No Reports Found
+                No Properties Found
               </h3>
               <p className="text-gray-600 dark:text-gray-300 mb-6">
-                {searchTerm || statusFilter !== "all" 
-                  ? "No reports match your current search criteria."
-                  : "No engineering reports are currently available for public viewing."
+                {searchTerm || areaFilter !== "all" || developerFilter !== "all"
+                  ? "No properties match your current search criteria."
+                  : "No properties are currently available for assessment."
                 }
               </p>
-              {(searchTerm || statusFilter !== "all") && (
+              {(searchTerm || areaFilter !== "all" || developerFilter !== "all") && (
                 <Button 
                   variant="outline" 
                   onClick={() => {
                     setSearchTerm("");
-                    setStatusFilter("all");
+                    setAreaFilter("all");
+                    setDeveloperFilter("all");
                   }}
                   data-testid="button-clear-filters"
                 >
@@ -160,58 +235,90 @@ export default function CivilMepReports() {
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredReports.map((report: CivilMepReport) => (
-              <Card key={report.id} className="hover:shadow-lg transition-shadow duration-200">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg line-clamp-2 mb-2">
-                        {report.reportTitle}
-                      </CardTitle>
-                      <CardDescription className="flex items-center gap-1 text-sm">
-                        <FileText className="w-4 h-4" />
-                        Civil + MEP Assessment
-                      </CardDescription>
+            {filteredProperties.map((property: Property) => {
+              const hasReport = hasExistingReport(property.id);
+              return (
+                <Card key={property.id} className="hover:shadow-lg transition-shadow duration-200">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="text-lg line-clamp-2 mb-2">
+                          {property.name}
+                        </CardTitle>
+                        <CardDescription className="flex items-center gap-1 text-sm">
+                          <MapPin className="w-4 h-4" />
+                          {property.area}
+                        </CardDescription>
+                      </div>
+                      {hasReport && (
+                        <Badge className="bg-green-100 text-green-800 border-green-200">
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          Report Available
+                        </Badge>
+                      )}
                     </div>
-                    {getStatusBadge(report.status)}
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="font-medium text-gray-600 dark:text-gray-400">Engineer:</span>
-                      <p className="text-gray-900 dark:text-white truncate">{report.engineerName}</p>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="font-medium text-gray-600 dark:text-gray-400">Developer:</span>
+                        <span className="text-gray-900 dark:text-white">{property.developer || 'N/A'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-medium text-gray-600 dark:text-gray-400">Type:</span>
+                        <span className="text-gray-900 dark:text-white">{property.type || 'N/A'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-medium text-gray-600 dark:text-gray-400">Status:</span>
+                        <span className="text-gray-900 dark:text-white">{property.status || 'N/A'}</span>
+                      </div>
                     </div>
-                    <div>
-                      <span className="font-medium text-gray-600 dark:text-gray-400">Score:</span>
-                      <p className="text-gray-900 dark:text-white">
-                        {report.overallScore ? `${report.overallScore}/10` : 'Pending'}
-                      </p>
-                    </div>
-                  </div>
 
-                  <div>
-                    <span className="font-medium text-gray-600 dark:text-gray-400 text-sm">Recommendation:</span>
-                    <div className="mt-1">
-                      {getRecommendationBadge(report.investmentRecommendation)}
+                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                      {hasReport ? (
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-lg font-bold text-green-600">
+                              <CheckCircle className="w-5 h-5 inline mr-1" />
+                              Report Ready
+                            </span>
+                          </div>
+                          <Link to={`/civil-mep-report/${(existingReports as CivilMepReport[]).find(r => r.propertyId === property.id)?.id}`}>
+                            <Button className="w-full" data-testid={`button-view-report-${property.id}`}>
+                              <Eye className="w-4 h-4 mr-2" />
+                              View Report
+                            </Button>
+                          </Link>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-lg font-bold text-blue-600">
+                              <IndianRupee className="w-5 h-5 inline mr-1" />
+                              ₹2,499
+                            </span>
+                            <Badge variant="outline">48hr delivery</Badge>
+                          </div>
+                          <Button 
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                            onClick={() => orderReportMutation.mutate(property.id)}
+                            disabled={orderReportMutation.isPending}
+                            data-testid={`button-buy-report-${property.id}`}
+                          >
+                            {orderReportMutation.isPending ? (
+                              <Clock className="w-4 h-4 mr-2 animate-spin" />
+                            ) : (
+                              <ShoppingCart className="w-4 h-4 mr-2" />
+                            )}
+                            {orderReportMutation.isPending ? "Processing..." : "Order Assessment"}
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
-                      <Calendar className="w-4 h-4" />
-                      {report.reportDate ? new Date(report.reportDate.toString()).toLocaleDateString() : 'Date pending'}
-                    </div>
-                    <Link to={`/civil-mep-report/${report.id}`}>
-                      <Button size="sm" data-testid={`button-view-report-${report.id}`}>
-                        <Eye className="w-4 h-4 mr-1" />
-                        View Report
-                      </Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
 
