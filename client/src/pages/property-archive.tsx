@@ -146,21 +146,50 @@ export default function PropertyArchive() {
 
   // Get price range for property
   const getPriceRange = (property: PropertyWithReports) => {
-    if (!property.configurations || !property.configurations.length) return "Price on request";
-    
-    const prices = property.configurations.map((c: PropertyConfiguration) => {
-      const pricePerSqft = parseFloat(c.pricePerSqft.toString());
-      const builtUpArea = c.builtUpArea;
-      return pricePerSqft * builtUpArea;
-    });
-    
-    const minPrice = Math.min(...prices);
-    const maxPrice = Math.max(...prices);
-    
-    if (minPrice === maxPrice) {
-      return formatPrice(minPrice);
+    // First try to get price from configurations
+    if (property.configurations && property.configurations.length > 0) {
+      const prices = property.configurations.map((c: PropertyConfiguration) => {
+        const pricePerSqft = parseFloat(c.pricePerSqft.toString());
+        const builtUpArea = c.builtUpArea;
+        return pricePerSqft * builtUpArea;
+      });
+      
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      
+      if (minPrice === maxPrice) {
+        return formatPrice(minPrice);
+      }
+      return `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`;
     }
-    return `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`;
+    
+    // Fallback to valuation report pricing
+    if (property.valuationReport?.estimatedMarketValue) {
+      const marketValue = parseFloat(property.valuationReport.estimatedMarketValue.toString());
+      return formatPrice(marketValue);
+    }
+    
+    // Fallback to builder quoted price
+    if (property.valuationReport?.builderQuotedPrice) {
+      const quotedPrice = parseFloat(property.valuationReport.builderQuotedPrice.toString());
+      return formatPrice(quotedPrice);
+    }
+    
+    // Final fallback - create approximate pricing based on market standards
+    // Use area * approximate rate for the zone
+    const defaultRates = {
+      'north': 12000,
+      'south': 15000,
+      'east': 10000,
+      'west': 11000,
+      'central': 18000
+    };
+    
+    const ratePerSqft = defaultRates[property.zone as keyof typeof defaultRates] || 12000;
+    const estimatedArea = 1200; // Approximate 2-3 BHK size
+    const estimatedPrice = ratePerSqft * estimatedArea;
+    
+    return formatPrice(estimatedPrice);
   };
 
   // Get investment score
