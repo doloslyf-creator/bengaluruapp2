@@ -36,7 +36,7 @@ import type { Property, PropertyConfiguration, CivilMepReport, PropertyValuation
 type UserIntent = "investment" | "end-use" | null;
 
 interface PropertyWithReports extends Property {
-  configurations: PropertyConfiguration[];
+  configurations?: PropertyConfiguration[];
   civilMepReport?: CivilMepReport;
   valuationReport?: PropertyValuationReport;
 }
@@ -51,7 +51,7 @@ export default function PropertyArchive() {
 
   // Fetch properties with related reports
   const { data: properties = [], isLoading } = useQuery<PropertyWithReports[]>({
-    queryKey: ["/api/properties-with-reports"],
+    queryKey: ["/api/properties"],
     enabled: userIntent !== null,
   });
 
@@ -118,14 +118,14 @@ export default function PropertyArchive() {
       });
     } else if (sortBy === "price-low") {
       filtered.sort((a, b) => {
-        const aPrice = a.configurations[0]?.pricePerSqft || 0;
-        const bPrice = b.configurations[0]?.pricePerSqft || 0;
+        const aPrice = a.configurations?.[0]?.pricePerSqft || 0;
+        const bPrice = b.configurations?.[0]?.pricePerSqft || 0;
         return parseFloat(aPrice.toString()) - parseFloat(bPrice.toString());
       });
     } else if (sortBy === "price-high") {
       filtered.sort((a, b) => {
-        const aPrice = a.configurations[0]?.pricePerSqft || 0;
-        const bPrice = b.configurations[0]?.pricePerSqft || 0;
+        const aPrice = a.configurations?.[0]?.pricePerSqft || 0;
+        const bPrice = b.configurations?.[0]?.pricePerSqft || 0;
         return parseFloat(bPrice.toString()) - parseFloat(aPrice.toString());
       });
     }
@@ -146,7 +146,7 @@ export default function PropertyArchive() {
 
   // Get price range for property
   const getPriceRange = (property: PropertyWithReports) => {
-    if (!property.configurations.length) return "Price on request";
+    if (!property.configurations || !property.configurations.length) return "Price on request";
     
     const prices = property.configurations.map((c: PropertyConfiguration) => {
       const pricePerSqft = parseFloat(c.pricePerSqft.toString());
