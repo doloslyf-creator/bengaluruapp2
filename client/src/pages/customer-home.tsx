@@ -37,32 +37,7 @@ import Header from "@/components/layout/header";
 
 export default function CustomerHome() {
   const [, navigate] = useLocation();
-  const [timeLeft, setTimeLeft] = useState({
-    days: 30,
-    hours: 12,
-    minutes: 45,
-    seconds: 30
-  });
 
-  // Countdown timer effect
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev.seconds > 0) {
-          return { ...prev, seconds: prev.seconds - 1 };
-        } else if (prev.minutes > 0) {
-          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
-        } else if (prev.hours > 0) {
-          return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
-        } else if (prev.days > 0) {
-          return { ...prev, days: prev.days - 1, hours: 23, minutes: 59, seconds: 59 };
-        }
-        return prev;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
 
   // Fetch real property statistics
   const { data: propertiesStats } = useQuery({
@@ -80,19 +55,7 @@ export default function CustomerHome() {
     <div className="min-h-screen bg-white">
       <Header />
       
-      {/* Promotional Banner */}
-      <div className="bg-gradient-to-r from-red-500 to-pink-500 text-white py-3">
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-center space-x-4 text-sm">
-          <span className="font-semibold">🔥 Early Bird Property Consultation Ends Soon:</span>
-          <div className="flex items-center space-x-2 font-mono font-bold">
-            <span>{timeLeft.days}d</span>
-            <span>{timeLeft.hours}h</span>
-            <span>{timeLeft.minutes}m</span>
-            <span>{timeLeft.seconds}s</span>
-          </div>
-          <span>• Get 50% off property valuation reports!</span>
-        </div>
-      </div>
+
 
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-20">
@@ -556,7 +519,7 @@ export default function CustomerHome() {
               <div className="text-gray-600">Success Rate</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-primary mb-2">{stats.totalProperties || 5}+</div>
+              <div className="text-3xl font-bold text-primary mb-2">{(stats as any)?.totalProperties || 5}+</div>
               <div className="text-gray-600">Properties Analyzed</div>
             </div>
           </div>

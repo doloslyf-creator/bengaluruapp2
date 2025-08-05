@@ -88,14 +88,7 @@ export default function Header() {
           ? "bg-white/98 backdrop-blur-lg border-b border-gray-200 shadow-lg" 
           : "bg-white/90 backdrop-blur-sm border-b border-gray-100"
       }`}>
-        {/* Space for promotional banner when not scrolled */}
-        <div className={`transition-all duration-300 ${scrolled ? 'h-0' : 'h-12 bg-gradient-to-r from-blue-500 to-indigo-500'}`}>
-          {!scrolled && (
-            <div className="flex items-center justify-center h-full text-white text-sm px-4">
-              <span className="font-semibold">🎯 Expert property advisors • Zero builder bias • 100% buyer-first approach</span>
-            </div>
-          )}
-        </div>
+
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 lg:h-18 items-center justify-between">
