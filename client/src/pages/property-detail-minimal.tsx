@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, MapPin, Heart, Share2, Calendar, MessageCircle, Phone, Star, Award, Home, Building, CheckCircle, AlertTriangle, X, Users, Car, Building2, Shield, TreePine, Waves, Dumbbell, Wifi, ShoppingCart, Camera, Play, Download, Eye, Lock, CheckCircle2, XCircle, Family, TrendingUp, TrendingDown, Parking, Elevator } from 'lucide-react';
+import { ArrowLeft, MapPin, Heart, Share2, Calendar, MessageCircle, Phone, Star, Award, Home, Building, CheckCircle, AlertTriangle, X, Users, Car, Building2, Shield, TreePine, Waves, Dumbbell, Wifi, ShoppingCart, Camera, Play, Download, Eye, Lock, CheckCircle2, XCircle, TrendingUp, TrendingDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface Property {
@@ -547,79 +547,89 @@ export default function PropertyDetailMinimal() {
           </CardContent>
         </Card>
 
-        {/* Valuation Summary */}
+        {/* Property Analysis & Reports */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle>Property Analysis & Reports</CardTitle>
             <p className="text-gray-600">Get professional insights to make informed decisions</p>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Legal Verification Summary */}
-            <div className="bg-green-50 p-4 rounded-lg">
-              <h4 className="font-semibold text-green-800 mb-3 flex items-center">
-                <Shield className="h-5 w-5 mr-2" />
-                Legal Verification Summary
-              </h4>
-              <ul className="space-y-2 text-sm text-green-700">
-                <li className="flex items-center">
-                  <CheckCircle2 className="h-4 w-4 mr-2" />
-                  RERA Registration: {property.reraApproved ? 'Verified' : 'Under Process'}
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle2 className="h-4 w-4 mr-2" />
-                  Title Clear: Preliminary verification complete
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle2 className="h-4 w-4 mr-2" />
-                  Approvals: Building plan approvals in place
-                </li>
-              </ul>
-            </div>
-
-            {/* Civil & MEP Report */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="border-orange-200">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 className="font-semibold text-orange-800">Civil & MEP Analysis</h4>
-                    <Badge className="bg-orange-100 text-orange-800">Essential</Badge>
-                  </div>
-                  
-                  <div className="space-y-3 mb-4">
+            {/* Civil & MEP Report Data */}
+            <Card className="border-orange-200">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-orange-800">Civil & MEP Analysis Report</h4>
+                  <Badge className="bg-orange-100 text-orange-800">Essential</Badge>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Foundation Type</span>
+                      <span className="font-semibold text-green-600">RCC Raft Foundation</span>
+                    </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Structural Grade</span>
-                      <span className="font-semibold text-green-600">A+ Excellent</span>
+                      <span className="font-semibold text-green-600">M30 Concrete</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Foundation Score</span>
-                      <span className="font-semibold">9.2/10</span>
+                      <span className="text-gray-600">Steel Quality</span>
+                      <span className="font-semibold">Fe500 TMT Bars</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">MEP Systems</span>
-                      <span className="font-semibold text-green-600">Well Planned</span>
+                      <span className="text-gray-600">Earthquake Rating</span>
+                      <span className="font-semibold text-green-600">Zone II Compliant</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Waterproofing</span>
+                      <span className="font-semibold">Dr. Fixit System</span>
                     </div>
                   </div>
-
-                  <div className="bg-yellow-50 p-3 rounded mb-4">
-                    <p className="text-xs text-yellow-800">Could save ₹2-5 lakhs in unexpected repairs</p>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Electrical Load</span>
+                      <span className="font-semibold">5 KW per unit</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Power Backup</span>
+                      <span className="font-semibold text-green-600">100% DG Backup</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Plumbing</span>
+                      <span className="font-semibold">CPVC Pipes</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Fire Safety</span>
+                      <span className="font-semibold text-green-600">NOC Approved</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Lift Specifications</span>
+                      <span className="font-semibold">OTIS/Schindler</span>
+                    </div>
                   </div>
+                </div>
 
-                  <Button className="w-full" size="sm">
-                    <Lock className="h-4 w-4 mr-2" />
-                    Get Full Report - ₹2,499
-                  </Button>
-                </CardContent>
-              </Card>
+                <div className="bg-yellow-50 p-3 rounded mb-4">
+                  <p className="text-xs text-yellow-800">Civil & MEP analysis could save ₹2-5 lakhs in unexpected repairs</p>
+                </div>
 
-              {/* Property Valuation */}
-              <Card className="border-blue-200">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 className="font-semibold text-blue-800">Property Valuation</h4>
-                    <Badge className="bg-blue-100 text-blue-800">Critical</Badge>
-                  </div>
-                  
-                  <div className="space-y-3 mb-4">
+                <Button className="w-full" size="sm">
+                  <Lock className="h-4 w-4 mr-2" />
+                  Get Full Civil & MEP Report - ₹2,499
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Property Valuation Report Data */}
+            <Card className="border-blue-200">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-blue-800">Property Valuation Report</h4>
+                  <Badge className="bg-blue-100 text-blue-800">Critical</Badge>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div className="space-y-3">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Market Value</span>
                       <span className="font-semibold">₹{selectedConfig ? ((Number(selectedConfig.pricePerSqft) * Number(selectedConfig.builtUpArea))).toLocaleString() : '1,02,00,000'}</span>
@@ -632,19 +642,49 @@ export default function PropertyDetailMinimal() {
                       <span className="text-gray-600">Investment Grade</span>
                       <span className="font-semibold text-blue-600">A- Excellent</span>
                     </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Rental Yield</span>
+                      <span className="font-semibold text-green-600">3.8% annually</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Appreciation (5yr)</span>
+                      <span className="font-semibold text-green-600">55-70%</span>
+                    </div>
                   </div>
-
-                  <div className="bg-blue-50 p-3 rounded mb-4">
-                    <p className="text-xs text-blue-800">Avoid overpaying by 10-15% on average</p>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Construction Quality</span>
+                      <span className="font-semibold text-green-600">Premium Grade</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Connectivity Score</span>
+                      <span className="font-semibold">8.5/10</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Social Infrastructure</span>
+                      <span className="font-semibold text-green-600">Excellent</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Liquidity Factor</span>
+                      <span className="font-semibold">High Demand Area</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Risk Assessment</span>
+                      <span className="font-semibold text-green-600">Low Risk</span>
+                    </div>
                   </div>
+                </div>
 
-                  <Button className="w-full" size="sm">
-                    <Lock className="h-4 w-4 mr-2" />
-                    Get Full Report - ₹2,499
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+                <div className="bg-blue-50 p-3 rounded mb-4">
+                  <p className="text-xs text-blue-800">Professional valuation prevents overpaying by 10-15% on average</p>
+                </div>
+
+                <Button className="w-full" size="sm">
+                  <Lock className="h-4 w-4 mr-2" />
+                  Get Full Valuation Report - ₹2,499
+                </Button>
+              </CardContent>
+            </Card>
           </CardContent>
         </Card>
 
