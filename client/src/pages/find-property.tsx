@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion";
 
 interface PropertyPreferences {
@@ -199,30 +200,27 @@ export default function FindProperty() {
                     <label className="block text-lg font-semibold text-gray-900 mb-4">
                       Property Type <span className="text-red-500">*</span>
                     </label>
-                    <div className="grid gap-3">
-                      {displayPropertyTypes.map((type) => (
-                        <button
-                          key={type.value}
-                          onClick={() => handlePreferenceChange('propertyType', type.value)}
-                          data-testid={`select-property-type-${type.value}`}
-                          className={`p-4 rounded-xl border-2 text-left transition-all duration-200 ${
-                            preferences.propertyType === type.value
-                              ? 'border-blue-600 bg-blue-50 text-blue-600'
-                              : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
+                    <Select 
+                      value={preferences.propertyType} 
+                      onValueChange={(value) => handlePreferenceChange('propertyType', value)}
+                    >
+                      <SelectTrigger className="h-14 text-lg border-2 border-gray-200 focus:border-blue-600" data-testid="select-property-type">
+                        <div className="flex items-center space-x-3">
+                          <Home className="w-5 h-5 text-gray-600" />
+                          <SelectValue placeholder="Select property type" />
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {displayPropertyTypes.map((type) => (
+                          <SelectItem key={type.value} value={type.value} data-testid={`option-property-type-${type.value}`}>
                             <div className="flex items-center space-x-3">
-                              <Home className="w-5 h-5" />
-                              <span className="font-medium text-lg">{type.label}</span>
+                              <Home className="w-4 h-4" />
+                              <span>{type.label}</span>
                             </div>
-                            {preferences.propertyType === type.value && (
-                              <div className="w-3 h-3 bg-blue-600 rounded-full" />
-                            )}
-                          </div>
-                        </button>
-                      ))}
-                    </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   {/* Location Zone */}
@@ -230,30 +228,27 @@ export default function FindProperty() {
                     <label className="block text-lg font-semibold text-gray-900 mb-4">
                       Preferred Zone <span className="text-red-500">*</span>
                     </label>
-                    <div className="grid gap-3">
-                      {displayZones.map((zone) => (
-                        <button
-                          key={zone}
-                          onClick={() => handlePreferenceChange('zone', zone)}
-                          data-testid={`select-zone-${zone}`}
-                          className={`p-4 rounded-xl border-2 text-left transition-all duration-200 ${
-                            preferences.zone === zone
-                              ? 'border-blue-600 bg-blue-50 text-blue-600'
-                              : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
+                    <Select 
+                      value={preferences.zone} 
+                      onValueChange={(value) => handlePreferenceChange('zone', value)}
+                    >
+                      <SelectTrigger className="h-14 text-lg border-2 border-gray-200 focus:border-blue-600" data-testid="select-zone">
+                        <div className="flex items-center space-x-3">
+                          <MapPin className="w-5 h-5 text-gray-600" />
+                          <SelectValue placeholder="Select preferred zone" />
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {displayZones.map((zone) => (
+                          <SelectItem key={zone} value={zone} data-testid={`option-zone-${zone}`}>
                             <div className="flex items-center space-x-3">
-                              <MapPin className="w-5 h-5" />
-                              <span className="font-medium text-lg capitalize">{zone} Bengaluru</span>
+                              <MapPin className="w-4 h-4" />
+                              <span className="capitalize">{zone} Bengaluru</span>
                             </div>
-                            {preferences.zone === zone && (
-                              <div className="w-3 h-3 bg-blue-600 rounded-full" />
-                            )}
-                          </div>
-                        </button>
-                      ))}
-                    </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </div>
