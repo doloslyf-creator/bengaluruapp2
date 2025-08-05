@@ -43,6 +43,254 @@ interface Property {
   availableUnits: number;
 }
 
+interface PropertyReportCardProps {
+  property: Property;
+  onOrderReport: (property: Property, reportType: "valuation" | "civil-mep") => void;
+}
+
+function PropertyReportCard({ property, onOrderReport }: PropertyReportCardProps) {
+  const [activeReport, setActiveReport] = useState<"valuation" | "civil-mep">("valuation");
+
+  const valuationData = {
+    marketValue: "₹19,580,000",
+    locationPremium: "+15% vs Area Avg",
+    investmentGrade: "A- Excellent",
+    rentalYield: "3.8% annually",
+    appreciation: "55-70%",
+    constructionQuality: "Premium Grade",
+    connectivityScore: "8.5/10",
+    socialInfrastructure: "Excellent",
+    liquidityFactor: "High Demand Area",
+    riskAssessment: "Low Risk"
+  };
+
+  const civilMepData = {
+    structuralGrade: "Grade A",
+    foundationQuality: "Excellent",
+    electricalSystems: "BIS Compliant",
+    plumbingQuality: "Premium Grade",
+    fireDetection: "Installed",
+    ventilationScore: "9.2/10",
+    buildingMaterials: "High Quality",
+    safetyCompliance: "100% Compliant",
+    structuralIntegrity: "Certified",
+    overallRating: "Premium"
+  };
+
+  return (
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+      {/* Property Image */}
+      <div className="h-48 bg-gradient-to-r from-blue-500 to-purple-500 relative">
+        {property.images && property.images.length > 0 ? (
+          <img 
+            src={property.images[0]} 
+            alt={property.name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <Building2 className="w-16 h-16 text-white/80" />
+          </div>
+        )}
+        
+        {/* Quality Score Badge */}
+        <div className="absolute top-4 right-4">
+          <Badge className="bg-white/90 text-gray-900 font-semibold">
+            <Star className="w-3 h-3 mr-1 fill-yellow-400 text-yellow-400" />
+            {property.qualityScore}/10
+          </Badge>
+        </div>
+      </div>
+
+      <CardContent className="p-0">
+        {/* Property Info Header */}
+        <div className="p-6 pb-4">
+          <div className="space-y-3">
+            {/* Property Name & Developer */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                {property.name}
+              </h3>
+              <p className="text-sm text-gray-600">by {property.developer}</p>
+            </div>
+
+            {/* Location */}
+            <div className="flex items-center text-sm text-gray-600">
+              <MapPin className="w-4 h-4 mr-1" />
+              {property.locality}, {property.location}
+            </div>
+
+            {/* Price Range */}
+            <div className="text-lg font-bold text-green-600">
+              {property.priceRange}
+            </div>
+          </div>
+        </div>
+
+        {/* Report Type Tabs */}
+        <div className="border-t border-gray-200">
+          <Tabs value={activeReport} onValueChange={(value) => setActiveReport(value as "valuation" | "civil-mep")}>
+            <TabsList className="w-full grid grid-cols-2 h-12 bg-gray-50 rounded-none">
+              <TabsTrigger 
+                value="valuation" 
+                className="text-sm font-medium data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              >
+                Property Valuation Report
+              </TabsTrigger>
+              <TabsTrigger 
+                value="civil-mep"
+                className="text-sm font-medium data-[state=active]:bg-purple-600 data-[state=active]:text-white"
+              >
+                Civil MEP Analysis
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Valuation Report Content */}
+            <TabsContent value="valuation" className="p-6 pt-4 space-y-4">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-lg font-semibold text-blue-600">Property Valuation Report</h4>
+                <Badge className="bg-red-100 text-red-800 text-xs">Critical</Badge>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Market Value</span>
+                    <span className="font-semibold">{valuationData.marketValue}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Location Premium</span>
+                    <span className="font-semibold text-green-600">{valuationData.locationPremium}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Investment Grade</span>
+                    <span className="font-semibold text-blue-600">{valuationData.investmentGrade}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Rental Yield</span>
+                    <span className="font-semibold text-green-600">{valuationData.rentalYield}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Appreciation (5yr)</span>
+                    <span className="font-semibold text-green-600">{valuationData.appreciation}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Construction Quality</span>
+                    <span className="font-semibold text-green-600">{valuationData.constructionQuality}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Connectivity Score</span>
+                    <span className="font-semibold">{valuationData.connectivityScore}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Social Infrastructure</span>
+                    <span className="font-semibold text-green-600">{valuationData.socialInfrastructure}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Liquidity Factor</span>
+                    <span className="font-semibold">{valuationData.liquidityFactor}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Risk Assessment</span>
+                    <span className="font-semibold text-green-600">{valuationData.riskAssessment}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 p-3 rounded-lg">
+                <p className="text-blue-700 text-sm font-medium">
+                  Professional valuation prevents overpaying by 10-15% on average
+                </p>
+              </div>
+
+              <Button 
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12"
+                onClick={() => onOrderReport(property, "valuation")}
+              >
+                <Shield className="w-4 h-4 mr-2" />
+                Get Full Valuation Report - ₹2,499
+              </Button>
+            </TabsContent>
+
+            {/* Civil MEP Content */}
+            <TabsContent value="civil-mep" className="p-6 pt-4 space-y-4">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-lg font-semibold text-purple-600">Civil MEP Analysis</h4>
+                <Badge className="bg-green-100 text-green-800 text-xs">Certified</Badge>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Structural Grade</span>
+                    <span className="font-semibold text-green-600">{civilMepData.structuralGrade}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Foundation Quality</span>
+                    <span className="font-semibold text-green-600">{civilMepData.foundationQuality}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Electrical Systems</span>
+                    <span className="font-semibold text-blue-600">{civilMepData.electricalSystems}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Plumbing Quality</span>
+                    <span className="font-semibold text-green-600">{civilMepData.plumbingQuality}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Fire Detection</span>
+                    <span className="font-semibold text-green-600">{civilMepData.fireDetection}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Ventilation Score</span>
+                    <span className="font-semibold">{civilMepData.ventilationScore}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Building Materials</span>
+                    <span className="font-semibold text-green-600">{civilMepData.buildingMaterials}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Safety Compliance</span>
+                    <span className="font-semibold text-green-600">{civilMepData.safetyCompliance}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Structural Integrity</span>
+                    <span className="font-semibold text-blue-600">{civilMepData.structuralIntegrity}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Overall Rating</span>
+                    <span className="font-semibold text-green-600">{civilMepData.overallRating}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-purple-50 p-3 rounded-lg">
+                <p className="text-purple-700 text-sm font-medium">
+                  Engineering analysis prevents costly structural issues post-purchase
+                </p>
+              </div>
+
+              <Button 
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white h-12"
+                onClick={() => onOrderReport(property, "civil-mep")}
+              >
+                <TrendingUp className="w-4 h-4 mr-2" />
+                Get Full Civil MEP Report - ₹2,499
+              </Button>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function PropertyReports() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("all");
@@ -249,98 +497,13 @@ export default function PropertyReports() {
               <p className="text-gray-600">Try adjusting your search criteria</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {filteredProperties.map((property: Property) => (
-                <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  {/* Property Image */}
-                  <div className="h-48 bg-gradient-to-r from-blue-500 to-purple-500 relative">
-                    {property.images && property.images.length > 0 ? (
-                      <img 
-                        src={property.images[0]} 
-                        alt={property.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Building2 className="w-16 h-16 text-white/80" />
-                      </div>
-                    )}
-                    
-                    {/* Quality Score Badge */}
-                    <div className="absolute top-4 right-4">
-                      <Badge className="bg-white/90 text-gray-900 font-semibold">
-                        <Star className="w-3 h-3 mr-1 fill-yellow-400 text-yellow-400" />
-                        {property.qualityScore}/10
-                      </Badge>
-                    </div>
-                  </div>
-
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      {/* Property Name & Developer */}
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                          {property.name}
-                        </h3>
-                        <p className="text-sm text-gray-600">by {property.developer}</p>
-                      </div>
-
-                      {/* Location */}
-                      <div className="flex items-center text-sm text-gray-600">
-                        <MapPin className="w-4 h-4 mr-1" />
-                        {property.locality}, {property.location}
-                      </div>
-
-                      {/* Price Range */}
-                      <div className="text-lg font-bold text-green-600">
-                        {property.priceRange}
-                      </div>
-
-                      {/* Configurations */}
-                      <div className="flex flex-wrap gap-1">
-                        {property.configurations?.slice(0, 3).map((config, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {config}
-                          </Badge>
-                        ))}
-                        {property.configurations?.length > 3 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{property.configurations.length - 3} more
-                          </Badge>
-                        )}
-                      </div>
-
-                      {/* RERA Status */}
-                      {property.reraRegistered && (
-                        <div className="flex items-center">
-                          <Badge className="bg-green-100 text-green-800 text-xs">
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            RERA Registered
-                          </Badge>
-                        </div>
-                      )}
-
-                      {/* Report Buttons */}
-                      <div className="space-y-2">
-                        <Button 
-                          className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                          onClick={() => handleViewReports(property, "valuation")}
-                        >
-                          <FileText className="w-4 h-4 mr-2" />
-                          Property Valuation Report - ₹2,499
-                        </Button>
-                        <Button 
-                          variant="outline"
-                          className="w-full border-purple-600 text-purple-600 hover:bg-purple-50"
-                          onClick={() => handleViewReports(property, "civil-mep")}
-                        >
-                          <TrendingUp className="w-4 h-4 mr-2" />
-                          Civil+MEP Analysis - ₹2,499
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <PropertyReportCard 
+                  key={property.id} 
+                  property={property} 
+                  onOrderReport={handleViewReports}
+                />
               ))}
             </div>
           )}
