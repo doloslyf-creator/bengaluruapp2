@@ -49,8 +49,8 @@ const onboardingSchema = z.object({
   urgency: z.enum(["immediate", "3-6-months", "6-12-months", "exploratory"]),
   
   // Budget & Financing
-  budgetMin: z.number().min(0.5, "Minimum budget should be at least 0.5 crores"),
-  budgetMax: z.number().min(0.5, "Maximum budget should be at least 0.5 crores"),
+  budgetMin: z.number().min(0.1, "Minimum budget should be at least 0.1 crores"),
+  budgetMax: z.number().min(0.1, "Maximum budget should be at least 0.1 crores"),
   financing: z.enum(["own-funds", "bank-loan", "inheritance", "mixed"]),
   hasPreApproval: z.boolean().optional(),
   
@@ -345,9 +345,13 @@ export default function FirstTimeBuyerOnboarding() {
                       <Input 
                         type="number" 
                         step="0.1"
+                        min="0.1"
                         placeholder="1.5" 
                         value={field.value || ""}
-                        onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : "")}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          field.onChange(val === "" ? undefined : Number(val));
+                        }}
                       />
                     </FormControl>
                     <p className="text-xs text-gray-500 mt-1">For budgets below 1 Cr, use decimals (e.g., 0.8 for 80 Lakhs)</p>
@@ -366,9 +370,13 @@ export default function FirstTimeBuyerOnboarding() {
                       <Input 
                         type="number" 
                         step="0.1"
+                        min="0.1"
                         placeholder="2.5" 
                         value={field.value || ""}
-                        onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : "")}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          field.onChange(val === "" ? undefined : Number(val));
+                        }}
                       />
                     </FormControl>
                     <p className="text-xs text-gray-500 mt-1">For budgets below 1 Cr, use decimals (e.g., 0.9 for 90 Lakhs)</p>

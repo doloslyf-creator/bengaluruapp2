@@ -86,21 +86,27 @@ export default function CustomerHome() {
               <Button
                 onClick={() => navigate('/first-time-buyer')}
                 size="lg"
-                className="bg-gradient-to-r from-orange-500 to-red-600 hover:shadow-lg text-white px-8 py-4 text-lg font-semibold rounded-xl border-2 border-orange-400"
+                className="bg-gradient-to-r from-orange-500 to-red-600 hover:shadow-lg text-white px-8 py-4 rounded-xl border-2 border-orange-400 flex flex-col items-center space-y-1"
                 data-testid="button-first-time-buyer"
               >
-                <Sparkles className="h-5 w-5 mr-2" />
-                First-Time Buyer? Start Here →
+                <div className="flex items-center">
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  <span className="text-sm font-medium">First-time buyer?</span>
+                </div>
+                <div className="text-lg font-bold">Start Here →</div>
               </Button>
               
               <Button
                 onClick={() => navigate('/find-property')}
                 size="lg"
-                className="bg-gradient-to-r from-primary to-blue-600 hover:shadow-lg text-white px-8 py-4 text-lg font-semibold rounded-xl"
+                className="bg-gradient-to-r from-primary to-blue-600 hover:shadow-lg text-white px-8 py-4 rounded-xl flex flex-col items-center space-y-1"
                 data-testid="button-find-property"
               >
-                <Search className="h-5 w-5 mr-2" />
-                Find Your Perfect Home
+                <div className="flex items-center">
+                  <Search className="h-4 w-4 mr-2" />
+                  <span className="text-sm font-medium">Ready to buy?</span>
+                </div>
+                <div className="text-lg font-bold">Find Perfect Home</div>
               </Button>
             </div>
 
