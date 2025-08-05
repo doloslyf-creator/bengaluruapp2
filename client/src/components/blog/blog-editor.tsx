@@ -317,18 +317,24 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
           
           <div className="flex items-center space-x-2">
             <Button 
-              type="submit" 
+              type="button" 
               disabled={isPending}
               variant="outline"
-              onClick={() => form.setValue("status", "draft")}
+              onClick={(e) => {
+                form.setValue("status", "draft");
+                form.handleSubmit(handleSubmit)();
+              }}
             >
               <Save className="h-4 w-4 mr-2" />
               Save Draft
             </Button>
             <Button 
-              type="submit" 
+              type="button" 
               disabled={isPending}
-              onClick={() => form.setValue("status", "published")}
+              onClick={(e) => {
+                form.setValue("status", "published");
+                form.handleSubmit(handleSubmit)();
+              }}
             >
               <Eye className="h-4 w-4 mr-2" />
               {post?.status === "published" ? "Update" : "Publish"}
