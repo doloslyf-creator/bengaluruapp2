@@ -1646,6 +1646,193 @@ export const civilMepReports = pgTable("civil_mep_reports", {
   updatedAt: timestamp("updated_at").defaultNow()
 });
 
+// Legal Audit Reports Table
+export const legalAuditReports = pgTable("legal_audit_reports", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  propertyId: varchar("property_id").notNull().references(() => properties.id),
+  
+  // Report metadata
+  reportTitle: text("report_title").notNull(),
+  auditorName: text("auditor_name").notNull(),
+  auditorLicense: text("auditor_license").notNull(),
+  auditDate: date("audit_date").notNull(),
+  reportDate: date("report_date").notNull(),
+  
+  // Report status and scoring
+  status: varchar("status", { 
+    enum: ["draft", "in-progress", "completed", "approved"] 
+  }).notNull().default("draft"),
+  overallScore: real("overall_score").default(0), // 0-10 scale
+  overallGrade: varchar("overall_grade", { enum: ["A+", "A", "B+", "B", "C+", "C", "D"] }),
+  riskLevel: varchar("risk_level", { enum: ["low", "medium", "high", "critical"] }).default("medium"),
+  
+  // Executive summary and conclusions
+  executiveSummary: text("executive_summary"),
+  keyFindings: text("key_findings"),
+  criticalIssues: text("critical_issues"),
+  recommendations: text("recommendations"),
+  conclusions: text("conclusions"),
+  
+  // Legal recommendation
+  legalRecommendation: varchar("legal_recommendation", {
+    enum: ["proceed-confidently", "proceed-with-caution", "requires-resolution", "avoid"]
+  }).default("proceed-with-caution"),
+  
+  // Detailed audit sections (JSON fields for flexibility)
+  propertyOwnership: json("property_ownership").$type<{
+    currentLandowner?: string;
+    titleDeedNumber?: string;
+    ownershipHistory?: Array<{
+      owner?: string;
+      transferDate?: string;
+      documentType?: string;
+      registrationNumber?: string;
+    }>;
+    titleStatus?: string; // clear, marketable, encumbered
+    chainGaps?: string[];
+    ownershipFlags?: string[];
+    score?: number; // 0-10
+    notes?: string;
+  }>().default({}),
+  
+  landPropertyDocuments: json("land_property_documents").$type<{
+    saleDeedAvailable?: boolean;
+    rtcKhataDetails?: string;
+    conversionCertificate?: boolean;
+    encumbranceCertificate?: {
+      available?: boolean;
+      years?: number;
+      lastCheckedDate?: string;
+    };
+    gpaJdaAgreements?: boolean;
+    mutationExtract?: boolean;
+    agriculturalLandFlag?: boolean;
+    documentFlags?: string[];
+    score?: number;
+    notes?: string;
+  }>().default({}),
+  
+  builderLegalStatus: json("builder_legal_status").$type<{
+    reraRegistration?: {
+      number?: string;
+      status?: string;
+      link?: string;
+      expiryDate?: string;
+    };
+    companyRegistration?: {
+      cin?: string;
+      type?: string; // LLP, Pvt Ltd, etc
+      status?: string;
+    };
+    pastLitigation?: Array<{
+      caseType?: string;
+      court?: string;
+      status?: string;
+      caseNumber?: string;
+    }>;
+    deliveryDelays?: Array<{
+      project?: string;
+      delayMonths?: number;
+      reason?: string;
+    }>;
+    builderFlags?: string[];
+    score?: number;
+    notes?: string;
+  }>().default({}),
+  
+  approvalsPermissions: json("approvals_permissions").$type<{
+    buildingPlanSanction?: {
+      available?: boolean;
+      authority?: string; // BBMP, BDA, BMRDA, DTCP
+      approvalDate?: string;
+      planNumber?: string;
+    };
+    fireNoc?: boolean;
+    waterSewerageNoc?: boolean;
+    liftLicense?: boolean;
+    commencementCertificate?: boolean;
+    occupancyCertificate?: {
+      available?: boolean;
+      date?: string;
+      status?: string; // received, pending, applied
+    };
+    approvalFlags?: string[];
+    score?: number;
+    notes?: string;
+  }>().default({}),
+  
+  zoningEnvironmental: json("zoning_environmental").$type<{
+    zoningClassification?: string;
+    bufferZoneProximity?: Array<{
+      type?: string; // lake, rajkaluve, STP
+      distance?: string;
+      riskLevel?: string;
+    }>;
+    environmentalClearance?: boolean;
+    kspcbNoc?: boolean;
+    zoningFlags?: string[];
+    score?: number;
+    notes?: string;
+  }>().default({}),
+  
+  litigationDisputes: json("litigation_disputes").$type<{
+    activeCases?: Array<{
+      caseType?: string;
+      court?: string;
+      caseNumber?: string;
+      status?: string;
+      nextHearing?: string;
+    }>;
+    firDisputes?: Array<{
+      firNumber?: string;
+      station?: string;
+      type?: string;
+      status?: string;
+    }>;
+    gpaDisputes?: boolean;
+    stayOrders?: Array<{
+      type?: string;
+      issuedBy?: string;
+      date?: string;
+      status?: string;
+    }>;
+    litigationFlags?: string[];
+    score?: number;
+    notes?: string;
+  }>().default({}),
+  
+  loanabilityBankApprovals: json("loanability_bank_approvals").$type<{
+    approvedBanks?: Array<{
+      bankName?: string;
+      approvalDate?: string;
+      loanPercentage?: number;
+    }>;
+    rejectedBanks?: Array<{
+      bankName?: string;
+      rejectionReason?: string;
+      rejectionDate?: string;
+    }>;
+    individualUnitEligibility?: boolean;
+    commonRejectionReasons?: string[];
+    loanabilityFlags?: string[];
+    score?: number;
+    notes?: string;
+  }>().default({}),
+  
+  // Calculated section scores (0-10 each)
+  ownershipScore: real("ownership_score").default(0),
+  documentsScore: real("documents_score").default(0),
+  builderScore: real("builder_score").default(0),
+  approvalsScore: real("approvals_score").default(0),
+  zoningScore: real("zoning_score").default(0),
+  litigationScore: real("litigation_score").default(0),
+  loanabilityScore: real("loanability_score").default(0),
+  
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export type CivilMepReport = typeof civilMepReports.$inferSelect;
 export type NewCivilMepReport = typeof civilMepReports.$inferInsert;
 
@@ -1656,6 +1843,18 @@ export const insertCivilMepReportSchema = createInsertSchema(civilMepReports).om
 });
 
 export type InsertCivilMepReport = z.infer<typeof insertCivilMepReportSchema>;
+
+// Legal Audit Report Types
+export type LegalAuditReport = typeof legalAuditReports.$inferSelect;
+export type NewLegalAuditReport = typeof legalAuditReports.$inferInsert;
+
+export const insertLegalAuditReportSchema = createInsertSchema(legalAuditReports).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export type InsertLegalAuditReport = z.infer<typeof insertLegalAuditReportSchema>;
 
 // City and Zone schemas - Added at the end to avoid initialization issues
 export const insertCitySchema = createInsertSchema(cities).omit({

@@ -40,6 +40,8 @@
   type InsertPropertyValuationReport,
   type CivilMepReport,
   type InsertCivilMepReport,
+  type LegalAuditReport,
+  type InsertLegalAuditReport,
   type ReportPayment,
   type InsertReportPayment,
   type CustomerNote,
@@ -64,6 +66,7 @@
   bookingStaff,
   propertyValuationReports,
   civilMepReports,
+  legalAuditReports,
   reportPayments,
   customerNotes,
   appSettings,
@@ -227,6 +230,24 @@ export interface IStorage {
   updateCivilMepReport(reportId: string, updates: Partial<InsertCivilMepReport>): Promise<CivilMepReport | undefined>;
   deleteCivilMepReport(reportId: string): Promise<boolean>;
   getCivilMepReportStats(): Promise<any>;
+
+  // Legal Audit Report operations
+  createLegalAuditReport(report: InsertLegalAuditReport): Promise<LegalAuditReport>;
+  getLegalAuditReport(reportId: string): Promise<LegalAuditReport | undefined>;
+  getLegalAuditReportByProperty(propertyId: string): Promise<LegalAuditReport | undefined>;
+  getAllLegalAuditReports(): Promise<LegalAuditReport[]>;
+  updateLegalAuditReport(reportId: string, updates: Partial<InsertLegalAuditReport>): Promise<LegalAuditReport | undefined>;
+  deleteLegalAuditReport(reportId: string): Promise<boolean>;
+  getLegalAuditReportStats(): Promise<any>;
+  
+  // Legal Audit Report operations
+  createLegalAuditReport(report: InsertLegalAuditReport): Promise<LegalAuditReport>;
+  getLegalAuditReport(reportId: string): Promise<LegalAuditReport | undefined>;
+  getLegalAuditReportByProperty(propertyId: string): Promise<LegalAuditReport | undefined>;
+  getAllLegalAuditReports(): Promise<LegalAuditReport[]>;
+  updateLegalAuditReport(reportId: string, updates: Partial<InsertLegalAuditReport>): Promise<LegalAuditReport | undefined>;
+  deleteLegalAuditReport(reportId: string): Promise<boolean>;
+  getLegalAuditReportStats(): Promise<any>;
   
   // Report Payment operations
   createReportPayment(payment: InsertReportPayment): Promise<ReportPayment>;
@@ -1268,6 +1289,48 @@ export class MemStorage implements IStorage {
         "recommended": 0,
         "conditional": 0,
         "not-recommended": 0,
+      }
+    };
+  }
+
+  // Legal Audit Report operations - MemStorage stub implementations  
+  async createLegalAuditReport(report: InsertLegalAuditReport): Promise<LegalAuditReport> {
+    throw new Error("Legal Audit reports not implemented in MemStorage");
+  }
+
+  async getLegalAuditReport(reportId: string): Promise<LegalAuditReport | undefined> {
+    return undefined;
+  }
+
+  async getLegalAuditReportByProperty(propertyId: string): Promise<LegalAuditReport | undefined> {
+    return undefined;
+  }
+
+  async getAllLegalAuditReports(): Promise<LegalAuditReport[]> {
+    return [];
+  }
+
+  async updateLegalAuditReport(reportId: string, updates: Partial<InsertLegalAuditReport>): Promise<LegalAuditReport | undefined> {
+    return undefined;
+  }
+
+  async deleteLegalAuditReport(reportId: string): Promise<boolean> {
+    return false;
+  }
+
+  async getLegalAuditReportStats(): Promise<any> {
+    return {
+      totalReports: 0,
+      completedReports: 0,
+      inProgressReports: 0,
+      draftReports: 0,
+      approvedReports: 0,
+      avgScore: 0,
+      byRiskLevel: {
+        "low": 0,
+        "medium": 0,
+        "high": 0,
+        "critical": 0,
       }
     };
   }
@@ -2488,6 +2551,77 @@ export class DatabaseStorage implements IStorage {
       approvedReports,
       avgScore,
       byRecommendation
+    };
+  }
+
+  // Legal Audit Report operations
+  async createLegalAuditReport(report: InsertLegalAuditReport): Promise<LegalAuditReport> {
+    const [newReport] = await db.insert(legalAuditReports)
+      .values(report)
+      .returning();
+    return newReport;
+  }
+
+  async getLegalAuditReport(reportId: string): Promise<LegalAuditReport | undefined> {
+    const [report] = await db.select().from(legalAuditReports)
+      .where(eq(legalAuditReports.id, reportId));
+    return report || undefined;
+  }
+
+  async getLegalAuditReportByProperty(propertyId: string): Promise<LegalAuditReport | undefined> {
+    const [report] = await db.select().from(legalAuditReports)
+      .where(eq(legalAuditReports.propertyId, propertyId));
+    return report || undefined;
+  }
+
+  async getAllLegalAuditReports(): Promise<LegalAuditReport[]> {
+    return await db.select().from(legalAuditReports)
+      .orderBy(desc(legalAuditReports.createdAt));
+  }
+
+  async updateLegalAuditReport(reportId: string, updates: Partial<InsertLegalAuditReport>): Promise<LegalAuditReport | undefined> {
+    const [report] = await db.update(legalAuditReports)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(legalAuditReports.id, reportId))
+      .returning();
+    return report || undefined;
+  }
+
+  async deleteLegalAuditReport(reportId: string): Promise<boolean> {
+    const result = await db.delete(legalAuditReports)
+      .where(eq(legalAuditReports.id, reportId));
+    return result.rowCount > 0;
+  }
+
+  async getLegalAuditReportStats(): Promise<any> {
+    const reports = await this.getAllLegalAuditReports();
+    
+    const totalReports = reports.length;
+    const completedReports = reports.filter(r => r.status === "completed").length;
+    const inProgressReports = reports.filter(r => r.status === "in-progress").length;
+    const draftReports = reports.filter(r => r.status === "draft").length;
+    const approvedReports = reports.filter(r => r.status === "approved").length;
+    
+    const avgScore = reports.length > 0 
+      ? reports.reduce((sum, r) => sum + (r.overallScore || 0), 0) / reports.length 
+      : 0;
+    
+    // Group by risk level
+    const byRiskLevel = {
+      "low": reports.filter(r => r.riskLevel === "low").length,
+      "medium": reports.filter(r => r.riskLevel === "medium").length,
+      "high": reports.filter(r => r.riskLevel === "high").length,
+      "critical": reports.filter(r => r.riskLevel === "critical").length,
+    };
+    
+    return {
+      totalReports,
+      completedReports,
+      inProgressReports,
+      draftReports,
+      approvedReports,
+      avgScore,
+      byRiskLevel
     };
   }
 }

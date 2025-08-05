@@ -142,6 +142,12 @@ const groupedNavigation: NavigationGroup[] = [
         description: "Engineering Assessments"
       },
       { 
+        name: "Legal Audit Reports", 
+        href: "/admin-panel/legal-audit-reports", 
+        icon: Shield,
+        description: "Legal Due Diligence Analysis"
+      },
+      { 
         name: "Valuation Reports", 
         href: "/admin-panel/valuation-reports", 
         icon: TrendingUp,

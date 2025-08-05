@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { registerEnhancedLeadRoutes } from "./enhancedLeadRoutes";
 import { registerBookingRoutes } from "./bookingRoutes";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
-import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertCivilMepReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, insertPropertyValuationReportSchema, insertPropertyValuationReportConfigurationSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests, propertyValuationReportCustomers, propertyValuationReportConfigurations, userRoles, permissions, rolePermissions, userRoleAssignments, insertUserRoleSchema, insertPermissionSchema, insertRolePermissionSchema, insertUserRoleAssignmentSchema } from "@shared/schema";
+import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertCivilMepReportSchema, insertLegalAuditReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, insertPropertyValuationReportSchema, insertPropertyValuationReportConfigurationSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests, propertyValuationReportCustomers, propertyValuationReportConfigurations, userRoles, permissions, rolePermissions, userRoleAssignments, insertUserRoleSchema, insertPermissionSchema, insertRolePermissionSchema, insertUserRoleAssignmentSchema } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
@@ -1383,7 +1383,110 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Legal Audit Reports API - Complete CRUD operations
+  app.post("/api/legal-audit-reports", async (req, res) => {
+    try {
+      const validation = insertLegalAuditReportSchema.safeParse(req.body);
+      if (!validation.success) {
+        return res.status(400).json({ 
+          error: "Invalid report data", 
+          details: validation.error.format() 
+        });
+      }
 
+      const report = await storage.createLegalAuditReport(validation.data);
+      res.status(201).json(report);
+    } catch (error) {
+      console.error("Error creating Legal Audit report:", error);
+      res.status(500).json({ error: "Failed to create Legal Audit report" });
+    }
+  });
+
+  app.get("/api/legal-audit-reports", async (req, res) => {
+    try {
+      const reports = await storage.getAllLegalAuditReports();
+      res.json(reports);
+    } catch (error) {
+      console.error("Error fetching Legal Audit reports:", error);
+      res.status(500).json({ error: "Failed to fetch Legal Audit reports" });
+    }
+  });
+
+  app.get("/api/legal-audit-reports/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const report = await storage.getLegalAuditReport(id);
+      
+      if (!report) {
+        return res.status(404).json({ error: "Legal Audit report not found" });
+      }
+      
+      res.json(report);
+    } catch (error) {
+      console.error("Error fetching Legal Audit report:", error);
+      res.status(500).json({ error: "Failed to fetch Legal Audit report" });
+    }
+  });
+
+  app.get("/api/legal-audit-reports/property/:propertyId", async (req, res) => {
+    try {
+      const { propertyId } = req.params;
+      const report = await storage.getLegalAuditReportByProperty(propertyId);
+      
+      if (!report) {
+        return res.status(404).json({ error: "Legal Audit report not found for this property" });
+      }
+      
+      res.json(report);
+    } catch (error) {
+      console.error("Error fetching Legal Audit report by property:", error);
+      res.status(500).json({ error: "Failed to fetch Legal Audit report" });
+    }
+  });
+
+  app.put("/api/legal-audit-reports/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+      
+      const report = await storage.updateLegalAuditReport(id, updates);
+      
+      if (!report) {
+        return res.status(404).json({ error: "Legal Audit report not found" });
+      }
+      
+      res.json(report);
+    } catch (error) {
+      console.error("Error updating Legal Audit report:", error);
+      res.status(500).json({ error: "Failed to update Legal Audit report" });
+    }
+  });
+
+  app.delete("/api/legal-audit-reports/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deleteLegalAuditReport(id);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Legal Audit report not found" });
+      }
+      
+      res.json({ success: true, message: "Legal Audit report deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting Legal Audit report:", error);
+      res.status(500).json({ error: "Failed to delete Legal Audit report" });
+    }
+  });
+
+  app.get("/api/legal-audit-reports-stats", async (req, res) => {
+    try {
+      const stats = await storage.getLegalAuditReportStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching Legal Audit report stats:", error);
+      res.status(500).json({ error: "Failed to fetch Legal Audit report statistics" });
+    }
+  });
 
   // Customer CRM API - Get all customers with unified data
   app.get("/api/customers", async (req, res) => {

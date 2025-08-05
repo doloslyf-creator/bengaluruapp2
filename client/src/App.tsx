@@ -61,6 +61,8 @@ import BackupSystem from "@/pages/admin/backup-system";
 import { AdminCivilMepReports } from "@/pages/admin-civil-mep-reports";
 import { AdminCivilMepReportsCreate } from "@/pages/admin-civil-mep-reports-create";
 import { CivilMepReportView } from "@/pages/civil-mep-report-view";
+import AdminLegalAuditReports from "@/pages/admin/legal-audit-reports";
+import AdminLegalAuditReportsCreate from "@/pages/admin/legal-audit-reports-create";
 
 import Reports from "@/pages/reports";
 import PropertyReports from "@/pages/property-reports";
@@ -131,6 +133,9 @@ function ProtectedRouter() {
       <Route path="/admin-panel/civil-mep-reports/:id/edit" component={AdminCivilMepReportsCreate} />
       <Route path="/admin/civil-mep-reports/:id/edit" component={AdminCivilMepReportsCreate} />
       <Route path="/civil-mep-report/:id" component={CivilMepReportView} />
+      <Route path="/admin-panel/legal-audit-reports" component={AdminLegalAuditReports} />
+      <Route path="/admin-panel/legal-audit-reports/create" component={AdminLegalAuditReportsCreate} />
+      <Route path="/admin-panel/legal-audit-reports/:id/edit" component={AdminLegalAuditReportsCreate} />
       <Route path="/admin-panel/valuation-reports" component={ValuationReportsPage} />
       <Route path="/admin-panel/valuation-reports/create" component={ValuationReportsCreate} />
       <Route path="/admin-panel/valuation-reports/create-comprehensive" component={ValuationReportsCreateComprehensive} />
