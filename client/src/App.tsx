@@ -29,7 +29,7 @@ import Orders from "@/pages/admin/orders";
 import Customers from "@/pages/admin/customers";
 
 import PropertyEdit from "@/pages/property-edit";
-import PropertyDetailNew from "@/pages/property-detail-new";
+import PropertyDetailMinimal from "@/pages/property-detail-minimal";
 import FindProperty from "@/pages/find-property";
 import PropertyValuation from "@/pages/property-valuation";
 import PropertyValuationForm from "@/pages/property-valuation-form";
@@ -144,7 +144,7 @@ function ProtectedRouter() {
       <Route path="/about" component={About} />
       <Route path="/find-property" component={FindProperty} />
       <Route path="/find-property/results" component={PropertyResults} />
-      <Route path="/property/:id" component={PropertyDetailNew} />
+      <Route path="/property/:id" component={PropertyDetailMinimal} />
       <Route path="/property-valuation" component={PropertyValuation} />
       <Route path="/property-valuation-form" component={PropertyValuationForm} />
 
