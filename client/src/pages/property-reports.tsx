@@ -297,6 +297,7 @@ export default function PropertyReports() {
   const [showOrderForm, setShowOrderForm] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [selectedReportType, setSelectedReportType] = useState<"valuation" | "civil-mep">("valuation");
+  const [hasSearched, setHasSearched] = useState(false);
   
   const { toast } = useToast();
   const { processPayment } = usePayment();
@@ -307,7 +308,7 @@ export default function PropertyReports() {
 
   // Filter and sort properties
   const filteredProperties = useMemo(() => {
-    if (!Array.isArray(properties)) return [];
+    if (!Array.isArray(properties) || !hasSearched) return [];
     
     let filtered = properties.filter((property: Property) => {
       const matchesSearch = 
@@ -324,7 +325,7 @@ export default function PropertyReports() {
     return filtered.sort((a: Property, b: Property) => 
       (a.location || "").localeCompare(b.location || "")
     );
-  }, [properties, searchQuery, selectedLocation]);
+  }, [properties, searchQuery, selectedLocation, hasSearched]);
 
   // Get unique locations for filter
   const locations = useMemo(() => {
@@ -336,6 +337,46 @@ export default function PropertyReports() {
     });
     return Array.from(locationSet).sort();
   }, [properties]);
+
+  // Sample properties for display before search
+  const sampleProperties: Property[] = [
+    {
+      id: "sample-1",
+      name: "Prestige Lakeside Habitat",
+      developer: "Prestige Group",
+      location: "Varthur",
+      locality: "Whitefield",
+      priceRange: "₹1.2 - 2.1 Cr",
+      configurations: ["2 BHK", "3 BHK", "4 BHK"],
+      images: [],
+      amenities: ["Swimming Pool", "Gym", "Clubhouse"],
+      reraRegistered: true,
+      qualityScore: 8.5,
+      possessionDate: "Dec 2025",
+      totalUnits: 800,
+      availableUnits: 150
+    },
+    {
+      id: "sample-2",
+      name: "Brigade Cornerstone Utopia",
+      developer: "Brigade Group",
+      location: "Electronic City",
+      locality: "Phase 1",
+      priceRange: "₹85 L - 1.5 Cr",
+      configurations: ["1 BHK", "2 BHK", "3 BHK"],
+      images: [],
+      amenities: ["Garden", "Parking", "Security"],
+      reraRegistered: true,
+      qualityScore: 9.2,
+      possessionDate: "Mar 2026",
+      totalUnits: 1200,
+      availableUnits: 320
+    }
+  ];
+
+  const handleSearch = () => {
+    setHasSearched(true);
+  };
 
   const handleViewReports = (property: Property, reportType: "valuation" | "civil-mep") => {
     setSelectedProperty(property);
@@ -443,10 +484,26 @@ export default function PropertyReports() {
               <Input
                 placeholder="Search by property name or developer..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  if (e.target.value.length > 0) {
+                    setHasSearched(true);
+                  }
+                }}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSearch();
+                  }
+                }}
                 className="pl-10 h-12"
               />
             </div>
+            <Button 
+              onClick={handleSearch}
+              className="h-12 px-6 bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Search Properties
+            </Button>
             <div className="w-full md:w-64">
               <Select value={selectedLocation} onValueChange={setSelectedLocation}>
                 <SelectTrigger className="h-12">
@@ -464,9 +521,15 @@ export default function PropertyReports() {
             </div>
           </div>
           
-          {filteredProperties.length > 0 && (
+          {hasSearched && filteredProperties.length > 0 && (
             <div className="mt-4 text-sm text-gray-600">
               Found {filteredProperties.length} properties
+            </div>
+          )}
+          
+          {!hasSearched && (
+            <div className="mt-4 text-sm text-gray-600">
+              Enter property name or developer to search. Sample properties shown below.
             </div>
           )}
         </div>
@@ -475,9 +538,20 @@ export default function PropertyReports() {
       {/* Properties Grid */}
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[...Array(6)].map((_, i) => (
+          {!hasSearched ? (
+            // Show sample properties before search
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {sampleProperties.map((property: Property) => (
+                <PropertyReportCard 
+                  key={property.id} 
+                  property={property} 
+                  onOrderReport={handleViewReports}
+                />
+              ))}
+            </div>
+          ) : isLoading ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {[...Array(4)].map((_, i) => (
                 <Card key={i} className="overflow-hidden">
                   <div className="h-48 bg-gray-200 animate-pulse" />
                   <CardContent className="p-6">
@@ -494,7 +568,7 @@ export default function PropertyReports() {
             <div className="text-center py-16">
               <Building2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">No Properties Found</h3>
-              <p className="text-gray-600">Try adjusting your search criteria</p>
+              <p className="text-gray-600">Try adjusting your search criteria or browse our sample properties above</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
