@@ -1,0 +1,65 @@
+{
+  "name": "OwnItRight - Property Advisory Services",
+  "short_name": "OwnItRight",
+  "description": "Professional property advisory services in Bangalore. Expert valuations, detailed reports, and personalized investment guidance.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "categories": ["business", "finance", "productivity"],
+  "lang": "en-US",
+  "scope": "/",
+  "shortcuts": [
+    {
+      "name": "Find Properties",
+      "short_name": "Properties",
+      "url": "/properties",
+      "icons": [
+        {
+          "src": "/icon-property.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Get Valuation",
+      "short_name": "Valuation",
+      "url": "/services/property-valuation",
+      "icons": [
+        {
+          "src": "/icon-valuation.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Book Consultation",
+      "short_name": "Consult",
+      "url": "/consultation",
+      "icons": [
+        {
+          "src": "/icon-consultation.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

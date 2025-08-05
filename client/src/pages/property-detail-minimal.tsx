@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, MapPin, Heart, Share2, Calendar, MessageCircle, Phone, Star, Award, Home, Building, CheckCircle, AlertTriangle, X, Users, Car, Building2, Shield, TreePine, Waves, Dumbbell, Wifi, ShoppingCart, Camera, Play, Download, Eye, Lock, CheckCircle2, XCircle, TrendingUp, TrendingDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePayment } from '@/hooks/use-payment';
+import { updateMetaTags, generatePropertySchema, generateSlug, injectSchema } from '@/utils/seo';
 
 interface Property {
   id: string;
@@ -68,7 +69,21 @@ export default function PropertyDetailMinimal() {
     if (property?.configurations && property.configurations.length > 0) {
       setSelectedConfig(property.configurations[0]);
     }
-  }, [property]);
+    
+    // SEO optimization for property page
+    if (property) {
+      const propertyTitle = `${property.name} in ${property.area} - Property Details | OwnItRight`;
+      const propertyDescription = `Explore ${property.name} in ${property.area}, ${property.zone}. ${property.type} property with ${property.configurations?.length || 0} configurations. Get professional valuation and CIVIL+MEP reports.`;
+      const keywords = `${property.name}, ${property.area} property, ${property.zone} real estate, ${property.type} in bangalore, property valuation, CIVIL MEP reports`;
+      const ogImage = property.images?.[0] || undefined;
+      const canonicalUrl = `${window.location.origin}/property/${params.id}/${generateSlug(property.name)}`;
+      
+      updateMetaTags(propertyTitle, propertyDescription, keywords, ogImage, canonicalUrl);
+      
+      // Inject property schema
+      injectSchema(generatePropertySchema(property), 'property-schema');
+    }
+  }, [property, params.id]);
 
   // Scroll progress tracking
   useEffect(() => {

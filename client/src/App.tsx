@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAnalyticsInit, useAnalytics } from "@/hooks/use-analytics";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import PerformanceOptimizer from "@/components/seo/PerformanceOptimizer";
+import MobileOptimization from "@/components/seo/MobileOptimization";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { AdminAuthForm } from "@/components/auth/AdminAuthForm";
 import AdminDashboard from "@/pages/admin/dashboard";
@@ -66,6 +68,11 @@ import ValuationReportsCreate from "@/pages/admin/valuation-reports-create";
 import ValuationReportsCreateComprehensive from "@/pages/admin/valuation-reports-create-comprehensive";
 import ValuationReportView from "@/pages/admin/valuation-report-view";
 import SetupWizard from "@/pages/setup-wizard";
+import PrivacyPolicy from "@/pages/privacy-policy";
+import TermsOfUse from "@/pages/terms-of-use";
+import RefundPolicy from "@/pages/refund-policy";
+import Services from "@/pages/services";
+import PropertiesLocation from "@/pages/properties-location";
 import NotFound from "@/pages/not-found";
 
 // Protected Routes Component that shows auth form for admin routes when not authenticated
@@ -167,6 +174,16 @@ function ProtectedRouter() {
       {/* Onboarding */}
       <Route path="/first-time-buyer" component={FirstTimeBuyerOnboarding} />
 
+      {/* Services */}
+      <Route path="/services" component={Services} />
+      
+      {/* Properties by Location */}
+      <Route path="/properties/:location" component={PropertiesLocation} />
+      
+      {/* Legal Pages */}
+      <Route path="/privacy-policy" component={PrivacyPolicy} />
+      <Route path="/terms-of-use" component={TermsOfUse} />
+      <Route path="/refund-policy" component={RefundPolicy} />
       
       <Route component={NotFound} />
     </Switch>
@@ -178,6 +195,8 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <TooltipProvider>
+          <PerformanceOptimizer />
+          <MobileOptimization />
           <Toaster />
           <ProtectedRouter />
         </TooltipProvider>

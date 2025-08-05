@@ -1,9 +1,12 @@
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Header from "@/components/layout/header";
+import Footer from "@/components/layout/footer";
+import { updateMetaTags, generateOrganizationSchema, injectSchema } from "@/utils/seo";
 import { 
   ArrowRight, 
   Building, 
@@ -20,6 +23,20 @@ import {
 } from "lucide-react";
 
 export default function Home() {
+  // SEO optimization
+  useEffect(() => {
+    updateMetaTags(
+      'OwnItRight - Property Advisory Services in Bangalore | Expert Real Estate Analysis',
+      'Professional property advisory services in Bangalore. Get expert property valuations, CIVIL+MEP reports, legal due diligence, and personalized real estate investment guidance.',
+      'property advisory bangalore, real estate valuation, property reports, CIVIL MEP analysis, property investment bangalore, real estate consultant',
+      undefined,
+      window.location.origin
+    );
+    
+    // Inject organization schema
+    injectSchema(generateOrganizationSchema(), 'organization-schema');
+  }, []);
+  
   // Fetch real statistics for admin dashboard
   const { data: propertiesStats } = useQuery({
     queryKey: ["/api/properties/stats"],
@@ -297,6 +314,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+      
+      <Footer />
     </div>
   );
 }
