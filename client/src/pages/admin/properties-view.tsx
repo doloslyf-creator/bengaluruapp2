@@ -92,12 +92,23 @@ export default function PropertiesView() {
     if (!startingPrice && !maxPrice) return "Price on Request";
     
     const formatPrice = (price: number): string => {
-      if (price >= 10000000) { // 1 Cr and above
-        return `₹${(price / 10000000).toFixed(2)} Cr`;
-      } else if (price >= 100000) { // 1 Lakh and above (but below 1 Cr)
-        return `₹${(price / 100000).toFixed(2)} L`;
+      // Handle different price storage formats
+      if (price < 1000) {
+        // Price is stored in lakhs format (e.g., 120 = 120 lakhs)
+        if (price >= 100) {
+          return `₹${(price / 100).toFixed(2)} Cr`;
+        } else {
+          return `₹${price} L`;
+        }
       } else {
-        return `₹${price.toLocaleString()}`;
+        // Price is stored in actual rupees
+        if (price >= 10000000) { // 1 Cr and above
+          return `₹${(price / 10000000).toFixed(2)} Cr`;
+        } else if (price >= 100000) { // 1 Lakh and above (but below 1 Cr)
+          return `₹${(price / 100000).toFixed(2)} L`;
+        } else {
+          return `₹${price.toLocaleString()}`;
+        }
       }
     };
 
