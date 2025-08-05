@@ -708,61 +708,72 @@ export default function PropertyDetailMinimal() {
                   <Badge className="bg-green-100 text-green-800">Strengths</Badge>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">RERA Compliance</span>
-                      <span className="font-semibold text-green-600">
-                        {property.reraApproved ? 'Fully Approved' : 'Under Process'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Location Score</span>
-                      <span className="font-semibold text-green-600">{property.locationScore || 4}/5 Excellent</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Amenities Rating</span>
-                      <span className="font-semibold text-green-600">{property.amenitiesScore || 5}/5 Premium</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Construction Status</span>
-                      <span className="font-semibold">
-                        {property.status === 'completed' ? 'Ready Possession' : 
-                         property.status === 'under-construction' ? 'Under Construction' : 
-                         'Pre-launch Phase'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Developer Reputation</span>
-                      <span className="font-semibold text-green-600">Established Brand</span>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Connectivity</span>
-                      <span className="font-semibold text-green-600">Excellent Transport Links</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Infrastructure</span>
-                      <span className="font-semibold text-green-600">Well Developed Area</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Investment Potential</span>
-                      <span className="font-semibold text-green-600">High Growth Zone</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Legal Clearance</span>
-                      <span className="font-semibold text-green-600">All Approvals Clear</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Quality Standards</span>
-                      <span className="font-semibold text-green-600">Premium Construction</span>
-                    </div>
-                  </div>
+                <div className="overflow-hidden rounded-lg border border-green-200">
+                  <table className="w-full">
+                    <thead className="bg-green-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Aspect</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Rating/Status</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Details</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-green-100">
+                      <tr className="hover:bg-green-25">
+                        <td className="px-4 py-3 text-sm text-gray-700 font-medium">RERA Compliance</td>
+                        <td className="px-4 py-3 text-sm">
+                          <Badge className="bg-green-100 text-green-800">
+                            {property.reraApproved ? 'Approved' : 'Process'}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">Full regulatory compliance</td>
+                      </tr>
+                      <tr className="hover:bg-green-25">
+                        <td className="px-4 py-3 text-sm text-gray-700 font-medium">Location Score</td>
+                        <td className="px-4 py-3 text-sm">
+                          <div className="flex items-center">
+                            <span className="font-semibold text-green-600">{property.locationScore || 4}/5</span>
+                            <span className="ml-2 text-xs text-green-600">Excellent</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">Prime connectivity & infrastructure</td>
+                      </tr>
+                      <tr className="hover:bg-green-25">
+                        <td className="px-4 py-3 text-sm text-gray-700 font-medium">Amenities Rating</td>
+                        <td className="px-4 py-3 text-sm">
+                          <div className="flex items-center">
+                            <span className="font-semibold text-green-600">{property.amenitiesScore || 5}/5</span>
+                            <span className="ml-2 text-xs text-green-600">Premium</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">World-class facilities & services</td>
+                      </tr>
+                      <tr className="hover:bg-green-25">
+                        <td className="px-4 py-3 text-sm text-gray-700 font-medium">Construction Status</td>
+                        <td className="px-4 py-3 text-sm">
+                          <Badge className="bg-blue-100 text-blue-800">
+                            {property.status === 'completed' ? 'Ready' : 
+                             property.status === 'under-construction' ? 'Ongoing' : 'Pre-launch'}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">
+                          {property.status === 'completed' ? 'Immediate possession available' : 
+                           property.status === 'under-construction' ? 'Construction in progress' : 
+                           'Launch phase planning'}
+                        </td>
+                      </tr>
+                      <tr className="hover:bg-green-25">
+                        <td className="px-4 py-3 text-sm text-gray-700 font-medium">Developer Reputation</td>
+                        <td className="px-4 py-3 text-sm">
+                          <Badge className="bg-green-100 text-green-800">Established</Badge>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">Proven track record & brand trust</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
 
-                <div className="bg-green-50 p-3 rounded mb-4">
-                  <p className="text-xs text-green-800">This property meets {getPropertyPros().length} out of 10 key investment criteria</p>
+                <div className="bg-green-50 p-3 rounded mt-4">
+                  <p className="text-xs text-green-800">✓ This property meets {getPropertyPros().length} out of 10 key investment criteria for buyers</p>
                 </div>
               </CardContent>
             </Card>
@@ -775,60 +786,66 @@ export default function PropertyDetailMinimal() {
                   <Badge className="bg-orange-100 text-orange-800">Important</Badge>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Construction Timeline</span>
-                      <span className="font-semibold">
-                        {property.status === 'under-construction' ? 'Ongoing Project' : 
-                         property.status === 'pre-launch' ? 'Future Delivery' : 'Immediate'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Price Point</span>
-                      <span className="font-semibold">
-                        {property.valueScore && property.valueScore < 4 ? 'Premium Pricing' : 'Market Competitive'}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Market Demand</span>
-                      <span className="font-semibold text-orange-600">High Competition</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Payment Structure</span>
-                      <span className="font-semibold">Construction Linked</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Additional Costs</span>
-                      <span className="font-semibold">Registration & Taxes Extra</span>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Rental Yield</span>
-                      <span className="font-semibold">3.2-3.8% Range</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Maintenance</span>
-                      <span className="font-semibold">₹3-5/sq ft monthly</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Resale Liquidity</span>
-                      <span className="font-semibold">Moderate to Good</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Area Development</span>
-                      <span className="font-semibold">Ongoing Infrastructure</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Market Risk</span>
-                      <span className="font-semibold text-orange-600">Moderate Volatility</span>
-                    </div>
-                  </div>
+                <div className="overflow-hidden rounded-lg border border-orange-200">
+                  <table className="w-full">
+                    <thead className="bg-orange-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-orange-800 uppercase tracking-wider">Factor</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-orange-800 uppercase tracking-wider">Impact</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-orange-800 uppercase tracking-wider">Recommendation</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-orange-100">
+                      <tr className="hover:bg-orange-25">
+                        <td className="px-4 py-3 text-sm text-gray-700 font-medium">Construction Timeline</td>
+                        <td className="px-4 py-3 text-sm">
+                          <Badge className={`${property.status === 'completed' ? 'bg-green-100 text-green-800' : 
+                                            property.status === 'under-construction' ? 'bg-yellow-100 text-yellow-800' : 
+                                            'bg-red-100 text-red-800'}`}>
+                            {property.status === 'under-construction' ? 'Ongoing' : 
+                             property.status === 'pre-launch' ? 'Future' : 'Immediate'}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">
+                          {property.status === 'completed' ? 'Ready to move' : 'Plan for waiting period'}
+                        </td>
+                      </tr>
+                      <tr className="hover:bg-orange-25">
+                        <td className="px-4 py-3 text-sm text-gray-700 font-medium">Price Point</td>
+                        <td className="px-4 py-3 text-sm">
+                          <span className="font-semibold text-orange-600">
+                            {property.valueScore && property.valueScore < 4 ? 'Premium' : 'Competitive'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">Compare with similar properties</td>
+                      </tr>
+                      <tr className="hover:bg-orange-25">
+                        <td className="px-4 py-3 text-sm text-gray-700 font-medium">Market Competition</td>
+                        <td className="px-4 py-3 text-sm">
+                          <Badge className="bg-orange-100 text-orange-800">High</Badge>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">Act quickly for preferred units</td>
+                      </tr>
+                      <tr className="hover:bg-orange-25">
+                        <td className="px-4 py-3 text-sm text-gray-700 font-medium">Additional Costs</td>
+                        <td className="px-4 py-3 text-sm">
+                          <span className="font-semibold text-orange-600">12-15%</span>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">Budget for registration & taxes</td>
+                      </tr>
+                      <tr className="hover:bg-orange-25">
+                        <td className="px-4 py-3 text-sm text-gray-700 font-medium">Rental Yield</td>
+                        <td className="px-4 py-3 text-sm">
+                          <span className="font-semibold text-orange-600">3.2-3.8%</span>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">Moderate returns for investors</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
 
-                <div className="bg-orange-50 p-3 rounded mb-4">
-                  <p className="text-xs text-orange-800">Consider these factors carefully - our experts can help you evaluate risks</p>
+                <div className="bg-orange-50 p-3 rounded mt-4">
+                  <p className="text-xs text-orange-800">⚠️ Consider these factors carefully - our experts can help you evaluate and mitigate risks</p>
                 </div>
               </CardContent>
             </Card>
