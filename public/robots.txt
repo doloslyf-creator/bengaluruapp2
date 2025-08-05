@@ -1,55 +1,21 @@
 User-agent: *
 Allow: /
-
-# Allow search engines to crawl all content
-Allow: /properties/
-Allow: /services/
-Allow: /blog/
+Allow: /find-property
+Allow: /services
+Allow: /property-valuation
+Allow: /civil-mep-reports
+Allow: /legal-due-diligence
 Allow: /about
 Allow: /contact
-Allow: /privacy-policy
-Allow: /terms-of-use
-Allow: /refund-policy
+Allow: /blog
 
-# Disallow admin and private areas
-Disallow: /admin/
+Disallow: /admin-panel/
+Disallow: /user-dashboard/
 Disallow: /api/
-Disallow: /dashboard/
-Disallow: /user/
-Disallow: /login
-Disallow: /register
+Disallow: /temp_restore/
+Disallow: /backups/
 
-# Disallow dynamic search and filter URLs to prevent duplicate content
-Disallow: /*?search=*
-Disallow: /*?filter=*
-Disallow: /*?sort=*
-Disallow: /*?page=*
-
-# Allow specific important parameters
-Allow: /properties/*?type=*
-Allow: /properties/*?location=*
-
-# Sitemap location
 Sitemap: https://ownitright.com/sitemap.xml
 
-# Crawl delay (optional - helps prevent server overload)
+# Crawl-delay for major search engines
 Crawl-delay: 1
-
-# Specific rules for different search engines
-User-agent: Googlebot
-Allow: /
-Crawl-delay: 0
-
-User-agent: Bingbot
-Allow: /
-Crawl-delay: 1
-
-# Block AI training bots if desired (optional)
-User-agent: ChatGPT-User
-Disallow: /
-
-User-agent: GPTBot
-Disallow: /
-
-User-agent: CCBot
-Disallow: /

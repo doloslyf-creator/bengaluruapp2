@@ -777,8 +777,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         const reportData = {
           propertyId: propertyId,
+          createdBy: "System - Pay Later",
+          reportTitle: `Property Valuation Report - ${property?.name || 'Property Assessment'}`,
           reportVersion: "1.0",
-          generatedBy: "System - Pay Later",
           reportDate: new Date(),
           marketAnalysis: {
             currentMarketTrend: "To be assessed",
@@ -845,7 +846,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (report) {
         const paymentData = {
           reportId: report.id,
-          reportType: "valuation" as const,
+          reportType: "property-valuation" as const,
           propertyId,
           customerName,
           customerEmail,
@@ -863,14 +864,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           success: true, 
           paymentId: payment.id,
           reportId: report.id,
-          reportType: "civil-mep",
+          reportType: "property-valuation",
           message: "Property Valuation Report access granted for 7 days. Payment due within 7 days.",
           amount: "15000.00"
         });
       } else {
         throw new Error("Failed to create or retrieve valuation report");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error processing valuation pay-later request:", error);
       res.status(500).json({ error: "Failed to process valuation pay-later request" });
     }
