@@ -1138,13 +1138,14 @@ export default function AdminSettings() {
                 {activeTab === "backup" && <BackupManagementTab />}
 
                 {/* Save Button - Only show for form-based tabs */}
-                {!["system", "backup"].includes(activeTab) && (
+                {!["api-keys", "roles", "system", "backup"].includes(activeTab) && (
                 <div className="flex justify-end">
                   <Button 
                     type="submit" 
                     size="lg" 
                     disabled={updateSettingsMutation.isPending}
                     className="min-w-32"
+                    data-testid="button-save-settings"
                   >
                     {updateSettingsMutation.isPending ? (
                       <div className="flex items-center space-x-2">
