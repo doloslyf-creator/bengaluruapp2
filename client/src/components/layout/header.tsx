@@ -60,6 +60,7 @@ export default function Header() {
   ];
 
   const services = [
+    { name: "All Reports", href: "/reports", description: "Comprehensive property reports hub" },
     { name: "Property Valuation", href: "/property-valuation", description: "Professional property assessment" },
     { name: "CIVIL+MEP Reports", href: "/civil-mep-reports", description: "Engineering analysis reports" },
     { name: "Legal Due Diligence", href: "/legal-due-diligence", description: "Complete legal verification" },
