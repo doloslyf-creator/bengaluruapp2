@@ -337,28 +337,31 @@ export default function FindProperty() {
                     <label className="block text-lg font-semibold text-gray-900 mb-4">
                       Preferred Amenities
                     </label>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                      {amenities.map((amenity) => (
-                        <button
-                          key={amenity}
-                          onClick={() => handleArrayToggle('amenities', amenity)}
-                          data-testid={`select-amenity-${amenity.toLowerCase().replace(/\s+/g, '-')}`}
-                          className={`p-3 rounded-xl border-2 text-center transition-all duration-200 ${
-                            preferences.amenities.includes(amenity)
-                              ? 'border-blue-600 bg-blue-50 text-blue-600'
-                              : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
-                          }`}
-                        >
-                          <div className="flex items-center justify-center space-x-2">
-                            <Sparkles className="w-4 h-4" />
-                            <span className="font-medium text-sm">{amenity}</span>
-                          </div>
-                          {preferences.amenities.includes(amenity) && (
-                            <div className="w-2 h-2 bg-blue-600 rounded-full mx-auto mt-2" />
-                          )}
-                        </button>
-                      ))}
+                    <div className="overflow-x-auto pb-2">
+                      <div className="flex gap-3 min-w-max">
+                        {amenities.map((amenity) => (
+                          <button
+                            key={amenity}
+                            onClick={() => handleArrayToggle('amenities', amenity)}
+                            data-testid={`select-amenity-${amenity.toLowerCase().replace(/\s+/g, '-')}`}
+                            className={`flex-shrink-0 px-4 py-3 rounded-xl border-2 transition-all duration-200 min-w-[140px] ${
+                              preferences.amenities.includes(amenity)
+                                ? 'border-blue-600 bg-blue-50 text-blue-600'
+                                : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                            }`}
+                          >
+                            <div className="flex items-center justify-center space-x-2">
+                              <Sparkles className="w-4 h-4" />
+                              <span className="font-medium text-sm">{amenity}</span>
+                            </div>
+                            {preferences.amenities.includes(amenity) && (
+                              <div className="w-2 h-2 bg-blue-600 rounded-full mx-auto mt-2" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
                     </div>
+                    <p className="text-xs text-gray-500 mt-2">← Scroll horizontally to see more options</p>
                   </div>
 
                   {/* Special Features */}
@@ -367,28 +370,31 @@ export default function FindProperty() {
                       <label className="block text-lg font-semibold text-gray-900 mb-4">
                         Special Features
                       </label>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        {tags.slice(0, 9).map((tag) => (
-                          <button
-                            key={tag.value}
-                            onClick={() => handleArrayToggle('tags', tag.value)}
-                            data-testid={`select-tag-${tag.value}`}
-                            className={`p-3 rounded-xl border-2 text-center transition-all duration-200 ${
-                              preferences.tags.includes(tag.value)
-                                ? 'border-blue-600 bg-blue-50 text-blue-600'
-                                : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
-                            }`}
-                          >
-                            <div className="flex items-center justify-center space-x-2">
-                              <Filter className="w-4 h-4" />
-                              <span className="font-medium text-sm">{tag.label}</span>
-                            </div>
-                            {preferences.tags.includes(tag.value) && (
-                              <div className="w-2 h-2 bg-blue-600 rounded-full mx-auto mt-2" />
-                            )}
-                          </button>
-                        ))}
+                      <div className="overflow-x-auto pb-2">
+                        <div className="flex gap-3 min-w-max">
+                          {tags.slice(0, 12).map((tag) => (
+                            <button
+                              key={tag.value}
+                              onClick={() => handleArrayToggle('tags', tag.value)}
+                              data-testid={`select-tag-${tag.value}`}
+                              className={`flex-shrink-0 px-4 py-3 rounded-xl border-2 transition-all duration-200 min-w-[160px] ${
+                                preferences.tags.includes(tag.value)
+                                  ? 'border-blue-600 bg-blue-50 text-blue-600'
+                                  : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                              }`}
+                            >
+                              <div className="flex items-center justify-center space-x-2">
+                                <Filter className="w-4 h-4" />
+                                <span className="font-medium text-sm">{tag.label}</span>
+                              </div>
+                              {preferences.tags.includes(tag.value) && (
+                                <div className="w-2 h-2 bg-blue-600 rounded-full mx-auto mt-2" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
                       </div>
+                      <p className="text-xs text-gray-500 mt-2">← Scroll horizontally to see more options</p>
                     </div>
                   )}
                 </div>
