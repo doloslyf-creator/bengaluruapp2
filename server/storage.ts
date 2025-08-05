@@ -2575,7 +2575,24 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllLegalAuditReports(): Promise<LegalAuditReport[]> {
-    return await db.select().from(legalAuditReports)
+    return await db.select({
+      id: legalAuditReports.id,
+      propertyId: legalAuditReports.propertyId,
+      reportTitle: legalAuditReports.reportTitle,
+      customerName: legalAuditReports.customerName,
+      customerEmail: legalAuditReports.customerEmail,
+      customerPhone: legalAuditReports.customerPhone,
+      lawyerName: legalAuditReports.lawyerName,
+      reportType: legalAuditReports.reportType,
+      status: legalAuditReports.status,
+      overallScore: legalAuditReports.overallScore,
+      riskLevel: legalAuditReports.riskLevel,
+      priority: legalAuditReports.priority,
+      price: legalAuditReports.price,
+      createdAt: legalAuditReports.createdAt,
+      updatedAt: legalAuditReports.updatedAt,
+      completedAt: legalAuditReports.completedAt
+    }).from(legalAuditReports)
       .orderBy(desc(legalAuditReports.createdAt));
   }
 
