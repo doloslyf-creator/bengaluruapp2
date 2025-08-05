@@ -134,7 +134,7 @@ export default function FindProperty() {
       <Header />
       
       {/* Integrated Header */}
-      <section className="bg-white py-16 border-b">
+      <section className="bg-white py-8 border-b">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
@@ -165,7 +165,7 @@ export default function FindProperty() {
       </section>
 
       {/* Progress & Form Container */}
-      <section className="py-16">
+      <section className="py-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Progress Indicator */}
           <div className="mb-12">

@@ -355,7 +355,7 @@ export default function PropertyDetail() {
 
         {/* Hero Content Overlay */}
         <div className="absolute inset-0 flex items-end">
-          <div className="w-full max-w-7xl mx-auto px-6 pb-20">
+          <div className="w-full max-w-7xl mx-auto px-6 pb-12">
             <div className="max-w-3xl">
               {/* Property Status Badge */}
               <div className="mb-4">
