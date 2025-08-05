@@ -414,7 +414,13 @@ export default function PropertyArchive() {
                 key={property.id}
                 property={property}
                 userIntent={userIntent}
-                onViewDetails={() => navigate(`/property/${property.id}`)}
+                onViewDetails={() => {
+                  if (userIntent === "investment") {
+                    navigate(`/property/${property.id}/investment`);
+                  } else {
+                    navigate(`/property/${property.id}/end-use`);
+                  }
+                }}
                 formatPrice={formatPrice}
                 getPriceRange={getPriceRange}
                 getInvestmentScore={getInvestmentScore}

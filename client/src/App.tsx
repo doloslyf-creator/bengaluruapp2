@@ -65,6 +65,8 @@ import { CivilMepReportView } from "@/pages/civil-mep-report-view";
 import Reports from "@/pages/reports";
 import PropertyReports from "@/pages/property-reports";
 import PropertyArchive from "@/pages/property-archive";
+import PropertyDetailInvestment from "@/pages/property-detail-investment";
+import PropertyDetailEndUse from "@/pages/property-detail-enduse";
 import ValuationReportsPage from "@/pages/admin/valuation-reports";
 import ValuationReportEdit from "@/pages/admin/valuation-report-edit-comprehensive";
 import ValuationReportsCreate from "@/pages/admin/valuation-reports-create";
@@ -157,6 +159,8 @@ function ProtectedRouter() {
       <Route path="/find-property" component={FindProperty} />
       <Route path="/property-results" component={PropertyResults} />
       <Route path="/property/:id" component={PropertyDetailMinimal} />
+      <Route path="/property/:id/investment" component={PropertyDetailInvestment} />
+      <Route path="/property/:id/end-use" component={PropertyDetailEndUse} />
       <Route path="/property/:id/:slug" component={PropertyDetailMinimal} />
 
       <Route path="/contact" component={Contact} />
