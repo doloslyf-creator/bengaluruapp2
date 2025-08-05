@@ -57,7 +57,21 @@ export function usePayment() {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const createOrderMutation = useMutation({
-    mutationFn: async (orderData: CreateOrderData): Promise<RazorpayOrder> => {
+    mutationFn: async (orderData: CreateOrderData & { reportType?: string; propertyId?: string; customerName?: string; customerEmail?: string; customerPhone?: string }): Promise<RazorpayOrder> => {
+      // If it's a report payment, use the specific reports endpoint
+      if (orderData.reportType && orderData.propertyId) {
+        return apiRequest('/api/payments/reports/create-order', {
+          method: 'POST',
+          body: JSON.stringify({
+            propertyId: orderData.propertyId,
+            reportType: orderData.reportType,
+            customerName: orderData.customerName || 'Customer Name',
+            customerEmail: orderData.customerEmail || 'customer@example.com',
+            customerPhone: orderData.customerPhone || '',
+          }),
+        });
+      }
+      
       return apiRequest('/api/payments/create-order', {
         method: 'POST',
         body: JSON.stringify(orderData),
@@ -73,7 +87,15 @@ export function usePayment() {
   });
 
   const verifyPaymentMutation = useMutation({
-    mutationFn: async (verificationData: PaymentVerificationData) => {
+    mutationFn: async (verificationData: PaymentVerificationData & { reportType?: string; propertyId?: string; customerName?: string; customerEmail?: string; customerPhone?: string }) => {
+      // If it's a report payment, verify with additional data
+      if (verificationData.reportType && verificationData.propertyId) {
+        return apiRequest('/api/payments/reports/verify', {
+          method: 'POST',
+          body: JSON.stringify(verificationData),
+        });
+      }
+      
       return apiRequest('/api/payments/verify', {
         method: 'POST',
         body: JSON.stringify(verificationData),
@@ -110,7 +132,7 @@ export function usePayment() {
   };
 
   const processPayment = async (
-    orderData: CreateOrderData,
+    orderData: CreateOrderData & { reportType?: string; propertyId?: string; customerName?: string; customerEmail?: string; customerPhone?: string },
     options: Partial<RazorpayOptions> = {}
   ): Promise<boolean> => {
     try {
@@ -139,6 +161,11 @@ export function usePayment() {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
+              reportType: orderData.reportType,
+              propertyId: orderData.propertyId,
+              customerName: orderData.customerName,
+              customerEmail: orderData.customerEmail,
+              customerPhone: orderData.customerPhone,
             });
           } catch (error) {
             console.error('Payment verification failed:', error);

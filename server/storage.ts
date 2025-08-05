@@ -206,6 +206,13 @@ export interface IStorage {
   updateCivilMepReport(reportId: string, updates: Partial<InsertCivilMepReport>): Promise<CivilMepReport | undefined>;
   deleteCivilMepReport(reportId: string): Promise<boolean>;
   getCivilMepReportStats(): Promise<any>;
+  
+  // Report Payment operations
+  createReportPayment(payment: InsertReportPayment): Promise<ReportPayment>;
+  getReportPayment(paymentId: string): Promise<ReportPayment | undefined>;
+  getAllReportPayments(): Promise<ReportPayment[]>;
+  getReportPaymentsByProperty(propertyId: string): Promise<ReportPayment[]>;
+  updateReportPaymentStatus(paymentId: string, status: string): Promise<ReportPayment | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -1765,6 +1772,20 @@ export class DatabaseStorage implements IStorage {
     return newPayment;
   }
 
+  // Report Payment operations
+  async createReportPayment(payment: InsertReportPayment): Promise<ReportPayment> {
+    const [newPayment] = await db.insert(reportPayments)
+      .values(payment)
+      .returning();
+    return newPayment;
+  }
+
+  async getReportPayment(paymentId: string): Promise<ReportPayment | undefined> {
+    const [payment] = await db.select().from(reportPayments)
+      .where(eq(reportPayments.id, paymentId));
+    return payment || undefined;
+  }
+
   async getReportPayments(reportId: string, reportType?: string): Promise<ReportPayment[]> {
     let query = db.select().from(reportPayments);
     
@@ -1777,6 +1798,20 @@ export class DatabaseStorage implements IStorage {
     }
     
     return await query;
+  }
+
+  async getReportPaymentsByProperty(propertyId: string): Promise<ReportPayment[]> {
+    return await db.select().from(reportPayments)
+      .where(eq(reportPayments.propertyId, propertyId))
+      .orderBy(desc(reportPayments.createdAt));
+  }
+
+  async updateReportPaymentStatus(paymentId: string, status: string): Promise<ReportPayment | undefined> {
+    const [payment] = await db.update(reportPayments)
+      .set({ paymentStatus: status as any, updatedAt: new Date() })
+      .where(eq(reportPayments.id, paymentId))
+      .returning();
+    return payment || undefined;
   }
 
   async getAllReportPayments(): Promise<ReportPayment[]> {

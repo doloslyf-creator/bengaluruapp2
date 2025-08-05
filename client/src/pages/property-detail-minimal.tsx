@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, MapPin, Heart, Share2, Calendar, MessageCircle, Phone, Star, Award, Home, Building, CheckCircle, AlertTriangle, X, Users, Car, Building2, Shield, TreePine, Waves, Dumbbell, Wifi, ShoppingCart, Camera, Play, Download, Eye, Lock, CheckCircle2, XCircle, TrendingUp, TrendingDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { usePayment } from '@/hooks/use-payment';
 
 interface Property {
   id: string;
@@ -44,6 +45,7 @@ export default function PropertyDetailMinimal() {
   const params = useParams();
   const navigate = useLocation()[1];
   const { toast } = useToast();
+  const { processPayment, isProcessing } = usePayment();
   
   const [isFavorite, setIsFavorite] = useState(false);
   const [selectedConfig, setSelectedConfig] = useState<any>(null);
@@ -116,6 +118,64 @@ export default function PropertyDetailMinimal() {
       title: isFavorite ? "Removed from favorites" : "Added to favorites",
       description: isFavorite ? "Property removed from your saved list" : "Property saved to your favorites",
     });
+  };
+
+  const handleCivilMepReport = async () => {
+    if (!property) return;
+    
+    const success = await processPayment({
+      amount: 249900, // ₹2,499 in paise
+      currency: 'INR',
+      receipt: `civil_mep_${property.id}_${Date.now()}`,
+      notes: {
+        reportType: 'civil-mep',
+        propertyId: property.id,
+        propertyName: property.name,
+        customerId: 'customer_id', // You may want to get this from auth context
+      }
+    }, {
+      description: `Civil & MEP Report for ${property.name}`,
+      prefill: {
+        name: 'Customer Name', // You may want to get this from auth context
+        email: 'customer@example.com', // You may want to get this from auth context
+      }
+    });
+
+    if (success) {
+      toast({
+        title: "Payment Successful",
+        description: "Your Civil & MEP Report will be prepared and delivered soon.",
+      });
+    }
+  };
+
+  const handleValuationReport = async () => {
+    if (!property) return;
+    
+    const success = await processPayment({
+      amount: 249900, // ₹2,499 in paise
+      currency: 'INR',
+      receipt: `valuation_${property.id}_${Date.now()}`,
+      notes: {
+        reportType: 'valuation',
+        propertyId: property.id,  
+        propertyName: property.name,
+        customerId: 'customer_id', // You may want to get this from auth context
+      }
+    }, {
+      description: `Property Valuation Report for ${property.name}`,
+      prefill: {
+        name: 'Customer Name', // You may want to get this from auth context
+        email: 'customer@example.com', // You may want to get this from auth context
+      }
+    });
+
+    if (success) {
+      toast({
+        title: "Payment Successful",
+        description: "Your Property Valuation Report will be prepared and delivered soon.",
+      });
+    }
   };
 
   const handleBookVisit = () => {
@@ -1346,14 +1406,24 @@ export default function PropertyDetailMinimal() {
                     Get detailed analysis to make informed decisions
                   </div>
                   
-                  <Button className="w-full bg-orange-600 hover:bg-orange-700" size="sm">
+                  <Button 
+                    className="w-full bg-orange-600 hover:bg-orange-700" 
+                    size="sm"
+                    onClick={handleCivilMepReport}
+                    disabled={isProcessing}
+                  >
                     <Lock className="h-4 w-4 mr-2" />
-                    Civil & MEP Report
+                    {isProcessing ? 'Processing...' : 'Civil & MEP Report'}
                   </Button>
                   
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700" size="sm">
+                  <Button 
+                    className="w-full bg-blue-600 hover:bg-blue-700" 
+                    size="sm"
+                    onClick={handleValuationReport}
+                    disabled={isProcessing}
+                  >
                     <Lock className="h-4 w-4 mr-2" />
-                    Valuation Report
+                    {isProcessing ? 'Processing...' : 'Valuation Report'}
                   </Button>
                   
                   <div className="text-center">

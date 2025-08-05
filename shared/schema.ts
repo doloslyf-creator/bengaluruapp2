@@ -238,7 +238,7 @@ export const reraData = pgTable("rera_data", {
 export const reportPayments = pgTable("report_payments", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   reportId: varchar("report_id"), // Can be null for general service orders
-  reportType: varchar("report_type", { enum: ["civil-mep", "legal-due-diligence"] }).notNull().default("civil-mep"),
+  reportType: varchar("report_type", { enum: ["civil-mep", "property-valuation"] }).notNull().default("civil-mep"),
   propertyId: varchar("property_id").references(() => properties.id), // Can be null for general service orders
   
   // Customer Information

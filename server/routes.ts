@@ -2207,16 +2207,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Create payment record in database
         const paymentData = {
           reportId: null, // Will be linked when report is created
-          reportType: reportType as "civil-mep" | "property-valuation",
+          reportType: reportType === "valuation" ? "property-valuation" as const : "civil-mep" as const,
           propertyId,
           customerName,
           customerEmail,
           customerPhone: customerPhone || "",
           amount: "2499",
-          paymentMethod: "razorpay" as const,
+          currency: "INR",
+          paymentMethod: "upi" as const, // Default to UPI for Razorpay
           paymentStatus: "completed" as const,
-          razorpayOrderId: razorpay_order_id,
-          razorpayPaymentId: razorpay_payment_id,
           accessGrantedAt: new Date()
         };
 
