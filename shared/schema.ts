@@ -781,6 +781,16 @@ export const appSettings = pgTable("app_settings", {
   primaryColor: text("primary_color").default("#2563eb"), // Default blue
   secondaryColor: text("secondary_color").default("#64748b"), // Default slate
   
+  // SEO Settings
+  metaTitle: text("meta_title").default("OwnItRight - Property Discovery Platform"),
+  metaDescription: text("meta_description").default("Discover your perfect property in Bengaluru with our advanced property discovery platform"),
+  
+  // Feature Toggles
+  enableBookings: boolean("enable_bookings").default(true),
+  enableConsultations: boolean("enable_consultations").default(true),
+  enableReports: boolean("enable_reports").default(true),
+  enableBlog: boolean("enable_blog").default(true),
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
