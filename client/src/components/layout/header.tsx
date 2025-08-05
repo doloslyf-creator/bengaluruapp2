@@ -54,7 +54,7 @@ export default function Header() {
   const navigation = [
     { name: "Home", href: "/", icon: Home },
     { name: "Find Property", href: "/find-property", icon: Search },
-    { name: "Reports", href: "/reports", icon: FileText },
+    { name: "Property Reports", href: "/property-reports", icon: FileText },
     { name: "About Us", href: "/about", icon: UserCircle },
   ];
 

@@ -62,6 +62,7 @@ import { AdminCivilMepReportsCreate } from "@/pages/admin-civil-mep-reports-crea
 import { CivilMepReportView } from "@/pages/civil-mep-report-view";
 
 import Reports from "@/pages/reports";
+import PropertyReports from "@/pages/property-reports";
 import ValuationReportsPage from "@/pages/admin/valuation-reports";
 import ValuationReportEdit from "@/pages/admin/valuation-report-edit-comprehensive";
 import ValuationReportsCreate from "@/pages/admin/valuation-reports-create";
@@ -173,6 +174,7 @@ function ProtectedRouter() {
 
       {/* Services */}
       <Route path="/reports" component={Reports} />
+      <Route path="/property-reports" component={PropertyReports} />
       
       {/* Properties by Location */}
       <Route path="/properties/:location" component={PropertiesLocation} />
