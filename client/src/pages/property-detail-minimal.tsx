@@ -950,9 +950,14 @@ export default function PropertyDetailMinimal() {
                   <p className="text-xs text-yellow-800">Civil & MEP analysis could save ₹2-5 lakhs in unexpected repairs</p>
                 </div>
 
-                <Button className="w-full" size="sm">
+                <Button 
+                  className="w-full" 
+                  size="sm"
+                  onClick={handleCivilMepReport}
+                  disabled={isProcessing}
+                >
                   <Lock className="h-4 w-4 mr-2" />
-                  Get Full Civil & MEP Report - ₹2,499
+                  {isProcessing ? 'Processing...' : 'Get Full Civil & MEP Report - ₹2,499'}
                 </Button>
               </CardContent>
             </Card>
@@ -1016,9 +1021,14 @@ export default function PropertyDetailMinimal() {
                   <p className="text-xs text-blue-800">Professional valuation prevents overpaying by 10-15% on average</p>
                 </div>
 
-                <Button className="w-full" size="sm">
+                <Button 
+                  className="w-full" 
+                  size="sm"
+                  onClick={handleValuationReport}
+                  disabled={isProcessing}
+                >
                   <Lock className="h-4 w-4 mr-2" />
-                  Get Full Valuation Report - ₹2,499
+                  {isProcessing ? 'Processing...' : 'Get Full Valuation Report - ₹2,499'}
                 </Button>
               </CardContent>
             </Card>
