@@ -364,6 +364,11 @@ export default function PropertyDetailMinimal() {
           </div>
         </div>
 
+        {/* Main Content with Sidebar Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-3 space-y-8">
+
         {/* Property Video Section */}
         {property.youtubeVideoUrl && (
           <Card className="mb-8">
@@ -388,7 +393,7 @@ export default function PropertyDetailMinimal() {
         )}
 
         {/* Enhanced Configuration Cards */}
-        <Card className="mb-8">
+        <Card className="mb-8" id="configurations">
           <CardHeader>
             <CardTitle>Available Configurations</CardTitle>
             <p className="text-gray-600">Select a configuration to view detailed information</p>
@@ -548,7 +553,7 @@ export default function PropertyDetailMinimal() {
         </Card>
 
         {/* Property Analysis & Reports */}
-        <Card className="mb-8">
+        <Card className="mb-8" id="reports">
           <CardHeader>
             <CardTitle>Property Analysis & Reports</CardTitle>
             <p className="text-gray-600">Get professional insights to make informed decisions</p>
@@ -689,7 +694,7 @@ export default function PropertyDetailMinimal() {
         </Card>
 
         {/* Pros & Cons */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8" id="pros-cons">
           {/* Pros */}
           <Card>
             <CardHeader>
@@ -732,7 +737,7 @@ export default function PropertyDetailMinimal() {
         </div>
 
         {/* Buyer Intent Match */}
-        <Card className="mb-8">
+        <Card className="mb-8" id="buyer-match">
           <CardHeader>
             <CardTitle>Buyer Suitability</CardTitle>
             <p className="text-gray-600">Who is this property perfect for?</p>
@@ -752,7 +757,7 @@ export default function PropertyDetailMinimal() {
         </Card>
 
         {/* Property Scoring */}
-        <Card className="mb-8">
+        <Card className="mb-8" id="property-score">
           <CardHeader>
             <CardTitle className="flex items-center">
               <Award className="h-5 w-5 mr-2 text-yellow-500" />
@@ -788,6 +793,170 @@ export default function PropertyDetailMinimal() {
             </div>
           </CardContent>
         </Card>
+
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-24 space-y-6">
+              {/* Quick Navigation */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Quick Navigation</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <a href="#configurations" className="flex items-center text-sm text-blue-600 hover:text-blue-800 transition-colors">
+                    <Building2 className="h-4 w-4 mr-2" />
+                    Configurations
+                  </a>
+                  <a href="#reports" className="flex items-center text-sm text-blue-600 hover:text-blue-800 transition-colors">
+                    <Shield className="h-4 w-4 mr-2" />
+                    Analysis Reports
+                  </a>
+                  <a href="#pros-cons" className="flex items-center text-sm text-blue-600 hover:text-blue-800 transition-colors">
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Pros & Cons
+                  </a>
+                  <a href="#buyer-match" className="flex items-center text-sm text-blue-600 hover:text-blue-800 transition-colors">
+                    <Users className="h-4 w-4 mr-2" />
+                    Buyer Suitability
+                  </a>
+                  <a href="#property-score" className="flex items-center text-sm text-blue-600 hover:text-blue-800 transition-colors">
+                    <Award className="h-4 w-4 mr-2" />
+                    Property Score
+                  </a>
+                </CardContent>
+              </Card>
+
+              {/* Key Highlights */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Key Highlights</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center text-sm">
+                      <Shield className="h-4 w-4 mr-2 text-green-600" />
+                      <span className="text-gray-600">RERA:</span>
+                      <span className="ml-1 font-medium text-green-600">
+                        {property.reraApproved ? 'Verified' : 'Pending'}
+                      </span>
+                    </div>
+                    <div className="flex items-center text-sm">
+                      <Calendar className="h-4 w-4 mr-2 text-blue-600" />
+                      <span className="text-gray-600">Possession:</span>
+                      <span className="ml-1 font-medium">{property.possessionDate || 'TBA'}</span>
+                    </div>
+                    <div className="flex items-center text-sm">
+                      <Building className="h-4 w-4 mr-2 text-purple-600" />
+                      <span className="text-gray-600">Developer:</span>
+                      <span className="ml-1 font-medium">{property.developer}</span>
+                    </div>
+                    <div className="flex items-center text-sm">
+                      <Star className="h-4 w-4 mr-2 text-yellow-600" />
+                      <span className="text-gray-600">Overall Score:</span>
+                      <span className="ml-1 font-medium">{property.overallScore || '4.3'}/5</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Price Summary for Selected Config */}
+              {selectedConfig && (
+                <Card className="border-blue-200 bg-blue-50">
+                  <CardHeader>
+                    <CardTitle className="text-lg text-blue-900">Selected Configuration</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="text-center">
+                      <div className="font-semibold text-blue-900">{selectedConfig.configuration}</div>
+                      <div className="text-2xl font-bold text-blue-600 mt-1">
+                        {formatPriceDisplay(selectedConfig.price)}
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">Area:</span>
+                        <span className="font-medium">{selectedConfig.builtUpArea} sq ft</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">Rate:</span>
+                        <span className="font-medium">₹{Number(selectedConfig.pricePerSqft).toLocaleString()}/sq ft</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">Status:</span>
+                        <Badge variant={selectedConfig.availabilityStatus === 'available' ? 'default' : 
+                                       selectedConfig.availabilityStatus === 'limited' ? 'secondary' : 'destructive'}>
+                          {selectedConfig.availabilityStatus}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-blue-200">
+                      <div className="text-xs text-blue-700 space-y-1">
+                        <div>EMI: ₹{Math.round(selectedConfig.price * 0.008).toLocaleString()}/month</div>
+                        <div>Expected Rent: ₹{Math.round(selectedConfig.price * 0.003).toLocaleString()}/month</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Action Panel */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Take Action</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button onClick={handleBookVisit} className="w-full" size="sm">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Book Site Visit
+                  </Button>
+                  <Button onClick={handleConsult} variant="outline" className="w-full" size="sm">
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Expert Consultation
+                  </Button>
+                  <Button variant="outline" className="w-full" size="sm">
+                    <Download className="h-4 w-4 mr-2" />
+                    Download Brochure
+                  </Button>
+                  <Button variant="outline" onClick={toggleFavorite} className="w-full" size="sm">
+                    <Heart className={`h-4 w-4 mr-2 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
+                    {isFavorite ? 'Saved' : 'Save Property'}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Report Access */}
+              <Card className="border-orange-200 bg-orange-50">
+                <CardHeader>
+                  <CardTitle className="text-lg text-orange-900">Professional Reports</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="text-center text-sm text-orange-800 mb-3">
+                    Get detailed analysis to make informed decisions
+                  </div>
+                  
+                  <Button className="w-full bg-orange-600 hover:bg-orange-700" size="sm">
+                    <Lock className="h-4 w-4 mr-2" />
+                    Civil & MEP Report
+                  </Button>
+                  
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700" size="sm">
+                    <Lock className="h-4 w-4 mr-2" />
+                    Valuation Report
+                  </Button>
+                  
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-gray-900">₹2,499</div>
+                    <div className="text-xs text-gray-600">per report</div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Sticky CTA Bar */}
