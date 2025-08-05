@@ -1981,27 +1981,44 @@ export class DatabaseStorage implements IStorage {
     const result = [];
     
     for (const payment of payments) {
-      const [property] = await db.select().from(properties)
-        .where(eq(properties.id, payment.propertyId));
+      let property = null;
+      if (payment.propertyId) {
+        [property] = await db.select().from(properties)
+          .where(eq(properties.id, payment.propertyId));
+      }
       
       let reportTitle = "Report";
-      let reportType = "unknown";
+      let reportType = payment.reportType || "unknown";
+      let reportDetails = null;
       
       // Check if it's a CIVIL+MEP report
-      const [civilMepReport] = await db.select().from(civilMepReports)
-        .where(eq(civilMepReports.id, payment.reportId));
-      
-      if (civilMepReport) {
-        reportTitle = civilMepReport.reportTitle || "CIVIL+MEP Report";
-        reportType = "civil-mep";
-      } else {
-        // Check if it's a Valuation report
-        const [valuationReport] = await db.select().from(propertyValuationReports)
-          .where(eq(propertyValuationReports.id, payment.reportId));
+      if (payment.reportId) {
+        const [civilMepReport] = await db.select().from(civilMepReports)
+          .where(eq(civilMepReports.id, payment.reportId));
         
-        if (valuationReport) {
+        if (civilMepReport) {
+          reportTitle = civilMepReport.reportTitle || "CIVIL+MEP Report";
+          reportType = "civil-mep";
+          reportDetails = civilMepReport;
+        } else {
+          // Check if it's a Valuation report
+          const [valuationReport] = await db.select().from(propertyValuationReports)
+            .where(eq(propertyValuationReports.id, payment.reportId));
+          
+          if (valuationReport) {
+            reportTitle = "Property Valuation Report";
+            reportType = "property-valuation";
+            reportDetails = valuationReport;
+          }
+        }
+      } else {
+        // For orders without linked reports, use the reportType from the order itself
+        if (payment.reportType === "civil-mep") {
+          reportTitle = "CIVIL+MEP Report";
+          reportType = "civil-mep";
+        } else if (payment.reportType === "property-valuation") {
           reportTitle = "Property Valuation Report";
-          reportType = "valuation";
+          reportType = "property-valuation";
         }
       }
       
@@ -2009,7 +2026,9 @@ export class DatabaseStorage implements IStorage {
         ...payment,
         reportType,
         propertyName: property?.name || "Unknown Property",
-        reportTitle
+        propertyDetails: property,
+        reportTitle,
+        reportDetails
       });
     }
     

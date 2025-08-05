@@ -89,12 +89,18 @@ export default function Orders() {
     switch (status) {
       case "completed":
         return <Badge className="bg-green-100 text-green-800"><CheckCircle className="w-3 h-3 mr-1" />Paid</Badge>;
+      case "pending":
+        return <Badge className="bg-blue-100 text-blue-800"><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
+      case "processing":
+        return <Badge className="bg-orange-100 text-orange-800"><Clock className="w-3 h-3 mr-1" />Processing</Badge>;
       case "pay-later-pending":
         return <Badge className="bg-yellow-100 text-yellow-800"><Clock className="w-3 h-3 mr-1" />Pay Later</Badge>;
       case "overdue":
         return <Badge className="bg-red-100 text-red-800"><XCircle className="w-3 h-3 mr-1" />Overdue</Badge>;
       case "failed":
         return <Badge className="bg-red-100 text-red-800"><XCircle className="w-3 h-3 mr-1" />Failed</Badge>;
+      case "refunded":
+        return <Badge className="bg-purple-100 text-purple-800"><XCircle className="w-3 h-3 mr-1" />Refunded</Badge>;
       default:
         return <Badge className="bg-gray-100 text-gray-800"><AlertCircle className="w-3 h-3 mr-1" />{status}</Badge>;
     }
@@ -204,7 +210,7 @@ export default function Orders() {
                       <span>CIVIL+MEP Reports</span>
                     </div>
                   </SelectItem>
-                  <SelectItem value="valuation">
+                  <SelectItem value="property-valuation">
                     <div className="flex items-center space-x-2">
                       <Calculator className="h-4 w-4 text-emerald-600" />
                       <span>Property Valuation</span>
@@ -215,10 +221,13 @@ export default function Orders() {
             </div>
             
             <Tabs value={statusFilter} onValueChange={setStatusFilter}>
-              <TabsList>
+              <TabsList className="grid w-full grid-cols-7">
                 <TabsTrigger value="all">All Orders</TabsTrigger>
-                <TabsTrigger value="pay-later-pending">Pay Later</TabsTrigger>
+                <TabsTrigger value="pending">Pending</TabsTrigger>
+                <TabsTrigger value="processing">Processing</TabsTrigger>
                 <TabsTrigger value="completed">Completed</TabsTrigger>
+                <TabsTrigger value="failed">Failed</TabsTrigger>
+                <TabsTrigger value="pay-later-pending">Pay Later</TabsTrigger>
                 <TabsTrigger value="overdue">Overdue</TabsTrigger>
               </TabsList>
             </Tabs>
@@ -229,7 +238,7 @@ export default function Orders() {
             <CardHeader>
               <CardTitle>Recent Orders</CardTitle>
               <CardDescription>
-                All report orders with payment tracking ({filteredOrders.length} {serviceFilter === 'all' ? 'total' : serviceFilter === 'civil-mep' ? 'CIVIL+MEP' : 'valuation'} orders)
+                All report orders with payment tracking ({filteredOrders.length} {serviceFilter === 'all' ? 'total' : serviceFilter === 'civil-mep' ? 'CIVIL+MEP' : 'property valuation'} orders)
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -273,7 +282,7 @@ export default function Orders() {
                                 <Wrench className="h-4 w-4 text-blue-600" />
                                 <span className="text-sm font-medium">CIVIL+MEP</span>
                               </>
-                            ) : order.reportType === 'valuation' ? (
+                            ) : order.reportType === 'property-valuation' ? (
                               <>
                                 <Calculator className="h-4 w-4 text-emerald-600" />
                                 <span className="text-sm font-medium">Valuation</span>
