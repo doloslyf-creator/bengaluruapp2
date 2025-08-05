@@ -103,9 +103,9 @@ export default function PropertyDetailMinimal() {
   }, []);
 
   const formatPriceDisplay = (price: number) => {
-    if (price >= 10000000) {
+    if (price >= 10000000) { // 1 Cr and above
       return `₹${(price / 10000000).toFixed(2)} Cr`;
-    } else if (price >= 100000) {
+    } else if (price >= 100000) { // 1 Lakh and above (but below 1 Cr)
       return `₹${(price / 100000).toFixed(2)} L`;
     } else {
       return `₹${price.toLocaleString()}`;

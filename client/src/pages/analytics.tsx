@@ -261,7 +261,9 @@ export default function Analytics() {
                   </div>
                   <div className="text-right">
                     <p className="font-medium text-gray-900">
-                      ₹{property.price >= 100 ? `${(property.price / 100).toFixed(1)} Cr` : `${property.price} L`}
+                      {property.price >= 10000000 ? `₹${(property.price / 10000000).toFixed(2)} Cr` : 
+                       property.price >= 100000 ? `₹${(property.price / 100000).toFixed(2)} L` : 
+                       `₹${property.price.toLocaleString()}`}
                     </p>
                     <p className="text-sm text-gray-600 capitalize">{property.type}</p>
                   </div>

@@ -88,6 +88,30 @@ export default function PropertiesView() {
     }
   };
 
+  const formatPriceDisplay = (startingPrice?: number, maxPrice?: number) => {
+    if (!startingPrice && !maxPrice) return "Price on Request";
+    
+    const formatPrice = (price: number): string => {
+      if (price >= 10000000) { // 1 Cr and above
+        return `₹${(price / 10000000).toFixed(2)} Cr`;
+      } else if (price >= 100000) { // 1 Lakh and above (but below 1 Cr)
+        return `₹${(price / 100000).toFixed(2)} L`;
+      } else {
+        return `₹${price.toLocaleString()}`;
+      }
+    };
+
+    if (startingPrice && maxPrice && startingPrice !== maxPrice) {
+      return `${formatPrice(startingPrice)} - ${formatPrice(maxPrice)}`;
+    } else if (startingPrice) {
+      return formatPrice(startingPrice);
+    } else if (maxPrice) {
+      return formatPrice(maxPrice);
+    }
+    
+    return "Price on Request";
+  };
+
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       active: { color: "bg-green-100 text-green-800", icon: CheckCircle },
