@@ -288,7 +288,13 @@ export default function PropertyDetailMinimal() {
       (p.tags.includes('investment-friendly') ||
        p.tags.includes('high-roi') ||
        p.tags.includes('rental-income') ||
-       (p.overallScore && p.overallScore >= 4.0))
+       p.tags.includes('premium') ||
+       p.tags.includes('metro-connectivity') ||
+       p.tags.includes('it-hub-proximity') ||
+       p.zone === 'east' || // East zone is often investment friendly
+       p.zone === 'north' ||
+       p.status === 'pre-launch' || // Pre-launch properties often good for investment
+       (p.overallScore && p.overallScore >= 3.5)) // Lowered threshold
     ).slice(0, 6);
   };
 
