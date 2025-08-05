@@ -14,6 +14,9 @@ export default function CivilMepReports() {
   const [searchTerm, setSearchTerm] = useState("");
   const [areaFilter, setAreaFilter] = useState("all");
   const [developerFilter, setDeveloperFilter] = useState("all");
+  const [hasSearched, setHasSearched] = useState(false);
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -77,15 +80,36 @@ export default function CivilMepReports() {
     );
   };
 
+  // Trigger search functionality
+  const handleSearch = () => {
+    setHasSearched(true);
+  };
+
+  // Auto-search when filters change (but only if user has searched before)
+  const triggerAutoSearch = () => {
+    if (hasSearched) {
+      // Auto-search triggered by filter changes
+    } else if (searchTerm || areaFilter !== "all" || developerFilter !== "all") {
+      setHasSearched(true);
+    }
+  };
+
   // Filter properties based on search, area, and developer
-  const filteredProperties = (properties as Property[]).filter((property: Property) => {
-    const matchesSearch = property.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredProperties = hasSearched ? (properties as Property[]).filter((property: Property) => {
+    const matchesSearch = !searchTerm || 
+                         property.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          property.area?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          property.developer?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesArea = areaFilter === "all" || property.area === areaFilter;
     const matchesDeveloper = developerFilter === "all" || property.developer === developerFilter;
     return matchesSearch && matchesArea && matchesDeveloper;
-  });
+  }) : [];
+
+  // Handle property selection for payment
+  const handleBuyReport = (property: Property) => {
+    setSelectedProperty(property);
+    setShowPaymentDialog(true);
+  };
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
