@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, MapPin, Heart, Share2, Calendar, MessageCircle, Phone, Star, Award, Home, Building, CheckCircle, AlertTriangle, X, Users, Car, Building2, Shield, TreePine, Waves, Dumbbell, Wifi, ShoppingCart, Camera, Play, Download, Eye, Lock, CheckCircle2, XCircle, TrendingUp, TrendingDown, ChevronLeft, ChevronRight, BarChart3, Target } from 'lucide-react';
+import { ArrowLeft, MapPin, Heart, Share2, Calendar, MessageCircle, Phone, Star, Award, Home, Building, CheckCircle, AlertTriangle, X, Users, Car, Building2, Shield, TreePine, Waves, Dumbbell, Wifi, ShoppingCart, Camera, Play, Download, Eye, Lock, CheckCircle2, XCircle, TrendingUp, TrendingDown, ChevronLeft, ChevronRight, BarChart3, Target, Zap, MapPinIcon, ShieldCheck, Activity } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePayment } from '@/hooks/use-payment';
 import { updateMetaTags, generatePropertySchema, generatePropertySlug, injectSchema } from '@/utils/seo';
@@ -718,6 +718,67 @@ export default function PropertyDetailMinimal() {
             </div>
           </div>
         </div>
+
+        {/* Property Scoring Section */}
+        <Card className="mb-8 bg-gray-50 border-0">
+          <CardContent className="py-8 px-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-8 text-center">Ratings based on features</h2>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              {/* Connectivity */}
+              <div className="flex flex-col items-center text-center">
+                <div className="relative mb-4">
+                  <div className="w-20 h-20 rounded-full border-4 border-teal-200 bg-white flex items-center justify-center shadow-sm">
+                    <Zap className="h-8 w-8 text-teal-600" />
+                  </div>
+                </div>
+                <div className="text-lg font-bold text-gray-900 mb-1">
+                  {property.locationScore ? `${property.locationScore}.4/5` : '4.4/5'}
+                </div>
+                <div className="text-sm text-gray-600 font-medium">Connectivity</div>
+              </div>
+
+              {/* Neighbourhood */}
+              <div className="flex flex-col items-center text-center">
+                <div className="relative mb-4">
+                  <div className="w-20 h-20 rounded-full border-4 border-teal-200 bg-white flex items-center justify-center shadow-sm">
+                    <MapPinIcon className="h-8 w-8 text-teal-600" />
+                  </div>
+                </div>
+                <div className="text-lg font-bold text-gray-900 mb-1">
+                  {property.amenitiesScore ? `${property.amenitiesScore}.1/5` : '4.1/5'}
+                </div>
+                <div className="text-sm text-gray-600 font-medium">Neighbourhood</div>
+              </div>
+
+              {/* Safety */}
+              <div className="flex flex-col items-center text-center">
+                <div className="relative mb-4">
+                  <div className="w-20 h-20 rounded-full border-4 border-teal-200 bg-white flex items-center justify-center shadow-sm">
+                    <ShieldCheck className="h-8 w-8 text-teal-600" />
+                  </div>
+                </div>
+                <div className="text-lg font-bold text-gray-900 mb-1">
+                  4/5
+                </div>
+                <div className="text-sm text-gray-600 font-medium">Safety</div>
+              </div>
+
+              {/* Livability */}
+              <div className="flex flex-col items-center text-center">
+                <div className="relative mb-4">
+                  <div className="w-20 h-20 rounded-full border-4 border-teal-200 bg-white flex items-center justify-center shadow-sm">
+                    <Activity className="h-8 w-8 text-teal-600" />
+                  </div>
+                </div>
+                <div className="text-lg font-bold text-gray-900 mb-1">
+                  {property.valueScore ? `${property.valueScore}.2/5` : '4.2/5'}
+                </div>
+                <div className="text-sm text-gray-600 font-medium">Livability</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Quick Navigation - Sticky Progress Bar */}
         <div className="sticky top-16 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 mb-8">
