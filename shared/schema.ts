@@ -971,6 +971,160 @@ export const propertyValuationReports = pgTable("property_valuation_reports", {
   customNotes: text("custom_notes"),
 });
 
+// Site Visit Bookings System
+export const siteVisitBookings = pgTable("site_visit_bookings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  
+  // Customer Information
+  customerName: varchar("customer_name", { length: 255 }).notNull(),
+  customerPhone: varchar("customer_phone", { length: 15 }).notNull(),
+  customerEmail: varchar("customer_email", { length: 255 }).notNull(),
+  
+  // Property Information
+  propertyId: varchar("property_id").notNull().references(() => properties.id),
+  configurationId: varchar("configuration_id").references(() => propertyConfigurations.id),
+  
+  // Visit Details
+  visitType: varchar("visit_type", { enum: ["site-visit", "virtual-tour", "model-unit"] }).notNull().default("site-visit"),
+  preferredDate: date("preferred_date").notNull(),
+  preferredTime: varchar("preferred_time", { length: 20 }).notNull(),
+  numberOfVisitors: integer("number_of_visitors").default(1),
+  
+  // Booking Status
+  status: varchar("status", { 
+    enum: ["pending", "confirmed", "rescheduled", "completed", "cancelled", "no-show"] 
+  }).notNull().default("pending"),
+  
+  // Additional Information
+  specialRequests: text("special_requests"),
+  source: varchar("source", { 
+    enum: ["website", "phone", "email", "walk-in", "referral", "social-media"] 
+  }).default("website"),
+  
+  // Admin Management Fields
+  assignedTo: varchar("assigned_to"), // Staff member assigned
+  confirmedDate: date("confirmed_date"),
+  confirmedTime: varchar("confirmed_time", { length: 20 }),
+  meetingPoint: text("meeting_point"), // Where to meet at the site
+  staffNotes: text("staff_notes"), // Internal notes
+  customerNotes: text("customer_notes"), // Notes from customer interaction
+  
+  // Follow-up tracking
+  followUpRequired: boolean("follow_up_required").default(true),
+  followUpDate: date("follow_up_date"),
+  followUpStatus: varchar("follow_up_status", { 
+    enum: ["pending", "completed", "not-required"] 
+  }).default("pending"),
+  
+  // Lead conversion tracking
+  leadId: varchar("lead_id").references(() => leads.id),
+  convertedToLead: boolean("converted_to_lead").default(false),
+  conversionDate: timestamp("conversion_date"),
+  
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  completedAt: timestamp("completed_at"),
+  cancelledAt: timestamp("cancelled_at"),
+  cancelReason: text("cancel_reason"),
+});
+
+// Booking Time Slots Management
+export const bookingTimeSlots = pgTable("booking_time_slots", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  
+  // Time slot details
+  timeSlot: varchar("time_slot", { length: 20 }).notNull(), // "09:00 AM", "02:30 PM"
+  displayName: varchar("display_name", { length: 50 }).notNull(), // "Morning 9:00 AM"
+  
+  // Availability
+  isActive: boolean("is_active").default(true),
+  dayOfWeek: varchar("day_of_week", { 
+    enum: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] 
+  }),
+  
+  // Capacity management
+  maxBookings: integer("max_bookings").default(5), // Max bookings per time slot per day
+  
+  // Created/Updated
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Staff/Team Members for booking assignments
+export const bookingStaff = pgTable("booking_staff", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  
+  // Staff details
+  name: varchar("name", { length: 255 }).notNull(),
+  phone: varchar("phone", { length: 15 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  role: varchar("role", { length: 100 }).default("Site Visit Coordinator"),
+  
+  // Availability
+  isActive: boolean("is_active").default(true),
+  workingDays: json("working_days").$type<string[]>().default([]), // ["monday", "tuesday", ...]
+  workingHours: json("working_hours").$type<{start: string, end: string}>(),
+  
+  // Contact preferences
+  preferredContact: varchar("preferred_contact", { enum: ["phone", "email", "whatsapp"] }).default("phone"),
+  whatsappNumber: varchar("whatsapp_number", { length: 15 }),
+  
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Booking system insert schemas and types
+export const insertSiteVisitBookingSchema = createInsertSchema(siteVisitBookings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  completedAt: true,
+  cancelledAt: true,
+  conversionDate: true,
+});
+
+export const insertBookingTimeSlotSchema = createInsertSchema(bookingTimeSlots).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertBookingStaffSchema = createInsertSchema(bookingStaff).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Booking system types
+export type SiteVisitBooking = typeof siteVisitBookings.$inferSelect;
+export type InsertSiteVisitBooking = z.infer<typeof insertSiteVisitBookingSchema>;
+export type BookingTimeSlot = typeof bookingTimeSlots.$inferSelect;
+export type InsertBookingTimeSlot = z.infer<typeof insertBookingTimeSlotSchema>;
+export type BookingStaff = typeof bookingStaff.$inferSelect;
+export type InsertBookingStaff = z.infer<typeof insertBookingStaffSchema>;
+
+// Enhanced booking with property and staff details
+export interface SiteVisitBookingWithDetails extends SiteVisitBooking {
+  property?: Property;
+  configuration?: PropertyConfiguration;
+  assignedStaff?: BookingStaff;
+}
+
+// Booking statistics
+export type BookingStats = {
+  totalBookings: number;
+  pendingBookings: number;
+  confirmedBookings: number;
+  completedBookings: number;
+  cancelledBookings: number;
+  conversionRate: number;
+  bookingsByStatus: Record<string, number>;
+  bookingsBySource: Record<string, number>;
+  monthlyBookings: Array<{month: string, count: number}>;
+};
+
 // Export types for Valuation Reports
 export type PropertyValuationReport = typeof propertyValuationReports.$inferSelect;
 

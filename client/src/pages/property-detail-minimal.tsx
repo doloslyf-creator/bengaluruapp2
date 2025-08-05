@@ -119,7 +119,18 @@ export default function PropertyDetailMinimal() {
   };
 
   const handleBookVisit = () => {
-    navigate('/book-visit');
+    // Pass property information to the booking page
+    navigate('/book-visit', { 
+      state: { 
+        property: {
+          id: property?.id,
+          name: property?.name,
+          area: property?.area,
+          developer: property?.developer,
+          selectedConfig: selectedConfig
+        }
+      } 
+    });
   };
 
   const handleConsult = () => {

@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { registerEnhancedLeadRoutes } from "./enhancedLeadRoutes";
+import { registerBookingRoutes } from "./bookingRoutes";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
 import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertCivilMepReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, insertPropertyValuationReportSchema, insertPropertyValuationReportConfigurationSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests, propertyValuationReportCustomers, propertyValuationReportConfigurations } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
@@ -3121,6 +3122,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Register enhanced lead routes
   registerEnhancedLeadRoutes(app);
+  
+  // Register booking system routes
+  registerBookingRoutes(app);
 
   const httpServer = createServer(app);
   return httpServer;

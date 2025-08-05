@@ -51,24 +51,22 @@ export default function BookVisit() {
   const bookingMutation = useMutation({
     mutationFn: async (data: BookingForm) => {
       const bookingData = {
-        ...data,
+        customerName: data.name,
+        customerPhone: data.phone,
+        customerEmail: data.email,
         propertyId: property.id,
-        propertyName: property.name,
-        bookingType: "site-visit",
-        status: "confirmed",
+        visitType: data.visitType,
+        preferredDate: data.preferredDate,
+        preferredTime: data.preferredTime,
+        numberOfVisitors: parseInt(data.numberOfVisitors),
+        specialRequests: data.specialRequests || null,
+        source: "website",
       };
       
-      const response = await fetch("/api/bookings", {
+      return apiRequest("/api/bookings", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bookingData),
       });
-      
-      if (!response.ok) {
-        throw new Error("Failed to create booking");
-      }
-      
-      return response.json();
     },
     onSuccess: (data) => {
       setBookingId(data.bookingId || `BK${Date.now()}`);

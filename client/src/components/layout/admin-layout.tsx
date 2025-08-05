@@ -14,7 +14,7 @@ import {
   ArrowLeft,
   ShoppingCart,
   Calculator,
-
+  Calendar,
   Star,
   Shield,
   Bell,
@@ -136,6 +136,12 @@ const groupedNavigation: NavigationGroup[] = [
         href: "/admin-panel/enhanced-leads", 
         icon: Target,
         description: "Advanced Lead Management & Analytics"
+      },
+      { 
+        name: "Site Visit Bookings", 
+        href: "/admin-panel/bookings", 
+        icon: Calendar,
+        description: "Manage Property Visit Schedules"
       },
     ]
   },
