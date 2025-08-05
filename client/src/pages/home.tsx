@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
+import { DataTransparencyFooter } from "@/components/data-transparency-footer";
 import { updateMetaTags, generateOrganizationSchema, injectSchema } from "@/utils/seo";
 import { 
   ArrowRight, 
@@ -319,6 +320,7 @@ export default function Home() {
         </div>
       </section>
 
+      <DataTransparencyFooter />
       <Footer />
     </div>
   );

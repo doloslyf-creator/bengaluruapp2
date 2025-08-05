@@ -10,10 +10,14 @@ import {
   Sparkles,
   Filter,
   Heart,
-  ArrowLeft
+  ArrowLeft,
+  FileCheck,
+  Clock,
+  Shield
 } from "lucide-react";
 import { type Property } from "@shared/schema";
 import Header from "@/components/layout/header";
+import { DataTransparencyIndicator } from "@/components/data-transparency-indicator";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
@@ -183,6 +187,14 @@ export default function FindProperty() {
               <div className="text-3xl font-bold text-purple-600">AI</div>
               <div className="text-sm text-gray-600 mt-1">Powered Matching</div>
             </div>
+          </div>
+          
+          {/* Data Transparency Trust Banner */}
+          <div className="mt-8">
+            <DataTransparencyIndicator 
+              variant="banner" 
+              sources={["RERA Database Verified", "Site Visit Verified", "Updated Daily"]}
+            />
           </div>
         </div>
       </section>

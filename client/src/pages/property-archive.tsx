@@ -29,7 +29,8 @@ import {
   Users,
   Compass,
   TreePine,
-  Zap
+  Zap,
+  FileCheck
 } from "lucide-react";
 import type { Property, PropertyConfiguration, CivilMepReport, PropertyValuationReport } from "@shared/schema";
 
@@ -323,8 +324,24 @@ export default function PropertyArchive() {
                 )}
               </div>
             </div>
-            <div className="text-sm text-gray-500">
-              {filteredProperties.length} properties found
+            <div className="flex items-center space-x-6">
+              <div className="text-sm text-gray-500">
+                {filteredProperties.length} properties found
+              </div>
+              
+              {/* Data Transparency Indicator */}
+              <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                <div className="flex items-center space-x-3 text-xs">
+                  <div className="flex items-center text-green-700">
+                    <FileCheck className="h-3 w-3 mr-1" />
+                    <span className="font-medium">All Reports Verified</span>
+                  </div>
+                  <div className="flex items-center text-blue-700">
+                    <Clock className="h-3 w-3 mr-1" />
+                    <span>Live Data</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 

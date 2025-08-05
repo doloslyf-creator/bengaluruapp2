@@ -23,7 +23,9 @@ import {
   FileText,
   TrendingUp,
   Shield,
-  Clock
+  Clock,
+  FileCheck,
+  BarChart3
 } from "lucide-react";
 
 interface Property {
@@ -463,6 +465,24 @@ export default function PropertyReports() {
               Get independent, engineer-certified property analysis to make informed investment decisions. 
               Our detailed reports help you avoid costly mistakes and negotiate better deals.
             </p>
+            
+            {/* Data Transparency Trust Banner */}
+            <div className="mt-8 max-w-4xl mx-auto bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-4">
+              <div className="flex items-center justify-center space-x-8 text-sm">
+                <div className="flex items-center text-green-700">
+                  <FileCheck className="h-4 w-4 mr-2" />
+                  <span className="font-medium">Engineer Certified</span>
+                </div>
+                <div className="flex items-center text-blue-700">
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  <span className="font-medium">Market Data Verified</span>
+                </div>
+                <div className="flex items-center text-purple-700">
+                  <Shield className="h-4 w-4 mr-2" />
+                  <span className="font-medium">Independent Analysis</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Search Section */}

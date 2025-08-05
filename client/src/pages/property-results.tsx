@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Grid3X3, List, MapPin, Calendar, Phone, ArrowLeft, Star, Eye, Heart, Filter, X, SlidersHorizontal, IndianRupee, Building, Shield } from "lucide-react";
+import { Grid3X3, List, MapPin, Calendar, Phone, ArrowLeft, Star, Eye, Heart, Filter, X, SlidersHorizontal, IndianRupee, Building, Shield, FileCheck, Clock, BarChart3 } from "lucide-react";
 import Header from "@/components/layout/header";
+import { DataTransparencyIndicator } from "@/components/data-transparency-indicator";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -328,6 +329,15 @@ export default function PropertyResults() {
                   <p className="text-sm text-gray-600">
                     {matchingProperties.length} properties found
                   </p>
+                </div>
+                
+                {/* Data Transparency Indicator */}
+                <div className="ml-6">
+                  <DataTransparencyIndicator 
+                    variant="compact" 
+                    sources={["RERA Database", "Site Verification"]}
+                    lastUpdated="Today"
+                  />
                 </div>
               </div>
               

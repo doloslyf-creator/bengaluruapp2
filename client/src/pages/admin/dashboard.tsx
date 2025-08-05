@@ -49,6 +49,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminLayout from "@/components/layout/admin-layout";
+import { DataTransparencyIndicator } from "@/components/data-transparency-indicator";
 import { type Property, type PropertyStats } from "@shared/schema";
 
 export default function AdminDashboard() {
@@ -176,7 +177,16 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
               <h1 className="text-3xl font-bold mb-2">Welcome to OwnItRight Dashboard</h1>
-              <p className="text-blue-100 mb-6">Your comprehensive property intelligence and analytics center</p>
+              <p className="text-blue-100 mb-4">Your comprehensive property intelligence and analytics center</p>
+              
+              {/* Data Transparency for Admin */}
+              <div className="mb-4">
+                <DataTransparencyIndicator 
+                  variant="inline" 
+                  sources={["Live Database", "Real-time Analytics", "Automated Reports"]}
+                  className="text-blue-100"
+                />
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
                   <div className="text-2xl font-bold">₹{businessMetrics.totalRevenue.toLocaleString()}</div>
