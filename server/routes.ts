@@ -2206,6 +2206,144 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Report unlock payment routes
+  app.post("/api/payments/reports/create-order", async (req, res) => {
+    try {
+      if (!paymentService.isReady()) {
+        return res.status(503).json({ error: "Payment service not configured. Please set up Razorpay keys in admin settings." });
+      }
+
+      const { propertyId, reportType, customerName, customerEmail, customerPhone } = req.body;
+      
+      if (!propertyId || !reportType || !customerName || !customerEmail) {
+        return res.status(400).json({ error: "Missing required fields: propertyId, reportType, customerName, customerEmail" });
+      }
+
+      const amount = 249900; // ₹2,499 in paise
+      const receipt = `${reportType}_${propertyId}_${Date.now()}`;
+      
+      const order = await paymentService.createOrder({
+        amount,
+        currency: "INR",
+        receipt,
+        notes: {
+          reportType,
+          propertyId,
+          customerName,
+          customerEmail,
+          customerPhone: customerPhone || ""
+        }
+      });
+
+      res.json({
+        orderId: order.id,
+        amount: order.amount,
+        currency: order.currency,
+        reportType,
+        propertyId
+      });
+    } catch (error) {
+      console.error("Error creating report payment order:", error);
+      res.status(500).json({ error: error.message || "Failed to create report payment order" });
+    }
+  });
+
+  app.post("/api/payments/reports/verify", async (req, res) => {
+    try {
+      if (!paymentService.isReady()) {
+        return res.status(503).json({ error: "Payment service not configured" });
+      }
+
+      const { 
+        razorpay_order_id, 
+        razorpay_payment_id, 
+        razorpay_signature,
+        propertyId,
+        reportType,
+        customerName,
+        customerEmail,
+        customerPhone
+      } = req.body;
+      
+      if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+        return res.status(400).json({ error: "Missing required payment verification parameters" });
+      }
+
+      const isValid = paymentService.verifyPayment({
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature
+      });
+
+      if (isValid) {
+        // Create payment record in database
+        const paymentData = {
+          reportId: null, // Will be linked when report is created
+          reportType: reportType as "civil-mep" | "property-valuation",
+          propertyId,
+          customerName,
+          customerEmail,
+          customerPhone: customerPhone || "",
+          amount: "2499",
+          paymentMethod: "razorpay" as const,
+          paymentStatus: "completed" as const,
+          razorpayOrderId: razorpay_order_id,
+          razorpayPaymentId: razorpay_payment_id,
+          accessGrantedAt: new Date()
+        };
+
+        const payment = await storage.createReportPayment(paymentData);
+        
+        console.log(`💳 Report payment verified: ${reportType} for property ${propertyId} by ${customerName}`);
+        
+        res.json({ 
+          success: true, 
+          message: "Payment verified and report unlocked successfully",
+          paymentId: payment.id,
+          accessGranted: true
+        });
+      } else {
+        res.status(400).json({ error: "Payment verification failed" });
+      }
+    } catch (error) {
+      console.error("Error verifying report payment:", error);
+      res.status(500).json({ error: "Failed to verify report payment" });
+    }
+  });
+
+  // Check if user has paid for a specific report
+  app.get("/api/payments/reports/access/:propertyId/:reportType", async (req, res) => {
+    try {
+      const { propertyId, reportType } = req.params;
+      const { customerEmail } = req.query;
+
+      if (!customerEmail) {
+        return res.status(400).json({ error: "Customer email is required" });
+      }
+
+      // Check if payment exists for this customer, property, and report type
+      const payment = await db.select()
+        .from(reportPayments)
+        .where(
+          and(
+            eq(reportPayments.propertyId, propertyId),
+            eq(reportPayments.reportType, reportType as "civil-mep" | "property-valuation"),
+            eq(reportPayments.customerEmail, customerEmail as string),
+            eq(reportPayments.paymentStatus, "completed")
+          )
+        )
+        .limit(1);
+
+      res.json({ 
+        hasAccess: payment.length > 0,
+        paymentId: payment[0]?.id || null
+      });
+    } catch (error) {
+      console.error("Error checking report access:", error);
+      res.status(500).json({ error: "Failed to check report access" });
+    }
+  });
+
   // Supabase Migration API endpoints
   app.get("/api/supabase/status", async (req, res) => {
     try {

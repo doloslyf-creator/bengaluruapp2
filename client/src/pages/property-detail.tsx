@@ -1,19 +1,23 @@
 import { useState, useEffect } from "react";
 import { useLocation, useRoute } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
   ArrowLeft, MapPin, Calendar, IndianRupee, Building, Users, 
   Star, Heart, Share2, Phone, MessageCircle, CheckCircle, 
   Info, Award, Shield, TrendingUp, Clock, Eye, Camera,
   Bed, Bath, Car, TreePine, Dumbbell, ShoppingCart, Wifi,
   Waves, Zap, Home, ExternalLink, Download, ChevronLeft, ChevronRight, Play, BarChart3,
-  TrendingUp as TrendingUpIcon
+  TrendingUp as TrendingUpIcon, Lock, Unlock, FileText, CreditCard
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 
 import { formatPriceDisplay } from "@/lib/utils";
 import { type Property, type PropertyConfiguration } from "@shared/schema";
@@ -619,11 +623,13 @@ export default function PropertyDetail() {
             <Card>
               <CardContent className="p-0">
                 <Tabs defaultValue="overview" className="w-full">
-                  <TabsList className="grid w-full grid-cols-4 rounded-none border-b">
+                  <TabsList className="grid w-full grid-cols-6 rounded-none border-b">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="amenities">Amenities</TabsTrigger>
                     <TabsTrigger value="location">Location</TabsTrigger>
                     <TabsTrigger value="legal">Legal</TabsTrigger>
+                    <TabsTrigger value="civil-mep">Civil+MEP Report</TabsTrigger>
+                    <TabsTrigger value="valuation">Valuation Report</TabsTrigger>
                   </TabsList>
                   
                   <TabsContent value="overview" className="p-6 space-y-4">
@@ -881,6 +887,66 @@ export default function PropertyDetail() {
                       </Card>
                     )}
                   </TabsContent>
+
+                  {/* Civil+MEP Report Tab */}
+                  <TabsContent value="civil-mep" className="p-6 space-y-6">
+                    <ReportPreview 
+                      reportType="civil-mep"
+                      propertyId={property.id}
+                      propertyName={property.name}
+                      price={2499}
+                      title="Civil + MEP Engineering Report"
+                      description="Comprehensive structural and MEP systems analysis with safety recommendations"
+                      features={[
+                        "Structural integrity assessment",
+                        "Foundation and load-bearing analysis", 
+                        "Electrical systems evaluation",
+                        "Plumbing and water supply review",
+                        "HVAC systems inspection",
+                        "Safety compliance check",
+                        "Maintenance recommendations",
+                        "Cost estimation for repairs"
+                      ]}
+                      sampleData={{
+                        "Structural Assessment": "Grade A - Excellent structural integrity",
+                        "Foundation Score": "9.2/10 - Strong foundation with minor settlements",
+                        "Electrical Safety": "Compliant - All systems meet safety standards",
+                        "Plumbing Grade": "B+ - Good condition with recommended upgrades",
+                        "HVAC Efficiency": "85% - Well-maintained systems",
+                        "Overall Rating": "8.7/10 - Excellent property condition"
+                      }}
+                    />
+                  </TabsContent>
+
+                  {/* Property Valuation Report Tab */}
+                  <TabsContent value="valuation" className="p-6 space-y-6">
+                    <ReportPreview 
+                      reportType="property-valuation"
+                      propertyId={property.id}
+                      propertyName={property.name}
+                      price={2499}
+                      title="Professional Property Valuation Report"
+                      description="Independent market valuation with investment analysis and recommendations"
+                      features={[
+                        "Current market value assessment",
+                        "Comparable properties analysis",
+                        "Location premium evaluation",
+                        "Rental yield calculations",
+                        "Investment potential scoring",
+                        "Market trend analysis",
+                        "Risk assessment matrix",
+                        "Future value projections"
+                      ]}
+                      sampleData={{
+                        "Market Value": `₹${((selectedConfig?.pricePerSqft || 8500) * (selectedConfig?.builtUpArea || 1200)).toLocaleString()}`,
+                        "Price Per Sq Ft": `₹${selectedConfig?.pricePerSqft || 8500}`,
+                        "Location Premium": "15% above area average",
+                        "Rental Yield": "3.2% annually", 
+                        "Investment Score": "8.5/10 - Excellent investment potential",
+                        "Market Trend": "Appreciating at 8% annually"
+                      }}
+                    />
+                  </TabsContent>
                 </Tabs>
               </CardContent>
             </Card>
@@ -1068,6 +1134,320 @@ export default function PropertyDetail() {
       </section>
 
 
+    </div>
+  );
+}
+
+// Report Preview Component with Payment Integration
+interface ReportPreviewProps {
+  reportType: 'civil-mep' | 'property-valuation';
+  propertyId: string;
+  propertyName: string;
+  price: number;
+  title: string;
+  description: string;
+  features: string[];
+  sampleData: Record<string, string>;
+}
+
+function ReportPreview({ reportType, propertyId, propertyName, price, title, description, features, sampleData }: ReportPreviewProps) {
+  const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
+  const [customerInfo, setCustomerInfo] = useState({
+    name: '',
+    email: '',
+    phone: ''
+  });
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Check if user has access to this report
+  const { data: accessData } = useQuery({
+    queryKey: ["/api/payments/reports/access", propertyId, reportType, customerInfo.email],
+    queryFn: async () => {
+      if (!customerInfo.email) return { hasAccess: false };
+      const response = await fetch(`/api/payments/reports/access/${propertyId}/${reportType}?customerEmail=${customerInfo.email}`);
+      if (!response.ok) return { hasAccess: false };
+      return response.json();
+    },
+    enabled: !!customerInfo.email,
+  });
+
+  // Create payment order mutation
+  const createOrderMutation = useMutation({
+    mutationFn: async (orderData: any) => {
+      const response = await fetch('/api/payments/reports/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to create payment order');
+      }
+      return response.json();
+    }
+  });
+
+  // Payment verification mutation
+  const verifyPaymentMutation = useMutation({
+    mutationFn: async (verificationData: any) => {
+      const response = await fetch('/api/payments/reports/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(verificationData)
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Payment verification failed');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/payments/reports/access"] });
+      setIsPaymentDialogOpen(false);
+      toast({
+        title: "Payment Successful!",
+        description: `${title} has been unlocked. You now have full access to the report.`,
+      });
+    }
+  });
+
+  const handlePayment = async () => {
+    if (!customerInfo.name || !customerInfo.email) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in your name and email to proceed.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      // Create payment order
+      const orderData = await createOrderMutation.mutateAsync({
+        propertyId,
+        reportType,
+        customerName: customerInfo.name,
+        customerEmail: customerInfo.email,
+        customerPhone: customerInfo.phone
+      });
+
+      // Load Razorpay script if not already loaded
+      if (!window.Razorpay) {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.async = true;
+        document.body.appendChild(script);
+        
+        await new Promise((resolve) => {
+          script.onload = resolve;
+        });
+      }
+
+      // Get Razorpay public key
+      const keysResponse = await fetch('/api/settings/api-keys');
+      const keysData = await keysResponse.json();
+      
+      if (!keysData.razorpayKeyId) {
+        throw new Error('Razorpay is not configured. Please contact support.');
+      }
+
+      // Initialize Razorpay payment
+      const options = {
+        key: keysData.razorpayKeyId,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'OwnItRight',
+        description: `${title} - ${propertyName}`,
+        order_id: orderData.orderId,
+        handler: async function (response: any) {
+          try {
+            await verifyPaymentMutation.mutateAsync({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              propertyId,
+              reportType,
+              customerName: customerInfo.name,
+              customerEmail: customerInfo.email,
+              customerPhone: customerInfo.phone
+            });
+          } catch (error) {
+            toast({
+              title: "Payment Verification Failed",
+              description: "Please contact support if payment was deducted.",
+              variant: "destructive"
+            });
+          }
+        },
+        prefill: {
+          name: customerInfo.name,
+          email: customerInfo.email,
+          contact: customerInfo.phone
+        },
+        theme: {
+          color: '#3b82f6'
+        },
+        modal: {
+          ondismiss: function() {
+            setIsProcessing(false);
+          }
+        }
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    } catch (error: any) {
+      setIsProcessing(false);
+      toast({
+        title: "Payment Failed",
+        description: error.message || "Something went wrong. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const hasAccess = accessData?.hasAccess || false;
+
+  return (
+    <div className="space-y-6">
+      {/* Report Header */}
+      <div className="text-center">
+        <div className="flex items-center justify-center mb-4">
+          <FileText className="h-8 w-8 text-primary mr-3" />
+          <div>
+            <h2 className="text-2xl font-bold">{title}</h2>
+            <p className="text-gray-600">{description}</p>
+          </div>
+        </div>
+        
+        {hasAccess ? (
+          <Badge className="bg-success text-white">
+            <Unlock className="h-4 w-4 mr-1" />
+            Report Unlocked
+          </Badge>
+        ) : (
+          <Badge variant="outline" className="border-warning text-warning">
+            <Lock className="h-4 w-4 mr-1" />
+            Premium Report - ₹{price.toLocaleString()}
+          </Badge>
+        )}
+      </div>
+
+      {/* Sample Data Preview */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <BarChart3 className="h-5 w-5 mr-2" />
+            Report Preview
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {Object.entries(sampleData).map(([key, value]) => (
+              <div key={key} className="p-3 bg-gray-50 rounded-lg">
+                <div className="text-sm font-medium text-gray-700">{key}</div>
+                <div className="text-lg font-semibold">{value}</div>
+              </div>
+            ))}
+          </div>
+          
+          {!hasAccess && (
+            <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border-l-4 border-primary">
+              <p className="text-sm text-gray-600 mb-2">
+                <Lock className="h-4 w-4 inline mr-1" />
+                This is a preview. Unlock the full report to access:
+              </p>
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-1 text-sm text-gray-700">
+                {features.map((feature, index) => (
+                  <li key={index} className="flex items-center">
+                    <CheckCircle className="h-3 w-3 text-success mr-2" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Action Button */}
+      {!hasAccess ? (
+        <div className="text-center">
+          <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
+            <DialogTrigger asChild>
+              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+                <CreditCard className="h-5 w-5 mr-2" />
+                Unlock Full Report - ₹{price.toLocaleString()}
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Unlock {title}</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">
+                  Get instant access to the complete {title.toLowerCase()} for {propertyName}.
+                </p>
+                
+                <div className="space-y-3">
+                  <div>
+                    <Label htmlFor="name">Full Name *</Label>
+                    <Input
+                      id="name"
+                      value={customerInfo.name}
+                      onChange={(e) => setCustomerInfo(prev => ({...prev, name: e.target.value}))}
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="email">Email Address *</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={customerInfo.email}
+                      onChange={(e) => setCustomerInfo(prev => ({...prev, email: e.target.value}))}
+                      placeholder="Enter your email"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <Input
+                      id="phone"
+                      value={customerInfo.phone}
+                      onChange={(e) => setCustomerInfo(prev => ({...prev, phone: e.target.value}))}
+                      placeholder="Enter your phone number"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2">
+                  <div className="text-lg font-semibold">Total: ₹{price.toLocaleString()}</div>
+                  <Button 
+                    onClick={handlePayment}
+                    disabled={isProcessing || !customerInfo.name || !customerInfo.email}
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                  >
+                    {isProcessing ? "Processing..." : "Pay Now"}
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+      ) : (
+        <div className="text-center">
+          <Button size="lg" className="bg-success hover:bg-success/90">
+            <Download className="h-5 w-5 mr-2" />
+            Download Full Report
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
