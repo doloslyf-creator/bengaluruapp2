@@ -5,9 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Search, Filter, Eye, Calendar, CheckCircle, Clock, AlertCircle, Building2, Wrench, Zap, MapPin, IndianRupee, ShoppingCart, User } from "lucide-react";
+import { FileText, Search, Filter, Eye, Calendar, CheckCircle, Clock, AlertCircle, Building2, Wrench, Zap, MapPin, IndianRupee, ShoppingCart, User, X, Shield } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { usePayment } from "@/hooks/use-payment";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import OrderFormDialog from "@/components/order-form-dialog";
 import type { CivilMepReport, Property } from "@shared/schema";
 
 export default function CivilMepReports() {
@@ -16,8 +19,9 @@ export default function CivilMepReports() {
   const [developerFilter, setDeveloperFilter] = useState("all");
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
-  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [showOrderForm, setShowOrderForm] = useState(false);
   const { toast } = useToast();
+  const { processPayment, isProcessing } = usePayment();
   const queryClient = useQueryClient();
 
   // Fetch properties for which users can buy civil+MEP reports
@@ -108,7 +112,7 @@ export default function CivilMepReports() {
   // Handle property selection for payment
   const handleBuyReport = (property: Property) => {
     setSelectedProperty(property);
-    setShowPaymentDialog(true);
+    setShowOrderForm(true);
   };
 
   const getStatusBadge = (status: string) => {
@@ -188,18 +192,24 @@ export default function CivilMepReports() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <div className="md:col-span-2">
                 <Input
                   placeholder="Search by property name, area, or developer..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    triggerAutoSearch();
+                  }}
                   className="w-full"
                   data-testid="input-search-properties"
                 />
               </div>
               <div>
-                <Select value={areaFilter} onValueChange={setAreaFilter}>
+                <Select value={areaFilter} onValueChange={(value) => {
+                  setAreaFilter(value);
+                  triggerAutoSearch();
+                }}>
                   <SelectTrigger data-testid="select-area-filter">
                     <SelectValue placeholder="Filter by area" />
                   </SelectTrigger>
@@ -212,7 +222,10 @@ export default function CivilMepReports() {
                 </Select>
               </div>
               <div>
-                <Select value={developerFilter} onValueChange={setDeveloperFilter}>
+                <Select value={developerFilter} onValueChange={(value) => {
+                  setDeveloperFilter(value);
+                  triggerAutoSearch();
+                }}>
                   <SelectTrigger data-testid="select-developer-filter">
                     <SelectValue placeholder="Filter by developer" />
                   </SelectTrigger>
@@ -224,12 +237,49 @@ export default function CivilMepReports() {
                   </SelectContent>
                 </Select>
               </div>
+              <div>
+                <Button 
+                  onClick={handleSearch} 
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  data-testid="button-search-properties"
+                >
+                  <Search className="w-4 h-4 mr-2" />
+                  Search Properties
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Properties Grid */}
-        {filteredProperties.length === 0 ? (
+        {!hasSearched ? (
+          <Card className="text-center py-16">
+            <CardContent>
+              <Building2 className="w-20 h-20 text-blue-400 mx-auto mb-6" />
+              <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+                Search Properties for Civil+MEP Assessment
+              </h3>
+              <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+                Use the search filters above to find properties and order your comprehensive engineering assessment report. 
+                Get detailed structural, mechanical, electrical, and plumbing analysis for just ₹2,499.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto text-sm">
+                <div className="flex items-center justify-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <CheckCircle className="w-4 h-4 text-blue-600" />
+                  <span>Licensed Engineers</span>
+                </div>
+                <div className="flex items-center justify-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span>48-Hour Delivery</span>
+                </div>
+                <div className="flex items-center justify-center gap-2 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                  <CheckCircle className="w-4 h-4 text-purple-600" />
+                  <span>Detailed Analysis</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ) : filteredProperties.length === 0 ? (
           <Card className="text-center py-12">
             <CardContent>
               <Building2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -237,24 +287,20 @@ export default function CivilMepReports() {
                 No Properties Found
               </h3>
               <p className="text-gray-600 dark:text-gray-300 mb-6">
-                {searchTerm || areaFilter !== "all" || developerFilter !== "all"
-                  ? "No properties match your current search criteria."
-                  : "No properties are currently available for assessment."
-                }
+                No properties match your current search criteria. Try adjusting your filters.
               </p>
-              {(searchTerm || areaFilter !== "all" || developerFilter !== "all") && (
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    setSearchTerm("");
-                    setAreaFilter("all");
-                    setDeveloperFilter("all");
-                  }}
-                  data-testid="button-clear-filters"
-                >
-                  Clear Filters
-                </Button>
-              )}
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setSearchTerm("");
+                  setAreaFilter("all");
+                  setDeveloperFilter("all");
+                  setHasSearched(false);
+                }}
+                data-testid="button-clear-filters"
+              >
+                Clear All Filters
+              </Button>
             </CardContent>
           </Card>
         ) : (
@@ -325,16 +371,11 @@ export default function CivilMepReports() {
                           </div>
                           <Button 
                             className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                            onClick={() => orderReportMutation.mutate(property.id)}
-                            disabled={orderReportMutation.isPending}
+                            onClick={() => handleBuyReport(property)}
                             data-testid={`button-buy-report-${property.id}`}
                           >
-                            {orderReportMutation.isPending ? (
-                              <Clock className="w-4 h-4 mr-2 animate-spin" />
-                            ) : (
-                              <ShoppingCart className="w-4 h-4 mr-2" />
-                            )}
-                            {orderReportMutation.isPending ? "Processing..." : "Order Assessment"}
+                            <ShoppingCart className="w-4 h-4 mr-2" />
+                            Order Assessment
                           </Button>
                         </div>
                       )}
@@ -346,51 +387,219 @@ export default function CivilMepReports() {
           </div>
         )}
 
-        {/* Information Section */}
-        <div className="mt-12 grid md:grid-cols-3 gap-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-blue-600" />
-                Civil Engineering
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Comprehensive structural assessments including foundation, superstructure, walls, roofing, and overall building integrity evaluation.
-              </p>
-            </CardContent>
-          </Card>
+        {/* Value Proposition Sections */}
+        {hasSearched && (
+          <>
+            {/* Why Civil+MEP Reports Section */}
+            <div className="mt-16 py-16 bg-gradient-to-br from-blue-50 to-green-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl">
+              <div className="max-w-6xl mx-auto px-6">
+                <div className="text-center mb-12">
+                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                    Why Civil+MEP Reports Are Essential for Property Buyers
+                  </h2>
+                  <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                    Don't let hidden structural or system issues turn your dream property into a costly nightmare. 
+                    Our engineering assessments reveal what builders don't want you to know.
+                  </p>
+                </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Wrench className="w-5 h-5 text-green-600" />
-                Mechanical Systems
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Detailed analysis of HVAC systems, ventilation, fire safety systems, and building management automation for optimal performance.
-              </p>
-            </CardContent>
-          </Card>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <Card className="border-0 shadow-lg">
+                    <CardHeader className="text-center">
+                      <div className="w-16 h-16 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
+                      </div>
+                      <CardTitle className="text-xl">Hidden Structural Issues</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-600 dark:text-gray-300 text-center">
+                        Identify foundation problems, wall cracks, roofing defects, and structural weaknesses 
+                        that could cost lakhs in repairs later.
+                      </p>
+                    </CardContent>
+                  </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="w-5 h-5 text-yellow-600" />
-                Electrical & Plumbing
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Complete evaluation of electrical installations, power distribution, plumbing systems, and water management infrastructure.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+                  <Card className="border-0 shadow-lg">
+                    <CardHeader className="text-center">
+                      <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Zap className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
+                      </div>
+                      <CardTitle className="text-xl">Electrical Safety</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-600 dark:text-gray-300 text-center">
+                        Detect faulty wiring, overloaded circuits, and fire hazards that pose serious 
+                        safety risks to your family.
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-0 shadow-lg">
+                    <CardHeader className="text-center">
+                      <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Building2 className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <CardTitle className="text-xl">MEP System Quality</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-600 dark:text-gray-300 text-center">
+                        Evaluate HVAC, plumbing, and mechanical systems to ensure they meet standards 
+                        and won't fail after possession.
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-0 shadow-lg">
+                    <CardHeader className="text-center">
+                      <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <IndianRupee className="w-8 h-8 text-green-600 dark:text-green-400" />
+                      </div>
+                      <CardTitle className="text-xl">Avoid Costly Repairs</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-600 dark:text-gray-300 text-center">
+                        Save 5-10 lakhs by identifying issues before purchase. Use our report to 
+                        negotiate better prices or avoid problem properties entirely.
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-0 shadow-lg">
+                    <CardHeader className="text-center">
+                      <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <CheckCircle className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+                      </div>
+                      <CardTitle className="text-xl">Quality Assurance</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-600 dark:text-gray-300 text-center">
+                        Verify that construction quality matches what was promised. Ensure your 
+                        investment meets building codes and safety standards.
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-0 shadow-lg">
+                    <CardHeader className="text-center">
+                      <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Shield className="w-8 h-8 text-orange-600 dark:text-orange-400" />
+                      </div>
+                      <CardTitle className="text-xl">Future-Proof Investment</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-600 dark:text-gray-300 text-center">
+                        Ensure your property will maintain its value and not become a liability. 
+                        Get expert recommendations for long-term durability.
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+
+            {/* What You Get Section */}
+            <div className="mt-16 py-16">
+              <div className="max-w-6xl mx-auto px-6">
+                <div className="text-center mb-12">
+                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                    What's Included in Your ₹2,499 Assessment
+                  </h2>
+                  <p className="text-lg text-gray-600 dark:text-gray-300">
+                    Comprehensive engineering evaluation by licensed professionals
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                  <Card className="p-6">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-3 text-xl">
+                        <Building2 className="w-6 h-6 text-blue-600" />
+                        Civil Engineering Assessment
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+                        <span>Foundation and structural integrity analysis</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+                        <span>Wall construction quality and load-bearing capacity</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+                        <span>Roofing and waterproofing evaluation</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+                        <span>Crack analysis and settlement assessment</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+                        <span>Building code compliance verification</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="p-6">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-3 text-xl">
+                        <Wrench className="w-6 h-6 text-green-600" />
+                        MEP Systems Evaluation
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+                        <span>Electrical wiring and safety systems inspection</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+                        <span>Plumbing and water supply system analysis</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+                        <span>HVAC and ventilation system assessment</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+                        <span>Fire safety and emergency systems review</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+                        <span>Energy efficiency and sustainability analysis</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="mt-8 p-6 bg-gradient-to-r from-blue-600 to-green-600 rounded-xl text-white text-center">
+                  <h3 className="text-xl font-semibold mb-2">Expert Investment Recommendation</h3>
+                  <p className="text-blue-100">
+                    Get a clear BUY, HOLD, or AVOID recommendation based on our comprehensive engineering analysis, 
+                    helping you make confident investment decisions.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
+
+      {/* Order Form Dialog */}
+      {selectedProperty && (
+        <OrderFormDialog
+          isOpen={showOrderForm}
+          onClose={() => {
+            setShowOrderForm(false);
+            setSelectedProperty(null);
+          }}
+          property={selectedProperty}
+          reportType="civil-mep-report"
+          serviceType="civil-mep-assessment"
+          amount={2499}
+        />
+      )}
     </div>
   );
 }
