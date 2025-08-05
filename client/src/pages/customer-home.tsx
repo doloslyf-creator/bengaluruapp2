@@ -34,6 +34,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Header from "@/components/layout/header";
+import Footer from "@/components/layout/footer";
 
 export default function CustomerHome() {
   const [, navigate] = useLocation();
@@ -513,52 +514,7 @@ export default function CustomerHome() {
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="py-20 bg-gradient-to-r from-primary to-blue-600 text-white">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Ready to Start Your Property Journey?
-            </h2>
-            <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-              Join thousands of smart buyers who chose expert guidance over expensive mistakes.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                onClick={() => navigate('/find-property')}
-                size="lg"
-                variant="secondary"
-                className="bg-white text-primary hover:bg-gray-100 px-8 py-4 text-lg font-semibold rounded-xl"
-                data-testid="button-find-home-cta"
-              >
-                <Home className="h-5 w-5 mr-2" />
-                Find My Dream Home
-              </Button>
-              
-              <Button
-                onClick={() => navigate('/contact')}
-                size="lg"
-                variant="outline"
-                className="border-white text-white hover:bg-white hover:text-primary px-8 py-4 text-lg font-semibold rounded-xl"
-                data-testid="button-contact-experts"
-              >
-                <Phone className="h-5 w-5 mr-2" />
-                Talk to Our Experts
-              </Button>
-            </div>
-
-            <p className="text-sm opacity-75 mt-6">
-              🎯 Zero risk guarantee - We only earn when we help you save
-            </p>
-          </motion.div>
-        </div>
-      </section>
+      <Footer />
     </div>
   );
 }
