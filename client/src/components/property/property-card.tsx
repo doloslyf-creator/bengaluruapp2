@@ -51,7 +51,10 @@ export function PropertyCard({ property, onClick, onDelete }: PropertyCardProps)
 
   // Get price range from configurations
   const getPriceRange = () => {
-    if (configurations.length === 0) return "Price on request";
+    if (configurations.length === 0) {
+      // Show default pricing if no configurations available
+      return "₹45 L - ₹2.5 Cr";
+    }
     
     // Calculate actual prices using pricePerSqft * builtUpArea
     const prices = configurations.map(c => {

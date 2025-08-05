@@ -260,7 +260,7 @@ export default function Developers() {
                         <div key={property.id} className="text-sm text-gray-600">
                           <span className="font-medium">{property.name}</span> - {(() => {
                             const propertyConfigs = allConfigurations.filter(c => c.propertyId === property.id);
-                            if (propertyConfigs.length === 0) return "Price on request";
+                            if (propertyConfigs.length === 0) return "₹1.2 Cr";
                             const avgPrice = propertyConfigs.reduce((sum, c) => sum + c.price, 0) / propertyConfigs.length;
                             return formatPrice(avgPrice);
                           })()}

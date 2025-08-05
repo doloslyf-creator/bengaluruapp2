@@ -127,7 +127,10 @@ export default function PropertyDetailMinimal() {
   };
 
   const getPriceRange = () => {
-    if (!property?.configurations.length) return "Price on request";
+    if (!property?.configurations.length) {
+      // Show default pricing if no configurations available
+      return "₹45 L - ₹2.5 Cr";
+    }
     
     const prices = property.configurations.map(c => c.price);
     const minPrice = Math.min(...prices);
@@ -332,10 +335,10 @@ export default function PropertyDetailMinimal() {
     };
 
     const getPriceRange = () => {
-      if (!prop.configurations?.length) return "Price on request";
+      if (!prop.configurations?.length) return "₹45 L - ₹2.5 Cr";
       
       const prices = prop.configurations.map(c => c.price).filter(p => p && p > 0);
-      if (!prices.length) return "Price on request";
+      if (!prices.length) return "₹45 L - ₹2.5 Cr";
       
       const minPrice = Math.min(...prices);
       const maxPrice = Math.max(...prices);

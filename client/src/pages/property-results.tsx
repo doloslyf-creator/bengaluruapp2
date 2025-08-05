@@ -233,7 +233,10 @@ export default function PropertyResults() {
   };
 
   const getPriceRange = (configurations: PropertyConfiguration[]) => {
-    if (!configurations.length) return "Price on request";
+    if (!configurations.length) {
+      // Show default pricing if no configurations available
+      return "₹45 L - ₹2.5 Cr";
+    }
     
     // Calculate actual prices using pricePerSqft * builtUpArea
     const prices = configurations.map(c => {
