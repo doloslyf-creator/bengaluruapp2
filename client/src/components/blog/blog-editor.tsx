@@ -18,6 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { Save, Eye, Clock, Tag, X } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { insertBlogPostSchema, type BlogPost, type InsertBlogPost } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
 
 interface BlogEditorProps {
   post?: BlogPost | null;
@@ -28,6 +29,7 @@ interface BlogEditorProps {
 export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) {
   const [newTag, setNewTag] = useState("");
   const [currentTags, setCurrentTags] = useState<string[]>(post?.tags || []);
+  const { toast } = useToast();
   
   const form = useForm<InsertBlogPost>({
     resolver: zodResolver(insertBlogPostSchema),
@@ -320,7 +322,19 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
               type="button" 
               disabled={isPending}
               variant="outline"
-              onClick={(e) => {
+              onClick={async () => {
+                // Validate required fields for draft
+                const title = form.getValues("title");
+                if (!title.trim()) {
+                  toast({
+                    title: "Title Required",
+                    description: "Please enter a blog post title before saving.",
+                    variant: "destructive",
+                  });
+                  form.setFocus("title");
+                  return;
+                }
+                
                 form.setValue("status", "draft");
                 form.handleSubmit(handleSubmit)();
               }}
@@ -331,7 +345,31 @@ export default function BlogEditor({ post, onSave, onCancel }: BlogEditorProps) 
             <Button 
               type="button" 
               disabled={isPending}
-              onClick={(e) => {
+              onClick={async () => {
+                // Validate all required fields for publish
+                const title = form.getValues("title");
+                const content = form.getValues("content");
+                
+                if (!title.trim()) {
+                  toast({
+                    title: "Title Required",
+                    description: "Please enter a blog post title before publishing.",
+                    variant: "destructive",
+                  });
+                  form.setFocus("title");
+                  return;
+                }
+                
+                if (!content.trim()) {
+                  toast({
+                    title: "Content Required", 
+                    description: "Please add content to your blog post before publishing.",
+                    variant: "destructive",
+                  });
+                  form.setFocus("content");
+                  return;
+                }
+                
                 form.setValue("status", "published");
                 form.handleSubmit(handleSubmit)();
               }}
