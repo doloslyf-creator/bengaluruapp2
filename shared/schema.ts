@@ -400,8 +400,6 @@ export const insertReportPaymentSchema = createInsertSchema(reportPayments).omit
 
 export type InsertBooking = z.infer<typeof insertBookingSchema>;
 export type Booking = typeof bookings.$inferSelect;
-export type CivilMepReport = typeof civilMepReports.$inferSelect;
-export type InsertCivilMepReport = z.infer<typeof insertCivilMepReportSchema>;
 
 export type ReportPayment = typeof reportPayments.$inferSelect;
 export type InsertReportPayment = z.infer<typeof insertReportPaymentSchema>;
