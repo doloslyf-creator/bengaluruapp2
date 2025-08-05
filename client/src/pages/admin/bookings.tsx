@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Calendar, Clock, User, Phone, Mail, MapPin, Edit, Check, X, AlertCircle, Filter, Plus, Eye } from "lucide-react";
+import { Calendar, Clock, User, Phone, Mail, MapPin, Edit, Check, X, AlertCircle, Filter, Plus, Eye, Trash2 } from "lucide-react";
+import AdminLayout from "@/components/layout/admin-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,22 +52,62 @@ export default function AdminBookings() {
   });
 
   // Fetch booking statistics
-  const { data: stats } = useQuery({
+  const { data: stats } = useQuery<{
+    totalBookings: string;
+    pendingBookings: string;
+    confirmedBookings: string;
+    completedBookings: string;
+    conversionRate: number;
+  }>({
     queryKey: ["/api/bookings/stats"],
   });
 
   // Fetch booking staff
-  const { data: staff = [] } = useQuery({
+  const { data: staff = [] } = useQuery<Array<{id: string; name: string; role: string}>>({
     queryKey: ["/api/booking-staff"],
+  });
+
+  // Delete booking mutation
+  const deleteBookingMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(`/api/bookings/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) throw new Error("Failed to delete booking");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/bookings/stats"] });
+      toast({
+        title: "Success",
+        description: "Booking deleted successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete booking",
+        variant: "destructive",
+      });
+    },
   });
 
   // Update booking mutation
   const updateBookingMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<UpdateBookingForm> }) => {
-      return apiRequest(`/api/bookings/${id}`, {
+      const response = await fetch(`/api/bookings/${id}`, {
         method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(data),
       });
+      if (!response.ok) throw new Error("Failed to update booking");
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/bookings"] });
@@ -134,15 +175,21 @@ export default function AdminBookings() {
     });
   };
 
-  const quickStatusUpdate = (bookingId: string, status: string, notes?: string) => {
+  const quickStatusUpdate = (bookingId: string, status: "pending" | "confirmed" | "rescheduled" | "completed" | "cancelled" | "no-show", notes?: string) => {
     updateBookingMutation.mutate({
       id: bookingId,
       data: { status, ...(notes && { cancelReason: notes }) },
     });
   };
 
+  const handleDeleteBooking = (bookingId: string, customerName: string) => {
+    if (confirm(`Are you sure you want to delete the booking for ${customerName}? This action cannot be undone.`)) {
+      deleteBookingMutation.mutate(bookingId);
+    }
+  };
+
   // Filter bookings
-  const filteredBookings = bookings.filter((booking: any) => {
+  const filteredBookings = (bookings as any[]).filter((booking: any) => {
     const matchesStatus = statusFilter === "all" || booking.status === statusFilter;
     const matchesSearch = !searchQuery || 
       booking.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -170,14 +217,21 @@ export default function AdminBookings() {
   }
 
   return (
-    <div className="space-y-6" data-testid="admin-bookings">
+    <AdminLayout>
+      <div className="space-y-6" data-testid="admin-bookings">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold" data-testid="bookings-title">Site Visit Bookings</h1>
           <p className="text-gray-600 mt-1">Manage and track property site visit bookings</p>
         </div>
-        <Button data-testid="button-create-booking">
+        <Button 
+          data-testid="button-create-booking"
+          onClick={() => {
+            // For now, redirect to the booking form page
+            window.location.href = '/book-visit';
+          }}
+        >
           <Plus className="h-4 w-4 mr-2" />
           Add Manual Booking
         </Button>
@@ -396,6 +450,17 @@ export default function AdminBookings() {
                       <Edit className="h-3 w-3 mr-1" />
                       Edit
                     </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleDeleteBooking(booking.id, booking.customerName)}
+                      disabled={deleteBookingMutation.isPending}
+                      data-testid={`button-delete-${booking.id}`}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="h-3 w-3 mr-1" />
+                      Delete
+                    </Button>
                   </div>
                 </div>
               </CardContent>
@@ -572,6 +637,7 @@ export default function AdminBookings() {
           </Form>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }

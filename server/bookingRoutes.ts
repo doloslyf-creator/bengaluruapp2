@@ -200,6 +200,22 @@ export function registerBookingRoutes(app: Express) {
     }
   });
 
+  // Delete a booking
+  app.delete("/api/bookings/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      await db
+        .delete(siteVisitBookings)
+        .where(eq(siteVisitBookings.id, id));
+      
+      res.json({ message: "Booking deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting booking:", error);
+      res.status(500).json({ error: "Failed to delete booking" });
+    }
+  });
+
   // Update a booking
   app.patch("/api/bookings/:id", async (req, res) => {
     try {
