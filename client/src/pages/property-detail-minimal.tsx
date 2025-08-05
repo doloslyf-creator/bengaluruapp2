@@ -9,6 +9,7 @@ import { ArrowLeft, MapPin, Heart, Share2, Calendar, MessageCircle, Phone, Star,
 import { useToast } from '@/hooks/use-toast';
 import { usePayment } from '@/hooks/use-payment';
 import { updateMetaTags, generatePropertySchema, generatePropertySlug, injectSchema } from '@/utils/seo';
+import OrderFormDialog from '@/components/order-form-dialog';
 
 interface Property {
   id: string;
@@ -55,6 +56,8 @@ export default function PropertyDetailMinimal() {
   const [similarCarouselIndex, setSimilarCarouselIndex] = useState(0);
   const [recommendedCarouselIndex, setRecommendedCarouselIndex] = useState(0);
   const [investmentCarouselIndex, setInvestmentCarouselIndex] = useState(0);
+  const [showOrderForm, setShowOrderForm] = useState(false);
+  const [orderFormType, setOrderFormType] = useState<'civil-mep' | 'valuation'>('civil-mep');
 
   const { data: property, isLoading, error } = useQuery<Property>({
     queryKey: [`/api/properties/${params.id}/with-configurations`],
@@ -149,68 +152,59 @@ export default function PropertyDetailMinimal() {
     });
   };
 
-  const handleCivilMepReport = async () => {
-    if (!property) return;
-    
-    // Generate short receipt ID (max 40 chars for Razorpay)
-    const shortId = Math.random().toString(36).substring(2, 8);
-    const receipt = `CM_${shortId}_${Date.now().toString().slice(-8)}`;
-    
-    const success = await processPayment({
-      amount: 249900, // ₹2,499 in paise
-      currency: 'INR',
-      receipt,
-      notes: {
-        reportType: 'civil-mep',
-        propertyId: property.id,
-        propertyName: property.name,
-        customerId: 'customer_id', // You may want to get this from auth context
-      }
-    }, {
-      description: `Civil & MEP Report for ${property.name}`,
-      prefill: {
-        name: 'Customer Name', // You may want to get this from auth context
-        email: 'customer@example.com', // You may want to get this from auth context
-      }
-    });
-
-    if (success) {
-      toast({
-        title: "Payment Successful",
-        description: "Your Civil & MEP Report will be prepared and delivered soon.",
-      });
-    }
+  const handleCivilMepReport = () => {
+    setOrderFormType('civil-mep');
+    setShowOrderForm(true);
   };
 
-  const handleValuationReport = async () => {
+  const handleValuationReport = () => {
+    setOrderFormType('valuation');
+    setShowOrderForm(true);
+  };
+
+  const handleOrderSubmit = async (orderData: any) => {
     if (!property) return;
+    
+    // Calculate total amount based on urgency
+    const baseAmount = 249900; // ₹2,499 in paise
+    const urgencyPricing = {
+      standard: 0,
+      priority: 99900, // ₹999 in paise
+      express: 199900  // ₹1999 in paise
+    };
+    const totalAmount = baseAmount + urgencyPricing[orderData.urgency as keyof typeof urgencyPricing];
     
     // Generate short receipt ID (max 40 chars for Razorpay)
     const shortId = Math.random().toString(36).substring(2, 8);
-    const receipt = `VR_${shortId}_${Date.now().toString().slice(-8)}`;
+    const receipt = `${orderData.reportType === 'civil-mep' ? 'CM' : 'VR'}_${shortId}_${Date.now().toString().slice(-8)}`;
     
     const success = await processPayment({
-      amount: 249900, // ₹2,499 in paise
+      amount: totalAmount,
       currency: 'INR',
       receipt,
       notes: {
-        reportType: 'valuation',
-        propertyId: property.id,  
+        reportType: orderData.reportType,
+        propertyId: property.id,
         propertyName: property.name,
-        customerId: 'customer_id', // You may want to get this from auth context
+        customerId: orderData.email, // Using email as customer identifier
+        customerName: orderData.customerName,
+        urgency: orderData.urgency,
+        additionalRequirements: orderData.additionalRequirements || '',
       }
     }, {
-      description: `Property Valuation Report for ${property.name}`,
+      description: `${orderData.reportType === 'civil-mep' ? 'Civil & MEP Report' : 'Property Valuation Report'} for ${property.name}`,
       prefill: {
-        name: 'Customer Name', // You may want to get this from auth context
-        email: 'customer@example.com', // You may want to get this from auth context
+        name: orderData.customerName,
+        email: orderData.email,
+        contact: orderData.phone,
       }
     });
 
     if (success) {
+      setShowOrderForm(false);
       toast({
         title: "Payment Successful",
-        description: "Your Property Valuation Report will be prepared and delivered soon.",
+        description: `Your ${orderData.reportType === 'civil-mep' ? 'Civil & MEP Report' : 'Property Valuation Report'} will be prepared and delivered soon.`,
       });
     }
   };
@@ -1641,6 +1635,18 @@ export default function PropertyDetailMinimal() {
 
       {/* Bottom padding to account for sticky CTA */}
       <div className="h-20"></div>
+
+      {/* Order Form Dialog */}
+      {property && (
+        <OrderFormDialog
+          isOpen={showOrderForm}
+          onClose={() => setShowOrderForm(false)}
+          onSubmit={handleOrderSubmit}
+          property={property}
+          reportType={orderFormType}
+          isProcessing={isProcessing}
+        />
+      )}
     </div>
   );
 }
