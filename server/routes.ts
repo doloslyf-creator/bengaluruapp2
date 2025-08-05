@@ -119,6 +119,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get properties with reports for archive page
+  app.get("/api/properties-with-reports", async (req, res) => {
+    try {
+      const properties = await storage.getAllProperties();
+      res.json(properties);
+    } catch (error) {
+      console.error("Error fetching properties with reports:", error);
+      res.status(500).json({ error: "Failed to fetch properties with reports" });
+    }
+  });
+
   // Get property statistics (place before :id route)
   app.get("/api/properties/stats", async (req, res) => {
     try {
