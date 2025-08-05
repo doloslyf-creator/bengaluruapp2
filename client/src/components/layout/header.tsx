@@ -55,10 +55,7 @@ export default function Header() {
     { name: "Home", href: "/", icon: Home },
     { name: "Find Property", href: "/find-property", icon: Search },
     { name: "Reports", href: "/reports", icon: FileText },
-    { name: "Consultation", href: "/consultation", icon: MessageCircle },
-    { name: "Book Visit", href: "/book-visit", icon: Calendar },
     { name: "About Us", href: "/about", icon: UserCircle },
-    { name: "Contact", href: "/contact", icon: Phone },
   ];
 
   const adminLinks = [
