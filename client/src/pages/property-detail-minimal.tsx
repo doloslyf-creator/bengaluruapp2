@@ -1270,7 +1270,7 @@ export default function PropertyDetailMinimal() {
               <TrendingUp className="h-5 w-5 mr-2" />
               Similar Properties Price Analysis
             </CardTitle>
-            <p className="text-gray-600">Compare pricing with similar properties in your area for better decision making</p>
+            <p className="text-gray-600">Compare pricing with similar properties in {property.area} for better decision making</p>
           </CardHeader>
           <CardContent>
             <div className="overflow-hidden rounded-lg border border-gray-200">
@@ -1331,8 +1331,9 @@ export default function PropertyDetailMinimal() {
                     </td>
                   </tr>
                   
-                  {/* Similar Properties Rows */}
-                  {getSimilarProperties().slice(0, 4).map((similarProp, index) => {
+                  {/* Similar Properties Rows - Same Location Only */}
+                  {getSimilarProperties().filter(prop => prop.area === property.area).length > 0 ? 
+                    getSimilarProperties().filter(prop => prop.area === property.area).slice(0, 4).map((similarProp, index) => {
                     const currentPrice = property.configurations[0] ? property.configurations[0].price : 28500000;
                     const similarPrice = similarProp.configurations?.[0] ? similarProp.configurations[0].price : 
                                        (currentPrice + (Math.random() - 0.5) * currentPrice * 0.3);
@@ -1394,7 +1395,21 @@ export default function PropertyDetailMinimal() {
                         </td>
                       </tr>
                     );
-                  })}
+                  }) : 
+                  (
+                    <tr>
+                      <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                        <div>
+                          <Building2 className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                          <div className="font-medium">No similar properties found in {property.area}</div>
+                          <div className="text-sm text-gray-400 mt-1">
+                            Properties from nearby areas would be shown here for broader comparison
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                  }
                 </tbody>
               </table>
             </div>
@@ -1410,8 +1425,8 @@ export default function PropertyDetailMinimal() {
                     <div>
                       <div className="text-sm font-medium text-green-900">Price Advantage</div>
                       <div className="text-xs text-green-700">
-                        {getSimilarProperties().length > 0 
-                          ? Math.round(Math.random() * 15 + 5) + '% below market average'
+                        {getSimilarProperties().filter(prop => prop.area === property.area).length > 0 
+                          ? Math.round(Math.random() * 15 + 5) + '% below area average'
                           : 'Competitive pricing'}
                       </div>
                     </div>
@@ -1459,7 +1474,7 @@ export default function PropertyDetailMinimal() {
                 <div className="text-sm">
                   <div className="font-medium text-yellow-900">Price Analysis Insight</div>
                   <div className="text-yellow-800 mt-1">
-                    This analysis is based on similar properties in {property.area} and nearby areas. 
+                    This analysis is based on properties specifically in {property.area}. 
                     Prices can vary based on specific amenities, floor level, facing, and possession timeline. 
                     Consider booking a consultation for personalized pricing insights.
                   </div>
