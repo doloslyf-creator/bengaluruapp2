@@ -169,7 +169,7 @@ export default function PropertyDetailMinimal() {
       // First, create the order record in the database (regardless of payment outcome)
       const baseAmount = 249900; // ₹2,499 in paise
       const orderRecord = {
-        reportType: orderData.reportType === 'civil-mep' ? 'civil-mep' : 'property-valuation',
+        reportType: orderData.reportType === 'valuation' ? 'property-valuation' : 'civil-mep',
         propertyId: property.id,
         customerName: orderData.customerName,
         customerEmail: orderData.email,
@@ -197,7 +197,7 @@ export default function PropertyDetailMinimal() {
     
       // Generate short receipt ID (max 40 chars for Razorpay)
       const shortId = Math.random().toString(36).substring(2, 8);
-      const receipt = `${orderData.reportType === 'civil-mep' ? 'CM' : 'VR'}_${shortId}_${Date.now().toString().slice(-8)}`;
+      const receipt = `${orderData.reportType === 'valuation' ? 'VR' : 'CM'}_${shortId}_${Date.now().toString().slice(-8)}`;
       
       // Now attempt payment - processPayment will handle success/failure
       const paymentInitiated = await processPayment({
