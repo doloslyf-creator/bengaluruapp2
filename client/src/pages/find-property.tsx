@@ -122,7 +122,11 @@ export default function FindProperty() {
   };
 
   const isFormValid = () => {
-    return preferences.propertyType !== "" && preferences.zone !== "" && preferences.bhkType.length > 0;
+    const hasPropertyType = preferences.propertyType !== "";
+    const hasZone = preferences.zone !== "";
+    const hasBhkType = preferences.propertyType === "plot" || preferences.bhkType.length > 0;
+    
+    return hasPropertyType && hasZone && hasBhkType;
   };
 
   return (
@@ -262,50 +266,52 @@ export default function FindProperty() {
                 </div>
                 
                 <div className="grid md:grid-cols-2 gap-8">
-                  {/* BHK Configuration */}
-                  <div>
-                    <label className="block text-lg font-semibold text-gray-900 mb-4">
-                      Configuration <span className="text-red-500">*</span>
-                    </label>
-                    <div className="grid grid-cols-2 gap-3">
-                      {bhkOptions.map((bhk) => (
-                        <button
-                          key={bhk}
-                          className={`p-4 rounded-xl border-2 text-center transition-all duration-200 ${
-                            preferences.bhkType.includes(bhk)
-                              ? 'border-blue-600 bg-blue-50 text-blue-600'
-                              : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
-                          }`}
-                          onClick={() => handleArrayToggle('bhkType', bhk)}
-                          data-testid={`select-bhk-${bhk.toLowerCase().replace('+', 'plus')}`}
-                        >
-                          <div className="flex items-center justify-center space-x-2">
-                            <Building2 className="w-4 h-4" />
-                            <span className="font-medium">{bhk}</span>
-                          </div>
-                          {preferences.bhkType.includes(bhk) && (
-                            <div className="w-2 h-2 bg-blue-600 rounded-full mx-auto mt-2" />
-                          )}
-                        </button>
-                      ))}
+                  {/* BHK Configuration - Hidden for Plot */}
+                  {preferences.propertyType !== "plot" && (
+                    <div>
+                      <label className="block text-lg font-semibold text-gray-900 mb-4">
+                        Configuration <span className="text-red-500">*</span>
+                      </label>
+                      <div className="grid grid-cols-2 gap-3">
+                        {bhkOptions.map((bhk) => (
+                          <button
+                            key={bhk}
+                            className={`p-4 rounded-xl border-2 text-center transition-all duration-200 ${
+                              preferences.bhkType.includes(bhk)
+                                ? 'border-blue-600 bg-blue-50 text-blue-600'
+                                : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                            }`}
+                            onClick={() => handleArrayToggle('bhkType', bhk)}
+                            data-testid={`select-bhk-${bhk.toLowerCase().replace('+', 'plus')}`}
+                          >
+                            <div className="flex items-center justify-center space-x-2">
+                              <Building2 className="w-4 h-4" />
+                              <span className="font-medium">{bhk}</span>
+                            </div>
+                            {preferences.bhkType.includes(bhk) && (
+                              <div className="w-2 h-2 bg-blue-600 rounded-full mx-auto mt-2" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-3 text-center">Select all that work for you</p>
                     </div>
-                    <p className="text-xs text-gray-500 mt-3 text-center">Select all that work for you</p>
-                  </div>
+                  )}
 
                   {/* Budget Range */}
-                  <div>
+                  <div className={preferences.propertyType === "plot" ? "md:col-span-2" : ""}>
                     <label className="block text-lg font-semibold text-gray-900 mb-4">
                       Budget Range
                     </label>
                     <div className="bg-gray-50 p-6 rounded-xl">
-                      <div className="mb-6">
+                      <div className="mb-6 relative">
                         <Slider
                           value={preferences.budgetRange}
                           onValueChange={(value) => handlePreferenceChange('budgetRange', value)}
                           max={1000}
                           min={20}
                           step={10}
-                          className="w-full"
+                          className="w-full [&>span:first-child]:h-6 [&>span:first-child]:w-6 [&>span:first-child]:border-4 [&>span:first-child]:border-white [&>span:first-child]:bg-blue-600 [&>span:first-child]:shadow-lg [&>span:last-child]:h-6 [&>span:last-child]:w-6 [&>span:last-child]:border-4 [&>span:last-child]:border-white [&>span:last-child]:bg-blue-600 [&>span:last-child]:shadow-lg"
                         />
                       </div>
                       <div className="flex justify-between text-sm text-gray-600 mb-4">
@@ -412,7 +418,10 @@ export default function FindProperty() {
                 
                 {!isFormValid() && (
                   <p className="text-sm text-red-500 mt-4">
-                    Please select property type, zone, and at least one configuration to continue
+                    {preferences.propertyType === "plot" 
+                      ? "Please select property type and zone to continue"
+                      : "Please select property type, zone, and at least one configuration to continue"
+                    }
                   </p>
                 )}
               </div>
