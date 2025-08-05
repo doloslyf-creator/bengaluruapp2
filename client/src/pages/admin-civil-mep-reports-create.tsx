@@ -67,7 +67,7 @@ export function AdminCivilMepReportsCreate() {
   const isEditMode = !!reportId;
 
   // Fetch properties for dropdown
-  const { data: properties = [] } = useQuery({
+  const { data: properties = [], isLoading: isLoadingProperties } = useQuery<any[]>({
     queryKey: ["/api/properties"],
   });
 
@@ -115,6 +115,7 @@ export function AdminCivilMepReportsCreate() {
   // Populate form with existing data when in edit mode
   useEffect(() => {
     if (existingReport && isEditMode) {
+      const report = existingReport as any; // Type cast to handle the dynamic nature of the report data
       const formatDateForInput = (dateString: string) => {
         if (!dateString) return "";
         const date = new Date(dateString);
@@ -122,35 +123,35 @@ export function AdminCivilMepReportsCreate() {
       };
 
       form.reset({
-        propertyId: existingReport.propertyId || "",
-        reportTitle: existingReport.reportTitle || "",
-        engineerName: existingReport.engineerName || "",
-        engineerLicense: existingReport.engineerLicense || "",
-        inspectionDate: formatDateForInput(existingReport.inspectionDate) || "",
-        reportDate: formatDateForInput(existingReport.reportDate) || "",
-        status: existingReport.status || "draft",
-        overallScore: existingReport.overallScore || 0,
-        executiveSummary: existingReport.executiveSummary || "",
-        recommendations: existingReport.recommendations || "",
-        conclusions: existingReport.conclusions || "",
-        investmentRecommendation: existingReport.investmentRecommendation || "conditional",
+        propertyId: report.propertyId || "",
+        reportTitle: report.reportTitle || "",
+        engineerName: report.engineerName || "",
+        engineerLicense: report.engineerLicense || "",
+        inspectionDate: formatDateForInput(report.inspectionDate) || "",
+        reportDate: formatDateForInput(report.reportDate) || "",
+        status: report.status || "draft",
+        overallScore: report.overallScore || 0,
+        executiveSummary: report.executiveSummary || "",
+        recommendations: report.recommendations || "",
+        conclusions: report.conclusions || "",
+        investmentRecommendation: report.investmentRecommendation || "conditional",
         // Populate JSON fields with existing data or empty objects
-        siteInformation: existingReport.siteInformation || {},
-        foundationDetails: existingReport.foundationDetails || {},
-        superstructureDetails: existingReport.superstructureDetails || {},
-        wallsFinishes: existingReport.wallsFinishes || {},
-        roofingDetails: existingReport.roofingDetails || {},
-        doorsWindows: existingReport.doorsWindows || {},
-        flooringDetails: existingReport.flooringDetails || {},
-        staircasesElevators: existingReport.staircasesElevators || {},
-        externalWorks: existingReport.externalWorks || {},
-        mechanicalSystems: existingReport.mechanicalSystems || {},
-        electricalSystems: existingReport.electricalSystems || {},
-        plumbingSystems: existingReport.plumbingSystems || {},
-        fireSafetySystems: existingReport.fireSafetySystems || {},
-        bmsAutomation: existingReport.bmsAutomation || {},
-        greenSustainability: existingReport.greenSustainability || {},
-        documentation: existingReport.documentation || {},
+        siteInformation: report.siteInformation || {},
+        foundationDetails: report.foundationDetails || {},
+        superstructureDetails: report.superstructureDetails || {},
+        wallsFinishes: report.wallsFinishes || {},
+        roofingDetails: report.roofingDetails || {},
+        doorsWindows: report.doorsWindows || {},
+        flooringDetails: report.flooringDetails || {},
+        staircasesElevators: report.staircasesElevators || {},
+        externalWorks: report.externalWorks || {},
+        mechanicalSystems: report.mechanicalSystems || {},
+        electricalSystems: report.electricalSystems || {},
+        plumbingSystems: report.plumbingSystems || {},
+        fireSafetySystems: report.fireSafetySystems || {},
+        bmsAutomation: report.bmsAutomation || {},
+        greenSustainability: report.greenSustainability || {},
+        documentation: report.documentation || {},
       });
     }
   }, [existingReport, isEditMode, form]);
@@ -191,14 +192,14 @@ export function AdminCivilMepReportsCreate() {
   });
 
   const onSubmit = (data: FormData) => {
-    // Convert date strings to Date objects for submission
+    // Keep date strings as strings for submission
     const submitData = {
       propertyId: data.propertyId,
       reportTitle: data.reportTitle,
       engineerName: data.engineerName,
       engineerLicense: data.engineerLicense,
-      inspectionDate: new Date(data.inspectionDate),
-      reportDate: new Date(data.reportDate),
+      inspectionDate: data.inspectionDate,
+      reportDate: data.reportDate,
       status: data.status,
       overallScore: data.overallScore,
       executiveSummary: data.executiveSummary,
@@ -303,11 +304,17 @@ export function AdminCivilMepReportsCreate() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {(properties as any[]).map((property) => (
-                                <SelectItem key={property.id} value={property.id}>
-                                  {property.title} - {property.location}
-                                </SelectItem>
-                              ))}
+                              {isLoadingProperties ? (
+                                <div className="p-2 text-sm text-gray-500">Loading properties...</div>
+                              ) : properties.length === 0 ? (
+                                <div className="p-2 text-sm text-gray-500">No properties available</div>
+                              ) : (
+                                (properties as any[]).map((property) => (
+                                  <SelectItem key={property.id} value={property.id}>
+                                    {property.name} - {property.address}
+                                  </SelectItem>
+                                ))
+                              )}
                             </SelectContent>
                           </Select>
                           <FormMessage />
