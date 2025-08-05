@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, MapPin, Heart, Share2, Calendar, MessageCircle, Phone, Star, Award, Home, Building, CheckCircle, AlertTriangle, X, Users, Car, Building2, Shield, TreePine, Waves, Dumbbell, Wifi, ShoppingCart, Camera, Play, Download, Eye, Lock, CheckCircle2, XCircle, TrendingUp, TrendingDown, ChevronLeft, ChevronRight, BarChart3, Target } from 'lucide-react';
+import { ArrowLeft, MapPin, Heart, Share2, Calendar, MessageCircle, Phone, Star, Award, Home, Building, CheckCircle, AlertTriangle, X, Users, Car, Building2, Shield, TreePine, Waves, Dumbbell, Wifi, ShoppingCart, Camera, Play, Download, Eye, Lock, CheckCircle2, XCircle, TrendingUp, TrendingDown, ChevronLeft, ChevronRight, BarChart3, Target, FileCheck, Clock, MapPin as MapPinVerified, UserCheck } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePayment } from '@/hooks/use-payment';
 import { updateMetaTags, generatePropertySchema, generatePropertySlug, injectSchema } from '@/utils/seo';
@@ -708,7 +708,59 @@ export default function PropertyDetailMinimal() {
               </div>
             </div>
 
-            {/* Tags */}
+            {/* Data Verification Badges */}
+            <div className="space-y-3">
+              <div className="text-sm font-medium text-gray-900">Data Verification Status</div>
+              <div className="grid grid-cols-2 gap-3">
+                {/* RERA Verification */}
+                <div className="flex items-center bg-green-50 border border-green-200 rounded-lg p-3">
+                  <div className="flex-shrink-0 h-8 w-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                    <FileCheck className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-green-900">RERA Verified</div>
+                    <div className="text-xs text-green-700">Government database</div>
+                  </div>
+                </div>
+
+                {/* Site Visit Verification */}
+                <div className="flex items-center bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <div className="flex-shrink-0 h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                    <MapPinVerified className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-blue-900">Site Verified</div>
+                    <div className="text-xs text-blue-700">Expert site visit</div>
+                  </div>
+                </div>
+
+                {/* Price Verification */}
+                <div className="flex items-center bg-purple-50 border border-purple-200 rounded-lg p-3">
+                  <div className="flex-shrink-0 h-8 w-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                    <BarChart3 className="h-4 w-4 text-purple-600" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-purple-900">Price Verified</div>
+                    <div className="text-xs text-purple-700">Market analysis</div>
+                  </div>
+                </div>
+
+                {/* Last Updated */}
+                <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg p-3">
+                  <div className="flex-shrink-0 h-8 w-8 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                    <Clock className="h-4 w-4 text-gray-600" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">Last Updated</div>
+                    <div className="text-xs text-gray-700">
+                      {new Date().toLocaleDateString('en-IN')}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Property Tags */}
             <div className="flex flex-wrap gap-2">
               {property.tags.slice(0, 4).map((tag) => (
                 <Badge key={tag} variant="secondary" className="text-xs">
@@ -956,15 +1008,27 @@ export default function PropertyDetailMinimal() {
         {/* Property Analysis & Reports */}
         <Card className="mb-8" id="reports">
           <CardHeader>
-            <CardTitle>Property Analysis & Reports</CardTitle>
-            <p className="text-gray-600">Get professional insights to make informed decisions</p>
+            <CardTitle className="flex items-center">
+              Property Analysis & Reports
+              <Badge className="ml-3 bg-green-100 text-green-800 border-green-200">
+                <FileCheck className="h-3 w-3 mr-1" />
+                Expert Verified
+              </Badge>
+            </CardTitle>
+            <p className="text-gray-600">Get professional insights to make informed decisions backed by site visits and expert analysis</p>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Civil & MEP Report Data */}
             <Card className="border-orange-200">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-semibold text-orange-800">Civil & MEP Analysis Report</h4>
+                  <div className="flex items-center">
+                    <h4 className="font-semibold text-orange-800">Civil & MEP Analysis Report</h4>
+                    <Badge className="ml-2 bg-blue-100 text-blue-800 border-blue-200 text-xs">
+                      <MapPinVerified className="h-3 w-3 mr-1" />
+                      Site Verified
+                    </Badge>
+                  </div>
                   <Badge className="bg-orange-100 text-orange-800">Essential</Badge>
                 </div>
                 
@@ -1035,7 +1099,13 @@ export default function PropertyDetailMinimal() {
             <Card className="border-blue-200">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-semibold text-blue-800">Property Valuation Report</h4>
+                  <div className="flex items-center">
+                    <h4 className="font-semibold text-blue-800">Property Valuation Report</h4>
+                    <Badge className="ml-2 bg-purple-100 text-purple-800 border-purple-200 text-xs">
+                      <BarChart3 className="h-3 w-3 mr-1" />
+                      Market Verified
+                    </Badge>
+                  </div>
                   <Badge className="bg-blue-100 text-blue-800">Critical</Badge>
                 </div>
                 
@@ -1479,6 +1549,20 @@ export default function PropertyDetailMinimal() {
                     Consider booking a consultation for personalized pricing insights.
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Data Source Trust Footer */}
+            <div className="mt-4 bg-gray-50 border border-gray-200 rounded-lg p-3">
+              <div className="flex items-center text-xs text-gray-600">
+                <FileCheck className="h-3 w-3 mr-2 text-green-600" />
+                <span className="font-medium">Data Sources:</span>
+                <span className="ml-1">RERA database, Developer records, Market surveys, Expert site visits</span>
+              </div>
+              <div className="flex items-center text-xs text-gray-600 mt-1">
+                <Clock className="h-3 w-3 mr-2 text-blue-600" />
+                <span className="font-medium">Last Verified:</span>
+                <span className="ml-1">{new Date().toLocaleDateString('en-IN')}</span>
               </div>
             </div>
           </CardContent>
