@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { formatPriceDisplay } from "@/lib/utils";
-import { generateSlug } from "@/utils/seo";
+import { generatePropertySlug } from "@/utils/seo";
 import { type Property, type PropertyConfiguration } from "@shared/schema";
 import { PropertyCardSkeleton } from "@/components/ui/skeleton";
 
@@ -230,7 +230,7 @@ export default function PropertyResults() {
   };
 
   const handleViewProperty = (property: PropertyWithConfigurations) => {
-    navigate(`/property/${property.id}/${generateSlug(property.name)}`);
+    navigate(`/property/${property.id}/${generatePropertySlug(property)}`);
   };
 
   const getPriceRange = (configurations: PropertyConfiguration[]) => {

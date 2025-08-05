@@ -1,5 +1,3 @@
-import { Property } from '@/pages/property-detail-minimal';
-
 // SEO utility functions
 export const generateSlug = (text: string): string => {
   return text
@@ -8,14 +6,20 @@ export const generateSlug = (text: string): string => {
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .trim();
-};
+}
 
-export const generatePropertySlug = (property: Property): string => {
-  const name = property.name || 'property';
-  const area = property.area || '';
-  const type = property.type || '';
+export const generatePropertySlug = (property: { name: string; area?: string; developer?: string }): string => {
+  const parts = [property.name];
+  if (property.area) parts.push(property.area);
+  if (property.developer) parts.push(property.developer);
   
-  return generateSlug(`${name} ${area} ${type}`);
+  return parts
+    .join(' ')
+    .toLowerCase()
+    .replace(/[^a-z0-9 -]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim();
 };
 
 export const updateMetaTags = (
@@ -84,7 +88,7 @@ const updateLinkTag = (rel: string, href: string) => {
 };
 
 // Schema markup generators
-export const generatePropertySchema = (property: Property) => {
+export const generatePropertySchema = (property: any) => {
   const schema = {
     "@context": "https://schema.org",
     "@type": "RealEstateProperty",
@@ -96,7 +100,7 @@ export const generatePropertySchema = (property: Property) => {
       "addressRegion": "Karnataka",
       "addressCountry": "IN"
     },
-    "offers": property.configurations?.map(config => ({
+    "offers": property.configurations?.map((config: any) => ({
       "@type": "Offer",
       "price": config.price,
       "priceCurrency": "INR",
@@ -114,7 +118,7 @@ export const generatePropertySchema = (property: Property) => {
     },
     "numberOfRooms": property.configurations?.[0]?.configuration.match(/\d+/)?.[0] || "2",
     "propertyType": property.type,
-    "url": `${window.location.origin}/property/${property.id}/${generateSlug(property.name)}`
+    "url": `${window.location.origin}/property/${property.id}/${generatePropertySlug(property)}`
   };
   
   return JSON.stringify(schema);

@@ -8,7 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, MapPin, Heart, Share2, Calendar, MessageCircle, Phone, Star, Award, Home, Building, CheckCircle, AlertTriangle, X, Users, Car, Building2, Shield, TreePine, Waves, Dumbbell, Wifi, ShoppingCart, Camera, Play, Download, Eye, Lock, CheckCircle2, XCircle, TrendingUp, TrendingDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePayment } from '@/hooks/use-payment';
-import { updateMetaTags, generatePropertySchema, generateSlug, injectSchema } from '@/utils/seo';
+import { updateMetaTags, generatePropertySchema, generatePropertySlug, injectSchema } from '@/utils/seo';
 
 interface Property {
   id: string;
@@ -76,7 +76,7 @@ export default function PropertyDetailMinimal() {
       const propertyDescription = `Explore ${property.name} in ${property.area}, ${property.zone}. ${property.type} property with ${property.configurations?.length || 0} configurations. Get professional valuation and CIVIL+MEP reports.`;
       const keywords = `${property.name}, ${property.area} property, ${property.zone} real estate, ${property.type} in bangalore, property valuation, CIVIL MEP reports`;
       const ogImage = property.images?.[0] || undefined;
-      const canonicalUrl = `${window.location.origin}/property/${params.id}/${generateSlug(property.name)}`;
+      const canonicalUrl = `${window.location.origin}/property/${params.id}/${generatePropertySlug(property)}`;
       
       updateMetaTags(propertyTitle, propertyDescription, keywords, ogImage, canonicalUrl);
       
@@ -464,7 +464,7 @@ export default function PropertyDetailMinimal() {
     };
 
     return (
-      <Link href={`/property/${prop.id}/${generateSlug(prop.name)}`} className="block group">
+      <Link href={`/property/${prop.id}/${generatePropertySlug(prop)}`} className="block group">
         <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 group-hover:scale-105">
           <div className="relative">
             {prop.images?.[0] ? (
