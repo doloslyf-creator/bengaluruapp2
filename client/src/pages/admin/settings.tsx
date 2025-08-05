@@ -43,7 +43,8 @@ import { insertAppSettingsSchema, type AppSettings, type InsertAppSettings } fro
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ApiKeysSettings } from "@/components/settings/api-keys-settings";
 import GoogleAnalyticsSettings from "@/components/settings/GoogleAnalyticsSettings";
-import { Key } from "lucide-react";
+import RolePermissionSettings from "@/components/settings/RolePermissionSettings";
+import { Key, Shield } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 // System Monitoring Component
@@ -527,6 +528,7 @@ export default function AdminSettings() {
   const tabs = [
     { id: "general", label: "General", icon: Building },
     { id: "api-keys", label: "API Keys", icon: Key },
+    { id: "roles", label: "Roles & Permissions", icon: Shield },
     { id: "contact", label: "Contact Info", icon: Mail },
     { id: "localization", label: "Localization", icon: Globe },
     { id: "appearance", label: "Appearance", icon: Palette },
@@ -727,6 +729,24 @@ export default function AdminSettings() {
                     </CardHeader>
                     <CardContent>
                       <ApiKeysSettings />
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Role & Permission Settings */}
+                {activeTab === "roles" && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <Shield className="h-5 w-5" />
+                        <span>Roles & Permissions</span>
+                      </CardTitle>
+                      <CardDescription>
+                        Manage user roles and control access to different parts of the system
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <RolePermissionSettings />
                     </CardContent>
                   </Card>
                 )}

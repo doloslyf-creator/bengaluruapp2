@@ -838,6 +838,129 @@ export const insertApiKeysSettingsSchema = createInsertSchema(apiKeysSettings).o
 export type ApiKeysSettings = typeof apiKeysSettings.$inferSelect;
 export type InsertApiKeysSettings = z.infer<typeof insertApiKeysSettingsSchema>;
 
+// Google Analytics Configuration
+export const googleAnalyticsConfig = pgTable("google_analytics_config", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  measurementId: text("measurement_id").notNull(),
+  trackingEnabled: boolean("tracking_enabled").default(true),
+  trackPageViews: boolean("track_page_views").default(true),
+  trackEvents: boolean("track_events").default(true),
+  trackEcommerce: boolean("track_ecommerce").default(true),
+  trackFormSubmissions: boolean("track_form_submissions").default(true),
+  trackScrollDepth: boolean("track_scroll_depth").default(false),
+  trackFileDownloads: boolean("track_file_downloads").default(true),
+  trackOutboundLinks: boolean("track_outbound_links").default(true),
+  anonymizeIp: boolean("anonymize_ip").default(true),
+  cookieConsent: boolean("cookie_consent").default(true),
+  dataRetentionMonths: integer("data_retention_months").default(26),
+  customDimensions: json("custom_dimensions").$type<Array<{
+    index: number;
+    name: string;
+    scope: "hit" | "session" | "user" | "product";
+  }>>(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertGoogleAnalyticsConfigSchema = createInsertSchema(googleAnalyticsConfig).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type GoogleAnalyticsConfig = typeof googleAnalyticsConfig.$inferSelect;
+export type InsertGoogleAnalyticsConfig = z.infer<typeof insertGoogleAnalyticsConfigSchema>;
+
+// User Roles and Permissions System
+export const userRoles = pgTable("user_roles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  roleName: text("role_name").notNull().unique(),
+  displayName: text("display_name").notNull(),
+  description: text("description"),
+  level: integer("level").notNull().default(1), // 1-10, higher = more access
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const permissions = pgTable("permissions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  permissionKey: text("permission_key").notNull().unique(),
+  displayName: text("display_name").notNull(),
+  description: text("description"),
+  category: varchar("category", { 
+    enum: ["properties", "leads", "customers", "reports", "analytics", "settings", "team", "system", "billing"] 
+  }).notNull(),
+  isSystemLevel: boolean("is_system_level").default(false), // System admin only
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const rolePermissions = pgTable("role_permissions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  roleId: varchar("role_id").notNull().references(() => userRoles.id, { onDelete: "cascade" }),
+  permissionId: varchar("permission_id").notNull().references(() => permissions.id, { onDelete: "cascade" }),
+  canRead: boolean("can_read").default(false),
+  canWrite: boolean("can_write").default(false),
+  canDelete: boolean("can_delete").default(false),
+  canAdmin: boolean("can_admin").default(false), // Full admin access to this permission
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const userRoleAssignments = pgTable("user_role_assignments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(), // Reference to your team member ID
+  roleId: varchar("role_id").notNull().references(() => userRoles.id, { onDelete: "cascade" }),
+  assignedBy: varchar("assigned_by").notNull(), // Admin who assigned this role
+  isActive: boolean("is_active").default(true),
+  expiresAt: timestamp("expires_at"), // Optional expiration
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Create insert schemas
+export const insertUserRoleSchema = createInsertSchema(userRoles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPermissionSchema = createInsertSchema(permissions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertRolePermissionSchema = createInsertSchema(rolePermissions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertUserRoleAssignmentSchema = createInsertSchema(userRoleAssignments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Type exports
+export type UserRole = typeof userRoles.$inferSelect;
+export type InsertUserRole = z.infer<typeof insertUserRoleSchema>;
+export type Permission = typeof permissions.$inferSelect;
+export type InsertPermission = z.infer<typeof insertPermissionSchema>;
+export type RolePermission = typeof rolePermissions.$inferSelect;
+export type InsertRolePermission = z.infer<typeof insertRolePermissionSchema>;
+export type UserRoleAssignment = typeof userRoleAssignments.$inferSelect;
+export type InsertUserRoleAssignment = z.infer<typeof insertUserRoleAssignmentSchema>;
+
+// Enhanced types with relations
+export interface UserRoleWithPermissions extends UserRole {
+  permissions: Array<RolePermission & { permission: Permission }>;
+}
+
+export interface UserWithRoles {
+  userId: string;
+  userName: string;
+  roles: Array<UserRoleAssignment & { role: UserRoleWithPermissions }>;
+}
+
 export const insertAppSettingsSchema = createInsertSchema(appSettings).omit({
   id: true,
   createdAt: true,

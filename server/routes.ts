@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { registerEnhancedLeadRoutes } from "./enhancedLeadRoutes";
 import { registerBookingRoutes } from "./bookingRoutes";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
-import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertCivilMepReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, insertPropertyValuationReportSchema, insertPropertyValuationReportConfigurationSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests, propertyValuationReportCustomers, propertyValuationReportConfigurations } from "@shared/schema";
+import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertCivilMepReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, insertPropertyValuationReportSchema, insertPropertyValuationReportConfigurationSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests, propertyValuationReportCustomers, propertyValuationReportConfigurations, userRoles, permissions, rolePermissions, userRoleAssignments, insertUserRoleSchema, insertPermissionSchema, insertRolePermissionSchema, insertUserRoleAssignmentSchema } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
@@ -3128,6 +3128,231 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register booking system routes
   registerBookingRoutes(app);
+
+  // ==============================
+  // ROLE & PERMISSION MANAGEMENT API
+  // ==============================
+
+  // Get all roles
+  app.get("/api/admin/roles", async (req, res) => {
+    try {
+      const roles = await db.select().from(userRoles).orderBy(userRoles.level);
+      res.json(roles);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+      res.status(500).json({ error: "Failed to fetch roles" });
+    }
+  });
+
+  // Create new role
+  app.post("/api/admin/roles", async (req, res) => {
+    try {
+      const roleData = insertUserRoleSchema.parse(req.body);
+      const [role] = await db.insert(userRoles).values(roleData).returning();
+      console.log(`🔐 New role created: ${role.displayName} (${role.roleName})`);
+      res.status(201).json(role);
+    } catch (error) {
+      console.error("Error creating role:", error);
+      res.status(500).json({ error: "Failed to create role" });
+    }
+  });
+
+  // Get all permissions
+  app.get("/api/admin/permissions", async (req, res) => {
+    try {
+      const allPermissions = await db.select().from(permissions).orderBy(permissions.category, permissions.displayName);
+      res.json(allPermissions);
+    } catch (error) {
+      console.error("Error fetching permissions:", error);
+      res.status(500).json({ error: "Failed to fetch permissions" });
+    }
+  });
+
+  // Initialize default permissions
+  app.post("/api/admin/permissions/initialize", async (req, res) => {
+    try {
+      const defaultPermissions = [
+        // Properties
+        { permissionKey: "properties.view", displayName: "View Properties", description: "View property listings and details", category: "properties" },
+        { permissionKey: "properties.create", displayName: "Create Properties", description: "Add new property listings", category: "properties" },
+        { permissionKey: "properties.edit", displayName: "Edit Properties", description: "Modify existing property listings", category: "properties" },
+        { permissionKey: "properties.delete", displayName: "Delete Properties", description: "Remove property listings", category: "properties" },
+        
+        // Leads
+        { permissionKey: "leads.view", displayName: "View Leads", description: "View lead information and details", category: "leads" },
+        { permissionKey: "leads.create", displayName: "Create Leads", description: "Add new leads to the system", category: "leads" },
+        { permissionKey: "leads.edit", displayName: "Edit Leads", description: "Modify lead information and status", category: "leads" },
+        { permissionKey: "leads.assign", displayName: "Assign Leads", description: "Assign leads to team members", category: "leads" },
+        
+        // Customers
+        { permissionKey: "customers.view", displayName: "View Customers", description: "View customer information", category: "customers" },
+        { permissionKey: "customers.edit", displayName: "Edit Customers", description: "Modify customer details", category: "customers" },
+        { permissionKey: "customers.notes", displayName: "Customer Notes", description: "Add and view customer notes", category: "customers" },
+        
+        // Reports
+        { permissionKey: "reports.view", displayName: "View Reports", description: "Access report dashboard and data", category: "reports" },
+        { permissionKey: "reports.generate", displayName: "Generate Reports", description: "Create new reports", category: "reports" },
+        { permissionKey: "reports.export", displayName: "Export Reports", description: "Download and export report data", category: "reports" },
+        
+        // Analytics
+        { permissionKey: "analytics.view", displayName: "View Analytics", description: "Access analytics dashboard", category: "analytics" },
+        { permissionKey: "analytics.configure", displayName: "Configure Analytics", description: "Modify analytics settings", category: "analytics" },
+        
+        // Settings
+        { permissionKey: "settings.view", displayName: "View Settings", description: "Access system settings", category: "settings" },
+        { permissionKey: "settings.edit", displayName: "Edit Settings", description: "Modify system configuration", category: "settings" },
+        { permissionKey: "settings.api-keys", displayName: "Manage API Keys", description: "Configure API keys and integrations", category: "settings" },
+        
+        // Team
+        { permissionKey: "team.view", displayName: "View Team", description: "View team member information", category: "team" },
+        { permissionKey: "team.manage", displayName: "Manage Team", description: "Add, edit, and remove team members", category: "team" },
+        { permissionKey: "team.roles", displayName: "Manage Roles", description: "Assign and modify user roles", category: "team" },
+        
+        // System (Admin only)
+        { permissionKey: "system.backup", displayName: "System Backup", description: "Create and manage system backups", category: "system", isSystemLevel: true },
+        { permissionKey: "system.logs", displayName: "System Logs", description: "Access system logs and diagnostics", category: "system", isSystemLevel: true },
+        { permissionKey: "system.maintenance", displayName: "System Maintenance", description: "System maintenance and updates", category: "system", isSystemLevel: true },
+        
+        // Billing
+        { permissionKey: "billing.view", displayName: "View Billing", description: "View payment and billing information", category: "billing" },
+        { permissionKey: "billing.manage", displayName: "Manage Billing", description: "Process payments and manage billing", category: "billing" },
+      ];
+
+      // Insert permissions, ignoring duplicates
+      for (const permission of defaultPermissions) {
+        try {
+          await db.insert(permissions).values(permission).onConflictDoNothing();
+        } catch (error) {
+          // Continue with next permission if this one fails
+          console.log(`Permission ${permission.permissionKey} already exists or failed to create`);
+        }
+      }
+
+      console.log(`🔐 Default permissions initialized`);
+      res.json({ success: true, message: "Default permissions initialized" });
+    } catch (error) {
+      console.error("Error initializing permissions:", error);
+      res.status(500).json({ error: "Failed to initialize permissions" });
+    }
+  });
+
+  // Get role permissions for a specific role
+  app.get("/api/admin/roles/:roleId/permissions", async (req, res) => {
+    try {
+      const { roleId } = req.params;
+      const rolePermissions = await db
+        .select({
+          id: rolePermissions.id,
+          roleId: rolePermissions.roleId,
+          permissionId: rolePermissions.permissionId,
+          canRead: rolePermissions.canRead,
+          canWrite: rolePermissions.canWrite,
+          canDelete: rolePermissions.canDelete,
+          canAdmin: rolePermissions.canAdmin,
+          permission: permissions
+        })
+        .from(rolePermissions)
+        .innerJoin(permissions, eq(rolePermissions.permissionId, permissions.id))
+        .where(eq(rolePermissions.roleId, roleId));
+
+      res.json(rolePermissions);
+    } catch (error) {
+      console.error("Error fetching role permissions:", error);
+      res.status(500).json({ error: "Failed to fetch role permissions" });
+    }
+  });
+
+  // Update role permission
+  app.put("/api/admin/roles/:roleId/permissions/:permissionId", async (req, res) => {
+    try {
+      const { roleId, permissionId } = req.params;
+      const { canRead, canWrite, canDelete, canAdmin } = req.body;
+
+      // Check if role permission exists
+      const existing = await db
+        .select()
+        .from(rolePermissions)
+        .where(and(eq(rolePermissions.roleId, roleId), eq(rolePermissions.permissionId, permissionId)))
+        .limit(1);
+
+      if (existing.length > 0) {
+        // Update existing
+        const [updated] = await db
+          .update(rolePermissions)
+          .set({ canRead, canWrite, canDelete, canAdmin })
+          .where(and(eq(rolePermissions.roleId, roleId), eq(rolePermissions.permissionId, permissionId)))
+          .returning();
+        res.json(updated);
+      } else {
+        // Create new
+        const [created] = await db
+          .insert(rolePermissions)
+          .values({ roleId, permissionId, canRead, canWrite, canDelete, canAdmin })
+          .returning();
+        res.json(created);
+      }
+    } catch (error) {
+      console.error("Error updating role permission:", error);
+      res.status(500).json({ error: "Failed to update role permission" });
+    }
+  });
+
+  // Get user role assignments
+  app.get("/api/admin/user-roles/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const assignments = await db
+        .select({
+          id: userRoleAssignments.id,
+          userId: userRoleAssignments.userId,
+          roleId: userRoleAssignments.roleId,
+          assignedBy: userRoleAssignments.assignedBy,
+          isActive: userRoleAssignments.isActive,
+          expiresAt: userRoleAssignments.expiresAt,
+          createdAt: userRoleAssignments.createdAt,
+          role: userRoles
+        })
+        .from(userRoleAssignments)
+        .innerJoin(userRoles, eq(userRoleAssignments.roleId, userRoles.id))
+        .where(eq(userRoleAssignments.userId, userId));
+
+      res.json(assignments);
+    } catch (error) {
+      console.error("Error fetching user roles:", error);
+      res.status(500).json({ error: "Failed to fetch user roles" });
+    }
+  });
+
+  // Assign role to user
+  app.post("/api/admin/user-roles", async (req, res) => {
+    try {
+      const assignmentData = insertUserRoleAssignmentSchema.parse(req.body);
+      const [assignment] = await db.insert(userRoleAssignments).values(assignmentData).returning();
+      console.log(`🔐 Role assigned: ${assignmentData.roleId} to user ${assignmentData.userId}`);
+      res.status(201).json(assignment);
+    } catch (error) {
+      console.error("Error assigning role:", error);
+      res.status(500).json({ error: "Failed to assign role" });
+    }
+  });
+
+  // Remove role from user
+  app.delete("/api/admin/user-roles/:assignmentId", async (req, res) => {
+    try {
+      const { assignmentId } = req.params;
+      const deleted = await db.delete(userRoleAssignments).where(eq(userRoleAssignments.id, assignmentId)).returning();
+      
+      if (deleted.length === 0) {
+        return res.status(404).json({ error: "Role assignment not found" });
+      }
+
+      console.log(`🔐 Role assignment removed: ${assignmentId}`);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error removing role assignment:", error);
+      res.status(500).json({ error: "Failed to remove role assignment" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
