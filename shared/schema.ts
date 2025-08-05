@@ -749,7 +749,7 @@ export const appSettings = pgTable("app_settings", {
   enableBookings: boolean("enable_bookings").default(true),
   enableConsultations: boolean("enable_consultations").default(true),
   enableReports: boolean("enable_reports").default(true),
-  enableBlog: boolean("enable_blog").default(true),
+
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

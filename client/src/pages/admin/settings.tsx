@@ -469,7 +469,7 @@ export default function AdminSettings() {
       enableBookings: true,
       enableConsultations: true,
       enableReports: true,
-      enableBlog: true,
+
     },
   });
 
@@ -497,7 +497,7 @@ export default function AdminSettings() {
         enableBookings: settings.enableBookings ?? true,
         enableConsultations: settings.enableConsultations ?? true,
         enableReports: settings.enableReports ?? true,
-        enableBlog: settings.enableBlog ?? true,
+
       });
     }
   }, [settings, form]);
@@ -1125,26 +1125,7 @@ export default function AdminSettings() {
                           )}
                         />
 
-                        <FormField
-                          control={form.control}
-                          name="enableBlog"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                              <div className="space-y-0.5">
-                                <FormLabel className="text-base">Blog System</FormLabel>
-                                <FormDescription>
-                                  Enable blog management and content publishing
-                                </FormDescription>
-                              </div>
-                              <FormControl>
-                                <Switch
-                                  checked={field.value || false}
-                                  onCheckedChange={field.onChange}
-                                />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
+
                       </div>
                     </CardContent>
                   </Card>
