@@ -1017,9 +1017,9 @@ export const siteVisitBookings = pgTable("site_visit_bookings", {
   }).default("pending"),
   
   // Lead conversion tracking
-  leadId: varchar("lead_id").references(() => leads.id),
+  // leadId: varchar("lead_id").references(() => leads.id), // Commented out as this column doesn't exist in DB
   convertedToLead: boolean("converted_to_lead").default(false),
-  conversionDate: timestamp("conversion_date"),
+  // conversionDate: timestamp("conversion_date"), // Commented out as this column doesn't exist in DB
   
   // Timestamps
   createdAt: timestamp("created_at").defaultNow(),
