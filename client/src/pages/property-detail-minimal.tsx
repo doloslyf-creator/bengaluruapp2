@@ -693,66 +693,286 @@ export default function PropertyDetailMinimal() {
           </CardContent>
         </Card>
 
-        {/* Pros & Cons */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8" id="pros-cons">
-          {/* Pros */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-green-700 flex items-center">
-                <CheckCircle className="h-5 w-5 mr-2" />
-                Property Highlights
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                {getPropertyPros().map((pro, index) => (
-                  <li key={index} className="flex items-center text-green-700">
-                    <CheckCircle2 className="h-4 w-4 mr-3 flex-shrink-0" />
-                    <span>{pro}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
+        {/* Property Highlights & Considerations */}
+        <Card className="mb-8" id="pros-cons">
+          <CardHeader>
+            <CardTitle>Property Highlights & Considerations</CardTitle>
+            <p className="text-gray-600">Comprehensive analysis of property strengths and key considerations</p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Property Highlights */}
+            <Card className="border-green-200">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-green-800">Property Highlights</h4>
+                  <Badge className="bg-green-100 text-green-800">Strengths</Badge>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">RERA Compliance</span>
+                      <span className="font-semibold text-green-600">
+                        {property.reraApproved ? 'Fully Approved' : 'Under Process'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Location Score</span>
+                      <span className="font-semibold text-green-600">{property.locationScore || 4}/5 Excellent</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Amenities Rating</span>
+                      <span className="font-semibold text-green-600">{property.amenitiesScore || 5}/5 Premium</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Construction Status</span>
+                      <span className="font-semibold">
+                        {property.status === 'completed' ? 'Ready Possession' : 
+                         property.status === 'under-construction' ? 'Under Construction' : 
+                         'Pre-launch Phase'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Developer Reputation</span>
+                      <span className="font-semibold text-green-600">Established Brand</span>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Connectivity</span>
+                      <span className="font-semibold text-green-600">Excellent Transport Links</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Infrastructure</span>
+                      <span className="font-semibold text-green-600">Well Developed Area</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Investment Potential</span>
+                      <span className="font-semibold text-green-600">High Growth Zone</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Legal Clearance</span>
+                      <span className="font-semibold text-green-600">All Approvals Clear</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Quality Standards</span>
+                      <span className="font-semibold text-green-600">Premium Construction</span>
+                    </div>
+                  </div>
+                </div>
 
-          {/* Cons */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-orange-700 flex items-center">
-                <AlertTriangle className="h-5 w-5 mr-2" />
-                Considerations
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                {getPropertyCons().map((con, index) => (
-                  <li key={index} className="flex items-center text-orange-700">
-                    <XCircle className="h-4 w-4 mr-3 flex-shrink-0" />
-                    <span>{con}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
+                <div className="bg-green-50 p-3 rounded mb-4">
+                  <p className="text-xs text-green-800">This property meets {getPropertyPros().length} out of 10 key investment criteria</p>
+                </div>
+              </CardContent>
+            </Card>
 
-        {/* Buyer Intent Match */}
+            {/* Property Considerations */}
+            <Card className="border-orange-200">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-orange-800">Key Considerations</h4>
+                  <Badge className="bg-orange-100 text-orange-800">Important</Badge>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Construction Timeline</span>
+                      <span className="font-semibold">
+                        {property.status === 'under-construction' ? 'Ongoing Project' : 
+                         property.status === 'pre-launch' ? 'Future Delivery' : 'Immediate'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Price Point</span>
+                      <span className="font-semibold">
+                        {property.valueScore && property.valueScore < 4 ? 'Premium Pricing' : 'Market Competitive'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Market Demand</span>
+                      <span className="font-semibold text-orange-600">High Competition</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Payment Structure</span>
+                      <span className="font-semibold">Construction Linked</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Additional Costs</span>
+                      <span className="font-semibold">Registration & Taxes Extra</span>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Rental Yield</span>
+                      <span className="font-semibold">3.2-3.8% Range</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Maintenance</span>
+                      <span className="font-semibold">₹3-5/sq ft monthly</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Resale Liquidity</span>
+                      <span className="font-semibold">Moderate to Good</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Area Development</span>
+                      <span className="font-semibold">Ongoing Infrastructure</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Market Risk</span>
+                      <span className="font-semibold text-orange-600">Moderate Volatility</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-orange-50 p-3 rounded mb-4">
+                  <p className="text-xs text-orange-800">Consider these factors carefully - our experts can help you evaluate risks</p>
+                </div>
+              </CardContent>
+            </Card>
+          </CardContent>
+        </Card>
+
+        {/* Buyer Suitability Analysis */}
         <Card className="mb-8" id="buyer-match">
           <CardHeader>
-            <CardTitle>Buyer Suitability</CardTitle>
-            <p className="text-gray-600">Who is this property perfect for?</p>
+            <CardTitle>Buyer Suitability Analysis</CardTitle>
+            <p className="text-gray-600">Detailed analysis of who this property is perfect for</p>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {getBuyerIntentData().map((insight, index) => (
-                <div key={index} className={`flex items-center p-3 rounded-lg ${
-                  insight.positive ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
-                }`}>
-                  <span className="text-2xl mr-3">{insight.icon}</span>
-                  <span className="font-medium">{insight.text}</span>
+          <CardContent className="space-y-6">
+            {/* Family Suitability */}
+            <Card className="border-green-200">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-green-800">Family Suitability</h4>
+                  <Badge className="bg-green-100 text-green-800">Excellent Match</Badge>
                 </div>
-              ))}
-            </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Family Size</span>
+                      <span className="font-semibold text-green-600">3-6 Members Ideal</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Child-Friendly</span>
+                      <span className="font-semibold text-green-600">
+                        {property.tags.some(tag => tag.includes('school') || tag.includes('family')) ? 'Yes - Schools Nearby' : 'Yes - Safe Environment'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Parking Availability</span>
+                      <span className="font-semibold text-green-600">
+                        {property.type === 'villa' ? '2-3 Car Parking' : '1-2 Car Parking'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Recreational Facilities</span>
+                      <span className="font-semibold text-green-600">Club House & Gym</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Security Features</span>
+                      <span className="font-semibold text-green-600">24/7 Gated Security</span>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Elevator Access</span>
+                      <span className="font-semibold text-green-600">
+                        {property.type === 'apartment' ? 'High-Speed Lifts' : 'Ground Floor Access'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Green Spaces</span>
+                      <span className="font-semibold text-green-600">Landscaped Gardens</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Community Living</span>
+                      <span className="font-semibold text-green-600">Like-minded Neighbors</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Healthcare</span>
+                      <span className="font-semibold text-green-600">Hospitals Within 5km</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Shopping & Entertainment</span>
+                      <span className="font-semibold text-green-600">Malls & Restaurants Near</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-green-50 p-3 rounded mb-4">
+                  <p className="text-xs text-green-800">👨‍👩‍👧‍👦 Perfect for families with children - safe, convenient, and community-focused living</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Investment Suitability */}
+            <Card className="border-blue-200">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-blue-800">Investment Suitability</h4>
+                  <Badge className="bg-blue-100 text-blue-800">
+                    {property.tags.some(tag => tag.includes('investment') || tag.includes('roi')) ? 'Good Match' : 'Moderate'}
+                  </Badge>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Rental Demand</span>
+                      <span className="font-semibold text-blue-600">
+                        {property.area.toLowerCase().includes('it') || property.zone === 'east' ? 'High IT Demand' : 'Steady Demand'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Appreciation Potential</span>
+                      <span className="font-semibold text-blue-600">8-12% annually</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Rental Yield</span>
+                      <span className="font-semibold text-blue-600">3.2-3.8%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Exit Strategy</span>
+                      <span className="font-semibold text-blue-600">Good Resale Market</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Tenant Profile</span>
+                      <span className="font-semibold text-blue-600">IT Professionals</span>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Maintenance Ease</span>
+                      <span className="font-semibold text-blue-600">Professional Management</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Capital Growth</span>
+                      <span className="font-semibold text-blue-600">Above Market Average</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Market Liquidity</span>
+                      <span className="font-semibold text-blue-600">High Demand Area</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Investment Risk</span>
+                      <span className="font-semibold text-blue-600">Low to Moderate</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">ROI Timeline</span>
+                      <span className="font-semibold text-blue-600">5-7 years optimal</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 p-3 rounded mb-4">
+                  <p className="text-xs text-blue-800">📈 {property.tags.some(tag => tag.includes('investment')) ? 'Excellent investment potential with strong fundamentals' : 'Moderate investment opportunity - consider long-term goals'}</p>
+                </div>
+              </CardContent>
+            </Card>
           </CardContent>
         </Card>
 
