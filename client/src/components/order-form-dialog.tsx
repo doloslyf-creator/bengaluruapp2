@@ -20,7 +20,6 @@ const orderFormSchema = z.object({
   phone: z.string().min(10, 'Phone number must be at least 10 digits'),
   address: z.string().min(10, 'Address must be at least 10 characters'),
   reportType: z.enum(['civil-mep', 'valuation', 'both']),
-  urgency: z.enum(['standard', 'priority', 'express']),
   additionalRequirements: z.string().optional(),
 });
 
@@ -47,7 +46,7 @@ const reportTypeDetails = {
     title: 'Civil & MEP Analysis Report',
     description: 'Comprehensive analysis of construction quality, structural integrity, and MEP systems',
     price: 2499,
-    deliveryTime: '3-5 business days',
+    deliveryTime: 'Within 24 hours',
     features: [
       'Foundation & Structural Analysis',
       'Electrical Systems Review',
@@ -61,7 +60,7 @@ const reportTypeDetails = {
     title: 'Property Valuation Report',
     description: 'Professional property valuation with market analysis and investment insights',
     price: 2499,
-    deliveryTime: '2-3 business days',
+    deliveryTime: 'Within 24 hours',
     features: [
       'Market Value Assessment',
       'Comparative Market Analysis',
@@ -73,11 +72,7 @@ const reportTypeDetails = {
   }
 };
 
-const urgencyOptions = {
-  standard: { label: 'Standard Delivery', additionalCost: 0, description: 'Normal processing time' },
-  priority: { label: 'Priority Delivery', additionalCost: 999, description: '50% faster delivery' },
-  express: { label: 'Express Delivery', additionalCost: 1999, description: 'Next business day delivery' }
-};
+// Remove urgency options - delivery is always within 24 hours
 
 export default function OrderFormDialog({ 
   isOpen, 
@@ -87,11 +82,8 @@ export default function OrderFormDialog({
   reportType, 
   isProcessing = false 
 }: OrderFormDialogProps) {
-  const [selectedUrgency, setSelectedUrgency] = useState<keyof typeof urgencyOptions>('standard');
-  
   const report = reportTypeDetails[reportType];
-  const urgency = urgencyOptions[selectedUrgency];
-  const totalAmount = report.price + urgency.additionalCost;
+  const totalAmount = report.price;
 
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderFormSchema),
@@ -101,13 +93,12 @@ export default function OrderFormDialog({
       phone: '',
       address: '',
       reportType: reportType,
-      urgency: 'standard',
       additionalRequirements: '',
     },
   });
 
   const handleSubmit = (data: OrderFormData) => {
-    onSubmit({ ...data, urgency: selectedUrgency });
+    onSubmit(data);
   };
 
   return (
@@ -184,16 +175,13 @@ export default function OrderFormDialog({
                   <span>Report Price</span>
                   <span>₹{report.price.toLocaleString()}</span>
                 </div>
-                {urgency.additionalCost > 0 && (
-                  <div className="flex justify-between text-blue-600">
-                    <span>{urgency.label}</span>
-                    <span>+₹{urgency.additionalCost.toLocaleString()}</span>
-                  </div>
-                )}
                 <Separator />
                 <div className="flex justify-between font-semibold text-lg">
                   <span>Total Amount</span>
                   <span>₹{totalAmount.toLocaleString()}</span>
+                </div>
+                <div className="text-xs text-green-600 mt-2">
+                  ✓ Delivery within 24 hours
                 </div>
               </div>
             </CardContent>
@@ -270,39 +258,7 @@ export default function OrderFormDialog({
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardContent className="p-6">
-                    <h3 className="font-semibold text-lg mb-4">Delivery Options</h3>
-                    
-                    <div className="space-y-3">
-                      {Object.entries(urgencyOptions).map(([key, option]) => (
-                        <div
-                          key={key}
-                          className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                            selectedUrgency === key 
-                              ? 'border-blue-500 bg-blue-50' 
-                              : 'border-gray-200 hover:border-gray-300'
-                          }`}
-                          onClick={() => setSelectedUrgency(key as keyof typeof urgencyOptions)}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className="font-medium">{option.label}</div>
-                              <div className="text-sm text-gray-600">{option.description}</div>
-                            </div>
-                            <div className="text-right">
-                              {option.additionalCost > 0 ? (
-                                <div className="font-medium text-blue-600">+₹{option.additionalCost}</div>
-                              ) : (
-                                <Badge variant="outline">Free</Badge>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+
 
                 <Card>
                   <CardContent className="p-6">

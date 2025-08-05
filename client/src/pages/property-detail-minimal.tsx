@@ -165,46 +165,92 @@ export default function PropertyDetailMinimal() {
   const handleOrderSubmit = async (orderData: any) => {
     if (!property) return;
     
-    // Calculate total amount based on urgency
-    const baseAmount = 249900; // ₹2,499 in paise
-    const urgencyPricing = {
-      standard: 0,
-      priority: 99900, // ₹999 in paise
-      express: 199900  // ₹1999 in paise
-    };
-    const totalAmount = baseAmount + urgencyPricing[orderData.urgency as keyof typeof urgencyPricing];
-    
-    // Generate short receipt ID (max 40 chars for Razorpay)
-    const shortId = Math.random().toString(36).substring(2, 8);
-    const receipt = `${orderData.reportType === 'civil-mep' ? 'CM' : 'VR'}_${shortId}_${Date.now().toString().slice(-8)}`;
-    
-    const success = await processPayment({
-      amount: totalAmount,
-      currency: 'INR',
-      receipt,
-      notes: {
-        reportType: orderData.reportType,
+    try {
+      // First, create the order record in the database (regardless of payment outcome)
+      const baseAmount = 249900; // ₹2,499 in paise
+      const orderRecord = {
+        reportType: orderData.reportType === 'civil-mep' ? 'civil-mep' : 'property-valuation',
         propertyId: property.id,
-        propertyName: property.name,
-        customerId: orderData.email, // Using email as customer identifier
         customerName: orderData.customerName,
-        urgency: orderData.urgency,
+        customerEmail: orderData.email,
+        customerPhone: orderData.phone,
+        amount: (baseAmount / 100).toString(), // Convert paise to rupees for storage
+        paymentMethod: 'razorpay',
+        paymentStatus: 'pending', // Initially pending
         additionalRequirements: orderData.additionalRequirements || '',
-      }
-    }, {
-      description: `${orderData.reportType === 'civil-mep' ? 'Civil & MEP Report' : 'Property Valuation Report'} for ${property.name}`,
-      prefill: {
-        name: orderData.customerName,
-        email: orderData.email,
-        contact: orderData.phone,
-      }
-    });
+        address: orderData.address
+      };
 
-    if (success) {
-      setShowOrderForm(false);
+      // Create order record first
+      const orderResponse = await fetch('/api/orders/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderRecord)
+      });
+      
+      if (!orderResponse.ok) {
+        throw new Error('Failed to create order record');
+      }
+      
+      const order = await orderResponse.json();
+      console.log('Order created:', order);
+    
+      // Generate short receipt ID (max 40 chars for Razorpay)
+      const shortId = Math.random().toString(36).substring(2, 8);
+      const receipt = `${orderData.reportType === 'civil-mep' ? 'CM' : 'VR'}_${shortId}_${Date.now().toString().slice(-8)}`;
+      
+      // Now attempt payment
+      const success = await processPayment({
+        amount: baseAmount,
+        currency: 'INR',
+        receipt,
+        orderId: order.orderId, // Pass the order ID to link payment
+        notes: {
+          reportType: orderData.reportType,
+          propertyId: property.id,
+          propertyName: property.name,
+          customerId: orderData.email,
+          customerName: orderData.customerName,
+          orderId: order.orderId,
+          additionalRequirements: orderData.additionalRequirements || '',
+        }
+      }, {
+        description: `${orderData.reportType === 'civil-mep' ? 'Civil & MEP Report' : 'Property Valuation Report'} for ${property.name}`,
+        prefill: {
+          name: orderData.customerName,
+          email: orderData.email,
+          contact: orderData.phone,
+        }
+      });
+
+      if (success) {
+        // Update order status to completed
+        await fetch(`/api/orders/${order.orderId}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'completed' })
+        });
+        
+        setShowOrderForm(false);
+        toast({
+          title: "Payment Successful",
+          description: `Your ${orderData.reportType === 'civil-mep' ? 'Civil & MEP Report' : 'Property Valuation Report'} will be prepared and delivered within 24 hours.`,
+        });
+      } else {
+        // Payment failed but order record exists - it will show as pending in admin panel
+        toast({
+          title: "Order Created",
+          description: "Your order has been recorded. You can complete payment later from your account.",
+          variant: "default",
+        });
+        setShowOrderForm(false);
+      }
+    } catch (error) {
+      console.error('Order submission error:', error);
       toast({
-        title: "Payment Successful",
-        description: `Your ${orderData.reportType === 'civil-mep' ? 'Civil & MEP Report' : 'Property Valuation Report'} will be prepared and delivered soon.`,
+        title: "Error",
+        description: "Failed to create order. Please try again.",
+        variant: "destructive",
       });
     }
   };

@@ -889,6 +889,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create new order
+  app.post("/api/orders/create", async (req, res) => {
+    try {
+      const { reportType, propertyId, customerName, customerEmail, customerPhone, amount, paymentMethod, paymentStatus, additionalRequirements, address } = req.body;
+      
+      if (!reportType || !propertyId || !customerName || !customerEmail || !amount) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const orderData = {
+        reportId: null,
+        reportType: reportType as "civil-mep" | "property-valuation",
+        propertyId,
+        customerName,
+        customerEmail,
+        customerPhone: customerPhone || "",
+        amount: amount.toString(),
+        paymentMethod: paymentMethod || "razorpay",
+        paymentStatus: paymentStatus || "pending",
+        additionalRequirements: additionalRequirements || "",
+        createdAt: new Date(),
+        accessGrantedAt: paymentStatus === "completed" ? new Date() : null
+      };
+      
+      const order = await storage.createReportPayment(orderData);
+      
+      console.log(`📋 New order created: ${reportType} for ${customerName} - Status: ${paymentStatus}`);
+      
+      res.status(201).json({ 
+        success: true,
+        orderId: order.id,
+        message: "Order created successfully" 
+      });
+    } catch (error) {
+      console.error("Error creating order:", error);
+      res.status(500).json({ error: "Failed to create order" });
+    }
+  });
+
   // Orders API - Get order statistics
   app.get("/api/orders/stats", async (req, res) => {
     try {
