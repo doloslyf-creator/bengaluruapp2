@@ -305,44 +305,527 @@ export default function PropertyDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header - Stripe Style */}
-      <header className="bg-card shadow-sm border-b border-border sticky top-0 z-40 backdrop-blur-sm bg-card/95">
-        <div className="container-stripe py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-6">
-              <Button 
-                variant="ghost" 
-                onClick={() => window.history.back()}
-                className="flex items-center space-x-2 rounded-xl focus-stripe transition-stripe hover:bg-muted"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                <span className="text-body font-medium">Back</span>
-              </Button>
-              <div>
-                <h1 className="text-heading-2 text-foreground mb-1">{property.name}</h1>
-                <p className="text-body-small text-muted-foreground flex items-center">
-                  <MapPin className="h-4 w-4 mr-2" />
-                  {property.area}, {property.zone} Bengaluru
-                </p>
+    <div className="min-h-screen bg-white">
+      {/* Floating Navigation */}
+      <div className="fixed top-6 left-6 z-50">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/')}
+          className="bg-white/90 backdrop-blur-sm shadow-lg rounded-full px-4 py-2 border hover:bg-white"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button>
+      </div>
+
+      {/* Floating Action Buttons */}
+      <div className="fixed top-6 right-6 z-50 flex space-x-2">
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={toggleFavorite}
+          className="bg-white/90 backdrop-blur-sm shadow-lg rounded-full p-2 border hover:bg-white"
+        >
+          <Heart className={`h-5 w-5 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={handleShare}
+          className="bg-white/90 backdrop-blur-sm shadow-lg rounded-full p-2 border hover:bg-white"
+        >
+          <Share2 className="h-5 w-5 text-gray-600" />
+        </Button>
+      </div>
+
+      {/* Hero Image Section */}
+      <div className="relative h-screen">
+        {/* Background Image */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60">
+          {property.images && property.images.length > 0 ? (
+            <img 
+              src={property.images[0]} 
+              alt={property.name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600" />
+          )}
+        </div>
+
+        {/* Hero Content Overlay */}
+        <div className="absolute inset-0 flex items-end">
+          <div className="w-full max-w-7xl mx-auto px-6 pb-20">
+            <div className="max-w-3xl">
+              {/* Property Status Badge */}
+              <div className="mb-4">
+                <Badge className={`${getStatusColor(property.status)} text-sm font-medium px-3 py-1`}>
+                  {property.status.replace('-', ' ').toUpperCase()}
+                </Badge>
+              </div>
+
+              {/* Property Title */}
+              <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 leading-tight">
+                {property.name}
+              </h1>
+
+              {/* Location */}
+              <div className="flex items-center text-white/90 text-xl mb-6">
+                <MapPin className="h-6 w-6 mr-3" />
+                <span>{property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)} Zone</span>
+              </div>
+
+              {/* Key Features */}
+              <div className="flex flex-wrap gap-3 mb-8">
+                {property.tags.slice(0, 4).map((tag) => (
+                  <div key={tag} className="bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium">
+                    {tag.replace('-', ' ').toUpperCase()}
+                  </div>
+                ))}
+              </div>
+
+              {/* Price Range */}
+              <div className="text-white mb-8">
+                <div className="text-lg text-white/80 mb-1">Starting Price</div>
+                <div className="text-4xl font-bold">{getPriceRange()}</div>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="flex flex-wrap gap-4">
+                <Button 
+                  size="lg" 
+                  onClick={handleBookVisit}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-semibold rounded-full"
+                >
+                  <Calendar className="h-5 w-5 mr-2" />
+                  Book Visit
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  onClick={handleConsult}
+                  className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 px-8 py-3 text-lg font-semibold rounded-full"
+                >
+                  <MessageCircle className="h-5 w-5 mr-2" />
+                  Get Consultation
+                </Button>
               </div>
             </div>
-            
-            <div className="flex items-center space-x-3">
-              <Button variant="outline" size="sm" onClick={toggleFavorite}>
-                <Heart className={`h-4 w-4 mr-2 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
-                {isFavorite ? 'Saved' : 'Save'}
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleWhatsAppShare} className="bg-green-50 hover:bg-green-100 text-green-700 border-green-200">
-                <MessageCircle className="h-4 w-4 mr-2" />
-                WhatsApp
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleShare}>
-                <Share2 className="h-4 w-4 mr-2" />
-                Share
-              </Button>
-              <Button size="sm" onClick={handleBookVisit}>
-                <Eye className="h-4 w-4 mr-2" />
+          </div>
+        </div>
+
+        {/* Image Gallery Thumbnails */}
+        {property.images && property.images.length > 1 && (
+          <div className="absolute bottom-6 left-6 right-6">
+            <div className="flex space-x-2 justify-center">
+              {property.images.slice(0, 5).map((image, index) => (
+                <button
+                  key={index}
+                  className="w-16 h-16 rounded-lg overflow-hidden border-2 border-white/50 hover:border-white transition-all"
+                >
+                  <img src={image} alt={`${property.name} ${index + 1}`} className="w-full h-full object-cover" />
+                </button>
+              ))}
+              {property.images.length > 5 && (
+                <div className="w-16 h-16 rounded-lg bg-black/50 backdrop-blur-sm border-2 border-white/50 flex items-center justify-center text-white font-semibold">
+                  +{property.images.length - 5}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Content Sections */}
+      <div className="relative -mt-20 z-10">
+        {/* Property Configurations Card */}
+        <div className="max-w-7xl mx-auto px-6 mb-12">
+          <Card className="bg-white shadow-2xl rounded-2xl overflow-hidden">
+            <CardContent className="p-8">
+              <h2 className="text-3xl font-bold mb-6">Available Units</h2>
+              {property.configurations && property.configurations.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {property.configurations.map((config, index) => (
+                    <div 
+                      key={index} 
+                      className={`p-6 rounded-xl border-2 transition-all cursor-pointer hover:shadow-lg ${
+                        selectedConfig?.id === config.id 
+                          ? 'border-blue-500 bg-blue-50' 
+                          : 'border-gray-200 hover:border-blue-300'
+                      }`}
+                      onClick={() => setSelectedConfig(config)}
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-xl font-semibold">{config.unitType}</h3>
+                        <Badge variant="outline" className="text-sm">
+                          {config.bhkType}
+                        </Badge>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-600">Built-up Area</span>
+                          <span className="font-semibold">{config.builtUpArea} sq ft</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-600">Price/sq ft</span>
+                          <span className="font-semibold">₹{Number(config.pricePerSqft).toLocaleString()}</span>
+                        </div>
+                        <Separator />
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-900 font-medium">Total Price</span>
+                          <span className="text-xl font-bold text-blue-600">
+                            {formatPriceDisplay(Number(config.pricePerSqft) * config.builtUpArea)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <Building className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                  <p>Configuration details coming soon</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Property Overview */}
+        <div className="max-w-7xl mx-auto px-6 mb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main Content */}
+            <div className="lg:col-span-2 space-y-8">
+              {/* Description */}
+              <Card className="shadow-xl rounded-2xl">
+                <CardHeader>
+                  <CardTitle className="text-2xl">About {property.name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-700 leading-relaxed text-lg">
+                    {property.description || `Discover luxury living at ${property.name}, located in the prestigious ${property.area} area of ${property.zone} zone. This premium development offers world-class amenities and modern architecture designed for the discerning homeowner.`}
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Amenities */}
+              {property.amenities && property.amenities.length > 0 && (
+                <Card className="shadow-xl rounded-2xl">
+                  <CardHeader>
+                    <CardTitle className="text-2xl">Premium Amenities</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {property.amenities.map((amenity, index) => {
+                        const IconComponent = amenityIcons[amenity as keyof typeof amenityIcons] || Home;
+                        return (
+                          <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                            <IconComponent className="h-5 w-5 text-blue-600" />
+                            <span className="text-gray-700 font-medium">{amenity}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Location Details */}
+              <Card className="shadow-xl rounded-2xl">
+                <CardHeader>
+                  <CardTitle className="text-2xl">Location Advantages</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-start space-x-3">
+                      <MapPin className="h-5 w-5 text-blue-600 mt-1" />
+                      <div>
+                        <div className="font-semibold">Prime Location</div>
+                        <div className="text-gray-600">{property.area}, {property.zone} Zone, Bengaluru</div>
+                      </div>
+                    </div>
+                    {property.nearbyPlaces && property.nearbyPlaces.length > 0 && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                        {property.nearbyPlaces.map((place, index) => (
+                          <div key={index} className="flex items-center space-x-2 text-gray-700">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span>{place}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Developer Info */}
+              {property.developerName && (
+                <Card className="shadow-xl rounded-2xl">
+                  <CardHeader>
+                    <CardTitle className="text-2xl">Developer</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center space-x-4">
+                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                        {property.developerName.charAt(0)}
+                      </div>
+                      <div>
+                        <div className="text-xl font-semibold">{property.developerName}</div>
+                        <div className="text-gray-600">Trusted Developer</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
+              {/* Contact Card */}
+              <Card className="shadow-xl rounded-2xl sticky top-6">
+                <CardHeader>
+                  <CardTitle className="text-xl">Get More Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Button className="w-full" size="lg" onClick={handleBookVisit}>
+                    <Calendar className="h-5 w-5 mr-2" />
+                    Schedule Site Visit
+                  </Button>
+                  <Button variant="outline" className="w-full" size="lg" onClick={handleConsult}>
+                    <MessageCircle className="h-5 w-5 mr-2" />
+                    Expert Consultation
+                  </Button>
+                  <Button variant="outline" className="w-full" size="lg" onClick={handleWhatsAppShare}>
+                    <MessageCircle className="h-5 w-5 mr-2" />
+                    WhatsApp Inquiry
+                  </Button>
+                  
+                  <Separator className="my-4" />
+                  
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600 mb-3">Speak to our property consultant</p>
+                    <Button variant="outline" className="w-full">
+                      <Phone className="h-5 w-5 mr-2" />
+                      +91 98765 43210
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Property Score */}
+              <Card className="shadow-xl rounded-2xl">
+                <CardHeader>
+                  <CardTitle className="text-xl flex items-center">
+                    <Award className="h-5 w-5 mr-2 text-yellow-500" />
+                    Property Score
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center mb-4">
+                    <div className="text-3xl text-yellow-500 font-bold">
+                      {property.overallScore ? Number(property.overallScore).toFixed(1) : (((property.locationScore || 4) + (property.amenitiesScore || 5) + (property.valueScore || 4)) / 3).toFixed(1)}
+                    </div>
+                    <div className="text-sm text-gray-600">Overall Rating</div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Location</span>
+                      <div className="flex">
+                        {[1,2,3,4,5].map((star) => (
+                          <Star key={star} className={`h-4 w-4 ${star <= (property.locationScore || 4) ? 'text-yellow-500 fill-current' : 'text-gray-300'}`} />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Amenities</span>
+                      <div className="flex">
+                        {[1,2,3,4,5].map((star) => (
+                          <Star key={star} className={`h-4 w-4 ${star <= (property.amenitiesScore || 5) ? 'text-yellow-500 fill-current' : 'text-gray-300'}`} />
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Value</span>
+                      <div className="flex">
+                        {[1,2,3,4,5].map((star) => (
+                          <Star key={star} className={`h-4 w-4 ${star <= (property.valueScore || 4) ? 'text-yellow-500 fill-current' : 'text-gray-300'}`} />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+
+        {/* Professional Reports Section */}
+        <div className="bg-gray-50 py-16">
+          <div className="max-w-7xl mx-auto px-6">
+            {/* Section Header */}
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                Professional Property Reports
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Make informed decisions with our comprehensive analysis reports. Get insights that could save you thousands.
+              </p>
+              <div className="mt-6 flex items-center justify-center gap-8 text-sm text-gray-500">
+                <div className="flex items-center">
+                  <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                  Professional Analysis
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                  Instant Download
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                  Expert Recommendations
+                </div>
+              </div>
+            </div>
+
+            {/* Report Cards */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+              {/* Civil + MEP Report */}
+              <ReportCard 
+                reportType="civil-mep"
+                propertyId={property.id}
+                propertyName={property.name}
+                price={2499}
+                title="Civil + MEP Engineering Report"
+                subtitle="Structural & Systems Analysis"
+                description="Avoid costly surprises with our comprehensive structural and MEP systems evaluation."
+                urgencyText="Essential before finalizing any property purchase"
+                features={[
+                  "Structural integrity assessment",
+                  "Foundation stability analysis", 
+                  "Electrical systems safety check",
+                  "Plumbing infrastructure review",
+                  "HVAC efficiency evaluation",
+                  "Maintenance cost estimation"
+                ]}
+                sampleData={{
+                  "Structural Grade": "A+ Excellent",
+                  "Foundation Score": "9.2/10",
+                  "Electrical Safety": "Fully Compliant",
+                  "Plumbing Status": "Good Condition",
+                  "HVAC Efficiency": "85% Optimal",
+                  "Risk Assessment": "Low Risk"
+                }}
+                highlights={[
+                  "Could save ₹2-5 lakhs in unexpected repairs",
+                  "Identifies safety issues before move-in",
+                  "Provides negotiation leverage with seller"
+                ]}
+              />
+
+              {/* Property Valuation Report */}
+              <ReportCard 
+                reportType="property-valuation"
+                propertyId={property.id}
+                propertyName={property.name}
+                price={2499}
+                title="Professional Property Valuation"
+                subtitle="Independent Market Analysis"
+                description="Ensure you're paying the right price with our expert valuation and investment analysis."
+                urgencyText="Critical for smart investment decisions"
+                features={[
+                  "Current market value assessment",
+                  "Comparable properties analysis",
+                  "Location premium calculation",
+                  "Future appreciation forecast",
+                  "Rental yield projections",
+                  "Investment risk evaluation"
+                ]}
+                sampleData={{
+                  "Market Value": `₹${((Number(selectedConfig?.pricePerSqft) || 8500) * (Number(selectedConfig?.builtUpArea) || 1200)).toLocaleString()}`,
+                  "Price Per Sq Ft": `₹${Number(selectedConfig?.pricePerSqft) || 8500}`,
+                  "Location Premium": "+15% vs Area Avg",
+                  "Annual Appreciation": "8.2% Expected",
+                  "Rental Yield": "3.4% Annually",
+                  "Investment Grade": "A- Excellent"
+                }}
+                highlights={[
+                  "Avoid overpaying by 10-15% on average",
+                  "Identifies best ROI potential areas",
+                  "Professional bank-grade valuation"
+                ]}
+              />
+            </div>
+
+            {/* Trust Indicators */}
+            <Card className="shadow-xl rounded-2xl">
+              <CardContent className="p-8">
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold mb-2">Why Property Buyers Trust Our Reports</h3>
+                  <p className="text-gray-600">Join 2,500+ smart property buyers who made informed decisions</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                  <div className="space-y-2">
+                    <div className="text-3xl font-bold text-blue-600">2,500+</div>
+                    <div className="text-gray-600">Properties Analyzed</div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="text-3xl font-bold text-green-600">₹12 Cr+</div>
+                    <div className="text-gray-600">Saved for Clients</div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="text-3xl font-bold text-purple-600">98%</div>
+                    <div className="text-gray-600">Client Satisfaction</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Similar Properties */}
+        {similarProperties.length > 0 && (
+          <div className="max-w-7xl mx-auto px-6 py-16">
+            <h2 className="text-3xl font-bold mb-8">Similar Properties</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {similarProperties.map((similarProperty) => (
+                <Card 
+                  key={similarProperty.id} 
+                  className="shadow-lg rounded-2xl overflow-hidden hover:shadow-xl transition-all cursor-pointer"
+                  onClick={() => navigate(`/property/${similarProperty.id}`)}
+                >
+                  <div className="aspect-video bg-gradient-to-br from-blue-500 to-purple-600"></div>
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-bold text-lg">{similarProperty.name}</h4>
+                      <Badge className={getStatusColor(similarProperty.status)} variant="outline">
+                        {similarProperty.status.replace('-', ' ').charAt(0).toUpperCase() + similarProperty.status.slice(1)}
+                      </Badge>
+                    </div>
+                    <p className="text-gray-600 flex items-center mb-4">
+                      <MapPin className="h-4 w-4 mr-1" />
+                      {similarProperty.area}, {similarProperty.zone}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex gap-1">
+                        {similarProperty.tags.slice(0, 2).map((tag) => (
+                          <Badge key={tag} variant="secondary" className="text-xs">
+                            {tag.replace("-", " ").charAt(0).toUpperCase() + tag.slice(1)}
+                          </Badge>
+                        ))}
+                      </div>
+                      <p className="font-semibold text-blue-600">
+                        {similarProperty.type.charAt(0).toUpperCase() + similarProperty.type.slice(1)}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
                 Book Visit
               </Button>
             </div>
