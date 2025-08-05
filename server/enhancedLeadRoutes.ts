@@ -57,7 +57,8 @@ export function registerEnhancedLeadRoutes(app: Express) {
       };
       
       console.log("Fetching enhanced leads with filters:", filters);
-      const leads = await storage.getEnhancedLeads(filters);
+      // Fallback to regular leads if enhanced leads method doesn't exist
+      const leads = storage.getEnhancedLeads ? await storage.getEnhancedLeads(filters) : await storage.getLeads();
       console.log(`Found ${leads.length} enhanced leads`);
       res.json(leads);
     } catch (error) {
