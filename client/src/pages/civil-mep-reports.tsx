@@ -336,7 +336,7 @@ export default function CivilMepReports() {
                     );
 
                     return (
-                      <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                      <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow border-l-4 border-l-blue-500">
                         <CardContent className="p-6">
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex-1">
@@ -353,10 +353,109 @@ export default function CivilMepReports() {
                                   <span>{property.developer}</span>
                                 </div>
                               )}
-                              <Badge variant="outline" className="text-xs">
-                                {property.type}
-                              </Badge>
+                              <div className="flex gap-2 mb-3">
+                                <Badge variant="outline" className="text-xs">
+                                  {property.type}
+                                </Badge>
+                                {property.possessionDate && (
+                                  <Badge variant="secondary" className="text-xs">
+                                    Possession: {new Date(property.possessionDate).getFullYear()}
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
+                          </div>
+
+                          {/* Property Details Preview */}
+                          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-4">
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              {property.configurations && property.configurations.length > 0 && (
+                                <div>
+                                  <span className="font-medium text-gray-700 dark:text-gray-300">Configurations:</span>
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {property.configurations.slice(0, 3).map((config, index) => (
+                                      <Badge key={index} variant="outline" className="text-xs">
+                                        {config}
+                                      </Badge>
+                                    ))}
+                                    {property.configurations.length > 3 && (
+                                      <Badge variant="outline" className="text-xs">
+                                        +{property.configurations.length - 3} more
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                              
+                              {property.priceRange && (
+                                <div>
+                                  <span className="font-medium text-gray-700 dark:text-gray-300">Price Range:</span>
+                                  <p className="text-green-600 dark:text-green-400 font-semibold mt-1">
+                                    ₹{property.priceRange}
+                                  </p>
+                                </div>
+                              )}
+                              
+                              {property.totalUnits && (
+                                <div>
+                                  <span className="font-medium text-gray-700 dark:text-gray-300">Total Units:</span>
+                                  <p className="text-blue-600 dark:text-blue-400 font-semibold mt-1">
+                                    {property.totalUnits}
+                                  </p>
+                                </div>
+                              )}
+                              
+                              {property.launchDate && (
+                                <div>
+                                  <span className="font-medium text-gray-700 dark:text-gray-300">Launch Date:</span>
+                                  <p className="text-gray-600 dark:text-gray-400 mt-1">
+                                    {new Date(property.launchDate).toLocaleDateString()}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                            
+                            {/* Amenities Preview */}
+                            {property.amenities && property.amenities.length > 0 && (
+                              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                <span className="font-medium text-gray-700 dark:text-gray-300 text-sm">Key Amenities:</span>
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                  {property.amenities.slice(0, 4).map((amenity, index) => (
+                                    <Badge key={index} variant="secondary" className="text-xs">
+                                      {amenity}
+                                    </Badge>
+                                  ))}
+                                  {property.amenities.length > 4 && (
+                                    <Badge variant="secondary" className="text-xs">
+                                      +{property.amenities.length - 4} more
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Quality Indicators */}
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex gap-2">
+                              {property.reraApproved && (
+                                <Badge className="bg-green-100 text-green-800 border-green-200">
+                                  <Shield className="w-3 h-3 mr-1" />
+                                  RERA Approved
+                                </Badge>
+                              )}
+                              {property.qualityScore && (
+                                <Badge variant="outline" className="border-blue-200 text-blue-700">
+                                  <Star className="w-3 h-3 mr-1" />
+                                  Quality Score: {property.qualityScore}/10
+                                </Badge>
+                              )}
+                            </div>
+                            {property.distanceFromCenter && (
+                              <div className="text-xs text-gray-500 dark:text-gray-400">
+                                {property.distanceFromCenter} from city center
+                              </div>
+                            )}
                           </div>
 
                           {hasReport ? (
