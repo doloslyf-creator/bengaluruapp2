@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, MapPin, Heart, Share2, Calendar, MessageCircle, Phone, Star, Award, Home, Building, CheckCircle, AlertTriangle, X, Users, Car, Building2, Shield, TreePine, Waves, Dumbbell, Wifi, ShoppingCart, Camera, Play, Download, Eye, Lock, CheckCircle2, XCircle, TrendingUp, TrendingDown } from 'lucide-react';
+import { ArrowLeft, MapPin, Heart, Share2, Calendar, MessageCircle, Phone, Star, Award, Home, Building, CheckCircle, AlertTriangle, X, Users, Car, Building2, Shield, TreePine, Waves, Dumbbell, Wifi, ShoppingCart, Camera, Play, Download, Eye, Lock, CheckCircle2, XCircle, TrendingUp, TrendingDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface Property {
@@ -49,6 +49,9 @@ export default function PropertyDetailMinimal() {
   const [selectedConfig, setSelectedConfig] = useState<any>(null);
   const [showVideo, setShowVideo] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [similarCarouselIndex, setSimilarCarouselIndex] = useState(0);
+  const [recommendedCarouselIndex, setRecommendedCarouselIndex] = useState(0);
+  const [investmentCarouselIndex, setInvestmentCarouselIndex] = useState(0);
 
   const { data: property, isLoading, error } = useQuery<Property>({
     queryKey: [`/api/properties/${params.id}/with-configurations`],
@@ -243,6 +246,140 @@ export default function PropertyDetailMinimal() {
     }
     
     return cons;
+  };
+
+  // Property filtering functions
+  const getSimilarProperties = () => {
+    if (!property || !properties.length) return [];
+    
+    return properties.filter(p => 
+      p.id !== property.id && (
+        p.area === property.area ||
+        p.zone === property.zone ||
+        p.type === property.type ||
+        p.tags.some(tag => property.tags.includes(tag))
+      )
+    ).slice(0, 6);
+  };
+
+  const getRecommendedProperties = () => {
+    if (!property || !properties.length || !selectedConfig) return [];
+    
+    const currentPrice = selectedConfig.price;
+    const priceRange = currentPrice * 0.3; // 30% price variance
+    
+    return properties.filter(p => {
+      if (p.id === property.id) return false;
+      const configs = p.configurations || [];
+      return configs.some(config => 
+        Math.abs(config.price - currentPrice) <= priceRange
+      );
+    }).slice(0, 6);
+  };
+
+  const getInvestmentProperties = () => {
+    if (!properties.length) return [];
+    
+    return properties.filter(p => 
+      p.id !== property?.id &&
+      (p.tags.includes('investment-friendly') ||
+       p.tags.includes('high-roi') ||
+       p.tags.includes('rental-income') ||
+       (p.overallScore && p.overallScore >= 4.0))
+    ).slice(0, 6);
+  };
+
+  // Carousel navigation functions
+  const navigateCarousel = (type: 'similar' | 'recommended' | 'investment', direction: 'prev' | 'next') => {
+    const properties = type === 'similar' ? getSimilarProperties() : 
+                     type === 'recommended' ? getRecommendedProperties() : 
+                     getInvestmentProperties();
+    
+    const maxIndex = Math.max(0, properties.length - 3); // Show 3 cards at a time
+    
+    if (type === 'similar') {
+      setSimilarCarouselIndex(prev => 
+        direction === 'next' 
+          ? Math.min(prev + 1, maxIndex)
+          : Math.max(prev - 1, 0)
+      );
+    } else if (type === 'recommended') {
+      setRecommendedCarouselIndex(prev => 
+        direction === 'next' 
+          ? Math.min(prev + 1, maxIndex)
+          : Math.max(prev - 1, 0)
+      );
+    } else {
+      setInvestmentCarouselIndex(prev => 
+        direction === 'next' 
+          ? Math.min(prev + 1, maxIndex)
+          : Math.max(prev - 1, 0)
+      );
+    }
+  };
+
+  // Property Card Component
+  const PropertyCard = ({ property: prop }: { property: Property }) => {
+    const minPrice = prop.configurations?.length ? Math.min(...prop.configurations.map(c => c.price)) : 0;
+    const maxPrice = prop.configurations?.length ? Math.max(...prop.configurations.map(c => c.price)) : 0;
+    const priceRange = minPrice === maxPrice ? formatPriceDisplay(minPrice) : `${formatPriceDisplay(minPrice)} - ${formatPriceDisplay(maxPrice)}`;
+
+    return (
+      <Link href={`/property/${prop.id}`} className="block group">
+        <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+          <div className="relative">
+            {prop.images?.[0] ? (
+              <img 
+                src={prop.images[0]} 
+                alt={prop.name}
+                className="w-full h-48 object-cover"
+              />
+            ) : (
+              <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
+                <Building2 className="h-12 w-12 text-gray-400" />
+              </div>
+            )}
+            <div className="absolute top-3 left-3">
+              <Badge className="bg-blue-600 text-white">
+                {prop.status === 'completed' ? 'Ready' : prop.status === 'under-construction' ? 'UC' : 'Pre-Launch'}
+              </Badge>
+            </div>
+            <div className="absolute top-3 right-3">
+              {prop.overallScore && (
+                <Badge className="bg-yellow-500 text-white">
+                  ⭐ {prop.overallScore}/5
+                </Badge>
+              )}
+            </div>
+          </div>
+          
+          <CardContent className="p-4">
+            <div className="space-y-2">
+              <h3 className="font-semibold text-lg line-clamp-1">{prop.name}</h3>
+              <div className="flex items-center text-sm text-gray-600">
+                <MapPin className="h-4 w-4 mr-1" />
+                <span className="line-clamp-1">{prop.area}, {prop.zone}</span>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="text-lg font-bold text-blue-600">
+                  {priceRange}
+                </div>
+                <div className="text-sm text-gray-500">
+                  {prop.type}
+                </div>
+              </div>
+
+              {prop.tags.slice(0, 2).map(tag => (
+                <Badge key={tag} variant="secondary" className="text-xs mr-1">
+                  {tag.replace('-', ' ')}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </Link>
+    );
   };
 
   if (isLoading) {
@@ -1186,6 +1323,139 @@ export default function PropertyDetailMinimal() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Sliding Property Carousels */}
+      <div className="max-w-6xl mx-auto px-4 space-y-12 py-12">
+        
+        {/* Similar Properties */}
+        {getSimilarProperties().length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Similar Properties</h2>
+                <p className="text-gray-600">Based on your preferences and search history</p>
+              </div>
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigateCarousel('similar', 'prev')}
+                  disabled={similarCarouselIndex === 0}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigateCarousel('similar', 'next')}
+                  disabled={similarCarouselIndex >= Math.max(0, getSimilarProperties().length - 3)}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            
+            <div className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-300 ease-in-out"
+                style={{ transform: `translateX(-${similarCarouselIndex * (100/3)}%)` }}
+              >
+                {getSimilarProperties().map((prop) => (
+                  <div key={prop.id} className="w-1/3 flex-shrink-0 px-2">
+                    <PropertyCard property={prop} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Recommended Properties - Budget Based */}
+        {getRecommendedProperties().length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Recommended for You</h2>
+                <p className="text-gray-600">Properties matching your budget range</p>
+              </div>
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigateCarousel('recommended', 'prev')}
+                  disabled={recommendedCarouselIndex === 0}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigateCarousel('recommended', 'next')}
+                  disabled={recommendedCarouselIndex >= Math.max(0, getRecommendedProperties().length - 3)}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            
+            <div className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-300 ease-in-out"
+                style={{ transform: `translateX(-${recommendedCarouselIndex * (100/3)}%)` }}
+              >
+                {getRecommendedProperties().map((prop) => (
+                  <div key={prop.id} className="w-1/3 flex-shrink-0 px-2">
+                    <PropertyCard property={prop} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Investment Friendly Properties */}
+        {getInvestmentProperties().length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Investment Opportunities</h2>
+                <p className="text-gray-600">High-return investment properties with strong fundamentals</p>
+              </div>
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigateCarousel('investment', 'prev')}
+                  disabled={investmentCarouselIndex === 0}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigateCarousel('investment', 'next')}
+                  disabled={investmentCarouselIndex >= Math.max(0, getInvestmentProperties().length - 3)}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            
+            <div className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-300 ease-in-out"
+                style={{ transform: `translateX(-${investmentCarouselIndex * (100/3)}%)` }}
+              >
+                {getInvestmentProperties().map((prop) => (
+                  <div key={prop.id} className="w-1/3 flex-shrink-0 px-2">
+                    <PropertyCard property={prop} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Sticky CTA Bar */}
