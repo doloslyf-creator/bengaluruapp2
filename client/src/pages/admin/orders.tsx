@@ -271,7 +271,9 @@ export default function Orders() {
                             <div className="text-sm text-gray-500">{order.customerEmail}</div>
                           </div>
                         </TableCell>
-                        <TableCell>{order.propertyName || "Property"}</TableCell>
+                        <TableCell>
+                          <div className="font-medium">{order.propertyName || "Unknown Property"}</div>
+                        </TableCell>
                         <TableCell>₹{parseFloat(order.amount).toLocaleString()}</TableCell>
                         <TableCell>{getStatusBadge(order.paymentStatus)}</TableCell>
                         <TableCell>
@@ -308,6 +310,31 @@ export default function Orders() {
                                         <div className="flex items-center space-x-2">
                                           <Phone className="h-4 w-4 text-gray-400" />
                                           <span className="text-sm">{selectedOrder.customerPhone}</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  {/* Property Information */}
+                                  <div>
+                                    <h4 className="font-medium mb-3">Property Information</h4>
+                                    <div className="grid grid-cols-2 gap-4">
+                                      <div>
+                                        <span className="text-sm text-gray-500">Property Name:</span>
+                                        <div className="font-medium">{selectedOrder.propertyName || "Unknown Property"}</div>
+                                      </div>
+                                      <div>
+                                        <span className="text-sm text-gray-500">Report Type:</span>
+                                        <div className="font-medium">
+                                          {selectedOrder.reportType === 'civil-mep' ? 'CIVIL+MEP Report' : 
+                                           selectedOrder.reportType === 'property-valuation' ? 'Property Valuation Report' : 
+                                           'Unknown Report'}
+                                        </div>
+                                      </div>
+                                      {selectedOrder.reportTitle && (
+                                        <div className="col-span-2">
+                                          <span className="text-sm text-gray-500">Report Title:</span>
+                                          <div className="font-medium">{selectedOrder.reportTitle}</div>
                                         </div>
                                       )}
                                     </div>
