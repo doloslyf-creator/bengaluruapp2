@@ -1433,7 +1433,7 @@ export default function PropertyDetail() {
                     reportType="property-valuation"
                     propertyId={property.id}
                     propertyName={property.name}
-                    price={2499}
+                    price={1499}
                     title="Professional Property Valuation"
                     subtitle="Independent Market Analysis"
                     description="Ensure you're paying the right price with our expert valuation and investment analysis."
