@@ -5,22 +5,22 @@ import * as schema from "@shared/schema";
 
 neonConfig.webSocketConstructor = ws;
 
-// Priority: Use Supabase database URL if available, otherwise fall back to existing DATABASE_URL
+// Priority: Use Supabase database URL as primary, fallback to existing DATABASE_URL
 function getDatabaseUrl() {
-  // For now, we'll keep using DATABASE_URL but you should replace it with your Supabase connection string
-  // To get your Supabase database connection string:
-  // 1. Go to your Supabase project dashboard
-  // 2. Click "Settings" > "Database" 
-  // 3. Copy the "Connection string" under "Connection parameters"
-  // 4. Replace [YOUR-PASSWORD] with your database password
+  // Check for Supabase connection string first
+  if (process.env.SUPABASE_DATABASE_URL) {
+    console.log('Using Supabase as primary database');
+    return process.env.SUPABASE_DATABASE_URL;
+  }
   
+  // Fallback to existing DATABASE_URL for backward compatibility
   if (process.env.DATABASE_URL) {
-    console.log('Using existing DATABASE_URL (will transition to Supabase)');
+    console.log('Using existing DATABASE_URL (consider migrating to Supabase)');
     return process.env.DATABASE_URL;
   }
   
   throw new Error(
-    "DATABASE_URL must be set. Please provide your Supabase database connection string.",
+    "DATABASE_URL or SUPABASE_DATABASE_URL must be set. Please provide a database connection string.",
   );
 }
 
