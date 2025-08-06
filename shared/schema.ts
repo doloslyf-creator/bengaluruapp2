@@ -1885,6 +1885,10 @@ export interface ZoneWithProperties extends Zone {
   properties?: Property[];
 }
 
+export interface ZoneWithCity extends Zone {
+  city?: City;
+}
+
 export interface PropertyWithLocation extends Property {
   city?: City;
   zone?: Zone;

@@ -91,6 +91,7 @@ export interface IStorage {
   getAllZones(): Promise<Zone[]>;
   getZonesByCity(cityId: string): Promise<Zone[]>;
   getZoneWithProperties(id: string): Promise<ZoneWithProperties | undefined>;
+  getZoneWithCity(id: string): Promise<ZoneWithCity | undefined>;
   createZone(zone: InsertZone): Promise<Zone>;
   updateZone(id: string, zone: Partial<InsertZone>): Promise<Zone | undefined>;
   deleteZone(id: string): Promise<boolean>;
@@ -1475,6 +1476,15 @@ export class DatabaseStorage implements IStorage {
   async deleteZone(id: string): Promise<boolean> {
     const result = await db.delete(zones).where(eq(zones.id, id));
     return result.rowCount > 0;
+  }
+
+  async getZoneWithCity(id: string): Promise<ZoneWithCity | undefined> {
+    const zone = await this.getZone(id);
+    if (!zone) return undefined;
+
+    const city = await this.getCity(zone.cityId);
+    
+    return { ...zone, city };
   }
 
   // Property CRUD operations - Updated for city-wise structure

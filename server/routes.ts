@@ -1752,48 +1752,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Zones API - Simple zones management
+  // Zones API - Database-driven zones management with city integration
   app.get("/api/zones", async (req, res) => {
     try {
-      // Return hardcoded zones for now - in production, would come from database
-      const zones = [
-        { id: "1", name: "North Bengaluru", description: "Areas like Hebbal, Yelahanka, Devanahalli" },
-        { id: "2", name: "South Bengaluru", description: "Areas like Bannerghatta, Jayanagar, Koramangala" },
-        { id: "3", name: "East Bengaluru", description: "Areas like Whitefield, Marathahalli, Sarjapur" },
-        { id: "4", name: "West Bengaluru", description: "Areas like Rajajinagar, Vijayanagar, Kengeri" },
-        { id: "5", name: "Central Bengaluru", description: "Areas like MG Road, Brigade Road, Commercial Street" }
-      ];
-      res.json(zones);
+      const zonesFromDb = await storage.getAllZones();
+      res.json(zonesFromDb);
     } catch (error) {
       console.error("Error fetching zones:", error);
       res.status(500).json({ error: "Failed to fetch zones" });
     }
   });
 
+  // Get zones by city ID
+  app.get("/api/zones/city/:cityId", async (req, res) => {
+    try {
+      const { cityId } = req.params;
+      const zones = await storage.getZonesByCity(cityId);
+      res.json(zones);
+    } catch (error) {
+      console.error("Error fetching zones by city:", error);
+      res.status(500).json({ error: "Failed to fetch zones for city" });
+    }
+  });
+
+  // Get zone by ID with city information
+  app.get("/api/zones/:id", async (req, res) => {
+    try {
+      const zone = await storage.getZoneWithCity(req.params.id);
+      if (!zone) {
+        return res.status(404).json({ error: "Zone not found" });
+      }
+      res.json(zone);
+    } catch (error) {
+      console.error("Error fetching zone:", error);
+      res.status(500).json({ error: "Failed to fetch zone" });
+    }
+  });
+
   app.post("/api/zones", async (req, res) => {
     try {
-      const zoneData = req.body;
-      // In production, would save to database
-      const newZone = {
-        id: Date.now().toString(),
-        ...zoneData,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-      console.log("Zone created:", newZone);
-      res.json(newZone);
+      const validatedData = insertZoneSchema.parse(req.body);
+      const newZone = await storage.createZone(validatedData);
+      res.status(201).json(newZone);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Validation failed", details: error.errors });
+      }
       console.error("Error creating zone:", error);
       res.status(500).json({ error: "Failed to create zone" });
     }
   });
 
+  app.patch("/api/zones/:id", async (req, res) => {
+    try {
+      const validatedData = insertZoneSchema.partial().parse(req.body);
+      const updatedZone = await storage.updateZone(req.params.id, validatedData);
+      if (!updatedZone) {
+        return res.status(404).json({ error: "Zone not found" });
+      }
+      res.json(updatedZone);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Validation failed", details: error.errors });
+      }
+      console.error("Error updating zone:", error);
+      res.status(500).json({ error: "Failed to update zone" });
+    }
+  });
+
   app.delete("/api/zones/:id", async (req, res) => {
     try {
-      const { id } = req.params;
-      // In production, would delete from database
-      console.log("Zone deleted:", id);
-      res.json({ success: true, message: "Zone deleted successfully" });
+      const deleted = await storage.deleteZone(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Zone not found" });
+      }
+      res.status(204).send();
     } catch (error) {
       console.error("Error deleting zone:", error);
       res.status(500).json({ error: "Failed to delete zone" });

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import { ArrowLeft, MapPin, Save } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Form,
   FormControl,
@@ -24,9 +25,19 @@ import { apiRequest } from "@/lib/queryClient";
 const zoneSchema = z.object({
   name: z.string().min(1, "Zone name is required"),
   description: z.string().optional(),
-  area: z.string().optional(),
-  pincode: z.string().optional(),
-  coordinates: z.string().optional(),
+  cityId: z.string().min(1, "City selection is required"),
+  locationType: z.enum(["urban", "suburban", "rural"]).default("urban"),
+  priceRangeMin: z.number().optional(),
+  priceRangeMax: z.number().optional(),
+  appreciationRate: z.number().optional(),
+  rentalYield: z.number().optional(),
+  infrastructureScore: z.number().min(1).max(10).default(5),
+  connectivityScore: z.number().min(1).max(10).default(5),
+  amenitiesScore: z.number().min(1).max(10).default(5),
+  educationScore: z.number().min(1).max(10).default(5),
+  area: z.number().optional(),
+  population: z.number().optional(),
+  pincodesServed: z.array(z.string()).default([]),
 });
 
 type ZoneFormData = z.infer<typeof zoneSchema>;
@@ -41,9 +52,23 @@ export default function ZonesAdd() {
     defaultValues: {
       name: "",
       description: "",
-      area: "",
-      pincode: "",
-      coordinates: "",
+      cityId: "",
+      locationType: "urban",
+      infrastructureScore: 5,
+      connectivityScore: 5,
+      amenitiesScore: 5,
+      educationScore: 5,
+      pincodesServed: [],
+    },
+  });
+
+  // Fetch cities for dropdown
+  const { data: cities = [] } = useQuery({
+    queryKey: ["/api/cities"],
+    queryFn: async () => {
+      const response = await fetch("/api/cities");
+      if (!response.ok) throw new Error("Failed to fetch cities");
+      return response.json();
     },
   });
 
@@ -73,41 +98,54 @@ export default function ZonesAdd() {
   };
 
   return (
-    <AdminLayout title="Add Zone">
+    <AdminLayout title="Add New Zone">
       <div className="flex flex-col h-full">
-        {/* Breadcrumb Header */}
+        {/* Header */}
         <header className="border-b border-gray-200 bg-white px-6 py-4">
           <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center space-x-2 text-sm text-gray-600 mb-2">
+                <MapPin className="h-4 w-4" />
+                <span>Zones</span>
+                <span className="mx-2">›</span>
+                <span className="text-gray-900 font-medium">Add New Zone</span>
+              </div>
+              <h2 className="text-lg font-medium text-gray-900">Create Zone</h2>
+              <p className="text-sm text-gray-600">Add a new geographical zone to your city</p>
+            </div>
             <div className="flex items-center space-x-3">
-              <Link href="/admin-panel/zones">
-                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
+              <Link href="/admin-panel/zones/view">
+                <Button variant="outline">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Zones
                 </Button>
               </Link>
-              <div className="text-sm text-gray-500">
-                <span>Zones</span>
-                <span className="mx-2">›</span>
-                <span className="text-gray-900 font-medium">Add Zone</span>
-              </div>
+              <Button
+                onClick={form.handleSubmit(onSubmit)}
+                disabled={createZoneMutation.isPending}
+                className="bg-primary text-white hover:bg-primary/90"
+              >
+                <Save className="h-4 w-4 mr-2" />
+                {createZoneMutation.isPending ? "Creating..." : "Create Zone"}
+              </Button>
             </div>
           </div>
         </header>
 
-        {/* Content */}
-        <div className="flex-1 p-6">
-          <div className="max-w-2xl mx-auto">
+        {/* Form Content */}
+        <div className="flex-1 px-6 py-6">
+          <div className="max-w-4xl mx-auto">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <MapPin className="h-5 w-5" />
-                  <span>Create New Zone</span>
+                <CardTitle className="flex items-center">
+                  <MapPin className="h-5 w-5 mr-2" />
+                  Zone Details
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    {/* Basic Information */}
+                    {/* Basic Zone Info */}
                     <div className="space-y-4">
                       <h3 className="text-lg font-medium">Basic Information</h3>
                       
@@ -118,7 +156,7 @@ export default function ZonesAdd() {
                           <FormItem>
                             <FormLabel>Zone Name *</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g., North Bengaluru, Whitefield" {...field} />
+                              <Input placeholder="e.g., North Bengaluru, Whitefield, Koramangala" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -151,6 +189,54 @@ export default function ZonesAdd() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormField
                           control={form.control}
+                          name="cityId"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>City *</FormLabel>
+                              <FormControl>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select a city" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {cities.map((city: any) => (
+                                      <SelectItem key={city.id} value={city.id}>
+                                        {city.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="locationType"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Location Type</FormLabel>
+                              <FormControl>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select location type" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="urban">Urban</SelectItem>
+                                    <SelectItem value="suburban">Suburban</SelectItem>
+                                    <SelectItem value="rural">Rural</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
                           name="area"
                           render={({ field }) => (
                             <FormItem>
@@ -158,8 +244,9 @@ export default function ZonesAdd() {
                               <FormControl>
                                 <Input 
                                   type="number" 
-                                  placeholder="e.g., 25.5" 
-                                  {...field} 
+                                  placeholder="25.5" 
+                                  {...field}
+                                  onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -169,40 +256,204 @@ export default function ZonesAdd() {
 
                         <FormField
                           control={form.control}
-                          name="pincode"
+                          name="population"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Primary Pincode</FormLabel>
+                              <FormLabel>Population</FormLabel>
                               <FormControl>
-                                <Input placeholder="e.g., 560001" {...field} />
+                                <Input 
+                                  type="number" 
+                                  placeholder="500000" 
+                                  {...field}
+                                  onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
                       </div>
+                    </div>
 
-                      <FormField
-                        control={form.control}
-                        name="coordinates"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Coordinates (Optional)</FormLabel>
-                            <FormControl>
-                              <Input 
-                                placeholder="e.g., 12.9716,77.5946" 
-                                {...field} 
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                    {/* Market Data */}
+                    <div className="space-y-4 pt-6 border-t">
+                      <h3 className="text-lg font-medium">Market Data</h3>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="priceRangeMin"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Min Price (₹ Lakhs)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  placeholder="50" 
+                                  {...field}
+                                  onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="priceRangeMax"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Max Price (₹ Lakhs)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  placeholder="200" 
+                                  {...field}
+                                  onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="appreciationRate"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Appreciation Rate (%)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  step="0.01"
+                                  placeholder="8.5" 
+                                  {...field}
+                                  onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="rentalYield"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Rental Yield (%)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  step="0.01"
+                                  placeholder="3.5" 
+                                  {...field}
+                                  onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Infrastructure Scores */}
+                    <div className="space-y-4 pt-6 border-t">
+                      <h3 className="text-lg font-medium">Infrastructure Scores (1-10)</h3>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="infrastructureScore"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Infrastructure Score</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  min="1" 
+                                  max="10" 
+                                  placeholder="5" 
+                                  {...field}
+                                  onChange={(e) => field.onChange(Number(e.target.value))}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="connectivityScore"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Connectivity Score</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  min="1" 
+                                  max="10" 
+                                  placeholder="5" 
+                                  {...field}
+                                  onChange={(e) => field.onChange(Number(e.target.value))}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="amenitiesScore"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Amenities Score</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  min="1" 
+                                  max="10" 
+                                  placeholder="5" 
+                                  {...field}
+                                  onChange={(e) => field.onChange(Number(e.target.value))}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="educationScore"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Education Score</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  min="1" 
+                                  max="10" 
+                                  placeholder="5" 
+                                  {...field}
+                                  onChange={(e) => field.onChange(Number(e.target.value))}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
                     </div>
 
                     {/* Actions */}
                     <div className="flex items-center justify-end space-x-4 pt-6 border-t">
-                      <Link href="/admin-panel/zones">
+                      <Link href="/admin-panel/zones/view">
                         <Button type="button" variant="outline">
                           Cancel
                         </Button>
