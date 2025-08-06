@@ -648,7 +648,7 @@ export default function PropertyDetailMinimal() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Property Not Found</h1>
           <p className="text-gray-600 mb-4">The property you're looking for doesn't exist.</p>
-          <Button onClick={() => navigate('/')}>
+          <Button onClick={() => window.history.back()}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Properties
           </Button>
@@ -672,7 +672,7 @@ export default function PropertyDetailMinimal() {
       {/* Header */}
       <div className="bg-white border-b sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Button variant="ghost" onClick={() => navigate('/')} className="text-gray-600">
+          <Button variant="ghost" onClick={() => window.history.back()} className="text-gray-600">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Search
           </Button>

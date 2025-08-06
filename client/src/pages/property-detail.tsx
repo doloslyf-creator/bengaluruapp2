@@ -334,7 +334,7 @@ export default function PropertyDetail() {
       <div className="fixed top-6 left-6 z-50">
         <Button 
           variant="ghost" 
-          onClick={() => navigate('/')}
+          onClick={() => window.history.back()}
           className="bg-white/90 backdrop-blur-sm shadow-lg rounded-full px-4 py-2 border hover:bg-white"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
