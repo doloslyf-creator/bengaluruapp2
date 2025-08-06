@@ -113,11 +113,20 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50">
       <Header />
+      
+      {/* SUPER OBVIOUS MEGA BANNER */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-red-600 text-white text-center py-3 animate-pulse">
+        <div className="flex items-center justify-center">
+          <div className="w-3 h-3 bg-yellow-400 rounded-full mr-3 animate-ping"></div>
+          <span className="text-lg font-black">🚨 MEGA HOMEPAGE TRANSFORMATION ACTIVE - ALL ENGAGEMENT FEATURES LOADED! 🚨</span>
+          <div className="w-3 h-3 bg-yellow-400 rounded-full ml-3 animate-ping"></div>
+        </div>
+      </div>
 
       {/* Hero Section */}
-      <section className="relative pt-16 pb-12 overflow-hidden">
+      <section className="relative pt-24 pb-12 overflow-hidden">
         {/* Background Elements */}
         <div className="absolute inset-0">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-r from-blue-100/50 to-purple-100/50 rounded-full blur-3xl"></div>
@@ -133,21 +142,24 @@ export default function Home() {
               <span className="text-sm font-medium text-gray-700">Real Estate Management Platform</span>
             </div>
             
-            {/* Urgency Alert */}
+            {/* EXTREME URGENCY ALERT */}
             <div className="mb-8">
-              <div className="inline-flex items-center bg-red-100 text-red-800 px-6 py-3 rounded-full text-sm font-bold mb-6 animate-pulse border-2 border-red-200">
-                <div className="w-3 h-3 bg-red-500 rounded-full mr-3 animate-ping"></div>
-                🚨 MARKET ALERT: Property prices surged 27% this quarter - Don't wait!
+              <div className="inline-flex items-center bg-red-600 text-white px-8 py-4 rounded-full text-lg font-black mb-6 animate-pulse border-4 border-yellow-400 shadow-2xl">
+                <div className="w-4 h-4 bg-yellow-400 rounded-full mr-3 animate-ping"></div>
+                🔥 BREAKING: 89% of Bangalore properties have HIDDEN DEFECTS! 🔥
+              </div>
+              <div className="inline-flex items-center bg-yellow-400 text-red-800 px-6 py-3 rounded-full text-md font-bold animate-bounce">
+                ⏰ PRICE INCREASES IN 3 DAYS - ACT NOW!
               </div>
             </div>
 
-            {/* Main Heading */}
-            <h1 className="text-5xl md:text-7xl font-black text-gray-900 mb-8 leading-[1.1] tracking-tight">
-              Stop Losing
-              <span className="block bg-gradient-to-r from-red-600 via-orange-600 to-red-600 bg-clip-text text-transparent">
-                ₹5+ Lakhs
+            {/* Main Heading - EXTREME CONVERSION VERSION */}
+            <h1 className="text-5xl md:text-7xl font-black text-gray-900 mb-8 leading-[1.1] tracking-tight animate-pulse">
+              🚨 DON'T LOSE
+              <span className="block bg-gradient-to-r from-red-600 via-orange-600 to-red-600 bg-clip-text text-transparent animate-bounce">
+                ₹10+ LAKHS
               </span>
-              <span className="block text-4xl md:text-5xl text-gray-700 font-semibold">on Every Property Purchase</span>
+              <span className="block text-4xl md:text-5xl text-red-700 font-black animate-shake">LIKE 2,341 BUYERS DID THIS MONTH!</span>
             </h1>
             
             {/* Subtitle */}
