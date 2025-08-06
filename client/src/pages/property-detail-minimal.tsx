@@ -12,7 +12,6 @@ import { updateMetaTags, generatePropertySchema, generatePropertySlug, injectSch
 import OrderFormDialog from '@/components/order-form-dialog';
 import { ExpertCredentials } from '@/components/expert-credentials';
 import { ExitIntentPopup } from '@/components/exit-intent-popup';
-import { FloatingActionButtons } from '@/components/floating-action-buttons';
 
 interface Property {
   id: string;
@@ -647,16 +646,6 @@ export default function PropertyDetailMinimal() {
 
   return (
     <div className="min-h-screen bg-white">
-      
-      {/* Floating Action Buttons */}
-      <FloatingActionButtons
-        property={property}
-        onShare={handleShare}
-        onWhatsApp={handleWhatsAppShare}
-        onFavorite={toggleFavorite}
-        isFavorite={isFavorite}
-      />
-
       {/* Exit Intent Popup */}
       <ExitIntentPopup 
         title="Wait! Don't Miss This Property!"
@@ -1808,74 +1797,7 @@ export default function PropertyDetailMinimal() {
                 </CardContent>
               </Card>
 
-              {/* Enhanced Contact & Action Card */}
-              <Card className="shadow-xl rounded-2xl border-2 border-blue-100">
-                <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-t-2xl">
-                  <CardTitle className="text-xl text-blue-900">Get Expert Assistance</CardTitle>
-                  <p className="text-sm text-blue-700">Speak with our property consultants</p>
-                </CardHeader>
-                <CardContent className="space-y-4 p-6">
-                  <Button 
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" 
-                    size="lg" 
-                    onClick={handleBookVisit}
-                    data-testid="button-schedule-site-visit"
-                  >
-                    <Calendar className="h-5 w-5 mr-2" />
-                    Schedule Site Visit
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="w-full border-green-200 text-green-700 hover:bg-green-50" 
-                    size="lg" 
-                    onClick={handleWhatsAppShare}
-                    data-testid="button-whatsapp-inquiry"
-                  >
-                    <MessageCircle className="h-5 w-5 mr-2" />
-                    WhatsApp Inquiry
-                  </Button>
-                  
-                  <Separator className="my-4" />
-                  
-                  <div className="text-center">
-                    <p className="text-sm text-gray-600 mb-3">Speak to our property consultant</p>
-                    <Button 
-                      variant="outline" 
-                      className="w-full border-gray-200 hover:bg-gray-50"
-                      data-testid="button-phone-contact"
-                    >
-                      <Phone className="h-5 w-5 mr-2" />
-                      +91 98765 43210
-                    </Button>
-                  </div>
 
-                  {/* Quick Reports Access */}
-                  <Separator className="my-4" />
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-gray-900">Quick Report Access</p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full text-left justify-start border-orange-200 text-orange-700 hover:bg-orange-50"
-                      onClick={handleCivilMepReport}
-                      data-testid="button-civil-mep-report"
-                    >
-                      <Shield className="h-4 w-4 mr-2" />
-                      Civil & MEP Report - ₹2,499
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full text-left justify-start border-purple-200 text-purple-700 hover:bg-purple-50"
-                      onClick={handleValuationReport}
-                      data-testid="button-valuation-report"
-                    >
-                      <Award className="h-4 w-4 mr-2" />
-                      Property Valuation - ₹1,499
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
           </div>
         </div>
