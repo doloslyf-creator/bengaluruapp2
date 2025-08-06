@@ -1682,7 +1682,7 @@ export default function PropertyDetailMinimal() {
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="space-y-6">
+            <div className="sticky top-32 space-y-6">
 
               {/* Quick Navigation */}
               <Card>
