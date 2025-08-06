@@ -279,7 +279,19 @@ export default function PropertyDetailMinimal() {
   };
 
   const handleConsult = () => {
-    navigate('/consultation');
+    // Pass property information to the consultation page
+    navigate('/consultation', { 
+      state: { 
+        property: {
+          id: property?.id,
+          name: property?.name,
+          area: property?.area,
+          zone: property?.zone,
+          developer: property?.developer,
+          selectedConfig: selectedConfig
+        }
+      } 
+    });
   };
 
   const handleShare = async () => {
