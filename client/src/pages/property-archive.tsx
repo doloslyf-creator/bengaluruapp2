@@ -71,49 +71,7 @@ export default function PropertyArchive() {
     }));
   }, [properties, civilReports, valuationReports]);
 
-  // Filter and sort properties
-  const filteredProperties = useMemo(() => {
-    let filtered = propertiesWithReports;
-
-    // Search filter
-    if (searchTerm) {
-      filtered = filtered.filter(property =>
-        property.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        property.developer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        property.area.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Zone filter
-    if (selectedZone !== "all") {
-      filtered = filtered.filter(property => property.zone === selectedZone);
-    }
-
-    // Type filter
-    if (selectedType !== "all") {
-      filtered = filtered.filter(property => property.type === selectedType);
-    }
-
-    // Sort properties
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case "investment-score":
-          return getInvestmentScore(b) - getInvestmentScore(a);
-        case "end-use-score":
-          return getEndUseScore(b) - getEndUseScore(a);
-        case "price-low":
-          return getMinPrice(a) - getMinPrice(b);
-        case "price-high":
-          return getMinPrice(b) - getMinPrice(a);
-        default:
-          return 0;
-      }
-    });
-
-    return filtered;
-  }, [propertiesWithReports, searchTerm, selectedZone, selectedType, sortBy]);
-
-  // Helper functions
+  // Helper functions (defined before filteredProperties useMemo)
   const formatPrice = (price: number) => {
     if (price >= 10000000) {
       return `₹${(price / 10000000).toFixed(1)}Cr`;
@@ -180,6 +138,48 @@ export default function PropertyArchive() {
     const amenitiesScore = property.amenitiesScore || 0;
     return (locationScore + amenitiesScore) / 2;
   };
+
+  // Filter and sort properties
+  const filteredProperties = useMemo(() => {
+    let filtered = propertiesWithReports;
+
+    // Search filter
+    if (searchTerm) {
+      filtered = filtered.filter(property =>
+        property.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.developer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.area.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Zone filter
+    if (selectedZone !== "all") {
+      filtered = filtered.filter(property => property.zone === selectedZone);
+    }
+
+    // Type filter
+    if (selectedType !== "all") {
+      filtered = filtered.filter(property => property.type === selectedType);
+    }
+
+    // Sort properties
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case "investment-score":
+          return getInvestmentScore(b) - getInvestmentScore(a);
+        case "end-use-score":
+          return getEndUseScore(b) - getEndUseScore(a);
+        case "price-low":
+          return getMinPrice(a) - getMinPrice(b);
+        case "price-high":
+          return getMinPrice(b) - getMinPrice(a);
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  }, [propertiesWithReports, searchTerm, selectedZone, selectedType, sortBy, getInvestmentScore, getEndUseScore, getMinPrice]);
 
   // User intent selection screen
   if (userIntent === null) {
