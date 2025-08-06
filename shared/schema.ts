@@ -1356,23 +1356,88 @@ export type TeamMember = typeof teamMembers.$inferSelect;
 // Developers table - property developers and builders
 export const developers = pgTable("developers", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  name: text("name").notNull(),
+  
+  // 🧱 Core Builder Information
+  name: text("name").notNull(), // Official name (e.g., Prestige Group)
+  legalEntity: text("legal_entity"), // Registered company name
   description: text("description"),
   phone: varchar("phone", { length: 20 }),
   email: varchar("email", { length: 255 }),
-  address: text("address"),
+  address: text("address"), // Office address
   website: varchar("website"),
+  headquarters: text("headquarters"), // City, state of main office
   establishedYear: varchar("established_year", { length: 4 }),
-  specialization: varchar("specialization"),
+  promoters: json("promoters").$type<string[]>().default([]), // Founders or key people
+  
+  // 🔢 Track Record
   totalProjects: integer("total_projects").default(0),
-  activeProjects: integer("active_projects").default(0),
+  activeProjects: integer("active_projects").default(0), // Ongoing Projects
   completedProjects: integer("completed_projects").default(0),
+  operatingCities: json("operating_cities").$type<string[]>().default([]), // List of cities/regions
+  flagshipProjects: json("flagship_projects").$type<{name: string; description?: string; imageUrl?: string}[]>().default([]),
+  totalUnitsDelivered: integer("total_units_delivered").default(0),
+  
+  // 🕐 Delivery Track Record
+  onTimeDeliveryPercent: decimal("on_time_delivery_percent", { precision: 5, scale: 2 }), // Ratio of on-time vs delayed
+  majorDelays: json("major_delays").$type<{projectName: string; reason?: string; delayMonths?: number}[]>().default([]),
+  avgDeliveryDelay: integer("avg_delivery_delay").default(0), // In months
+  complaintsHistory: text("complaints_history"), // Summary of legal disputes/customer issues
+  
+  // 🏢 Company Type & Market Positioning
+  companyType: varchar("company_type", { enum: ["public", "private", "partnership", "llp"] }).default("private"),
+  stockTicker: varchar("stock_ticker"), // If applicable (e.g., NSE: PRESTIGE)
+  marketSegment: varchar("market_segment", { enum: ["affordable", "mid-range", "luxury", "ultra-luxury"] }).default("mid-range"),
+  constructionModel: varchar("construction_model", { enum: ["in-house", "contracting", "hybrid"] }).default("contracting"),
+  fundingStatus: varchar("funding_status", { 
+    enum: ["bootstrap", "pe-backed", "listed", "debt-ridden", "government-backed"] 
+  }).default("bootstrap"),
+  auditHistory: text("audit_history"), // Any financial audits, controversies
+  
+  // 🧱 Quality & Construction Practices
+  civilQualityRating: integer("civil_quality_rating").default(3), // 1-5 score
+  constructionModel2: varchar("construction_model2", { 
+    enum: ["in-house", "outsourced", "hybrid"] 
+  }).default("outsourced"), // For MEP, waterproofing, interiors
+  commonIssues: json("common_issues").$type<string[]>().default([]), // Leaks, cracks, material failures
+  certifications: json("certifications").$type<string[]>().default([]), // IGBC, RERA, ISO, OC/CC compliance
+  technologiesUsed: json("technologies_used").$type<string[]>().default([]), // Mivan, Precast, RCC, SmartTech
+  vendorNetwork: json("vendor_network").$type<string[]>().default([]), // Known vendors or PMC
+  
+  // 📜 Legal & Regulatory
+  reraRegistrationNo: json("rera_registration_no").$type<{state: string; regNo: string}[]>().default([]),
+  legalRedFlags: text("legal_red_flags"), // Known disputes, NGT issues, A-Khata issues
+  projectApprovals: json("project_approvals").$type<string[]>().default([]), // BBMP, BDA, BMRDA, EC, Fire
+  litigationsSummary: text("litigations_summary"), // High-profile legal cases
+  
+  // ⭐ Reputation & Reviews
   averageRating: decimal("average_rating", { precision: 3, scale: 2 }).default("0.00"),
-  certifications: json("certifications").default('[]'), // Array of certifications
-  operatingCities: json("operating_cities").default('[]'), // Array of city IDs
+  clientFeedbackHighlights: json("client_feedback_highlights").$type<string[]>().default([]),
+  popularFor: text("popular_for"), // e.g., "Great clubhouse but slow possession"
+  mediaMentions: json("media_mentions").$type<{type: string; title: string; url?: string; date?: string}[]>().default([]),
+  
+  // 🔗 Crosslinking & Integration
+  filterTags: json("filter_tags").$type<string[]>().default([]), // "Top 10 in Whitefield", "Known for on-time delivery"
+  specialization: varchar("specialization", { 
+    enum: ["residential", "commercial", "mixed-use", "affordable-housing", "luxury-housing", "plotted-development"] 
+  }).default("residential"),
+  
+  // Optional SEO-Driven Fields
+  builderSlug: varchar("builder_slug").unique(), // prestige-group, sobha-ltd, etc.
+  seoMetaTitle: text("seo_meta_title"),
+  seoDescription: text("seo_description"), // 140-160 chars
+  
+  // Media and Social
   logo: varchar("logo"), // URL to logo image
   coverImage: varchar("cover_image"), // URL to cover image
-  socialMedia: json("social_media").default('{}'), // Social media links
+  socialMedia: json("social_media").$type<{
+    facebook?: string;
+    twitter?: string;
+    linkedin?: string;
+    instagram?: string;
+    youtube?: string;
+  }>().default({}),
+  
+  // System fields
   isActive: boolean("is_active").default(true),
   verificationStatus: varchar("verification_status", { 
     enum: ["pending", "verified", "rejected"] 
