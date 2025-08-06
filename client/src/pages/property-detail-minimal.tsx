@@ -11,6 +11,8 @@ import { usePayment } from '@/hooks/use-payment';
 import { updateMetaTags, generatePropertySchema, generatePropertySlug, injectSchema } from '@/utils/seo';
 import OrderFormDialog from '@/components/order-form-dialog';
 import { ExpertCredentials } from '@/components/expert-credentials';
+import { ExitIntentPopup } from '@/components/exit-intent-popup';
+import { FloatingActionButtons } from '@/components/floating-action-buttons';
 
 interface Property {
   id: string;
@@ -279,6 +281,55 @@ export default function PropertyDetailMinimal() {
 
   const handleConsult = () => {
     navigate('/consultation');
+  };
+
+  const handleShare = async () => {
+    if (!property) return;
+    
+    const propertyUrl = window.location.href;
+    const shareText = `🏠 *${property.name}*\n📍 ${property.area}, ${property.zone} Bengaluru\n🏗️ By ${property.developer}\n💰 ${getPriceRange()}\n\nView details: ${propertyUrl}`;
+    
+    const shareData = {
+      title: `${property.name} - Property in ${property.area}, ${property.zone} Bengaluru`,
+      text: shareText,
+      url: propertyUrl
+    };
+
+    try {
+      // Try native Web Share API first (mobile/modern browsers)
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+      
+      // Fallback: Copy to clipboard
+      await navigator.clipboard.writeText(propertyUrl);
+      toast({
+        title: "Link copied!",
+        description: "Property link copied to clipboard",
+      });
+    } catch (error) {
+      // Final fallback: Manual copy
+      const textArea = document.createElement('textarea');
+      textArea.value = propertyUrl;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      toast({
+        title: "Link copied!",
+        description: "Property link copied to clipboard",
+      });
+    }
+  };
+
+  const handleWhatsAppShare = () => {
+    if (!property) return;
+    
+    const propertyUrl = window.location.href;
+    const whatsappText = `🏠 *${property.name}*\n📍 ${property.area}, ${property.zone} Bengaluru\n🏗️ By ${property.developer}\n💰 ${getPriceRange()}\n\nView details: ${propertyUrl}`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   const getPriceRange = () => {
@@ -596,6 +647,26 @@ export default function PropertyDetailMinimal() {
 
   return (
     <div className="min-h-screen bg-white">
+      
+      {/* Floating Action Buttons */}
+      <FloatingActionButtons
+        property={property}
+        onShare={handleShare}
+        onWhatsApp={handleWhatsAppShare}
+        onFavorite={toggleFavorite}
+        isFavorite={isFavorite}
+      />
+
+      {/* Exit Intent Popup */}
+      <ExitIntentPopup 
+        title="Wait! Don't Miss This Property!"
+        description="Get a FREE Property Valuation Report worth ₹1,499 before you leave"
+        ctaText="Get FREE Report"
+        onAction={() => {
+          setOrderFormType('valuation');
+          setShowOrderForm(true);
+        }}
+      />
       {/* Header */}
       <div className="bg-white border-b sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -607,7 +678,7 @@ export default function PropertyDetailMinimal() {
             <Button variant="ghost" size="sm" onClick={toggleFavorite}>
               <Heart className={`h-5 w-5 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
             </Button>
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" onClick={handleShare}>
               <Share2 className="h-5 w-5 text-gray-600" />
             </Button>
           </div>
@@ -1734,6 +1805,75 @@ export default function PropertyDetailMinimal() {
                     <MessageCircle className="h-4 w-4 mr-2" />
                     Expert Consultation
                   </Button>
+                </CardContent>
+              </Card>
+
+              {/* Enhanced Contact & Action Card */}
+              <Card className="shadow-xl rounded-2xl border-2 border-blue-100">
+                <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-t-2xl">
+                  <CardTitle className="text-xl text-blue-900">Get Expert Assistance</CardTitle>
+                  <p className="text-sm text-blue-700">Speak with our property consultants</p>
+                </CardHeader>
+                <CardContent className="space-y-4 p-6">
+                  <Button 
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" 
+                    size="lg" 
+                    onClick={handleBookVisit}
+                    data-testid="button-schedule-site-visit"
+                  >
+                    <Calendar className="h-5 w-5 mr-2" />
+                    Schedule Site Visit
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-green-200 text-green-700 hover:bg-green-50" 
+                    size="lg" 
+                    onClick={handleWhatsAppShare}
+                    data-testid="button-whatsapp-inquiry"
+                  >
+                    <MessageCircle className="h-5 w-5 mr-2" />
+                    WhatsApp Inquiry
+                  </Button>
+                  
+                  <Separator className="my-4" />
+                  
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600 mb-3">Speak to our property consultant</p>
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-gray-200 hover:bg-gray-50"
+                      data-testid="button-phone-contact"
+                    >
+                      <Phone className="h-5 w-5 mr-2" />
+                      +91 98765 43210
+                    </Button>
+                  </div>
+
+                  {/* Quick Reports Access */}
+                  <Separator className="my-4" />
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-gray-900">Quick Report Access</p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full text-left justify-start border-orange-200 text-orange-700 hover:bg-orange-50"
+                      onClick={handleCivilMepReport}
+                      data-testid="button-civil-mep-report"
+                    >
+                      <Shield className="h-4 w-4 mr-2" />
+                      Civil & MEP Report - ₹2,499
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full text-left justify-start border-purple-200 text-purple-700 hover:bg-purple-50"
+                      onClick={handleValuationReport}
+                      data-testid="button-valuation-report"
+                    >
+                      <Award className="h-4 w-4 mr-2" />
+                      Property Valuation - ₹1,499
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </div>
