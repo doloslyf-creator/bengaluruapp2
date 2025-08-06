@@ -7,6 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { DataTransparencyFooter } from "@/components/data-transparency-footer";
+import { ExitIntentPopup } from "@/components/exit-intent-popup";
+import { FloatingActionButtons } from "@/components/floating-action-buttons";
+import { NotificationBanner } from "@/components/notification-banner";
 import { updateMetaTags, generateOrganizationSchema, injectSchema } from "@/utils/seo";
 import { 
   ArrowRight, 
@@ -24,7 +27,9 @@ import {
   Calculator,
   CheckCircle,
   Star,
-  Quote
+  Quote,
+  AlertTriangle,
+  Award
 } from "lucide-react";
 
 export default function Home() {
@@ -462,8 +467,155 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Live Activity Feed */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">🔴 Live Activity Feed</h3>
+            <p className="text-gray-600">See what other smart buyers are doing right now</p>
+          </div>
+          
+          <div className="space-y-4">
+            <div className="bg-white rounded-lg p-4 shadow-sm border-l-4 border-green-500 animate-fadeIn">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse"></div>
+                  <span className="font-medium">Ramesh K.</span>
+                  <span className="text-gray-600 ml-2">just ordered a Civil+MEP report for</span>
+                  <span className="font-semibold text-blue-600 ml-1">Prestige Lakeside Habitat</span>
+                </div>
+                <span className="text-xs text-gray-500">2 min ago</span>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-lg p-4 shadow-sm border-l-4 border-blue-500 animate-fadeIn">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full mr-3 animate-pulse"></div>
+                  <span className="font-medium">Priya S.</span>
+                  <span className="text-gray-600 ml-2">saved ₹3.2L using our valuation report in</span>
+                  <span className="font-semibold text-green-600 ml-1">Electronic City</span>
+                </div>
+                <span className="text-xs text-gray-500">5 min ago</span>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-lg p-4 shadow-sm border-l-4 border-purple-500 animate-fadeIn">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="w-3 h-3 bg-purple-500 rounded-full mr-3 animate-pulse"></div>
+                  <span className="font-medium">Amit & Kavya</span>
+                  <span className="text-gray-600 ml-2">found hidden legal issues in</span>
+                  <span className="font-semibold text-red-600 ml-1">Whitefield project</span>
+                  <span className="text-green-600 ml-1">- Crisis averted!</span>
+                </div>
+                <span className="text-xs text-gray-500">8 min ago</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="text-center mt-8">
+            <div className="inline-flex items-center bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm">
+              <TrendingUp className="h-4 w-4 mr-2" />
+              <span><strong>127 reports</strong> ordered in the last 24 hours</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Interactive Savings Calculator */}
+      <section className="py-20 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">💰 Calculate Your Potential Savings</h3>
+            <p className="text-gray-600">See how much you could save with professional property analysis</p>
+          </div>
+          
+          <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+              <div>
+                <h4 className="text-2xl font-bold text-gray-900 mb-6">Property Value Range</h4>
+                <div className="space-y-4">
+                  <button className="w-full text-left p-4 bg-white rounded-lg border-2 border-transparent hover:border-blue-500 transition-all duration-200 savings-option" data-value="50">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">₹30L - ₹60L</span>
+                      <span className="text-blue-600 font-bold">Save ₹1.5L - ₹3L</span>
+                    </div>
+                  </button>
+                  <button className="w-full text-left p-4 bg-white rounded-lg border-2 border-transparent hover:border-blue-500 transition-all duration-200 savings-option" data-value="80">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">₹60L - ₹1Cr</span>
+                      <span className="text-blue-600 font-bold">Save ₹3L - ₹5L</span>
+                    </div>
+                  </button>
+                  <button className="w-full text-left p-4 bg-white rounded-lg border-2 border-blue-500 bg-blue-50 savings-option" data-value="120">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">₹1Cr - ₹2Cr</span>
+                      <span className="text-blue-600 font-bold">Save ₹5L - ₹10L</span>
+                    </div>
+                  </button>
+                  <button className="w-full text-left p-4 bg-white rounded-lg border-2 border-transparent hover:border-blue-500 transition-all duration-200 savings-option" data-value="200">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">₹2Cr+</span>
+                      <span className="text-blue-600 font-bold">Save ₹10L+</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+              
+              <div className="text-center">
+                <div className="bg-white rounded-2xl p-8 shadow-lg">
+                  <div className="text-4xl mb-4">🎯</div>
+                  <h5 className="text-xl font-bold text-gray-900 mb-4">Your Potential Savings</h5>
+                  <div className="text-4xl font-bold text-green-600 mb-4" id="savings-amount">₹5L - ₹10L</div>
+                  <div className="text-sm text-gray-600 mb-6">
+                    Based on our analysis of <strong>2,847 properties</strong>
+                  </div>
+                  <Link href="/property-reports">
+                    <Button className="w-full bg-green-600 hover:bg-green-700 text-white h-12">
+                      <Shield className="h-4 w-4 mr-2" />
+                      Secure These Savings Now
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Risk Alert Banner */}
+      <section className="py-12 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center text-white">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-4 h-4 bg-white rounded-full mr-3 animate-ping"></div>
+              <h3 className="text-2xl font-bold">⚠️ HIGH RISK ALERT</h3>
+              <div className="w-4 h-4 bg-white rounded-full ml-3 animate-ping"></div>
+            </div>
+            <p className="text-lg mb-6">
+              <strong>89% of properties</strong> in Bangalore have at least one hidden issue. 
+              Don't be the next person to discover costly problems <strong>after</strong> purchase.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link href="/find-property">
+                <Button size="lg" className="bg-white text-red-600 hover:bg-gray-100 font-bold h-12 px-8">
+                  <AlertTriangle className="h-5 w-5 mr-2" />
+                  Check My Property Risk Now
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <DataTransparencyFooter />
       <Footer />
+      
+      {/* Interactive Elements */}
+      <NotificationBanner />
+      <ExitIntentPopup />
+      <FloatingActionButtons />
     </div>
   );
 }
