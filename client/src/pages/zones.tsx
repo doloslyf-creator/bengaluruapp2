@@ -21,35 +21,46 @@ export default function Zones() {
   });
 
   // Group properties by zone
-  const zoneData = properties.reduce((acc, property) => {
-    if (!acc[property.zone]) {
-      acc[property.zone] = {
-        zone: property.zone,
-        properties: [],
-        totalProjects: 0,
-        activeProjects: 0,
-        reraApproved: 0,
-        avgPrice: 0,
-        developers: new Set(),
-        types: new Set(),
-        areas: new Set(),
-      };
-    }
+  // Fetch zones data
+  const { data: zoneEntities = [] } = useQuery({
+    queryKey: ["/api/zones"],
+    queryFn: async () => {
+      const response = await fetch("/api/zones");
+      if (!response.ok) throw new Error("Failed to fetch zones");
+      return response.json();
+    },
+  });
+
+  // Fetch cities data
+  const { data: cities = [] } = useQuery({
+    queryKey: ["/api/cities"],
+    queryFn: async () => {
+      const response = await fetch("/api/cities");
+      if (!response.ok) throw new Error("Failed to fetch cities");
+      return response.json();
+    },
+  });
+
+  // Create zone data from actual zones and properties using zoneId
+  const zoneData = zoneEntities.reduce((acc: Record<string, any>, zone: any) => {
+    const zoneProperties = properties.filter((p: any) => p.zoneId === zone.id);
     
-    acc[property.zone].properties.push(property);
-    acc[property.zone].totalProjects += 1;
-    
-    if (property.status === "active" || property.status === "under-construction") {
-      acc[property.zone].activeProjects += 1;
-    }
-    
-    if (property.reraApproved) {
-      acc[property.zone].reraApproved += 1;
-    }
-    
-    acc[property.zone].developers.add(property.developer);
-    acc[property.zone].types.add(property.type);
-    acc[property.zone].areas.add(property.area);
+    acc[zone.id] = {
+      ...zone,
+      zone: zone.name, // Keep backward compatibility
+      properties: zoneProperties,
+      totalProjects: zoneProperties.length,
+      activeProjects: zoneProperties.filter((p: any) => 
+        p.status === "active" || p.status === "under-construction"
+      ).length,
+      reraApproved: zoneProperties.filter((p: any) => p.reraApproved).length,
+      avgPrice: zoneProperties.length > 0 ? 
+        zoneProperties.reduce((sum: number, p: any) => sum + (p.startingPrice || 0), 0) / zoneProperties.length : 0,
+      developers: new Set(zoneProperties.map((p: any) => p.developer)),
+      types: new Set(zoneProperties.map((p: any) => p.type)),
+      areas: new Set(zoneProperties.map((p: any) => p.area)),
+      cityName: cities.find((c: any) => c.id === zone.cityId)?.name || "Unknown City"
+    };
     
     return acc;
   }, {} as Record<string, any>);
@@ -69,10 +80,11 @@ export default function Zones() {
     }
   });
 
-  const zones = Object.values(zoneData).filter((zone: any) =>
-    (selectedZone === "all" || zone.zone === selectedZone) &&
+  const filteredZones = Object.values(zoneData).filter((zone: any) =>
+    (selectedZone === "all" || zone.id === selectedZone) &&
     (searchQuery === "" || 
      zone.zone.toLowerCase().includes(searchQuery.toLowerCase()) ||
+     zone.cityName.toLowerCase().includes(searchQuery.toLowerCase()) ||
      Array.from(zone.areas).some((area: any) => area.toLowerCase().includes(searchQuery.toLowerCase()))
     )
   );
@@ -81,7 +93,14 @@ export default function Zones() {
     return `₹${(price / 100).toFixed(1)} Cr`;
   };
 
-  const getZoneDescription = (zone: string) => {
+  const getZoneDescription = (zoneObj: any) => {
+    // Use zone description from database, or fallback to city-based description
+    if (zoneObj.description) {
+      return zoneObj.description;
+    }
+    
+    // Fallback descriptions based on zone name if no description in database
+    const zone = zoneObj.zone.toLowerCase();
     const descriptions: Record<string, string> = {
       north: "Emerging residential areas with good connectivity to the airport and upcoming metro lines.",
       south: "Premium residential zone with established IT corridors and excellent infrastructure.",
@@ -89,7 +108,7 @@ export default function Zones() {
       west: "Developing residential areas with upcoming infrastructure projects.",
       central: "Core city areas with established commercial and residential developments."
     };
-    return descriptions[zone] || "Residential development zone in Bengaluru.";
+    return descriptions[zone] || `Residential development zone in ${zoneObj.cityName || "the city"}.`;
   };
 
   if (propertiesLoading || configurationsLoading) {
@@ -230,7 +249,7 @@ export default function Zones() {
                 </div>
               ))}
             </div>
-          ) : zones.length === 0 ? (
+          ) : filteredZones.length === 0 ? (
             <div className="text-center py-12">
               <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">No zones found</h3>
@@ -240,15 +259,15 @@ export default function Zones() {
             </div>
           ) : (
             <div className="space-y-6">
-              {zones.map((zone: any) => (
-                <Card key={zone.zone} className="p-6">
+              {filteredZones.map((zone: any) => (
+                <Card key={zone.id} className="p-6">
                   <div className="flex items-start justify-between mb-6">
                     <div>
                       <h3 className="text-xl font-semibold text-gray-900 capitalize mb-2">
-                        {zone.zone} Bengaluru
+                        {zone.zone} {zone.cityName}
                       </h3>
                       <p className="text-sm text-gray-600 max-w-2xl">
-                        {getZoneDescription(zone.zone)}
+                        {getZoneDescription(zone)}
                       </p>
                     </div>
                     <Badge className="bg-primary/10 text-primary">

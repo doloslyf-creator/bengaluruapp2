@@ -36,6 +36,15 @@ export default function ZonesView() {
     },
   });
 
+  const { data: cities = [] } = useQuery({
+    queryKey: ["/api/cities"],
+    queryFn: async () => {
+      const response = await fetch("/api/cities");
+      if (!response.ok) throw new Error("Failed to fetch cities");
+      return response.json();
+    },
+  });
+
   const { data: properties = [] } = useQuery<any[]>({
     queryKey: ["/api/properties"],
   });
@@ -66,11 +75,19 @@ export default function ZonesView() {
     }
   };
 
-  // Count properties per zone
+  // Count properties per zone using zoneId
   const zonePropertyCounts = properties.reduce((acc: Record<string, number>, property: any) => {
-    acc[property.zone] = (acc[property.zone] || 0) + 1;
+    if (property.zoneId) {
+      acc[property.zoneId] = (acc[property.zoneId] || 0) + 1;
+    }
     return acc;
   }, {});
+
+  // Get city name by ID for display
+  const getCityName = (cityId: string) => {
+    const city = cities.find((c: any) => c.id === cityId);
+    return city?.name || "Unknown City";
+  };
 
   return (
     <AdminLayout title="View Zones">
@@ -149,9 +166,11 @@ export default function ZonesView() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Zone Name</TableHead>
-                      <TableHead>Description</TableHead>
+                      <TableHead>City</TableHead>
+                      <TableHead>Type</TableHead>
                       <TableHead>Properties</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead>Price Range</TableHead>
+                      <TableHead>Scores</TableHead>
                       <TableHead className="w-[50px]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -161,24 +180,56 @@ export default function ZonesView() {
                         <TableCell>
                           <div className="flex items-center space-x-2">
                             <MapPin className="h-4 w-4 text-gray-400" />
-                            <span className="font-medium">{zone.name}</span>
+                            <div>
+                              <span className="font-medium">{zone.name}</span>
+                              {zone.description && (
+                                <p className="text-xs text-gray-500 mt-1 truncate max-w-[200px]">
+                                  {zone.description}
+                                </p>
+                              )}
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <span className="text-gray-600">
-                            {zone.description || "No description provided"}
+                          <span className="text-gray-700">
+                            {getCityName(zone.cityId)}
                           </span>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className={
+                            zone.locationType === 'urban' ? 'bg-blue-50 text-blue-700' :
+                            zone.locationType === 'suburban' ? 'bg-green-50 text-green-700' :
+                            'bg-yellow-50 text-yellow-700'
+                          }>
+                            {zone.locationType || 'Urban'}
+                          </Badge>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center space-x-2">
                             <Building className="h-4 w-4 text-gray-400" />
-                            <span>{zonePropertyCounts[zone.name] || 0} properties</span>
+                            <span>{zonePropertyCounts[zone.id] || 0} properties</span>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className="bg-green-50 text-green-700">
-                            Active
-                          </Badge>
+                          {zone.priceRangeMin && zone.priceRangeMax ? (
+                            <span className="text-sm">
+                              ₹{zone.priceRangeMin}L - ₹{zone.priceRangeMax}L
+                            </span>
+                          ) : (
+                            <span className="text-gray-400 text-sm">Not set</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col space-y-1">
+                            <div className="flex items-center space-x-2 text-xs">
+                              <span className="text-gray-500">Infra:</span>
+                              <span className="font-medium">{zone.infrastructureScore || 5}/10</span>
+                            </div>
+                            <div className="flex items-center space-x-2 text-xs">
+                              <span className="text-gray-500">Conn:</span>
+                              <span className="font-medium">{zone.connectivityScore || 5}/10</span>
+                            </div>
+                          </div>
                         </TableCell>
                         <TableCell>
                           <DropdownMenu>
@@ -188,10 +239,12 @@ export default function ZonesView() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem>
-                                <Edit2 className="h-4 w-4 mr-2" />
-                                Edit Zone
-                              </DropdownMenuItem>
+                              <Link href={`/admin-panel/zones/edit/${zone.id}`}>
+                                <DropdownMenuItem>
+                                  <Edit2 className="h-4 w-4 mr-2" />
+                                  Edit Zone
+                                </DropdownMenuItem>
+                              </Link>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem 
                                 className="text-red-600"

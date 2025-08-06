@@ -157,6 +157,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/zones/:id", async (req, res) => {
+    try {
+      const zone = await storage.getZoneWithCity(req.params.id);
+      if (!zone) {
+        return res.status(404).json({ error: "Zone not found" });
+      }
+      res.json(zone);
+    } catch (error) {
+      console.error("Error fetching zone:", error);
+      res.status(500).json({ error: "Failed to fetch zone" });
+    }
+  });
+
   app.get("/api/zones/city/:cityId", async (req, res) => {
     try {
       const { cityId } = req.params;
@@ -1806,6 +1819,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/zones/:id", async (req, res) => {
     try {
       const validatedData = insertZoneSchema.partial().parse(req.body);
+      const updatedZone = await storage.updateZone(req.params.id, validatedData);
+      if (!updatedZone) {
+        return res.status(404).json({ error: "Zone not found" });
+      }
+      res.json(updatedZone);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Validation failed", details: error.errors });
+      }
+      console.error("Error updating zone:", error);
+      res.status(500).json({ error: "Failed to update zone" });
+    }
+  });
+
+  app.put("/api/zones/:id", async (req, res) => {
+    try {
+      const validatedData = insertZoneSchema.parse(req.body);
       const updatedZone = await storage.updateZone(req.params.id, validatedData);
       if (!updatedZone) {
         return res.status(404).json({ error: "Zone not found" });

@@ -19,6 +19,7 @@ import AdminAnalytics from "@/pages/admin/analytics";
 import AdminZones from "@/pages/admin/zones";
 import ZonesView from "@/pages/admin/zones-view";
 import ZonesAdd from "@/pages/admin/zones-add";
+import ZonesEdit from "@/pages/admin/zones-edit";
 import AdminDevelopers from "@/pages/admin/developers";
 import DevelopersView from "@/pages/admin/developers-view";
 import DevelopersAdd from "@/pages/admin/developers-add";
@@ -128,6 +129,7 @@ function ProtectedRouter() {
       <Route path="/admin-panel/zones" component={AdminZones} />
       <Route path="/admin-panel/zones/view" component={ZonesView} />
       <Route path="/admin-panel/zones/add" component={ZonesAdd} />
+      <Route path="/admin-panel/zones/edit/:id" component={ZonesEdit} />
 
 
       <Route path="/admin-panel/orders" component={Orders} />
