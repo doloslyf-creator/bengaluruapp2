@@ -1728,64 +1728,48 @@ export default function PropertyDetailMinimal() {
           <div className="lg:col-span-1">
             <div className="sticky top-32 space-y-6">
 
-              {/* Property Score - Moved to Sidebar */}
+              {/* Quick Navigation */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Award className="h-5 w-5 mr-2 text-yellow-500" />
+                  <CardTitle className="text-lg">Quick Navigation</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start"
+                    onClick={() => document.getElementById('configurations')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    Configurations
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start"
+                    onClick={() => document.getElementById('reports')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    Reports
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start"
+                    onClick={() => document.getElementById('pros-cons')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    Pros & Cons
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start"
+                    onClick={() => document.getElementById('buyer-match')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    Buyer Match
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start"
+                    onClick={() => document.getElementById('property-score')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
                     Property Score
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-4 text-center">
-                    <div>
-                      <div className="text-2xl font-bold text-blue-600 mb-1">
-                        {property.locationScore || 4}/5
-                      </div>
-                      <div className="text-sm text-gray-600">Location</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-green-600 mb-1">
-                        {property.amenitiesScore || 5}/5
-                      </div>
-                      <div className="text-sm text-gray-600">Amenities</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-orange-600 mb-1">
-                        {property.amenitiesScore || 4}/5
-                      </div>
-                      <div className="text-sm text-gray-600">Quality</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-purple-600 mb-1">
-                        {property.valueScore || 4}/5
-                      </div>
-                      <div className="text-sm text-gray-600">Value</div>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-gray-900 mb-1">
-                        {property.overallScore || '4.3'}/5
-                      </div>
-                      <div className="text-sm text-gray-600 mb-2">Overall Score</div>
-                      <Badge className="bg-yellow-100 text-yellow-800">
-                        {(property.overallScore || 4.3) >= 4.5 ? 'Excellent' : 
-                         (property.overallScore || 4.3) >= 4.0 ? 'Very Good' : 
-                         (property.overallScore || 4.3) >= 3.5 ? 'Good' : 'Average'}
-                      </Badge>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Action Panel */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Take Action</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
+                  </Button>
+                  <Separator className="my-3" />
                   <Button onClick={handleBookVisit} className="w-full" size="sm">
                     <Calendar className="h-4 w-4 mr-2" />
                     Book Site Visit
@@ -1794,51 +1778,6 @@ export default function PropertyDetailMinimal() {
                     <MessageCircle className="h-4 w-4 mr-2" />
                     Expert Consultation
                   </Button>
-                  <Button variant="outline" className="w-full" size="sm">
-                    <Download className="h-4 w-4 mr-2" />
-                    Download Brochure
-                  </Button>
-                  <Button variant="outline" onClick={toggleFavorite} className="w-full" size="sm">
-                    <Heart className={`h-4 w-4 mr-2 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
-                    {isFavorite ? 'Saved' : 'Save Property'}
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Report Access */}
-              <Card className="border-orange-200 bg-orange-50">
-                <CardHeader>
-                  <CardTitle className="text-lg text-orange-900">Professional Reports</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="text-center text-sm text-orange-800 mb-3">
-                    Get detailed analysis to make informed decisions
-                  </div>
-                  
-                  <Button 
-                    className="w-full bg-orange-600 hover:bg-orange-700" 
-                    size="sm"
-                    onClick={handleCivilMepReport}
-                    disabled={isProcessing}
-                  >
-                    <Lock className="h-4 w-4 mr-2" />
-                    {isProcessing ? 'Processing...' : 'Civil & MEP Report'}
-                  </Button>
-                  
-                  <Button 
-                    className="w-full bg-blue-600 hover:bg-blue-700" 
-                    size="sm"
-                    onClick={handleValuationReport}
-                    disabled={isProcessing}
-                  >
-                    <Lock className="h-4 w-4 mr-2" />
-                    {isProcessing ? 'Processing...' : 'Valuation Report'}
-                  </Button>
-                  
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-gray-900">₹2,499</div>
-                    <div className="text-xs text-gray-600">per report</div>
-                  </div>
                 </CardContent>
               </Card>
             </div>
