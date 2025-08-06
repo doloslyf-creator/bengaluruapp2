@@ -39,6 +39,17 @@ export default function BookVisit() {
   const property = (history.state?.property || {}) as any;
   const preferences = (history.state?.preferences || {}) as any;
 
+  // Function to navigate back to the property or property list
+  const navigateBack = () => {
+    if (property?.id) {
+      // Navigate back to the specific property page
+      navigate(`/property/${property.id}`);
+    } else {
+      // Navigate to find property page if no specific property
+      navigate('/find-property');
+    }
+  };
+
   const form = useForm<BookingForm>({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
@@ -208,11 +219,11 @@ export default function BookVisit() {
           <div className="flex items-center space-x-4">
             <Button 
               variant="ghost" 
-              onClick={() => navigate('/find-property/results')}
+              onClick={navigateBack}
               className="flex items-center space-x-2"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span>Back to Results</span>
+              <span>Back to Property</span>
             </Button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Book Site Visit</h1>
@@ -456,7 +467,7 @@ export default function BookVisit() {
                       <Button
                         type="button"
                         variant="outline"
-                        onClick={() => navigate('/find-property/results')}
+                        onClick={navigateBack}
                       >
                         Cancel
                       </Button>
