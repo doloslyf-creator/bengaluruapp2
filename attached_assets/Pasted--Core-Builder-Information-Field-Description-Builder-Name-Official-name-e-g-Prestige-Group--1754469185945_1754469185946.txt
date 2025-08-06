@@ -1,0 +1,70 @@
+🧱 Core Builder Information
+Field	Description
+🏗️ Builder Name	Official name (e.g., Prestige Group)
+🧾 Legal Entity	Registered company name (e.g., Prestige Estates Projects Ltd)
+🌐 Website	Official website
+📍 Headquarters	City, state of main office
+📞 Contact Details	Phone, email, office address
+📅 Founded Year	When the builder started
+🧑‍💼 Promoter(s)	Founders or key people
+
+🔢 Track Record
+Field	Description
+📊 Total Projects	Number of completed projects
+🏠 Ongoing Projects	Currently active builds
+🧱 Completed Projects	Projects handed over till date
+📍 Cities Operated In	List of cities/regions (for filtering/search)
+🏆 Flagship Projects	Showcase 3–5 major ones with photos/links
+🧾 Total Units Delivered	Cumulative residential units delivered
+
+🕐 Delivery Track Record
+Field	Description
+🕒 On-time Delivery %	Ratio of on-time vs delayed
+⚠️ Major Delays	Known delayed projects (name + reason optional)
+⏳ Avg. Delivery Delay	If any, in months
+🧑‍💼 Complaints History	Summary or count of legal disputes/customer issues
+
+🏢 Company Type & Market Positioning
+Field	Description
+🏦 Public / Private	Are they publicly listed or not
+📈 Stock Ticker	If applicable (e.g., NSE: PRESTIGE)
+🧩 Market Segment	Affordable / Mid-range / Luxury / Ultra-luxury
+🔧 In-house or Contracting	Do they use third-party contractors?
+💰 Funding Status	Bootstrap, PE-backed, listed, debt-ridden, etc.
+🔍 Audit History	Any financial audits, controversies, or CAs flagged
+
+🧱 Quality & Construction Practices
+Field	Description
+🧪 Civil Quality Rating	Optional internal score (1–5)
+🧰 In-house or Outsourced	Key verticals like MEP, waterproofing, interiors
+🛠️ Common Issues	Leaks, cracks, material failures
+✅ Certifications	IGBC, RERA, ISO, OC/CC compliance trends
+🧱 Technologies Used	Mivan, Precast, RCC, SmartTech, etc.
+📋 Vendor Network	Known vendors or PMC used (if any recurring)
+
+📜 Legal & Regulatory
+Field	Description
+🔎 RERA Registration No.	State-wise IDs (linked to projects)
+📄 Legal Red Flags	Known disputes, NGT issues, A-Khata issues
+📌 Project Approvals	BBMP, BDA, BMRDA, EC, Fire, Airport Authority
+📁 Litigations Summary	High-profile legal cases (optional field)
+
+⭐ Reputation & Reviews
+Field	Description
+⭐ Avg Customer Rating	Based on your internal scoring or GMB/Trustpilot
+💬 Client Feedback Highlights	2–3 representative quotes or review summaries
+🧠 Popular For	E.g., “Great clubhouse but slow possession,” “Responsive CRM”
+📺 Media Mentions	Awards, news articles, scandals, etc. (linkable)
+
+🔗 Crosslinking & Integration
+Field	Description
+🏘 Builder Project List	Auto-linked list of all projects by the builder
+🧭 City > Builder > Project	Navigation-friendly structure
+🔍 Filter Tags	“Top 10 in Whitefield”, “Known for on-time delivery” etc.
+
+Optional SEO-Driven Fields
+Field	Description
+📝 Builder Slug	prestige-group, sobha-ltd, etc.
+📈 Schema.org Markup	Use Organization + AggregateRating tags
+✍️ SEO Meta Title	“Prestige Group Projects in Bangalore
+📃 SEO Description	Short snippet (140–160 chars)
