@@ -1050,7 +1050,7 @@ export default function PropertyDetail() {
           <div className="lg:col-span-2 space-y-6">
             {/* Configuration Selector */}
             {property.configurations.length > 0 && (
-              <Card>
+              <Card id="configurations">
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <Building className="h-5 w-5 mr-2" />
@@ -1118,7 +1118,7 @@ export default function PropertyDetail() {
             )}
 
             {/* Property Details Tabs */}
-            <Card>
+            <Card id="overview">
               <CardContent className="p-0">
                 <Tabs defaultValue="overview" className="w-full">
                   <TabsList className="grid w-full grid-cols-4 rounded-none border-b">
@@ -1164,7 +1164,7 @@ export default function PropertyDetail() {
                     )}
                   </TabsContent>
                   
-                  <TabsContent value="amenities" className="p-6">
+                  <TabsContent value="amenities" id="amenities" className="p-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {Object.entries(amenityIcons).map(([amenity, IconComponent]) => (
                         <div key={amenity} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
@@ -1175,7 +1175,7 @@ export default function PropertyDetail() {
                     </div>
                   </TabsContent>
                   
-                  <TabsContent value="location" className="p-6 space-y-4">
+                  <TabsContent value="location" id="location" className="p-6 space-y-4">
                     <div>
                       <h4 className="font-medium mb-2">Address</h4>
                       <p className="text-gray-600">{property.address}</p>
@@ -1196,7 +1196,7 @@ export default function PropertyDetail() {
                     </div>
                   </TabsContent>
                   
-                  <TabsContent value="legal" className="p-4 space-y-4">
+                  <TabsContent value="legal" id="legal" className="p-4 space-y-4">
                     {/* Legal Verdict Badge */}
                     {property.legalVerdictBadge && (
                       <Card className="bg-success/10 border-success/20">
@@ -1510,14 +1510,50 @@ export default function PropertyDetail() {
             </div>
           </div>
 
-          {/* Right Sidebar */}
+          {/* Right Sidebar - Quick Navigation Only */}
           <div className="space-y-6">
-            {/* Contact Card */}
+            {/* Quick Navigation */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Get in Touch</CardTitle>
+                <CardTitle className="text-lg">Quick Navigation</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-2">
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start"
+                  onClick={() => document.getElementById('configurations')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  Configurations
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start"
+                  onClick={() => document.getElementById('overview')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  Overview
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start"
+                  onClick={() => document.getElementById('amenities')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  Amenities
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start"
+                  onClick={() => document.getElementById('location')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  Location
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start"
+                  onClick={() => document.getElementById('legal')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  Legal Details
+                </Button>
+                <Separator className="my-3" />
                 <Button className="w-full" onClick={handleBookVisit}>
                   <Eye className="h-4 w-4 mr-2" />
                   Schedule Site Visit
@@ -1526,14 +1562,6 @@ export default function PropertyDetail() {
                   <MessageCircle className="h-4 w-4 mr-2" />
                   Expert Consultation
                 </Button>
-                <Separator />
-                <div className="text-center">
-                  <p className="text-sm text-gray-600 mb-2">Speak to our property consultant</p>
-                  <Button variant="outline" className="w-full">
-                    <Phone className="h-4 w-4 mr-2" />
-                    +91 98765 43210
-                  </Button>
-                </div>
               </CardContent>
             </Card>
 
@@ -1543,86 +1571,7 @@ export default function PropertyDetail() {
 
 
 
-            {/* Property Score Widget */}
-            <Card className="card-stripe">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-medium text-foreground flex items-center">
-                  <Award className="h-4 w-4 mr-2 text-warning" />
-                  Property Score
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-1 pt-0">
-                <div className="text-center mb-2">
-                  <div className="text-xl text-warning font-bold">
-                    {property.overallScore ? Number(property.overallScore).toFixed(1) : (((property.locationScore || 4) + (property.amenitiesScore || 5) + (property.valueScore || 4)) / 3).toFixed(1)}
-                  </div>
-                  <div className="text-xs text-muted-foreground">Overall Rating</div>
-                </div>
-                <div className="space-y-1.5">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">Location</span>
-                    <div className="flex">
-                      {[1,2,3,4,5].map((star) => (
-                        <Star key={star} className={`h-3 w-3 ${star <= (property.locationScore || 4) ? 'text-warning fill-current' : 'text-muted'}`} />
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">Amenities</span>
-                    <div className="flex">
-                      {[1,2,3,4,5].map((star) => (
-                        <Star key={star} className={`h-3 w-3 ${star <= (property.amenitiesScore || 5) ? 'text-warning fill-current' : 'text-muted'}`} />
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">Value for Money</span>
-                    <div className="flex">
-                      {[1,2,3,4,5].map((star) => (
-                        <Star key={star} className={`h-3 w-3 ${star <= (property.valueScore || 4) ? 'text-warning fill-current' : 'text-muted'}`} />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
 
-            {/* Price Comparison Widget */}
-            <Card className="card-stripe">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-medium text-foreground flex items-center">
-                  <BarChart3 className="h-4 w-4 mr-2 text-primary" />
-                  Price Comparison
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 pt-0">
-                <div className="text-center p-3 bg-primary/5 rounded-lg border border-primary/20">
-                  <div className="text-xs text-muted-foreground">This Property</div>
-                  <div className="text-lg text-primary font-semibold">{getPriceRange()}</div>
-                </div>
-                <div className="space-y-1.5">
-                  <div className="flex justify-between items-center p-2 bg-muted/30 rounded-md">
-                    <span className="text-xs text-muted-foreground">Area Average</span>
-                    <span className="text-xs font-medium text-muted-foreground">
-                      {property.areaAvgPriceMin && property.areaAvgPriceMax 
-                        ? `₹${property.areaAvgPriceMin}L - ₹${property.areaAvgPriceMax}L`
-                        : "₹95L - ₹1.2Cr"
-                      }
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center p-2 bg-muted/30 rounded-md">
-                    <span className="text-xs text-muted-foreground">City Average</span>
-                    <span className="text-xs font-medium text-muted-foreground">
-                      {property.cityAvgPriceMin && property.cityAvgPriceMax 
-                        ? `₹${property.cityAvgPriceMin}L - ₹${property.cityAvgPriceMax}L`
-                        : "₹85L - ₹1.1Cr"
-                      }
-                    </span>
-                  </div>
-                </div>
-                <div className="p-2 bg-success/10 rounded-lg border border-success/20">
-                  <div className="flex items-center text-success text-xs font-medium">
-                    <TrendingUp className="h-3 w-3 mr-1" />
                     {property.priceComparison || "12% below area average - Great value!"}
                   </div>
                 </div>
