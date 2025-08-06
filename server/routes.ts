@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { registerEnhancedLeadRoutes } from "./enhancedLeadRoutes";
 import { registerBookingRoutes } from "./bookingRoutes";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
-import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertCivilMepReportSchema, insertLegalAuditReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, insertPropertyValuationReportSchema, insertPropertyValuationReportConfigurationSchema, insertZoneSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests, propertyValuationReportCustomers, propertyValuationReportConfigurations, userRoles, permissions, rolePermissions, userRoleAssignments, insertUserRoleSchema, insertPermissionSchema, insertRolePermissionSchema, insertUserRoleAssignmentSchema } from "@shared/schema";
+import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertCivilMepReportSchema, insertLegalAuditReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, insertPropertyValuationReportSchema, insertPropertyValuationReportConfigurationSchema, insertZoneSchema, insertCitySchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests, propertyValuationReportCustomers, propertyValuationReportConfigurations, userRoles, permissions, rolePermissions, userRoleAssignments, insertUserRoleSchema, insertPermissionSchema, insertRolePermissionSchema, insertUserRoleAssignmentSchema } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
@@ -143,6 +143,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching city with zones:", error);
       res.status(500).json({ error: "Failed to fetch city with zones" });
+    }
+  });
+
+  // Update city
+  app.put("/api/cities/:id", async (req, res) => {
+    try {
+      // Parse and validate the request body using the city schema
+      const cityData = insertCitySchema.partial().parse(req.body);
+      const { id } = req.params;
+      
+      const updatedCity = await storage.updateCity(id, cityData);
+      if (!updatedCity) {
+        return res.status(404).json({ error: "City not found" });
+      }
+      res.json(updatedCity);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Validation failed", details: error.errors });
+      }
+      console.error("Error updating city:", error);
+      res.status(500).json({ error: "Failed to update city" });
     }
   });
 
