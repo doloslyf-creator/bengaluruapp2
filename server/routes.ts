@@ -167,6 +167,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete city
+  app.delete("/api/cities/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deleted = await storage.deleteCity(id);
+      if (!deleted) {
+        return res.status(404).json({ error: "City not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting city:", error);
+      res.status(500).json({ error: "Failed to delete city" });
+    }
+  });
+
   // Zone routes
   app.get("/api/zones", async (req, res) => {
     try {
