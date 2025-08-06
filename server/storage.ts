@@ -50,6 +50,8 @@
   type InsertAppSettings,
   type TeamMember,
   type InsertTeamMember,
+  type Developer,
+  type InsertDeveloper,
   properties, 
   propertyConfigurations,
   propertyScores,
@@ -71,6 +73,7 @@
   customerNotes,
   appSettings,
   teamMembers,
+  developers,
 
 } from "@shared/schema";
 import { db } from "./db";
@@ -2665,6 +2668,60 @@ export class DatabaseStorage implements IStorage {
       approvedReports,
       avgScore,
       byRiskLevel
+    };
+  }
+
+  // Developer Management Methods
+  async getAllDevelopers(): Promise<Developer[]> {
+    const result = await db.select().from(developers).orderBy(desc(developers.createdAt));
+    return result;
+  }
+
+  async getDeveloper(id: string): Promise<Developer | null> {
+    const [result] = await db.select().from(developers).where(eq(developers.id, id));
+    return result || null;
+  }
+
+  async createDeveloper(data: InsertDeveloper): Promise<Developer> {
+    const [result] = await db.insert(developers)
+      .values({
+        ...data,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })
+      .returning();
+    return result;
+  }
+
+  async updateDeveloper(id: string, data: Partial<InsertDeveloper>): Promise<Developer | null> {
+    const [result] = await db.update(developers)
+      .set({
+        ...data,
+        updatedAt: new Date()
+      })
+      .where(eq(developers.id, id))
+      .returning();
+    return result || null;
+  }
+
+  async deleteDeveloper(id: string): Promise<boolean> {
+    const result = await db.delete(developers).where(eq(developers.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getDeveloperStats(): Promise<any> {
+    const allDevelopers = await this.getAllDevelopers();
+    const activeDevelopers = allDevelopers.filter(d => d.isActive).length;
+    const totalProjects = allDevelopers.reduce((sum, d) => sum + (d.totalProjects || 0), 0);
+    const avgRating = allDevelopers.length > 0 
+      ? allDevelopers.reduce((sum, d) => sum + parseFloat(d.averageRating || "0"), 0) / allDevelopers.length 
+      : 0;
+
+    return {
+      totalDevelopers: allDevelopers.length,
+      activeDevelopers,
+      totalProjects,
+      avgRating: Number(avgRating.toFixed(2))
     };
   }
 }

@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { registerEnhancedLeadRoutes } from "./enhancedLeadRoutes";
 import { registerBookingRoutes } from "./bookingRoutes";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
-import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertCivilMepReportSchema, insertLegalAuditReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, insertPropertyValuationReportSchema, insertPropertyValuationReportConfigurationSchema, insertZoneSchema, insertCitySchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests, propertyValuationReportCustomers, propertyValuationReportConfigurations, userRoles, permissions, rolePermissions, userRoleAssignments, insertUserRoleSchema, insertPermissionSchema, insertRolePermissionSchema, insertUserRoleAssignmentSchema } from "@shared/schema";
+import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertCivilMepReportSchema, insertLegalAuditReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, insertPropertyValuationReportSchema, insertPropertyValuationReportConfigurationSchema, insertZoneSchema, insertCitySchema, insertDeveloperSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests, propertyValuationReportCustomers, propertyValuationReportConfigurations, userRoles, permissions, rolePermissions, userRoleAssignments, insertUserRoleSchema, insertPermissionSchema, insertRolePermissionSchema, insertUserRoleAssignmentSchema } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
@@ -1914,44 +1914,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Developers API - Simple developers management  
+  // Developers API - Proper database-backed operations
   app.get("/api/developers", async (req, res) => {
     try {
-      // Return hardcoded developers for now - in production, would come from database
-      const developers = [
-        { 
-          id: "1", 
-          name: "Prestige Estates", 
-          description: "Premium residential and commercial developments",
-          phone: "+91 80 4933 0000",
-          email: "info@prestigeconstructions.com",
-          specialization: "Luxury Apartments & Villas"
-        },
-        { 
-          id: "2", 
-          name: "Brigade Group", 
-          description: "Diversified real estate conglomerate",
-          phone: "+91 80 4655 5000", 
-          email: "contact@brigade.co.in",
-          specialization: "Mixed-use Developments"
-        },
-        { 
-          id: "3", 
-          name: "Sobha Limited", 
-          description: "Backward integrated real estate player",
-          phone: "+91 80 4932 4050",
-          email: "enquiry@sobha.com", 
-          specialization: "Premium Residential"
-        },
-        { 
-          id: "4", 
-          name: "Embassy Group", 
-          description: "Real estate and hospitality conglomerate",
-          phone: "+91 80 4277 4000",
-          email: "info@embassygroup.in",
-          specialization: "Commercial & Residential"
-        }
-      ];
+      const developers = await storage.getAllDevelopers();
       res.json(developers);
     } catch (error) {
       console.error("Error fetching developers:", error);
@@ -1959,33 +1925,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/developers/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const developer = await storage.getDeveloper(id);
+      if (!developer) {
+        return res.status(404).json({ error: "Developer not found" });
+      }
+      res.json(developer);
+    } catch (error) {
+      console.error("Error fetching developer:", error);
+      res.status(500).json({ error: "Failed to fetch developer" });
+    }
+  });
+
   app.post("/api/developers", async (req, res) => {
     try {
-      const developerData = req.body;
-      // In production, would save to database
-      const newDeveloper = {
-        id: Date.now().toString(),
-        ...developerData,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
+      const developerData = insertDeveloperSchema.parse(req.body);
+      const newDeveloper = await storage.createDeveloper(developerData);
       console.log("Developer created:", newDeveloper);
-      res.json(newDeveloper);
+      res.status(201).json(newDeveloper);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Validation failed", details: error.errors });
+      }
       console.error("Error creating developer:", error);
       res.status(500).json({ error: "Failed to create developer" });
+    }
+  });
+
+  app.put("/api/developers/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updateData = insertDeveloperSchema.partial().parse(req.body);
+      const updatedDeveloper = await storage.updateDeveloper(id, updateData);
+      if (!updatedDeveloper) {
+        return res.status(404).json({ error: "Developer not found" });
+      }
+      res.json(updatedDeveloper);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Validation failed", details: error.errors });
+      }
+      console.error("Error updating developer:", error);
+      res.status(500).json({ error: "Failed to update developer" });
     }
   });
 
   app.delete("/api/developers/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      // In production, would delete from database
+      const deleted = await storage.deleteDeveloper(id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Developer not found" });
+      }
       console.log("Developer deleted:", id);
-      res.json({ success: true, message: "Developer deleted successfully" });
+      res.status(204).send();
     } catch (error) {
       console.error("Error deleting developer:", error);
       res.status(500).json({ error: "Failed to delete developer" });
+    }
+  });
+
+  app.get("/api/developers-stats", async (req, res) => {
+    try {
+      const stats = await storage.getDeveloperStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching developer stats:", error);
+      res.status(500).json({ error: "Failed to fetch developer stats" });
     }
   });
 

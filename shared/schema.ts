@@ -1353,6 +1353,45 @@ export const insertTeamMemberSchema = createInsertSchema(teamMembers).omit({
 export type InsertTeamMember = z.infer<typeof insertTeamMemberSchema>;
 export type TeamMember = typeof teamMembers.$inferSelect;
 
+// Developers table - property developers and builders
+export const developers = pgTable("developers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description"),
+  phone: varchar("phone", { length: 20 }),
+  email: varchar("email", { length: 255 }),
+  address: text("address"),
+  website: varchar("website"),
+  establishedYear: varchar("established_year", { length: 4 }),
+  specialization: varchar("specialization"),
+  totalProjects: integer("total_projects").default(0),
+  activeProjects: integer("active_projects").default(0),
+  completedProjects: integer("completed_projects").default(0),
+  averageRating: decimal("average_rating", { precision: 3, scale: 2 }).default("0.00"),
+  certifications: json("certifications").default('[]'), // Array of certifications
+  operatingCities: json("operating_cities").default('[]'), // Array of city IDs
+  logo: varchar("logo"), // URL to logo image
+  coverImage: varchar("cover_image"), // URL to cover image
+  socialMedia: json("social_media").default('{}'), // Social media links
+  isActive: boolean("is_active").default(true),
+  verificationStatus: varchar("verification_status", { 
+    enum: ["pending", "verified", "rejected"] 
+  }).default("pending"),
+  verifiedAt: timestamp("verified_at"),
+  verifiedBy: varchar("verified_by"), // Admin who verified
+  notes: text("notes"), // Internal admin notes
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertDeveloperSchema = createInsertSchema(developers).omit({ 
+  id: true, 
+  createdAt: true, 
+  updatedAt: true 
+});
+export type InsertDeveloper = z.infer<typeof insertDeveloperSchema>;
+export type Developer = typeof developers.$inferSelect;
+
 // Users table for authentication
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
