@@ -92,7 +92,8 @@ function PropertyReportCard({ property, onOrderReport }: PropertyReportCardProps
             <p className="text-gray-600 mb-2">by {property.developer}</p>
             <div className="flex items-center text-sm text-gray-600 mb-3">
               <MapPin className="w-4 h-4 mr-1" />
-              {property.locality}, {property.location}
+              {property.locality || property.location || property.area || "Location TBD"}
+              {property.locality && property.location && property.locality !== property.location && `, ${property.location}`}
             </div>
             <div className="text-2xl font-bold text-blue-600">
               {property.priceRange}
@@ -335,10 +336,12 @@ export default function PropertyReports() {
       return matchesSearch && matchesLocation;
     });
 
-    // Sort by location alphabetically
-    return filtered.sort((a: Property, b: Property) => 
-      (a.location || "").localeCompare(b.location || "")
-    );
+    // Sort by location alphabetically and limit to 2 results
+    return filtered
+      .sort((a: Property, b: Property) => 
+        (a.location || "").localeCompare(b.location || "")
+      )
+      .slice(0, 2); // Limit search results to maximum 2 properties
   }, [properties, searchQuery, selectedLocation, hasSearched]);
 
   // Get unique locations for filter
@@ -499,7 +502,7 @@ export default function PropertyReports() {
                 <div className="flex-1 relative">
                   <Search className="absolute left-4 top-4 h-5 w-5 text-gray-400" />
                   <Input
-                    placeholder="Search by property name or developer (e.g., Prestige, Brigade, Sobha...)"
+                    placeholder="Search by property name or developer (max 2 results shown)"
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
@@ -559,7 +562,7 @@ export default function PropertyReports() {
             {hasSearched && filteredProperties.length > 0 && (
               <div className="mt-6 text-center">
                 <Badge className="bg-green-100 text-green-800 px-4 py-2">
-                  Found {filteredProperties.length} properties matching your search
+                  Showing {filteredProperties.length} properties (limited to 2 for focused analysis)
                 </Badge>
               </div>
             )}
