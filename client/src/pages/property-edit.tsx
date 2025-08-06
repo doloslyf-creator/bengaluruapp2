@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { 
-  Building, Save, ArrowLeft, ChevronRight, Plus,
+  Building, Save, ArrowLeft, ChevronRight, Plus, Trash2,
   Home, MapPin, DollarSign, Calendar, Tag, Users,
   FileText, Image, Video, AlertCircle
 } from "lucide-react";
@@ -24,12 +24,20 @@ import AdminLayout from "@/components/layout/admin-layout";
 import { 
   type PropertyWithConfigurations,
   insertPropertySchema,
-  type Property 
+  insertPropertyConfigurationSchema,
+  type Property,
+  type PropertyConfiguration,
+  type InsertPropertyConfiguration
 } from "@shared/schema";
+
+const configurationSchema = insertPropertyConfigurationSchema.extend({
+  id: z.string().optional(),
+});
 
 const propertyFormSchema = insertPropertySchema.extend({
   tags: z.array(z.string()).optional(),
   images: z.array(z.string()).optional(),
+  configurations: z.array(configurationSchema).optional(),
 });
 
 type PropertyFormData = z.infer<typeof propertyFormSchema>;
@@ -68,7 +76,23 @@ export default function PropertyEdit() {
       brochureUrl: "",
       images: [],
       tags: [],
+      configurations: [{
+        propertyId: "",
+        configuration: "",
+        pricePerSqft: "0",
+        builtUpArea: 0,
+        plotSize: 0,
+        availabilityStatus: "available",
+        totalUnits: 0,
+        availableUnits: 0,
+        price: 0,
+      }],
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "configurations",
   });
 
   // Fetch cities for dropdown
@@ -137,17 +161,62 @@ export default function PropertyEdit() {
         youtubeVideoUrl: property.youtubeVideoUrl || "",
         videoUrl: property.youtubeVideoUrl || "",
         brochureUrl: property.brochureUrl || "",
+        configurations: property.configurations.length > 0 ? property.configurations.map(config => ({
+          id: config.id,
+          propertyId: config.propertyId,
+          configuration: config.configuration,
+          pricePerSqft: config.pricePerSqft,
+          builtUpArea: config.builtUpArea,
+          plotSize: config.plotSize || 0,
+          availabilityStatus: config.availabilityStatus,
+          totalUnits: config.totalUnits || 0,
+          availableUnits: config.availableUnits || 0,
+          price: config.price,
+        })) : [{
+          propertyId: id || "",
+          configuration: "",
+          pricePerSqft: "0",
+          builtUpArea: 0,
+          plotSize: 0,
+          availabilityStatus: "available" as const,
+          totalUnits: 0,
+          availableUnits: 0,
+          price: 0,
+        }]
       });
     }
   }, [property, form]);
 
   const updatePropertyMutation = useMutation({
     mutationFn: async (data: PropertyFormData) => {
-      const response = await apiRequest("PATCH", `/api/properties/${id}`, {
-        ...data,
+      const { configurations, ...propertyData } = data;
+      
+      // Update property
+      await apiRequest("PATCH", `/api/properties/${id}`, {
+        ...propertyData,
         tags: tags, // Use the current tags state
       });
-      return response.json();
+      
+      // Update configurations
+      if (configurations) {
+        for (const config of configurations) {
+          if (config.id) {
+            // Update existing configuration
+            await apiRequest("PATCH", `/api/property-configurations/${config.id}`, {
+              ...config,
+              propertyId: id,
+            });
+          } else {
+            // Create new configuration
+            await apiRequest("POST", "/api/property-configurations", {
+              ...config,
+              propertyId: id,
+            });
+          }
+        }
+      }
+      
+      return data;
     },
     onSuccess: () => {
       toast({
@@ -187,6 +256,27 @@ export default function PropertyEdit() {
       e.preventDefault();
       addTag();
     }
+  };
+
+  const addConfiguration = () => {
+    append({
+      propertyId: id || "",
+      configuration: "",
+      pricePerSqft: "0",
+      builtUpArea: 0,
+      plotSize: 0,
+      availabilityStatus: "available",
+      totalUnits: 0,
+      availableUnits: 0,
+      price: 0,
+    });
+  };
+
+  const calculatePrice = (index: number) => {
+    const builtUpArea = form.watch(`configurations.${index}.builtUpArea`);
+    const pricePerSqft = parseFloat(form.watch(`configurations.${index}.pricePerSqft`) || "0");
+    const totalPrice = Math.round((builtUpArea * pricePerSqft) / 100000); // Convert to lakhs
+    form.setValue(`configurations.${index}.price`, totalPrice);
   };
 
   if (isLoading) {
@@ -256,9 +346,10 @@ export default function PropertyEdit() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <Tabs value={currentTab} onValueChange={setCurrentTab}>
-                <TabsList className="grid w-full grid-cols-4">
+                <TabsList className="grid w-full grid-cols-5">
                   <TabsTrigger value="basic">Basic Info</TabsTrigger>
                   <TabsTrigger value="details">Details</TabsTrigger>
+                  <TabsTrigger value="configurations">Configurations</TabsTrigger>
                   <TabsTrigger value="media">Media</TabsTrigger>
                   <TabsTrigger value="tags">Tags</TabsTrigger>
                 </TabsList>
@@ -607,6 +698,213 @@ export default function PropertyEdit() {
                           </FormItem>
                         )}
                       />
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                {/* Configurations Tab */}
+                <TabsContent value="configurations" className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="flex items-center">
+                          <Users className="h-5 w-5 mr-2" />
+                          Property Configurations
+                        </CardTitle>
+                        <Button
+                          type="button"
+                          onClick={addConfiguration}
+                          size="sm"
+                          className="flex items-center"
+                        >
+                          <Plus className="h-4 w-4 mr-1" />
+                          Add Configuration
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      {fields.map((field, index) => (
+                        <div key={field.id} className="border border-border rounded-lg p-4">
+                          <div className="flex items-center justify-between mb-4">
+                            <h4 className="font-medium text-gray-900">Configuration {index + 1}</h4>
+                            {fields.length > 1 && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => remove(index)}
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <FormField
+                              control={form.control}
+                              name={`configurations.${index}.configuration`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Configuration Type *</FormLabel>
+                                  <FormControl>
+                                    <Input {...field} placeholder="e.g., 3BHK, 4BHK, Villa" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name={`configurations.${index}.pricePerSqft`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Price per Sqft (₹) *</FormLabel>
+                                  <FormControl>
+                                    <Input 
+                                      {...field} 
+                                      type="number"
+                                      step="0.01"
+                                      placeholder="0.00"
+                                      onChange={(e) => {
+                                        field.onChange(e);
+                                        setTimeout(() => calculatePrice(index), 100);
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name={`configurations.${index}.builtUpArea`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Built-up Area (Sqft) *</FormLabel>
+                                  <FormControl>
+                                    <Input 
+                                      {...field} 
+                                      type="number"
+                                      placeholder="0"
+                                      onChange={(e) => {
+                                        field.onChange(Number(e.target.value));
+                                        setTimeout(() => calculatePrice(index), 100);
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name={`configurations.${index}.plotSize`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Plot Size (Sqft)</FormLabel>
+                                  <FormControl>
+                                    <Input 
+                                      {...field} 
+                                      type="number"
+                                      placeholder="0 (optional for apartments)"
+                                      value={field.value || 0}
+                                      onChange={(e) => field.onChange(Number(e.target.value) || 0)}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name={`configurations.${index}.availabilityStatus`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Availability Status *</FormLabel>
+                                  <FormControl>
+                                    <Select onValueChange={field.onChange} value={field.value}>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Select status" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="available">Available</SelectItem>
+                                        <SelectItem value="sold-out">Sold Out</SelectItem>
+                                        <SelectItem value="coming-soon">Coming Soon</SelectItem>
+                                        <SelectItem value="limited">Limited</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name={`configurations.${index}.totalUnits`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Total Units</FormLabel>
+                                  <FormControl>
+                                    <Input 
+                                      {...field} 
+                                      type="number"
+                                      placeholder="0"
+                                      value={field.value || 0}
+                                      onChange={(e) => field.onChange(Number(e.target.value) || 0)}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name={`configurations.${index}.availableUnits`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Available Units</FormLabel>
+                                  <FormControl>
+                                    <Input 
+                                      {...field} 
+                                      type="number"
+                                      placeholder="0"
+                                      value={field.value || 0}
+                                      onChange={(e) => field.onChange(Number(e.target.value) || 0)}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name={`configurations.${index}.price`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Total Price (₹ Lakhs)</FormLabel>
+                                  <FormControl>
+                                    <Input 
+                                      {...field} 
+                                      type="number"
+                                      placeholder="Auto-calculated"
+                                      onChange={(e) => field.onChange(Number(e.target.value))}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        </div>
+                      ))}
                     </CardContent>
                   </Card>
                 </TabsContent>
