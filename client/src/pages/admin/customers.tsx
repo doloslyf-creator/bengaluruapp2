@@ -19,7 +19,9 @@ import {
   Target,
   Plus,
   Download,
-  Upload
+  Upload,
+  Edit2,
+  Trash2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -90,6 +92,14 @@ export default function Customers() {
     propertyType: "",
     location: "",
     notes: ""
+  });
+
+  const [editingCustomer, setEditingCustomer] = useState<CustomerProfile | null>(null);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    email: "",
+    phone: ""
   });
 
   const { data: customers = [], isLoading } = useQuery<CustomerProfile[]>({
@@ -199,6 +209,72 @@ export default function Customers() {
       });
     },
   });
+
+  const updateCustomerMutation = useMutation({
+    mutationFn: ({ customerId, data }: { customerId: string; data: typeof editForm }) => 
+      apiRequest("PUT", `/api/customers/${customerId}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/customers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/customers/stats"] });
+      setShowEditDialog(false);
+      setEditingCustomer(null);
+      toast({
+        title: "Customer Updated",
+        description: "Customer details have been updated successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update customer",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteCustomerMutation = useMutation({
+    mutationFn: (customerId: string) => 
+      apiRequest("DELETE", `/api/customers/${customerId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/customers"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/customers/stats"] });
+      toast({
+        title: "Customer Deleted",
+        description: "Customer has been deleted successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete customer",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleEditCustomer = (customer: CustomerProfile) => {
+    setEditingCustomer(customer);
+    setEditForm({
+      name: customer.name,
+      email: customer.email,
+      phone: customer.phone || ""
+    });
+    setShowEditDialog(true);
+  };
+
+  const handleDeleteCustomer = (customer: CustomerProfile) => {
+    if (window.confirm(`Are you sure you want to delete "${customer.name}"? This will permanently delete all their data including leads, bookings, and orders. This action cannot be undone.`)) {
+      deleteCustomerMutation.mutate(customer.id);
+    }
+  };
+
+  const handleUpdateCustomer = () => {
+    if (!editingCustomer) return;
+    updateCustomerMutation.mutate({
+      customerId: editingCustomer.id,
+      data: editForm
+    });
+  };
 
   const filteredCustomers = useMemo(() => {
     return customers.filter(customer => {
@@ -534,16 +610,36 @@ export default function Customers() {
                               {customer.lastActivity ? format(new Date(customer.lastActivity), 'MMM d, yyyy') : 'Never'}
                             </TableCell>
                             <TableCell>
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                onClick={() => {
-                                  setSelectedCustomer(customer);
-                                  setShowCustomerDialog(true);
-                                }}
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedCustomer(customer);
+                                    setShowCustomerDialog(true);
+                                  }}
+                                  data-testid={`button-view-customer-${customer.id}`}
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleEditCustomer(customer)}
+                                  data-testid={`button-edit-customer-${customer.id}`}
+                                >
+                                  <Edit2 className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleDeleteCustomer(customer)}
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  data-testid={`button-delete-customer-${customer.id}`}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))
@@ -741,6 +837,66 @@ export default function Customers() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Customer Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <Edit2 className="h-5 w-5 mr-2" />
+              Edit Customer
+            </DialogTitle>
+            <DialogDescription>
+              Update customer information
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+              <Input
+                value={editForm.name}
+                onChange={(e) => setEditForm({...editForm, name: e.target.value})}
+                placeholder="Customer name"
+                data-testid="input-edit-customer-name"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <Input
+                type="email"
+                value={editForm.email}
+                onChange={(e) => setEditForm({...editForm, email: e.target.value})}
+                placeholder="customer@email.com"
+                data-testid="input-edit-customer-email"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+              <Input
+                type="tel"
+                value={editForm.phone}
+                onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
+                placeholder="+91 9876543210"
+                data-testid="input-edit-customer-phone"
+              />
+            </div>
+            
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button variant="outline" onClick={() => setShowEditDialog(false)}>
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleUpdateCustomer} 
+                disabled={updateCustomerMutation.isPending}
+                data-testid="button-save-customer-edit"
+              >
+                {updateCustomerMutation.isPending ? "Updating..." : "Update Customer"}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </AdminLayout>

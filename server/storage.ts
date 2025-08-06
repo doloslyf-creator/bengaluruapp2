@@ -2370,11 +2370,72 @@ export class DatabaseStorage implements IStorage {
 
   async updateCustomerStatus(customerId: string, status: string): Promise<any> {
     // Update lead status if customer has leads
-    await db.update(this.leads)
+    await db.update(leads)
       .set({ leadType: status as any, updatedAt: new Date() })
-      .where(or(eq(this.leads.email, customerId), eq(this.leads.phone, customerId)));
+      .where(or(eq(leads.email, customerId), eq(leads.phone, customerId)));
     
     return { success: true, customerId, status };
+  }
+
+  async updateCustomerDetails(customerId: string, data: { name: string; email: string; phone?: string }): Promise<any> {
+    const { name, email, phone } = data;
+
+    // Update leads
+    await db.update(leads)
+      .set({ 
+        customerName: name, 
+        email: email,
+        phone: phone || null,
+        updatedAt: new Date() 
+      })
+      .where(or(eq(leads.email, customerId), eq(leads.phone, customerId)));
+
+    // Update bookings
+    await db.update(bookings)
+      .set({ 
+        customerName: name, 
+        customerEmail: email,
+        customerPhone: phone || null,
+        updatedAt: new Date() 
+      })
+      .where(or(eq(bookings.customerEmail, customerId), eq(bookings.customerPhone, customerId)));
+
+    // Update report payments
+    await db.update(reportPayments)
+      .set({ 
+        customerName: name, 
+        customerEmail: email,
+        customerPhone: phone || null,
+        updatedAt: new Date() 
+      })
+      .where(or(eq(reportPayments.customerEmail, customerId), eq(reportPayments.customerPhone, customerId)));
+
+    return { success: true, customerId, updatedData: data };
+  }
+
+  async deleteCustomer(customerId: string): Promise<boolean> {
+    try {
+      // Delete customer notes first (foreign key constraint)
+      await db.delete(customerNotes)
+        .where(eq(customerNotes.customerId, customerId));
+
+      // Delete associated leads
+      await db.delete(leads)
+        .where(or(eq(leads.email, customerId), eq(leads.phone, customerId)));
+
+      // Delete associated bookings
+      await db.delete(bookings)
+        .where(or(eq(bookings.customerEmail, customerId), eq(bookings.customerPhone, customerId)));
+
+      // Delete associated report payments
+      await db.delete(reportPayments)
+        .where(or(eq(reportPayments.customerEmail, customerId), eq(reportPayments.customerPhone, customerId)));
+
+      return true;
+    } catch (error) {
+      console.error("Error in deleteCustomer:", error);
+      return false;
+    }
   }
 
   // App Settings operations

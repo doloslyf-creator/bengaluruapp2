@@ -1816,6 +1816,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Customer CRM API - Update customer details
+  app.put("/api/customers/:customerId", async (req, res) => {
+    try {
+      const { customerId } = req.params;
+      const { name, email, phone } = req.body;
+      
+      if (!name || !email) {
+        return res.status(400).json({ error: "Name and email are required" });
+      }
+
+      // Update leads with the customer ID (email or phone)
+      await db.update(leadTable)
+        .set({ 
+          customerName: name, 
+          email: email,
+          phone: phone || null,
+          updatedAt: new Date() 
+        })
+        .where(or(eq(leadTable.email, customerId), eq(leadTable.phone, customerId)));
+
+      // Update bookings
+      await db.update(bookingTable)
+        .set({ 
+          customerName: name, 
+          customerEmail: email,
+          customerPhone: phone || null,
+          updatedAt: new Date() 
+        })
+        .where(or(eq(bookingTable.customerEmail, customerId), eq(bookingTable.customerPhone, customerId)));
+
+      // Update report payments
+      await db.update(reportPayments)
+        .set({ 
+          customerName: name, 
+          customerEmail: email,
+          customerPhone: phone || null,
+          updatedAt: new Date() 
+        })
+        .where(or(eq(reportPayments.customerEmail, customerId), eq(reportPayments.customerPhone, customerId)));
+
+      res.json({ 
+        success: true, 
+        customerId, 
+        message: "Customer updated successfully",
+        updatedData: { name, email, phone }
+      });
+    } catch (error) {
+      console.error("Error updating customer:", error);
+      res.status(500).json({ error: "Failed to update customer" });
+    }
+  });
+
+  // Customer CRM API - Delete customer
+  app.delete("/api/customers/:customerId", async (req, res) => {
+    try {
+      const { customerId } = req.params;
+      
+      // Delete customer notes first (foreign key constraint)
+      await db.delete(customerNotes)
+        .where(eq(customerNotes.customerId, customerId));
+
+      // Delete associated leads
+      const deletedLeads = await db.delete(leadTable)
+        .where(or(eq(leadTable.email, customerId), eq(leadTable.phone, customerId)));
+
+      // Delete associated bookings
+      const deletedBookings = await db.delete(bookingTable)
+        .where(or(eq(bookingTable.customerEmail, customerId), eq(bookingTable.customerPhone, customerId)));
+
+      // Delete associated report payments
+      const deletedPayments = await db.delete(reportPayments)
+        .where(or(eq(reportPayments.customerEmail, customerId), eq(reportPayments.customerPhone, customerId)));
+
+      console.log(`Customer deleted: ${customerId}`);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting customer:", error);
+      res.status(500).json({ error: "Failed to delete customer" });
+    }
+  });
+
   // Zones API - Database-driven zones management with city integration
   app.get("/api/zones", async (req, res) => {
     try {
