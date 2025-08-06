@@ -45,7 +45,7 @@ const developerSchema = z.object({
   totalUnitsDelivered: z.number().default(0),
   
   // Delivery Track Record
-  onTimeDeliveryPercent: z.number().optional(),
+  onTimeDeliveryPercent: z.string().optional(),
   avgDeliveryDelay: z.number().default(0),
   complaintsHistory: z.string().optional(),
   
@@ -69,7 +69,7 @@ const developerSchema = z.object({
   litigationsSummary: z.string().optional(),
   
   // Reputation & Reviews
-  averageRating: z.number().default(0),
+  averageRating: z.string().default("0"),
   popularFor: z.string().optional(),
   
   // Specialization
@@ -106,7 +106,7 @@ export default function DevelopersAdd() {
       completedProjects: 0,
       operatingCities: [],
       totalUnitsDelivered: 0,
-      onTimeDeliveryPercent: 0,
+      onTimeDeliveryPercent: "",
       avgDeliveryDelay: 0,
       complaintsHistory: "",
       companyType: "private",
@@ -122,7 +122,7 @@ export default function DevelopersAdd() {
       technologiesUsed: [],
       legalRedFlags: "",
       litigationsSummary: "",
-      averageRating: 0,
+      averageRating: "0",
       popularFor: "",
       specialization: "residential",
       builderSlug: "",
@@ -467,7 +467,6 @@ export default function DevelopersAdd() {
                                     type="number" 
                                     placeholder="e.g., 85"
                                     {...field}
-                                    onChange={e => field.onChange(Number(e.target.value) || undefined)}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -755,7 +754,6 @@ export default function DevelopersAdd() {
                                     max="5"
                                     placeholder="e.g., 4.2"
                                     {...field}
-                                    onChange={e => field.onChange(Number(e.target.value) || 0)}
                                   />
                                 </FormControl>
                                 <FormMessage />
