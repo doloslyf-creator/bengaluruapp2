@@ -1534,13 +1534,29 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteProperty(id: string): Promise<boolean> {
-    // Delete associated configurations first
-    await db.delete(propertyConfigurations).where(eq(propertyConfigurations.propertyId, id));
-    // Delete associated property scores
-    await db.delete(propertyScores).where(eq(propertyScores.propertyId, id));
-    
-    const result = await db.delete(properties).where(eq(properties.id, id));
-    return result.rowCount > 0;
+    try {
+      // Delete all related data that references this property to avoid foreign key constraint violations
+      
+      // Delete property configurations
+      await db.delete(propertyConfigurations).where(eq(propertyConfigurations.propertyId, id));
+      
+      // Delete property scores 
+      await db.delete(propertyScores).where(eq(propertyScores.propertyId, id));
+      
+      // Delete report payments that reference this property
+      await db.delete(reportPayments).where(eq(reportPayments.propertyId, id));
+      
+      // Delete bookings that reference this property
+      await db.delete(bookings).where(eq(bookings.propertyId, id));
+      
+      // Finally delete the property itself
+      const result = await db.delete(properties).where(eq(properties.id, id));
+      return result.rowCount > 0;
+      
+    } catch (error) {
+      console.error("Error deleting property and related data:", error);
+      throw error;
+    }
   }
 
   // Property Scoring operations
