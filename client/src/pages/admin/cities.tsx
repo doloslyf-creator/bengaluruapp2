@@ -22,7 +22,8 @@ export default function AdminCities() {
   const deleteCityMutation = useMutation({
     mutationFn: async (cityId: string) => {
       const response = await apiRequest("DELETE", `/api/cities/${cityId}`);
-      return response.json();
+      // DELETE returns 204 with no content, so don't try to parse JSON
+      return response.ok;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/cities"] });
