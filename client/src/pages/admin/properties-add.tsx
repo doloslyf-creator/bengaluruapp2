@@ -55,6 +55,7 @@ export default function PropertiesAdd() {
       amenities: "",
       highlights: "",
       videoUrl: "",
+      brochureUrl: "",
       images: [],
       tags: [],
     },
@@ -497,6 +498,23 @@ export default function PropertiesAdd() {
                             <FormControl>
                               <Input
                                 placeholder="https://www.youtube.com/watch?v=..."
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="brochureUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Property Brochure URL</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="https://example.com/brochure.pdf"
                                 {...field}
                               />
                             </FormControl>

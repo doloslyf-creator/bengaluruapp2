@@ -988,9 +988,14 @@ export default function PropertyDetailMinimal() {
                     <MessageCircle className="h-4 w-4 mr-2" />
                     Get Expert Advice
                   </Button>
-                  <Button variant="outline" className="flex-1 min-w-48">
+                  <Button 
+                    variant="outline" 
+                    className="flex-1 min-w-48"
+                    onClick={() => property.brochureUrl ? window.open(property.brochureUrl, '_blank') : null}
+                    disabled={!property.brochureUrl}
+                  >
                     <Download className="h-4 w-4 mr-2" />
-                    Download Brochure
+                    {property.brochureUrl ? 'Download Brochure' : 'Brochure Not Available'}
                   </Button>
                 </div>
               </div>

@@ -117,6 +117,7 @@ export const properties = pgTable("properties", {
   images: json("images").$type<string[]>().notNull().default([]),
   videos: json("videos").$type<string[]>().notNull().default([]),
   youtubeVideoUrl: text("youtube_video_url"), // YouTube video URL for property overview
+  brochureUrl: text("brochure_url"), // URL to downloadable property brochure/PDF
   
 
   
