@@ -167,6 +167,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create new city
+  app.post("/api/cities", async (req, res) => {
+    try {
+      const cityData = insertCitySchema.parse(req.body);
+      const city = await storage.createCity(cityData);
+      res.status(201).json(city);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Validation failed", details: error.errors });
+      }
+      console.error("Error creating city:", error);
+      res.status(500).json({ error: "Failed to create city" });
+    }
+  });
+
   // Delete city
   app.delete("/api/cities/:id", async (req, res) => {
     try {
