@@ -94,7 +94,14 @@ export default function ZonesAdd() {
   });
 
   const onSubmit = (data: ZoneFormData) => {
-    createZoneMutation.mutate(data);
+    // Convert numeric fields to strings for decimal database fields
+    const transformedData = {
+      ...data,
+      appreciationRate: data.appreciationRate ? data.appreciationRate.toString() : undefined,
+      rentalYield: data.rentalYield ? data.rentalYield.toString() : undefined,
+      area: data.area ? data.area.toString() : undefined,
+    } as any; // Type assertion to handle decimal field conversion
+    createZoneMutation.mutate(transformedData);
   };
 
   return (
