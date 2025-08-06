@@ -21,6 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 
 import { formatPriceDisplay } from "@/lib/utils";
 import { type Property, type PropertyConfiguration } from "@shared/schema";
+import { PropertyGallery } from "@/components/property/property-gallery";
 
 
 import { Skeleton, PropertyDetailHeaderSkeleton } from "@/components/ui/skeleton";
@@ -852,128 +853,14 @@ export default function PropertyDetail() {
 }
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Main Media - Combined Video and Image Slider */}
+            {/* Enhanced Property Gallery */}
             <div className="lg:col-span-2">
-              {(() => {
-                // Combine video and images into single media array
-                const mediaItems = [];
-                if (property.youtubeVideoUrl) {
-                  mediaItems.push({ type: 'video', url: property.youtubeVideoUrl });
-                }
-                if (property.images && property.images.length > 0) {
-                  property.images.forEach(image => {
-                    mediaItems.push({ type: 'image', url: image });
-                  });
-                }
-                
-                // If no media, show placeholder
-                if (mediaItems.length === 0) {
-                  return (
-                    <div className="relative aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden">
-                      <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                        <div className="text-center">
-                          <Camera className="h-16 w-16 mx-auto mb-4" />
-                          <p className="text-xl font-medium">Property Media</p>
-                          <p className="text-sm">Photos and videos coming soon</p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                }
-
-                const currentMedia = mediaItems[activeMediaIndex];
-                
-                return (
-                  <div className="relative">
-                    {/* Main Media Display */}
-                    <div className="relative aspect-video rounded-lg overflow-hidden bg-black">
-                      {currentMedia.type === 'video' ? (
-                        <iframe
-                          src={`https://www.youtube.com/embed/${extractYouTubeVideoId(currentMedia.url)}`}
-                          title="Property Overview Video"
-                          className="w-full h-full"
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                      ) : (
-                        <img 
-                          src={currentMedia.url} 
-                          alt={`Property view ${activeMediaIndex + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-                      
-                      {/* Navigation Arrows */}
-                      {mediaItems.length > 1 && (
-                        <>
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white"
-                            onClick={() => setActiveMediaIndex(activeMediaIndex === 0 ? mediaItems.length - 1 : activeMediaIndex - 1)}
-                          >
-                            <ChevronLeft className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white"
-                            onClick={() => setActiveMediaIndex(activeMediaIndex === mediaItems.length - 1 ? 0 : activeMediaIndex + 1)}
-                          >
-                            <ChevronRight className="h-4 w-4" />
-                          </Button>
-                        </>
-                      )}
-                      
-                      {/* Media Type Indicator */}
-                      <div className="absolute top-4 left-4">
-                        <Badge variant="secondary" className="bg-black/50 text-white">
-                          {currentMedia.type === 'video' ? (
-                            <><Play className="h-3 w-3 mr-1" /> Video</>
-                          ) : (
-                            <><Camera className="h-3 w-3 mr-1" /> Photo {activeMediaIndex + (property.youtubeVideoUrl ? 0 : 1)}</>
-                          )}
-                        </Badge>
-                      </div>
-                      
-                      {/* Media Counter */}
-                      <div className="absolute top-4 right-4">
-                        <Badge variant="secondary" className="bg-black/50 text-white">
-                          {activeMediaIndex + 1} / {mediaItems.length}
-                        </Badge>
-                      </div>
-                    </div>
-                    
-                    {/* Thumbnail Navigation */}
-                    {mediaItems.length > 1 && (
-                      <div className="mt-4 flex space-x-2 overflow-x-auto pb-2">
-                        {mediaItems.map((media, index) => (
-                          <button
-                            key={index}
-                            className={`flex-shrink-0 relative w-20 h-12 rounded border-2 overflow-hidden ${
-                              index === activeMediaIndex ? 'border-primary' : 'border-gray-200'
-                            }`}
-                            onClick={() => setActiveMediaIndex(index)}
-                          >
-                            {media.type === 'video' ? (
-                              <div className="w-full h-full bg-black flex items-center justify-center">
-                                <Play className="h-4 w-4 text-white" />
-                              </div>
-                            ) : (
-                              <img 
-                                src={media.url} 
-                                alt={`Thumbnail ${index + 1}`}
-                                className="w-full h-full object-cover"
-                              />
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}
+              <PropertyGallery
+                images={property.images || []}
+                videos={property.youtubeVideoUrl ? [property.youtubeVideoUrl] : []}
+                propertyName={property.name}
+                className="w-full"
+              />
             </div>
 
             {/* Property Quick Info */}

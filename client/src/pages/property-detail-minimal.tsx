@@ -12,6 +12,7 @@ import { updateMetaTags, generatePropertySchema, generatePropertySlug, injectSch
 import OrderFormDialog from '@/components/order-form-dialog';
 import { ExpertCredentials } from '@/components/expert-credentials';
 import { ExitIntentPopup } from '@/components/exit-intent-popup';
+import { PropertyGallery } from '@/components/property/property-gallery';
 
 interface Property {
   id: string;
@@ -691,50 +692,13 @@ export default function PropertyDetailMinimal() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Images/Video */}
           <div className="space-y-4">
-            {/* Main Image/Video */}
-            <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-100">
-              {showVideo && property.youtubeVideoUrl ? (
-                <iframe 
-                  src={`https://www.youtube.com/embed/${property.youtubeVideoUrl.split('v=')[1]?.split('&')[0]}`}
-                  className="w-full h-full"
-                  allowFullScreen
-                />
-              ) : (
-                <>
-                  {property.images && property.images.length > 0 ? (
-                    <img 
-                      src={property.images[0]} 
-                      alt={property.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full bg-gray-200">
-                      <Camera className="h-12 w-12 text-gray-400" />
-                    </div>
-                  )}
-                  {property.youtubeVideoUrl && (
-                    <Button 
-                      onClick={() => setShowVideo(true)}
-                      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/90 text-black hover:bg-white"
-                    >
-                      <Play className="h-5 w-5 mr-2" />
-                      Watch Video
-                    </Button>
-                  )}
-                </>
-              )}
-            </div>
-
-            {/* Thumbnail Gallery */}
-            {property.images && property.images.length > 1 && (
-              <div className="grid grid-cols-4 gap-2">
-                {property.images.slice(1, 5).map((image, index) => (
-                  <div key={index} className="aspect-video rounded overflow-hidden">
-                    <img src={image} alt={`${property.name} ${index + 2}`} className="w-full h-full object-cover" />
-                  </div>
-                ))}
-              </div>
-            )}
+            {/* Enhanced Property Gallery */}
+            <PropertyGallery
+              images={property.images || []}
+              videos={property.youtubeVideoUrl ? [property.youtubeVideoUrl] : []}
+              propertyName={property.name}
+              className="w-full"
+            />
           </div>
 
           {/* Property Info */}

@@ -1,4 +1,4 @@
-import { Calendar, MapPin, Edit, Trash2, IndianRupee } from "lucide-react";
+import { Calendar, MapPin, Edit, Trash2, IndianRupee, Play } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -78,10 +78,31 @@ export function PropertyCard({ property, onClick, onDelete }: PropertyCardProps)
       onClick={onClick}
     >
       <div className="aspect-video bg-gradient-to-br from-muted to-muted/50 rounded-t-xl flex items-center justify-center relative overflow-hidden">
-        <div className="text-muted-foreground text-center group-hover:scale-110 transition-stripe">
-          <div className="text-3xl mb-2">🏢</div>
-          <p className="text-body-small font-medium">Property Image</p>
-        </div>
+        {property.images && property.images.length > 0 ? (
+          <>
+            <img 
+              src={property.images[0]} 
+              alt={property.name}
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            />
+            {property.images.length > 1 && (
+              <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                +{property.images.length - 1} more
+              </div>
+            )}
+            {property.youtubeVideoUrl && (
+              <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded flex items-center">
+                <Play className="h-3 w-3 mr-1" />
+                Video
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="text-muted-foreground text-center group-hover:scale-110 transition-stripe">
+            <div className="text-3xl mb-2">🏢</div>
+            <p className="text-body-small font-medium">Property Image</p>
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-stripe"></div>
       </div>
       
@@ -91,7 +112,7 @@ export function PropertyCard({ property, onClick, onDelete }: PropertyCardProps)
             <h3 className="text-heading-3 text-foreground mb-2 group-hover:text-primary transition-stripe">{property.name}</h3>
             <p className="text-body-small text-muted-foreground flex items-center">
               <MapPin className="h-4 w-4 mr-2" />
-              {property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)} Bengaluru
+              {property.area}, {property.zone ? property.zone.charAt(0).toUpperCase() + property.zone.slice(1) : 'Bengaluru'} Bengaluru
             </p>
           </div>
           <Badge className={`${statusColors[property.status]} font-medium px-3 py-1 rounded-lg`}>
