@@ -92,6 +92,9 @@ import {
   civilMepReportAssignments,
   legalReportAssignments,
   propertyValuationReportAssignments,
+  reraData,
+  InsertReraData,
+  ReraData
 
 } from "@shared/schema";
 import { db } from "./db";
@@ -993,12 +996,12 @@ export class MemStorage implements IStorage {
   async updateLeadScore(leadId: string, score: number, notes?: string): Promise<Lead | undefined> {
     const updated = await this.updateLead(leadId, { 
       leadScore: score,
-      qualificationNotes: notes || lead.qualificationNotes 
+      qualificationNotes: notes || (await this.getLead(leadId))?.qualificationNotes 
     });
 
-    if (notes) {
+    if (notes && updated) {
       await this.addLeadNote({
-        leadId: lead.id,
+        leadId: updated.id,
         content: `Lead score updated to ${score}. ${notes}`,
         noteType: "qualification",
         createdBy: "system",
@@ -1021,12 +1024,14 @@ export class MemStorage implements IStorage {
       qualificationNotes: notes
     });
 
-    await this.addLeadNote({
-      leadId: lead.id,
-      content: `Lead ${qualified ? 'qualified' : 'disqualified'}: ${notes}`,
-      noteType: "qualification",
-      createdBy: "system",
-    });
+    if (updated) {
+      await this.addLeadNote({
+        leadId: updated.id,
+        content: `Lead ${qualified ? 'qualified' : 'disqualified'}: ${notes}`,
+        noteType: "qualification",
+        createdBy: "system",
+      });
+    }
 
     return updated;
   }
@@ -1393,6 +1398,8 @@ export class MemStorage implements IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  // Placeholder for db instance, assuming it's initialized elsewhere or passed in
+  private db = db;
 
   // Enhanced lead filtering
   async getEnhancedLeads(filters: {
@@ -1404,7 +1411,7 @@ export class DatabaseStorage implements IStorage {
     assignedTo?: string;
     dateRange?: string;
   }): Promise<LeadWithDetails[]> {
-    let query = db.select().from(leads);
+    let query = this.db.select().from(leads);
 
     // Build where conditions based on filters
     const conditions = [];
@@ -1423,6 +1430,11 @@ export class DatabaseStorage implements IStorage {
 
     if (filters.assignedTo && filters.assignedTo !== "all") {
       conditions.push(eq(leads.assignedTo, filters.assignedTo));
+    }
+
+    // Filter by smartTags if provided
+    if (filters.smartTags && filters.smartTags.length > 0) {
+      conditions.push(like(leads.smartTags, `%${filters.smartTags.join('%')}%`));
     }
 
     if (conditions.length > 0) {
@@ -1445,30 +1457,30 @@ export class DatabaseStorage implements IStorage {
 
   // Enhanced lead operations
   async addLeadTimeline(timeline: InsertLeadTimeline): Promise<LeadTimeline> {
-    const [result] = await db.insert(leadTimeline).values(timeline).returning();
+    const [result] = await this.db.insert(leadTimeline).values(timeline).returning();
     return result;
   }
 
   async getLeadTimeline(leadId: string): Promise<LeadTimeline[]> {
-    return await db.select().from(leadTimeline).where(eq(leadTimeline.leadId, leadId));
+    return await this.db.select().from(leadTimeline).where(eq(leadTimeline.leadId, leadId));
   }
 
   async addLeadDocument(document: InsertLeadDocument): Promise<LeadDocument> {
-    const [result] = await db.insert(leadDocuments).values(document).returning();
+    const [result] = await this.db.insert(leadDocuments).values(document).returning();
     return result;
   }
 
   async getLeadDocuments(leadId: string): Promise<LeadDocument[]> {
-    return await db.select().from(leadDocuments).where(eq(leadDocuments.leadId, leadId));
+    return await this.db.select().from(leadDocuments).where(eq(leadDocuments.leadId, leadId));
   }
   // City CRUD operations
   async getCity(id: string): Promise<City | undefined> {
-    const result = await db.select().from(cities).where(eq(cities.id, id)).limit(1);
+    const result = await this.db.select().from(cities).where(eq(cities.id, id)).limit(1);
     return result[0];
   }
 
   async getAllCities(): Promise<City[]> {
-    return await db.select().from(cities).where(eq(cities.isActive, true)).orderBy(cities.displayOrder, cities.name);
+    return await this.db.select().from(cities).where(eq(cities.isActive, true)).orderBy(cities.displayOrder, cities.name);
   }
 
   async getCityWithZones(id: string): Promise<CityWithZones | undefined> {
@@ -1480,32 +1492,32 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCity(city: InsertCity): Promise<City> {
-    const result = await db.insert(cities).values(city).returning();
+    const result = await this.db.insert(cities).values(city).returning();
     return result[0];
   }
 
   async updateCity(id: string, city: Partial<InsertCity>): Promise<City | undefined> {
-    const result = await db.update(cities).set(city).where(eq(cities.id, id)).returning();
+    const result = await this.db.update(cities).set(city).where(eq(cities.id, id)).returning();
     return result[0];
   }
 
   async deleteCity(id: string): Promise<boolean> {
-    const result = await db.delete(cities).where(eq(cities.id, id));
+    const result = await this.db.delete(cities).where(eq(cities.id, id));
     return result.rowCount > 0;
   }
 
   // Zone CRUD operations
   async getZone(id: string): Promise<Zone | undefined> {
-    const result = await db.select().from(zones).where(eq(zones.id, id)).limit(1);
+    const result = await this.db.select().from(zones).where(eq(zones.id, id)).limit(1);
     return result[0];
   }
 
   async getAllZones(): Promise<Zone[]> {
-    return await db.select().from(zones).where(eq(zones.isActive, true)).orderBy(zones.displayOrder, zones.name);
+    return await this.db.select().from(zones).where(eq(zones.isActive, true)).orderBy(zones.displayOrder, zones.name);
   }
 
   async getZonesByCity(cityId: string): Promise<Zone[]> {
-    return await db.select().from(zones).where(and(eq(zones.cityId, cityId), eq(zones.isActive, true))).orderBy(zones.displayOrder, zones.name);
+    return await this.db.select().from(zones).where(and(eq(zones.cityId, cityId), eq(zones.isActive, true))).orderBy(zones.displayOrder, zones.name);
   }
 
   async getZoneWithProperties(id: string): Promise<ZoneWithProperties | undefined> {
@@ -1519,17 +1531,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createZone(zone: InsertZone): Promise<Zone> {
-    const result = await db.insert(zones).values(zone).returning();
+    const result = await this.db.insert(zones).values(zone).returning();
     return result[0];
   }
 
   async updateZone(id: string, zone: Partial<InsertZone>): Promise<Zone | undefined> {
-    const result = await db.update(zones).set(zone).where(eq(zones.id, id)).returning();
+    const result = await this.db.update(zones).set(zone).where(eq(zones.id, id)).returning();
     return result[0];
   }
 
   async deleteZone(id: string): Promise<boolean> {
-    const result = await db.delete(zones).where(eq(zones.id, id));
+    const result = await this.db.delete(zones).where(eq(zones.id, id));
     return result.rowCount > 0;
   }
 
@@ -1544,7 +1556,7 @@ export class DatabaseStorage implements IStorage {
 
   // Property CRUD operations - Updated for city-wise structure
   async getProperty(id: string): Promise<Property | undefined> {
-    const [property] = await db.select().from(properties).where(eq(properties.id, id));
+    const [property] = await this.db.select().from(properties).where(eq(properties.id, id));
     return property || undefined;
   }
 
@@ -1559,22 +1571,22 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPropertiesByCity(cityId: string): Promise<Property[]> {
-    return await db.select().from(properties).where(eq(properties.cityId, cityId)).orderBy(desc(properties.createdAt));
+    return await this.db.select().from(properties).where(eq(properties.cityId, cityId)).orderBy(desc(properties.createdAt));
   }
 
   async getPropertiesByZone(zoneId: string): Promise<Property[]> {
-    return await db.select().from(properties).where(eq(properties.zoneId, zoneId)).orderBy(desc(properties.createdAt));
+    return await this.db.select().from(properties).where(eq(properties.zoneId, zoneId)).orderBy(desc(properties.createdAt));
   }
 
   async getAllProperties(): Promise<Property[]> {
-    return await db.select().from(properties).orderBy(desc(properties.createdAt));
+    return await this.db.select().from(properties).orderBy(desc(properties.createdAt));
   }
 
   async getPropertyWithConfigurations(id: string): Promise<PropertyWithConfigurations | undefined> {
     const property = await this.getProperty(id);
     if (!property) return undefined;
 
-    const configs = await db.select().from(propertyConfigurations)
+    const configs = await this.db.select().from(propertyConfigurations)
       .where(eq(propertyConfigurations.propertyId, id));
 
     return {
@@ -1584,14 +1596,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createProperty(insertProperty: InsertProperty): Promise<Property> {
-    const [property] = await db.insert(properties)
+    const [property] = await this.db.insert(properties)
       .values(insertProperty)
       .returning();
     return property;
   }
 
   async updateProperty(id: string, updates: Partial<InsertProperty>): Promise<Property | undefined> {
-    const [property] = await db.update(properties)
+    const [property] = await this.db.update(properties)
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(properties.id, id))
       .returning();
@@ -1603,19 +1615,19 @@ export class DatabaseStorage implements IStorage {
       // Delete all related data that references this property to avoid foreign key constraint violations
 
       // Delete property configurations
-      await db.delete(propertyConfigurations).where(eq(propertyConfigurations.propertyId, id));
+      await this.db.delete(propertyConfigurations).where(eq(propertyConfigurations.propertyId, id));
 
       // Delete property scores 
-      await db.delete(propertyScores).where(eq(propertyScores.propertyId, id));
+      await this.db.delete(propertyScores).where(eq(propertyScores.propertyId, id));
 
       // Delete report payments that reference this property
-      await db.delete(reportPayments).where(eq(reportPayments.propertyId, id));
+      await this.db.delete(reportPayments).where(eq(reportPayments.propertyId, id));
 
       // Delete bookings that reference this property
-      await db.delete(bookings).where(eq(bookings.propertyId, id));
+      await this.db.delete(bookings).where(eq(bookings.propertyId, id));
 
       // Finally delete the property itself
-      const result = await db.delete(properties).where(eq(properties.id, id));
+      const result = await this.db.delete(properties).where(eq(properties.id, id));
       return result.rowCount > 0;
 
     } catch (error) {
@@ -1675,12 +1687,12 @@ export class DatabaseStorage implements IStorage {
       overallGrade: grade
     };
 
-    const [score] = await db.insert(propertyScores)
+    const [score] = await this.db.insert(propertyScores)
       .values(scoreWithTotals)
       .returning();
 
     // Update property with the score reference and legacy scores
-    await db.update(properties)
+    await this.db.update(properties)
       .set({
         propertyScoreId: score.id,
         locationScore: Math.round(locationTotal / 5), // Convert to 1-5 scale for legacy compatibility
@@ -1694,14 +1706,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPropertyScore(propertyId: string): Promise<PropertyScore | undefined> {
-    const [score] = await db.select().from(propertyScores)
+    const [score] = await this.db.select().from(propertyScores)
       .where(eq(propertyScores.propertyId, propertyId));
     return score || undefined;
   }
 
   async updatePropertyScore(id: string, updates: Partial<InsertPropertyScore>): Promise<PropertyScore | undefined> {
     // Get current score to calculate new totals
-    const [currentScore] = await db.select().from(propertyScores).where(eq(propertyScores.id, id));
+    const [currentScore] = await this.db.select().from(propertyScores).where(eq(propertyScores.id, id));
     if (!currentScore) return undefined;
 
     const mergedScore = { ...currentScore, ...updates };
@@ -1756,14 +1768,14 @@ export class DatabaseStorage implements IStorage {
       lastUpdated: new Date()
     };
 
-    const [updatedScore] = await db.update(propertyScores)
+    const [updatedScore] = await this.db.update(propertyScores)
       .set(updatesWithTotals)
       .where(eq(propertyScores.id, id))
       .returning();
 
     // Update legacy scores in properties table
     if (updatedScore) {
-      await db.update(properties)
+      await this.db.update(properties)
         .set({
           locationScore: Math.round(locationTotal / 5),
           amenitiesScore: Math.round(amenitiesTotal / 4),
@@ -1778,10 +1790,10 @@ export class DatabaseStorage implements IStorage {
 
   async deletePropertyScore(id: string): Promise<boolean> {
     // Get the property ID first to update the property
-    const [score] = await db.select().from(propertyScores).where(eq(propertyScores.id, id));
+    const [score] = await this.db.select().from(propertyScores).where(eq(propertyScores.id, id));
     if (score) {
       // Reset property score reference and legacy scores
-      await db.update(properties)
+      await this.db.update(properties)
         .set({
           propertyScoreId: null,
           locationScore: 0,
@@ -1792,29 +1804,29 @@ export class DatabaseStorage implements IStorage {
         .where(eq(properties.id, score.propertyId));
     }
 
-    const result = await db.delete(propertyScores).where(eq(propertyScores.id, id));
+    const result = await this.db.delete(propertyScores).where(eq(propertyScores.id, id));
     return result.rowCount > 0;
   }
 
   async getAllPropertyScores(): Promise<PropertyScore[]> {
-    return await db.select().from(propertyScores).orderBy(desc(propertyScores.overallScoreTotal));
+    return await this.db.select().from(propertyScores).orderBy(desc(propertyScores.overallScoreTotal));
   }
 
   // Property Configuration CRUD operations
   async getPropertyConfigurations(propertyId: string): Promise<PropertyConfiguration[]> {
-    return await db.select().from(propertyConfigurations)
+    return await this.db.select().from(propertyConfigurations)
       .where(eq(propertyConfigurations.propertyId, propertyId));
   }
 
   async createPropertyConfiguration(config: InsertPropertyConfiguration): Promise<PropertyConfiguration> {
-    const [configuration] = await db.insert(propertyConfigurations)
+    const [configuration] = await this.db.insert(propertyConfigurations)
       .values(config)
       .returning();
     return configuration;
   }
 
   async updatePropertyConfiguration(id: string, updates: Partial<InsertPropertyConfiguration>): Promise<PropertyConfiguration | undefined> {
-    const [configuration] = await db.update(propertyConfigurations)
+    const [configuration] = await this.db.update(propertyConfigurations)
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(propertyConfigurations.id, id))
       .returning();
@@ -1822,13 +1834,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deletePropertyConfiguration(id: string): Promise<boolean> {
-    const result = await db.delete(propertyConfigurations).where(eq(propertyConfigurations.id, id));
+    const result = await this.db.delete(propertyConfigurations).where(eq(propertyConfigurations.id, id));
     return result.rowCount > 0;
   }
 
   // Search and filter operations
   async searchProperties(query: string): Promise<Property[]> {
-    return await db.select().from(properties)
+    return await this.db.select().from(properties)
       .where(
         sql`${properties.name} ILIKE ${`%${query}%`} OR 
             ${properties.developer} ILIKE ${`%${query}%`} OR 
@@ -1846,7 +1858,7 @@ export class DatabaseStorage implements IStorage {
     minPrice?: number;
     maxPrice?: number;
   }): Promise<Property[]> {
-    let query = db.select().from(properties);
+    let query = this.db.select().from(properties);
     const conditions = [];
 
     if (filters.type) conditions.push(eq(properties.type, filters.type));
@@ -1879,23 +1891,23 @@ export class DatabaseStorage implements IStorage {
 
   // Booking operations
   async createBooking(insertBooking: InsertBooking): Promise<Booking> {
-    const [booking] = await db.insert(bookings)
+    const [booking] = await this.db.insert(bookings)
       .values(insertBooking)
       .returning();
     return booking;
   }
 
   async getBooking(bookingId: string): Promise<Booking | undefined> {
-    const [booking] = await db.select().from(bookings).where(eq(bookings.id, bookingId));
+    const [booking] = await this.db.select().from(bookings).where(eq(bookings.id, bookingId));
     return booking || undefined;
   }
 
   async getAllBookings(): Promise<Booking[]> {
-    return await db.select().from(bookings).orderBy(desc(bookings.createdAt));
+    return await this.db.select().from(bookings).orderBy(desc(bookings.createdAt));
   }
 
   async updateBookingStatus(bookingId: string, status: string): Promise<Booking | undefined> {
-    const [booking] = await db.update(bookings)
+    const [booking] = await this.db.update(bookings)
       .set({ status, updatedAt: new Date() })
       .where(eq(bookings.id, bookingId))
       .returning();
@@ -1904,14 +1916,14 @@ export class DatabaseStorage implements IStorage {
 
   // Lead management operations
   async createLead(insertLead: InsertLead): Promise<Lead> {
-    const [lead] = await db.insert(leads)
+    const [lead] = await this.db.insert(leads)
       .values(insertLead)
       .returning();
     return lead;
   }
 
   async getLead(leadId: string): Promise<Lead | undefined> {
-    const [lead] = await db.select().from(leads).where(eq(leads.id, leadId));
+    const [lead] = await this.db.select().from(leads).where(eq(leads.id, leadId));
     return lead || undefined;
   }
 
@@ -1930,11 +1942,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllLeads(): Promise<Lead[]> {
-    return await db.select().from(leads).orderBy(desc(leads.createdAt));
+    return await this.db.select().from(leads).orderBy(desc(leads.createdAt));
   }
 
   async updateLead(leadId: string, updates: Partial<InsertLead>): Promise<Lead | undefined> {
-    const [lead] = await db.update(leads)
+    const [lead] = await this.db.update(leads)
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(leads.id, leadId))
       .returning();
@@ -1953,28 +1965,28 @@ export class DatabaseStorage implements IStorage {
       nextAction: insertActivity.nextAction || null
     };
 
-    const [activity] = await db.insert(leadActivities)
+    const [activity] = await this.db.insert(leadActivities)
       .values(activityData)
       .returning();
     return activity;
   }
 
   async getLeadActivities(leadId: string): Promise<LeadActivity[]> {
-    return await db.select().from(leadActivities)
+    return await this.db.select().from(leadActivities)
       .where(eq(leadActivities.leadId, leadId))
       .orderBy(desc(leadActivities.createdAt));
   }
 
   // Lead notes
   async addLeadNote(insertNote: InsertLeadNote): Promise<LeadNote> {
-    const [note] = await db.insert(leadNotes)
+    const [note] = await this.db.insert(leadNotes)
       .values(insertNote)
       .returning();
     return note;
   }
 
   async getLeadNotes(leadId: string): Promise<LeadNote[]> {
-    return await db.select().from(leadNotes)
+    return await this.db.select().from(leadNotes)
       .where(eq(leadNotes.leadId, leadId))
       .orderBy(desc(leadNotes.createdAt));
   }
@@ -2004,7 +2016,7 @@ export class DatabaseStorage implements IStorage {
     dateFrom?: string;
     dateTo?: string;
   }): Promise<Lead[]> {
-    let query = db.select().from(leads);
+    let query = this.db.select().from(leads);
     const conditions = [];
 
     if (filters.status) conditions.push(eq(leads.status, filters.status));
@@ -2025,7 +2037,7 @@ export class DatabaseStorage implements IStorage {
     const updates: Partial<InsertLead> = { score, updatedAt: new Date() };
     if (notes) updates.notes = notes;
 
-    const [lead] = await db.update(leads)
+    const [lead] = await this.db.update(leads)
       .set(updates)
       .where(eq(leads.id, leadId))
       .returning();
@@ -2033,7 +2045,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async qualifyLead(leadId: string, qualified: boolean, notes: string): Promise<Lead | undefined> {
-    const [lead] = await db.update(leads)
+    const [lead] = await this.db.update(leads)
       .set({ qualified, notes, updatedAt: new Date() })
       .where(eq(leads.id, leadId))
       .returning();
@@ -2057,7 +2069,7 @@ export class DatabaseStorage implements IStorage {
 
 
   async createReportPayment(payment: InsertReportPayment): Promise<ReportPayment> {
-    const [newPayment] = await db.insert(reportPayments)
+    const [newPayment] = await this.db.insert(reportPayments)
       .values(payment)
       .returning();
     return newPayment;
@@ -2066,13 +2078,13 @@ export class DatabaseStorage implements IStorage {
 
 
   async getReportPayment(paymentId: string): Promise<ReportPayment | undefined> {
-    const [payment] = await db.select().from(reportPayments)
+    const [payment] = await this.db.select().from(reportPayments)
       .where(eq(reportPayments.id, paymentId));
     return payment || undefined;
   }
 
   async getReportPayments(reportId: string, reportType?: string): Promise<ReportPayment[]> {
-    let query = db.select().from(reportPayments);
+    let query = this.db.select().from(reportPayments);
 
     if (reportId && reportType) {
       query = query.where(and(eq(reportPayments.reportId, reportId), eq(reportPayments.reportType, reportType)));
@@ -2086,13 +2098,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getReportPaymentsByProperty(propertyId: string): Promise<ReportPayment[]> {
-    return await db.select().from(reportPayments)
+    return await this.db.select().from(reportPayments)
       .where(eq(reportPayments.propertyId, propertyId))
       .orderBy(desc(reportPayments.createdAt));
   }
 
   async updateReportPaymentStatus(paymentId: string, status: string): Promise<ReportPayment | undefined> {
-    const [payment] = await db.update(reportPayments)
+    const [payment] = await this.db.update(reportPayments)
       .set({ paymentStatus: status as any, updatedAt: new Date() })
       .where(eq(reportPayments.id, paymentId))
       .returning();
@@ -2100,11 +2112,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllReportPayments(): Promise<ReportPayment[]> {
-    return await db.select().from(reportPayments);
+    return await this.db.select().from(reportPayments);
   }
 
   async updatePaymentStatus(paymentId: string, status: string): Promise<ReportPayment | undefined> {
-    const [payment] = await db.update(reportPayments)
+    const [payment] = await this.db.update(reportPayments)
       .set({ paymentStatus: status as any, updatedAt: new Date() })
       .where(eq(reportPayments.id, paymentId))
       .returning();
@@ -2115,25 +2127,25 @@ export class DatabaseStorage implements IStorage {
 
   // Property Valuation Report operations
   async createValuationReport(report: InsertPropertyValuationReport): Promise<PropertyValuationReport> {
-    const [newReport] = await db.insert(propertyValuationReports)
+    const [newReport] = await this.db.insert(propertyValuationReports)
       .values(report)
       .returning();
     return newReport;
   }
 
   async getValuationReport(reportId: string): Promise<PropertyValuationReport | undefined> {
-    const [report] = await db.select().from(propertyValuationReports)
+    const [report] = await this.db.select().from(propertyValuationReports)
       .where(eq(propertyValuationReports.id, reportId));
     return report || undefined;
   }
 
   async getAllValuationReports(): Promise<PropertyValuationReport[]> {
-    return await db.select().from(propertyValuationReports)
+    return await this.db.select().from(propertyValuationReports)
       .orderBy(desc(propertyValuationReports.createdAt));
   }
 
   async updateValuationReport(reportId: string, updates: Partial<InsertPropertyValuationReport>): Promise<PropertyValuationReport | undefined> {
-    const [report] = await db.update(propertyValuationReports)
+    const [report] = await this.db.update(propertyValuationReports)
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(propertyValuationReports.id, reportId))
       .returning();
@@ -2141,25 +2153,25 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteValuationReport(reportId: string): Promise<boolean> {
-    const result = await db.delete(propertyValuationReports)
+    const result = await this.db.delete(propertyValuationReports)
       .where(eq(propertyValuationReports.id, reportId));
     return result.rowCount ? result.rowCount > 0 : false;
   }
 
   async getValuationReportsByProperty(propertyId: string): Promise<PropertyValuationReport[]> {
-    return await db.select().from(propertyValuationReports)
+    return await this.db.select().from(propertyValuationReports)
       .where(eq(propertyValuationReports.propertyId, propertyId))
       .orderBy(desc(propertyValuationReports.createdAt));
   }
 
   async getValuationReportsByCustomer(customerId: string): Promise<PropertyValuationReport[]> {
-    return await db.select().from(propertyValuationReports)
+    return await this.db.select().from(propertyValuationReports)
       .where(eq(propertyValuationReports.customerId, customerId))
       .orderBy(desc(propertyValuationReports.createdAt));
   }
 
   async assignReportToCustomer(reportId: string, customerId: string): Promise<PropertyValuationReport | undefined> {
-    const [report] = await db.update(propertyValuationReports)
+    const [report] = await this.db.update(propertyValuationReports)
       .set({ customerId, assignedTo: customerId, updatedAt: new Date() })
       .where(eq(propertyValuationReports.id, reportId))
       .returning();
@@ -2172,7 +2184,7 @@ export class DatabaseStorage implements IStorage {
       updates.deliveredAt = new Date();
     }
 
-    const [report] = await db.update(propertyValuationReports)
+    const [report] = await this.db.update(propertyValuationReports)
       .set(updates)
       .where(eq(propertyValuationReports.id, reportId))
       .returning();
@@ -2209,13 +2221,13 @@ export class DatabaseStorage implements IStorage {
 
   // Orders management methods
   async getAllOrdersWithDetails(): Promise<any[]> {
-    const payments = await db.select().from(reportPayments);
+    const payments = await this.db.select().from(reportPayments);
     const result = [];
 
     for (const payment of payments) {
       let property = null;
       if (payment.propertyId) {
-        [property] = await db.select().from(properties)
+        [property] = await this.db.select().from(properties)
           .where(eq(properties.id, payment.propertyId));
       }
 
@@ -2225,7 +2237,7 @@ export class DatabaseStorage implements IStorage {
 
       // Check if it's a CIVIL+MEP report
       if (payment.reportId) {
-        const [civilMepReport] = await db.select().from(civilMepReports)
+        const [civilMepReport] = await this.db.select().from(civilMepReports)
           .where(eq(civilMepReports.id, payment.reportId));
 
         if (civilMepReport) {
@@ -2234,7 +2246,7 @@ export class DatabaseStorage implements IStorage {
           reportDetails = civilMepReport;
         } else {
           // Check if it's a Valuation report
-          const [valuationReport] = await db.select().from(propertyValuationReports)
+          const [valuationReport] = await this.db.select().from(propertyValuationReports)
             .where(eq(propertyValuationReports.id, payment.reportId));
 
           if (valuationReport) {
@@ -2268,7 +2280,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getOrderStats(): Promise<any> {
-    const allPayments = await db.select().from(reportPayments);
+    const allPayments = await this.db.select().from(reportPayments);
     const now = new Date();
 
     const overduePayments = allPayments.filter(p => 
@@ -2293,9 +2305,9 @@ export class DatabaseStorage implements IStorage {
   // Customer CRM methods
   async getAllCustomersWithDetails(): Promise<any[]> {
     // Get unique customers from leads, bookings, and orders
-    const allLeads = await db.select().from(this.leads);
-    const allBookings = await db.select().from(this.bookings);  
-    const payments = await db.select().from(reportPayments);
+    const allLeads = await this.db.select().from(leads);
+    const allBookings = await this.db.select().from(bookings);  
+    const payments = await this.db.select().from(reportPayments);
 
     const customerMap = new Map();
 
@@ -2383,7 +2395,7 @@ export class DatabaseStorage implements IStorage {
     }
 
     // Get notes for each customer
-    const notes = await db.select().from(customerNotes);
+    const notes = await this.db.select().from(customerNotes);
     for (const note of notes) {
       if (customerMap.has(note.customerId)) {
         customerMap.get(note.customerId).notes.push(note);
@@ -2414,7 +2426,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async addCustomerNote(customerId: string, content: string): Promise<CustomerNote> {
-    const [note] = await db.insert(customerNotes)
+    const [note] = await this.db.insert(customerNotes)
       .values({ customerId, content })
       .returning();
     return note;
@@ -2422,7 +2434,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateCustomerStatus(customerId: string, status: string): Promise<any> {
     // Update lead status if customer has leads
-    await db.update(leads)
+    await this.db.update(leads)
       .set({ leadType: status as any, updatedAt: new Date() })
       .where(or(eq(leads.email, customerId), eq(leads.phone, customerId)));
 
@@ -2433,7 +2445,7 @@ export class DatabaseStorage implements IStorage {
     const { name, email, phone } = data;
 
     // Update leads
-    await db.update(leads)
+    await this.db.update(leads)
       .set({ 
         customerName: name, 
         email: email,
@@ -2443,7 +2455,7 @@ export class DatabaseStorage implements IStorage {
       .where(or(eq(leads.email, customerId), eq(leads.phone, customerId)));
 
     // Update bookings
-    await db.update(bookings)
+    await this.db.update(bookings)
       .set({ 
         customerName: name, 
         customerEmail: email,
@@ -2453,7 +2465,7 @@ export class DatabaseStorage implements IStorage {
       .where(or(eq(bookings.customerEmail, customerId), eq(bookings.customerPhone, customerId)));
 
     // Update report payments
-    await db.update(reportPayments)
+    await this.db.update(reportPayments)
       .set({ 
         customerName: name, 
         customerEmail: email,
@@ -2468,19 +2480,19 @@ export class DatabaseStorage implements IStorage {
   async deleteCustomer(customerId: string): Promise<boolean> {
     try {
       // Delete customer notes first (foreign key constraint)
-      await db.delete(customerNotes)
+      await this.db.delete(customerNotes)
         .where(eq(customerNotes.customerId, customerId));
 
       // Delete associated leads
-      await db.delete(leads)
+      await this.db.delete(leads)
         .where(or(eq(leads.email, customerId), eq(leads.phone, customerId)));
 
       // Delete associated bookings
-      await db.delete(bookings)
+      await this.db.delete(bookings)
         .where(or(eq(bookings.customerEmail, customerId), eq(bookings.customerPhone, customerId)));
 
       // Delete associated report payments
-      await db.delete(reportPayments)
+      await this.db.delete(reportPayments)
         .where(or(eq(reportPayments.customerEmail, customerId), eq(reportPayments.customerPhone, customerId)));
 
       return true;
@@ -2492,7 +2504,7 @@ export class DatabaseStorage implements IStorage {
 
   // App Settings operations
   async getAppSettings(): Promise<AppSettings | undefined> {
-    const [settings] = await db.select().from(appSettings).limit(1);
+    const [settings] = await this.db.select().from(appSettings).limit(1);
     return settings;
   }
 
@@ -2500,7 +2512,7 @@ export class DatabaseStorage implements IStorage {
     const existing = await this.getAppSettings();
 
     if (existing) {
-      const [updated] = await db.update(appSettings)
+      const [updated] = await this.db.update(appSettings)
         .set({
           ...settingsData,
           updatedAt: new Date(),
@@ -2514,7 +2526,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async initializeAppSettings(): Promise<AppSettings> {
-    const [settings] = await db.insert(appSettings)
+    const [settings] = await this.db.insert(appSettings)
       .values({
         businessName: "OwnitWise – Curated Property Advisors",
         contactEmail: "contact@ownitwise.com",
@@ -2543,25 +2555,25 @@ export class DatabaseStorage implements IStorage {
 
   // Team member operations
   async createTeamMember(member: InsertTeamMember): Promise<TeamMember> {
-    const [newMember] = await db.insert(teamMembers)
+    const [newMember] = await this.db.insert(teamMembers)
       .values(member)
       .returning();
     return newMember;
   }
 
   async getTeamMember(id: string): Promise<TeamMember | undefined> {
-    const [member] = await db.select().from(teamMembers)
+    const [member] = await this.db.select().from(teamMembers)
       .where(eq(teamMembers.id, id));
     return member || undefined;
   }
 
   async getAllTeamMembers(): Promise<TeamMember[]> {
-    return await db.select().from(teamMembers)
+    return await this.db.select().from(teamMembers)
       .orderBy(desc(teamMembers.joinDate));
   }
 
   async updateTeamMember(id: string, updates: Partial<InsertTeamMember>): Promise<TeamMember | undefined> {
-    const [member] = await db.update(teamMembers)
+    const [member] = await this.db.update(teamMembers)
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(teamMembers.id, id))
       .returning();
@@ -2569,50 +2581,50 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteTeamMember(id: string): Promise<boolean> {
-    const result = await db.delete(teamMembers)
+    const result = await this.db.delete(teamMembers)
       .where(eq(teamMembers.id, id));
     return result.rowCount > 0;
   }
 
   async getTeamMembersByDepartment(department: string): Promise<TeamMember[]> {
-    return await db.select().from(teamMembers)
+    return await this.db.select().from(teamMembers)
       .where(eq(teamMembers.department, department))
       .orderBy(desc(teamMembers.joinDate));
   }
 
   async getActiveTeamMembers(): Promise<TeamMember[]> {
-    return await db.select().from(teamMembers)
+    return await this.db.select().from(teamMembers)
       .where(eq(teamMembers.status, "active"))
       .orderBy(desc(teamMembers.joinDate));
   }
 
   // RERA Data operations
   async createReraData(reraInfo: InsertReraData): Promise<ReraData> {
-    const [rera] = await db.insert(reraData)
+    const [rera] = await this.db.insert(reraData)
       .values(reraInfo)
       .returning();
     return rera;
   }
 
   async getReraData(reraId: string): Promise<ReraData | undefined> {
-    const [rera] = await db.select().from(reraData)
+    const [rera] = await this.db.select().from(reraData)
       .where(eq(reraData.id, reraId));
     return rera || undefined;
   }
 
   async getReraDataByProperty(propertyId: string): Promise<ReraData | undefined> {
-    const [rera] = await db.select().from(reraData)
+    const [rera] = await this.db.select().from(reraData)
       .where(eq(reraData.propertyId, propertyId));
     return rera || undefined;
   }
 
   async getAllReraData(): Promise<ReraData[]> {
-    return await db.select().from(reraData)
+    return await this.db.select().from(reraData)
       .orderBy(desc(reraData.createdAt));
   }
 
   async updateReraData(reraId: string, updates: Partial<InsertReraData>): Promise<ReraData | undefined> {
-    const [rera] = await db.update(reraData)
+    const [rera] = await this.db.update(reraData)
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(reraData.id, reraId))
       .returning();
@@ -2620,34 +2632,34 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteReraData(reraId: string): Promise<boolean> {
-    const result = await db.delete(reraData)
+    const result = await this.db.delete(reraData)
       .where(eq(reraData.id, reraId));
     return result.rowCount > 0;
   }
 
   // Civil+MEP Report operations
   async createCivilMepReport(report: InsertCivilMepReport): Promise<CivilMepReport> {
-    const [newReport] = await db.insert(civilMepReports)
+    const [newReport] = await this.db.insert(civilMepReports)
       .values(report)
       .returning();
     return newReport;
   }
 
   async getCivilMepReport(reportId: string): Promise<CivilMepReport | undefined> {
-    const [report] = await db.select().from(civilMepReports)
+    const [report] = await this.db.select().from(civilMepReports)
       .where(eq(civilMepReports.id, reportId));
     return report || undefined;
   }
 
   async getCivilMepReportByProperty(propertyId: string): Promise<CivilMepReport | undefined> {
-    const [report] = await db.select().from(civilMepReports)
+    const [report] = await this.db.select().from(civilMepReports)
       .where(eq(civilMepReports.propertyId, propertyId));
     return report || undefined;
   }
 
   async getAllCivilMepReports(): Promise<CivilMepReport[]> {
     try {
-      return await db.select().from(civilMepReports)
+      return await this.db.select().from(civilMepReports)
         .orderBy(desc(civilMepReports.createdAt));
     } catch (error) {
       console.error("Error in getAllCivilMepReports:", error);
@@ -2657,7 +2669,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateCivilMepReport(reportId: string, updates: Partial<InsertCivilMepReport>): Promise<CivilMepReport | undefined> {
-    const [report] = await db.update(civilMepReports)
+    const [report] = await this.db.update(civilMepReports)
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(civilMepReports.id, reportId))
       .returning();
@@ -2665,7 +2677,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteCivilMepReport(reportId: string): Promise<boolean> {
-    const result = await db.delete(civilMepReports)
+    const result = await this.db.delete(civilMepReports)
       .where(eq(civilMepReports.id, reportId));
     return result.rowCount > 0;
   }
@@ -2722,31 +2734,31 @@ export class DatabaseStorage implements IStorage {
 
   // Legal Audit Report operations
   async createLegalAuditReport(report: InsertLegalAuditReport): Promise<LegalAuditReport> {
-    const [newReport] = await db.insert(legalAuditReports)
+    const [newReport] = await this.db.insert(legalAuditReports)
       .values(report)
       .returning();
     return newReport;
   }
 
   async getLegalAuditReport(reportId: string): Promise<LegalAuditReport | undefined> {
-    const [report] = await db.select().from(legalAuditReports)
+    const [report] = await this.db.select().from(legalAuditReports)
       .where(eq(legalAuditReports.id, reportId));
     return report || undefined;
   }
 
   async getLegalAuditReportByProperty(propertyId: string): Promise<LegalAuditReport | undefined> {
-    const [report] = await db.select().from(legalAuditReports)
+    const [report] = await this.db.select().from(legalAuditReports)
       .where(eq(legalAuditReports.propertyId, propertyId));
     return report || undefined;
   }
 
   async getAllLegalAuditReports(): Promise<LegalAuditReport[]> {
-    return await db.select().from(legalAuditReports)
+    return await this.db.select().from(legalAuditReports)
       .orderBy(desc(legalAuditReports.createdAt));
   }
 
   async updateLegalAuditReport(reportId: string, updates: Partial<InsertLegalAuditReport>): Promise<LegalAuditReport | undefined> {
-    const [report] = await db.update(legalAuditReports)
+    const [report] = await this.db.update(legalAuditReports)
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(legalAuditReports.id, reportId))
       .returning();
@@ -2754,7 +2766,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteLegalAuditReport(reportId: string): Promise<boolean> {
-    const result = await db.delete(legalAuditReports)
+    const result = await this.db.delete(legalAuditReports)
       .where(eq(legalAuditReports.id, reportId));
     return result.rowCount > 0;
   }
@@ -2793,17 +2805,17 @@ export class DatabaseStorage implements IStorage {
 
   // Developer Management Methods
   async getAllDevelopers(): Promise<Developer[]> {
-    const result = await db.select().from(developers).orderBy(desc(developers.createdAt));
+    const result = await this.db.select().from(developers).orderBy(desc(developers.createdAt));
     return result;
   }
 
   async getDeveloper(id: string): Promise<Developer | null> {
-    const [result] = await db.select().from(developers).where(eq(developers.id, id));
+    const [result] = await this.db.select().from(developers).where(eq(developers.id, id));
     return result || null;
   }
 
   async createDeveloper(data: InsertDeveloper): Promise<Developer> {
-    const [result] = await db.insert(developers)
+    const [result] = await this.db.insert(developers)
       .values({
         ...data,
         createdAt: new Date(),
@@ -2814,7 +2826,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateDeveloper(id: string, data: Partial<InsertDeveloper>): Promise<Developer | null> {
-    const [result] = await db.update(developers)
+    const [result] = await this.db.update(developers)
       .set({
         ...data,
         updatedAt: new Date()
@@ -2825,7 +2837,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteDeveloper(id: string): Promise<boolean> {
-    const result = await db.delete(developers).where(eq(developers.id, id));
+    const result = await this.db.delete(developers).where(eq(developers.id, id));
     return result.rowCount > 0;
   }
 
@@ -2846,31 +2858,31 @@ export class DatabaseStorage implements IStorage {
   }
   // Customer Assignment System Operations
   async createCustomer(customer: InsertCustomer): Promise<Customer> {
-    const [newCustomer] = await db.insert(customers)
+    const [newCustomer] = await this.db.insert(customers)
       .values(customer)
       .returning();
     return newCustomer;
   }
 
   async getCustomer(customerId: string): Promise<Customer | undefined> {
-    const [customer] = await db.select().from(customers)
+    const [customer] = await this.db.select().from(customers)
       .where(eq(customers.id, customerId));
     return customer || undefined;
   }
 
   async getCustomerByEmail(email: string): Promise<Customer | undefined> {
-    const [customer] = await db.select().from(customers)
+    const [customer] = await this.db.select().from(customers)
       .where(eq(customers.email, email));
     return customer || undefined;
   }
 
   async getAllCustomers(): Promise<Customer[]> {
-    return await db.select().from(customers)
+    return await this.db.select().from(customers)
       .orderBy(desc(customers.createdAt));
   }
 
   async updateCustomer(customerId: string, updates: Partial<InsertCustomer>): Promise<Customer | undefined> {
-    const [customer] = await db.update(customers)
+    const [customer] = await this.db.update(customers)
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(customers.id, customerId))
       .returning();
@@ -2878,7 +2890,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteCustomer(customerId: string): Promise<boolean> {
-    const result = await db.delete(customers)
+    const result = await this.db.delete(customers)
       .where(eq(customers.id, customerId));
     return result.rowCount > 0;
   }
@@ -2902,14 +2914,14 @@ export class DatabaseStorage implements IStorage {
 
   // Civil+MEP Report Assignment Operations
   async assignCivilMepReportToCustomer(assignment: InsertCivilMepReportAssignment): Promise<CivilMepReportAssignment> {
-    const [newAssignment] = await db.insert(civilMepReportAssignments)
+    const [newAssignment] = await this.db.insert(civilMepReportAssignments)
       .values(assignment)
       .returning();
     return newAssignment;
   }
 
   async removeCivilMepReportAssignment(reportId: string, customerId: string): Promise<boolean> {
-    const result = await db.delete(civilMepReportAssignments)
+    const result = await this.db.delete(civilMepReportAssignments)
       .where(and(
         eq(civilMepReportAssignments.reportId, reportId),
         eq(civilMepReportAssignments.customerId, customerId)
@@ -2918,7 +2930,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCivilMepReportAssignments(reportId: string): Promise<Array<CivilMepReportAssignment & { customer: Customer }>> {
-    return await db.select({
+    return await this.db.select({
       id: civilMepReportAssignments.id,
       reportId: civilMepReportAssignments.reportId,
       customerId: civilMepReportAssignments.customerId,
@@ -2938,7 +2950,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCustomerCivilMepReports(customerId: string): Promise<Array<CivilMepReportAssignment & { report: CivilMepReport }>> {
-    return await db.select({
+    return await this.db.select({
       id: civilMepReportAssignments.id,
       reportId: civilMepReportAssignments.reportId,
       customerId: civilMepReportAssignments.customerId,
@@ -2973,14 +2985,14 @@ export class DatabaseStorage implements IStorage {
 
   // Legal Audit Report Assignment Operations
   async assignLegalReportToCustomer(assignment: InsertLegalReportAssignment): Promise<LegalReportAssignment> {
-    const [newAssignment] = await db.insert(legalReportAssignments)
+    const [newAssignment] = await this.db.insert(legalReportAssignments)
       .values(assignment)
       .returning();
     return newAssignment;
   }
 
   async removeLegalReportAssignment(reportId: string, customerId: string): Promise<boolean> {
-    const result = await db.delete(legalReportAssignments)
+    const result = await this.db.delete(legalReportAssignments)
       .where(and(
         eq(legalReportAssignments.reportId, reportId),
         eq(legalReportAssignments.customerId, customerId)
@@ -2989,7 +3001,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getLegalReportAssignments(reportId: string): Promise<Array<LegalReportAssignment & { customer: Customer }>> {
-    return await db.select({
+    return await this.db.select({
       id: legalReportAssignments.id,
       reportId: legalReportAssignments.reportId,
       customerId: legalReportAssignments.customerId,
@@ -3009,7 +3021,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCustomerLegalReports(customerId: string): Promise<Array<LegalReportAssignment & { report: LegalAuditReport }>> {
-    return await db.select({
+    return await this.db.select({
       id: legalReportAssignments.id,
       reportId: legalReportAssignments.reportId,
       customerId: legalReportAssignments.customerId,
@@ -3044,14 +3056,14 @@ export class DatabaseStorage implements IStorage {
 
   // Property Valuation Report Assignment Operations
   async assignValuationReportToCustomer(assignment: InsertPropertyValuationReportAssignment): Promise<PropertyValuationReportAssignment> {
-    const [newAssignment] = await db.insert(propertyValuationReportAssignments)
+    const [newAssignment] = await this.db.insert(propertyValuationReportAssignments)
       .values(assignment)
       .returning();
     return newAssignment;
   }
 
   async removeValuationReportAssignment(reportId: string, customerId: string): Promise<boolean> {
-    const result = await db.delete(propertyValuationReportAssignments)
+    const result = await this.db.delete(propertyValuationReportAssignments)
       .where(and(
         eq(propertyValuationReportAssignments.reportId, reportId),
         eq(propertyValuationReportAssignments.customerId, customerId)
@@ -3060,7 +3072,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getValuationReportAssignments(reportId: string): Promise<Array<PropertyValuationReportAssignment & { customer: Customer }>> {
-    return await db.select({
+    return await this.db.select({
       id: propertyValuationReportAssignments.id,
       reportId: propertyValuationReportAssignments.reportId,
       customerId: propertyValuationReportAssignments.customerId,
@@ -3080,7 +3092,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCustomerValuationReports(customerId: string): Promise<Array<PropertyValuationReportAssignment & { report: PropertyValuationReport }>> {
-    return await db.select({
+    return await this.db.select({
       id: propertyValuationReportAssignments.id,
       reportId: propertyValuationReportAssignments.reportId,
       customerId: propertyValuationReportAssignments.customerId,
@@ -3119,7 +3131,7 @@ export class DatabaseStorage implements IStorage {
 
     switch (reportType) {
       case "civil-mep":
-        const [civilAssignment] = await db.select()
+        const [civilAssignment] = await this.db.select()
           .from(civilMepReportAssignments)
           .where(and(
             eq(civilMepReportAssignments.customerId, customerId),
@@ -3131,7 +3143,7 @@ export class DatabaseStorage implements IStorage {
         break;
 
       case "legal":
-        const [legalAssignment] = await db.select()
+        const [legalAssignment] = await this.db.select()
           .from(legalReportAssignments)
           .where(and(
             eq(legalReportAssignments.customerId, customerId),
@@ -3143,7 +3155,7 @@ export class DatabaseStorage implements IStorage {
         break;
 
       case "valuation":
-        const [valuationAssignment] = await db.select()
+        const [valuationAssignment] = await this.db.select()
           .from(propertyValuationReportAssignments)
           .where(and(
             eq(propertyValuationReportAssignments.customerId, customerId),
@@ -3160,15 +3172,15 @@ export class DatabaseStorage implements IStorage {
 
   async updateReportAccess(assignmentId: string, accessGranted: boolean): Promise<boolean> {
     // Try updating in all assignment tables since we don't know which type
-    const civilResult = await db.update(civilMepReportAssignments)
+    const civilResult = await this.db.update(civilMepReportAssignments)
       .set({ accessGranted })
       .where(eq(civilMepReportAssignments.id, assignmentId));
 
-    const legalResult = await db.update(legalReportAssignments)
+    const legalResult = await this.db.update(legalReportAssignments)
       .set({ accessGranted })
       .where(eq(legalReportAssignments.id, assignmentId));
 
-    const valuationResult = await db.update(propertyValuationReportAssignments)
+    const valuationResult = await this.db.update(propertyValuationReportAssignments)
       .set({ accessGranted })
       .where(eq(propertyValuationReportAssignments.id, assignmentId));
 
@@ -3184,7 +3196,7 @@ export class DatabaseStorage implements IStorage {
 
     switch (reportType) {
       case "civil-mep":
-        await db.update(civilMepReportAssignments)
+        await this.db.update(civilMepReportAssignments)
           .set(accessUpdate)
           .where(and(
             eq(civilMepReportAssignments.customerId, customerId),
@@ -3193,7 +3205,7 @@ export class DatabaseStorage implements IStorage {
         break;
 
       case "legal":
-        await db.update(legalReportAssignments)
+        await this.db.update(legalReportAssignments)
           .set(accessUpdate)
           .where(and(
             eq(legalReportAssignments.customerId, customerId),
@@ -3202,7 +3214,7 @@ export class DatabaseStorage implements IStorage {
         break;
 
       case "valuation":
-        await db.update(propertyValuationReportAssignments)
+        await this.db.update(propertyValuationReportAssignments)
           .set(accessUpdate)
           .where(and(
             eq(propertyValuationReportAssignments.customerId, customerId),
