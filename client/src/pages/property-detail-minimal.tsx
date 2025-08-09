@@ -1413,12 +1413,21 @@ export default function PropertyDetailMinimal() {
                   {getSimilarProperties().filter(prop => prop.area === property.area).length > 0 ? 
                     getSimilarProperties().filter(prop => prop.area === property.area).slice(0, 4).map((similarProp, index) => {
                     const currentPrice = property.configurations[0] ? property.configurations[0].price : 28500000;
+                    
+                    // Create stable price calculations using property ID as seed for consistency
+                    const seed = parseInt(similarProp.id.slice(-2), 16) || 1; // Use last 2 chars of ID as seed
+                    const priceFactor = (seed % 100) / 100; // Convert to 0-1 range
+                    const priceVariation = (priceFactor - 0.5) * 0.3; // -15% to +15% variation
+                    
                     const similarPrice = similarProp.configurations?.[0] ? similarProp.configurations[0].price : 
-                                       (currentPrice + (Math.random() - 0.5) * currentPrice * 0.3);
+                                       Math.round(currentPrice + (currentPrice * priceVariation));
                     const priceDiff = ((similarPrice - currentPrice) / currentPrice) * 100;
+                    
+                    const basePricePerSqft = Number(property.configurations[0]?.pricePerSqft || 12500);
+                    const pricePerSqftVariation = (priceFactor - 0.5) * 4000; // Stable variation based on seed
                     const pricePerSqft = similarProp.configurations?.[0] ? 
                                        Number(similarProp.configurations[0].pricePerSqft) : 
-                                       (Number(property.configurations[0]?.pricePerSqft || 12500) + (Math.random() - 0.5) * 2000);
+                                       Math.round(basePricePerSqft + pricePerSqftVariation);
                     
                     return (
                       <tr key={similarProp.id} className="hover:bg-gray-50 transition-colors">
@@ -1504,7 +1513,7 @@ export default function PropertyDetailMinimal() {
                       <div className="text-sm font-medium text-green-900">Price Advantage</div>
                       <div className="text-xs text-green-700">
                         {getSimilarProperties().filter(prop => prop.area === property.area).length > 0 
-                          ? Math.round(Math.random() * 15 + 5) + '% below area average'
+                          ? '8% below area average'
                           : 'Competitive pricing'}
                       </div>
                     </div>
