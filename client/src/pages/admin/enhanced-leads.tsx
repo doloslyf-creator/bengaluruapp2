@@ -49,7 +49,8 @@ import {
   Pin,
   FileImage,
   Clock as Timeline,
-  Edit
+  Edit,
+  PhoneCall
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
