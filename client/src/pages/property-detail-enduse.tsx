@@ -597,6 +597,206 @@ export default function PropertyDetailEndUse() {
               </CardContent>
             </Card>
 
+            {/* Lifestyle Features Dashboard */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Heart className="h-5 w-5 mr-2 text-purple-600" />
+                  Family Lifestyle Dashboard
+                </CardTitle>
+                <p className="text-gray-600">Everything your family needs for a perfect home</p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <div className="bg-purple-50 p-4 rounded-lg border border-purple-200 text-center">
+                    <div className="text-2xl font-bold text-purple-800">{lifestyleScore.toFixed(1)}/5</div>
+                    <div className="text-sm text-purple-600">Lifestyle Score</div>
+                  </div>
+                  <div className="bg-pink-50 p-4 rounded-lg border border-pink-200 text-center">
+                    <div className="text-2xl font-bold text-pink-800">8.5/10</div>
+                    <div className="text-sm text-pink-600">Safety Rating</div>
+                  </div>
+                  <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200 text-center">
+                    <div className="text-2xl font-bold text-indigo-800">15 min</div>
+                    <div className="text-sm text-indigo-600">School Distance</div>
+                  </div>
+                  <div className="bg-cyan-50 p-4 rounded-lg border border-cyan-200 text-center">
+                    <div className="text-2xl font-bold text-cyan-800">25+</div>
+                    <div className="text-sm text-cyan-600">Amenities</div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                    <h4 className="font-medium text-green-900 mb-2">Family Essentials</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center"><School className="h-4 w-4 mr-2 text-green-600" />Top Schools</div>
+                        <span className="text-green-700">3-5 nearby</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center"><Hospital className="h-4 w-4 mr-2 text-green-600" />Hospitals</div>
+                        <span className="text-green-700">2 major</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center"><ShoppingBag className="h-4 w-4 mr-2 text-green-600" />Shopping</div>
+                        <span className="text-green-700">Mall nearby</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <h4 className="font-medium text-blue-900 mb-2">Connectivity</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center"><Train className="h-4 w-4 mr-2 text-blue-600" />Metro/Bus</div>
+                        <span className="text-blue-700">Well connected</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center"><Car className="h-4 w-4 mr-2 text-blue-600" />IT Hubs</div>
+                        <span className="text-blue-700">20-30 min</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center"><MapPin className="h-4 w-4 mr-2 text-blue-600" />Airport</div>
+                        <span className="text-blue-700">45 min</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Family Budget Analysis */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <DollarSign className="h-5 w-5 mr-2 text-purple-600" />
+                  Family Budget Breakdown
+                </CardTitle>
+                <p className="text-gray-600">Complete cost analysis for family planning</p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                      <h4 className="font-medium text-purple-900 mb-2">Monthly Family Expenses</h4>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Home EMI</span>
+                          <span className="font-medium">₹{property.configurations ? Math.round((Math.min(...property.configurations.map(c => c.price)) * 0.85) / (25 * 12)).toLocaleString() : '0'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Maintenance</span>
+                          <span className="font-medium">₹8,000</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Utilities</span>
+                          <span className="font-medium">₹5,000</span>
+                        </div>
+                        <div className="border-t pt-2 flex justify-between font-bold">
+                          <span>Total Housing Cost</span>
+                          <span className="text-purple-700">₹{property.configurations ? (Math.round((Math.min(...property.configurations.map(c => c.price)) * 0.85) / (25 * 12)) + 13000).toLocaleString() : '13000'}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
+                      <h4 className="font-medium text-indigo-900 mb-2">Total Investment</h4>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Home Price</span>
+                          <span className="font-medium">{property.configurations ? formatPrice(Math.min(...property.configurations.map(c => c.price))) : 'N/A'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Down Payment (15%)</span>
+                          <span className="font-medium">{property.configurations ? formatPrice(Math.min(...property.configurations.map(c => c.price)) * 0.15) : 'N/A'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Registration & Others</span>
+                          <span className="font-medium">₹8L</span>
+                        </div>
+                        <div className="border-t pt-2 flex justify-between font-bold">
+                          <span>Initial Investment</span>
+                          <span className="text-indigo-700">{property.configurations ? formatPrice(Math.min(...property.configurations.map(c => c.price)) * 0.15 + 800000) : '₹8L'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Family Media & Safety Reports */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Camera className="h-5 w-5 mr-2 text-purple-600" />
+                  Family Home Media & Safety
+                </CardTitle>
+                <p className="text-gray-600">Virtual tours and safety certifications for families</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {property.youtubeVideoUrl && (
+                  <div className="bg-gray-100 p-4 rounded-lg border border-gray-300">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-gray-900">Family Home Tour</h4>
+                        <p className="text-sm text-gray-600">Virtual walkthrough with family focus</p>
+                      </div>
+                      <Button 
+                        size="sm"
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                        onClick={() => property.youtubeVideoUrl && window.open(property.youtubeVideoUrl, '_blank')}
+                      >
+                        <Play className="h-4 w-4 mr-2" />
+                        Family Tour
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {property.hasCivilMepReport && (
+                    <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-medium text-green-900">Safety Assessment</h4>
+                        <Badge className={`${property.civilMepReportStatus === 'completed' ? 'bg-green-600' : 'bg-yellow-600'} text-white`}>
+                          {property.civilMepReportStatus}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-green-700 mb-3">Family safety & structural check</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-lg font-bold text-green-800">₹{property.civilMepReportPrice ? parseFloat(property.civilMepReportPrice).toLocaleString() : '0'}</span>
+                        <Button size="sm" variant="outline" className="border-green-300 text-green-700 hover:bg-green-100">
+                          <Shield className="h-4 w-4 mr-2" />
+                          Safety Report
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {property.hasValuationReport && (
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-medium text-blue-900">Property Value</h4>
+                        <Badge className={`${property.valuationReportStatus === 'completed' ? 'bg-green-600' : 'bg-yellow-600'} text-white`}>
+                          {property.valuationReportStatus}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-blue-700 mb-3">Fair value for your investment</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-lg font-bold text-blue-800">₹{property.valuationReportPrice ? parseFloat(property.valuationReportPrice).toLocaleString() : '0'}</span>
+                        <Button size="sm" variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-100">
+                          <Award className="h-4 w-4 mr-2" />
+                          Value Report
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Property Header */}
             <Card>
               <CardContent className="p-6">

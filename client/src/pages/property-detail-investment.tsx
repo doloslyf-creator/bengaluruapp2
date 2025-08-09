@@ -588,6 +588,168 @@ export default function PropertyDetailInvestment() {
               </CardContent>
             </Card>
 
+            {/* Investment Analysis Dashboard */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <BarChart3 className="h-5 w-5 mr-2 text-green-600" />
+                  Investment Analysis Dashboard
+                </CardTitle>
+                <p className="text-gray-600">Comprehensive investment metrics and projections</p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <div className="bg-green-50 p-4 rounded-lg border border-green-200 text-center">
+                    <div className="text-2xl font-bold text-green-800">{property.overallScore}/100</div>
+                    <div className="text-sm text-green-600">Investment Score</div>
+                  </div>
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 text-center">
+                    <div className="text-2xl font-bold text-blue-800">3.6%</div>
+                    <div className="text-sm text-blue-600">Rental Yield</div>
+                  </div>
+                  <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-200 text-center">
+                    <div className="text-2xl font-bold text-emerald-800">12-15%</div>
+                    <div className="text-sm text-emerald-600">Appreciation</div>
+                  </div>
+                  <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200 text-center">
+                    <div className="text-2xl font-bold text-indigo-800">{property.priceComparison || 'Market Rate'}</div>
+                    <div className="text-sm text-indigo-600">vs Area Avg</div>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h4 className="font-medium text-gray-900 mb-2">5-Year Investment Projection</h4>
+                    <div className="grid grid-cols-3 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-600">Current Value</span>
+                        <div className="font-medium">{property.configurations ? formatPrice(Math.min(...property.configurations.map(c => c.price))) : 'N/A'}</div>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Projected Value</span>
+                        <div className="font-medium text-green-600">{property.configurations ? formatPrice(Math.min(...property.configurations.map(c => c.price)) * 1.7) : 'N/A'}</div>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">Rental Income/Year</span>
+                        <div className="font-medium text-blue-600">₹{property.configurations ? (Math.min(...property.configurations.map(c => c.price)) * 0.036 / 100000).toFixed(0) : '0'}L</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Market Analysis */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <TrendingUp className="h-5 w-5 mr-2 text-green-600" />
+                  Market Price Analysis
+                </CardTitle>
+                <p className="text-gray-600">Real-time market comparison from admin data</p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                      <h4 className="font-medium text-green-900 mb-2">{property.area} Area Average</h4>
+                      <div className="text-lg font-bold text-green-800">
+                        ₹{property.areaAvgPriceMin}L - ₹{property.areaAvgPriceMax}L
+                      </div>
+                      <p className="text-sm text-green-600">Price range in locality</p>
+                    </div>
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                      <h4 className="font-medium text-blue-900 mb-2">City Average</h4>
+                      <div className="text-lg font-bold text-blue-800">
+                        ₹{property.cityAvgPriceMin}L - ₹{property.cityAvgPriceMax}L
+                      </div>
+                      <p className="text-sm text-blue-600">Bengaluru comparison</p>
+                    </div>
+                  </div>
+                  
+                  {property.priceComparison && (
+                    <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-yellow-900">Market Position</span>
+                        <Badge className="bg-yellow-600 text-white">{property.priceComparison}</Badge>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Video Tour & Reports */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Play className="h-5 w-5 mr-2 text-green-600" />
+                  Property Media & Reports
+                </CardTitle>
+                <p className="text-gray-600">Virtual tours and professional reports</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {property.youtubeVideoUrl && (
+                  <div className="bg-gray-100 p-4 rounded-lg border border-gray-300">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-gray-900">Virtual Property Tour</h4>
+                        <p className="text-sm text-gray-600">Professional video walkthrough</p>
+                      </div>
+                      <Button 
+                        size="sm"
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                        onClick={() => property.youtubeVideoUrl && window.open(property.youtubeVideoUrl, '_blank')}
+                      >
+                        <Play className="h-4 w-4 mr-2" />
+                        Watch Tour
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {property.hasCivilMepReport && (
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-medium text-blue-900">CIVIL+MEP Report</h4>
+                        <Badge className={`${property.civilMepReportStatus === 'completed' ? 'bg-green-600' : 'bg-yellow-600'} text-white`}>
+                          {property.civilMepReportStatus}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-blue-700 mb-3">Professional structural assessment</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-lg font-bold text-blue-800">₹{property.civilMepReportPrice ? parseFloat(property.civilMepReportPrice).toLocaleString() : '0'}</span>
+                        <Button size="sm" variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-100">
+                          <FileText className="h-4 w-4 mr-2" />
+                          View Report
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {property.hasValuationReport && (
+                    <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-200">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-medium text-emerald-900">Valuation Report</h4>
+                        <Badge className={`${property.valuationReportStatus === 'completed' ? 'bg-green-600' : 'bg-yellow-600'} text-white`}>
+                          {property.valuationReportStatus}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-emerald-700 mb-3">Independent property valuation</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-lg font-bold text-emerald-800">₹{property.valuationReportPrice ? parseFloat(property.valuationReportPrice).toLocaleString() : '0'}</span>
+                        <Button size="sm" variant="outline" className="border-emerald-300 text-emerald-700 hover:bg-emerald-100">
+                          <Award className="h-4 w-4 mr-2" />
+                          View Report
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Property Header */}
             <Card>
               <CardContent className="p-6">
