@@ -14,6 +14,7 @@ import {
   Calendar,
   MapPin,
   Building2,
+  Building,
   ArrowLeft,
   DollarSign,
   Percent,

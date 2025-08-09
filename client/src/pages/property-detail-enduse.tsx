@@ -15,6 +15,7 @@ import {
   Star,
   Calendar,
   Building2,
+  Building,
   ArrowLeft,
   School,
   Hospital,
