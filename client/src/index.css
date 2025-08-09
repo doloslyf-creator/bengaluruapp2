@@ -96,7 +96,7 @@
 
 /* OwnItRight Logo Styles */
 .logo-gradient {
-  background: linear-gradient(135deg, #2563eb 0%, #f97316 50%, #2563eb 100%);
+  background: linear-gradient(135deg, #64748b 0%, #6b7280 50%, #64748b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -124,7 +124,7 @@
   --card-foreground: hsl(210, 24%, 16%);
   --border: hsl(214, 32%, 91%);
   --input: hsl(214, 32%, 91%);
-  --primary: hsl(230, 91%, 56%); /* Stripe Blue #0570de */
+  --primary: hsl(215, 28%, 45%); /* More subtle blue-gray */
   --primary-foreground: hsl(0, 0%, 100%);
   --secondary: hsl(210, 40%, 98%);
   --secondary-foreground: hsl(210, 24%, 16%);
@@ -132,11 +132,11 @@
   --accent-foreground: hsl(210, 24%, 16%);
   --destructive: hsl(0, 91%, 55%); /* Stripe Red #df1b41 */
   --destructive-foreground: hsl(0, 0%, 100%);
-  --success: hsl(142, 76%, 36%); /* Stripe Green #00d924 */
+  --success: hsl(142, 45%, 42%); /* More muted green */
   --success-foreground: hsl(0, 0%, 100%);
-  --warning: hsl(38, 92%, 50%); /* Stripe Orange #ff9500 */
+  --warning: hsl(38, 65%, 45%); /* More muted orange */
   --warning-foreground: hsl(0, 0%, 100%);
-  --ring: hsl(230, 91%, 56%);
+  --ring: hsl(215, 28%, 45%);
   --radius: 0.75rem; /* Increased for modern look */
   --neutral: hsl(210, 40%, 98%);
   

@@ -32,8 +32,8 @@ export function ExitIntentPopup() {
         </button>
 
         <div className="text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <AlertTriangle className="h-8 w-8 text-red-600" />
+          <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <AlertTriangle className="h-8 w-8 text-orange-600" />
           </div>
 
           <h3 className="text-2xl font-bold text-gray-900 mb-4">
@@ -45,10 +45,10 @@ export function ExitIntentPopup() {
             and join 2,847+ smart buyers who avoided costly mistakes.
           </p>
 
-          <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-2xl p-4 mb-6">
+          <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-4 mb-6">
             <div className="flex items-center justify-center mb-3">
-              <Gift className="h-5 w-5 text-red-600 mr-2" />
-              <span className="font-bold text-red-800">Limited Time Bonus</span>
+              <Gift className="h-5 w-5 text-orange-600 mr-2" />
+              <span className="font-bold text-orange-800">Limited Time Bonus</span>
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
@@ -69,7 +69,7 @@ export function ExitIntentPopup() {
             </div>
           </div>
 
-          <div className="flex items-center justify-center mb-6 text-red-600">
+          <div className="flex items-center justify-center mb-6 text-orange-600">
             <Clock className="h-4 w-4 mr-2" />
             <span className="text-sm font-medium">Offer expires in 10 minutes</span>
           </div>
@@ -77,7 +77,7 @@ export function ExitIntentPopup() {
           <div className="space-y-3">
             <Link href="/find-property">
               <Button 
-                className="w-full bg-red-600 hover:bg-red-700 text-white h-12 text-lg font-bold"
+                className="w-full bg-primary hover:bg-primary/90 text-white h-12 text-lg font-bold"
                 onClick={() => setIsVisible(false)}
               >
                 <TrendingUp className="h-5 w-5 mr-2" />
