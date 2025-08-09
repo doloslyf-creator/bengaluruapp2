@@ -563,8 +563,8 @@ export default function PropertyResults() {
                   return (
                     <Card key={property.id} className="group hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer border-2 border-slate-200 hover:border-blue-300 bg-white rounded-2xl overflow-hidden card-hover-effect">
                       <div onClick={() => handleViewProperty(property)} className="relative">
-                        {/* Enhanced Property Image */}
-                        <div className="aspect-[4/3] bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 relative overflow-hidden">
+                        {/* Compact Property Image */}
+                        <div className="aspect-[3/2] bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 relative overflow-hidden">
                           <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
                           <div className="text-slate-400 text-center absolute inset-0 flex items-center justify-center">
                             <div>
@@ -624,6 +624,19 @@ export default function PropertyResults() {
                             {getPriceRange(property.configurations)}
                           </div>
                           
+                          {/* Investment Insights */}
+                          {preferences.intent && (
+                            <div className="flex flex-wrap gap-2">
+                              {getIntentHighlights(property).slice(0, 2).map((highlight, index) => (
+                                <div key={index} className="flex items-center space-x-1 bg-gray-50 border border-gray-200 rounded-md px-2 py-1">
+                                  <highlight.icon className={`w-3 h-3 ${highlight.color}`} />
+                                  <span className="text-xs font-medium text-gray-700">{highlight.label}:</span>
+                                  <span className={`text-xs font-semibold ${highlight.color}`}>{highlight.value}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
                           {/* Compact Configurations */}
                           {property.configurations.length > 0 && (
                             <div className="flex flex-wrap gap-1">
