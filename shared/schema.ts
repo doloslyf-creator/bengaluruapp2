@@ -1467,8 +1467,56 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// RERA Data types
+// RERA Data table
+export const reraData = pgTable("rera_data", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  reraId: text("rera_id").unique().notNull(),
+  propertyId: varchar("property_id").references(() => properties.id),
+  
+  // Basic Project Information
+  projectName: text("project_name").notNull(),
+  promoterName: text("promoter_name").notNull(),
+  location: text("location").notNull(),
+  district: text("district").notNull(),
+  state: text("state").default("Karnataka"),
+  
+  // Project Details
+  projectType: varchar("project_type", { 
+    enum: ["residential", "commercial", "mixed", "plotted-development", "other"] 
+  }).default("residential"),
+  totalUnits: integer("total_units"),
+  projectArea: text("project_area"),
+  builtUpArea: text("built_up_area"),
+  
+  // Legal and Compliance Status
+  registrationDate: text("registration_date"),
+  approvalDate: text("approval_date"),
+  completionDate: text("completion_date"),
+  registrationValidTill: text("registration_valid_till"),
+  projectStatus: varchar("project_status", { 
+    enum: ["under-construction", "completed", "delayed", "cancelled", "approved"] 
+  }).default("under-construction"),
+  complianceStatus: varchar("compliance_status", { 
+    enum: ["active", "non-compliant", "suspended", "cancelled"] 
+  }).default("active"),
+  
+  // Financial Information
+  projectCost: text("project_cost"),
+  amountCollected: text("amount_collected"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
 
+// RERA Data types
+export const insertReraDataSchema = createInsertSchema(reraData).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type ReraData = typeof reraData.$inferSelect;
+export type InsertReraData = z.infer<typeof insertReraDataSchema>;
 
 // User types - keeping existing ones
 export const insertUserSchema = createInsertSchema(users).omit({
