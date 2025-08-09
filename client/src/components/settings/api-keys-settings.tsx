@@ -211,10 +211,7 @@ export function ApiKeysSettings() {
 
   const updateApiKeysMutation = useMutation({
     mutationFn: async (data: ApiKeysData) => {
-      return apiRequest("/api/settings/api-keys", {
-        method: "PUT",
-        body: JSON.stringify(data),
-      });
+      return apiRequest("PUT", "/api/settings/api-keys", data);
     },
     onSuccess: () => {
       toast({
@@ -234,9 +231,7 @@ export function ApiKeysSettings() {
 
   const testConnectionMutation = useMutation({
     mutationFn: async (service: string) => {
-      return apiRequest(`/api/settings/test-connection/${service}`, {
-        method: "POST",
-      });
+      return apiRequest("POST", `/api/settings/test-connection/${service}`);
     },
     onSuccess: (data: any, service: string) => {
       toast({

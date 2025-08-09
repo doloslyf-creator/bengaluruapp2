@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { Eye, EyeOff, Mail, Lock, Shield } from "lucide-react";
+import { SupabaseConnectionTest } from "./SupabaseConnectionTest";
 
 interface AdminAuthFormProps {
   onSuccess?: () => void;
@@ -16,6 +17,7 @@ export function AdminAuthForm({ onSuccess }: AdminAuthFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showConnectionTest, setShowConnectionTest] = useState(false);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -42,7 +44,23 @@ export function AdminAuthForm({ onSuccess }: AdminAuthFormProps) {
       });
 
       if (error) {
-        setError(error.message);
+        // Provide more helpful error messages
+        let userFriendlyError = error.message;
+        
+        if (error.message.includes('Invalid login credentials')) {
+          userFriendlyError = 'Invalid email or password. Please check your credentials and try again.';
+        } else if (error.message.includes('Email not confirmed')) {
+          userFriendlyError = 'Please confirm your email address before signing in.';
+        } else if (error.message.includes('Too many requests')) {
+          userFriendlyError = 'Too many sign-in attempts. Please wait a moment and try again.';
+        } else if (error.message.includes('fetch')) {
+          userFriendlyError = 'Connection issue. Please check your internet connection and try again.';
+        } else if (error.message.includes('API key') || error.message.includes('Invalid API')) {
+          userFriendlyError = 'Authentication service configuration issue. Please use the connection diagnostics below to identify the problem.';
+          setShowConnectionTest(true); // Auto-show diagnostics for API key issues
+        }
+        
+        setError(userFriendlyError);
         return;
       }
 
@@ -144,8 +162,22 @@ export function AdminAuthForm({ onSuccess }: AdminAuthFormProps) {
             </Button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-muted-foreground">
-            <p>
+          <div className="mt-6 text-center">
+            <button
+              type="button"
+              onClick={() => setShowConnectionTest(!showConnectionTest)}
+              className="text-xs text-blue-600 hover:text-blue-800 underline"
+            >
+              {showConnectionTest ? 'Hide' : 'Show'} Connection Diagnostics
+            </button>
+            
+            {showConnectionTest && (
+              <div className="mt-4">
+                <SupabaseConnectionTest />
+              </div>
+            )}
+            
+            <p className="mt-4 text-xs text-muted-foreground">
               Authorized personnel only. All access is logged and monitored.
             </p>
           </div>
