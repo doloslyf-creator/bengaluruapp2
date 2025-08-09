@@ -53,21 +53,45 @@ export default function PropertyResults() {
   
   // Get preferences from navigation state or localStorage
   const getCachedPreferences = (): PropertyPreferences => {
+    // First try to get from navigation state
+    if (history.state?.preferences) {
+      return history.state.preferences;
+    }
+    
+    // Then try localStorage
     const cached = localStorage.getItem('propertyPreferences');
     if (cached) {
       try {
-        return JSON.parse(cached);
+        const parsed = JSON.parse(cached);
+        // Ensure all required fields exist
+        return {
+          intent: parsed.intent || '',
+          propertyType: parsed.propertyType || "",
+          cityId: parsed.cityId || "",
+          zoneId: parsed.zoneId || "",
+          zone: parsed.zone || "",
+          budgetRange: parsed.budgetRange || [50, 500],
+          bhkType: parsed.bhkType || [],
+          tags: parsed.tags || [],
+          amenities: parsed.amenities || [],
+          ...parsed
+        };
       } catch {
         // If parsing fails, return defaults
       }
     }
+    
+    // Default fallback
     return {
       intent: '',
       propertyType: "",
       cityId: "",
       zoneId: "",
+      zone: "",
       budgetRange: [50, 500],
-      bhkType: []
+      bhkType: [],
+      tags: [],
+      amenities: []
     };
   };
 
@@ -170,10 +194,20 @@ export default function PropertyResults() {
     
     return allProperties
       .filter(property => {
-        // STRICT filtering: If property type is selected, only show matching properties
-        if (preferences.propertyType && preferences.propertyType !== property.type) {
+        // Basic filtering - only exclude if there's a clear mismatch
+        
+        // Property type filter - only if specified
+        if (preferences.propertyType && preferences.propertyType !== "" && preferences.propertyType !== property.type) {
           return false;
         }
+        
+        // Zone filter - only if specified, check both zoneId and zone name
+        if (preferences.zoneId && preferences.zoneId !== "" && preferences.zoneId !== property.zoneId) {
+          if (preferences.zone && preferences.zone !== "" && preferences.zone !== property.zone) {
+            return false;
+          }
+        }
+        
         return true;
       })
       .map(property => {
@@ -181,35 +215,53 @@ export default function PropertyResults() {
         
         let score = 0;
         
-        // Property type match (30 points) - since we've pre-filtered, always give full score
-        if (preferences.propertyType && preferences.propertyType === property.type) {
+        // Property type match (30 points)
+        if (preferences.propertyType && preferences.propertyType !== "" && preferences.propertyType === property.type) {
           score += 30;
-        } else if (!preferences.propertyType) {
-          score += 15; // Default score when no type preference
+        } else if (!preferences.propertyType || preferences.propertyType === "") {
+          score += 20; // Default score when no type preference
         }
         
-        // Zone match (25 points) - if no preference set, give partial score
-        if (!preferences.zoneId || preferences.zoneId === property.zoneId) {
-          score += preferences.zoneId ? 25 : 12;
+        // Zone match (25 points)
+        if (preferences.zoneId && preferences.zoneId !== "" && preferences.zoneId === property.zoneId) {
+          score += 25;
+        } else if (preferences.zone && preferences.zone !== "" && preferences.zone === property.zone) {
+          score += 25;
+        } else if (!preferences.zoneId && !preferences.zone) {
+          score += 15; // Default score when no zone preference
         }
         
-        // Budget range match (25 points) - if no configurations, give default score
+        // Budget range match (25 points)
         if (propertyConfigs.length === 0) {
-          score += 20; // Default score when no price data available
+          score += 15; // Partial score when no price data available
         } else {
-          // Calculate actual prices using pricePerSqft * builtUpArea
-          const prices = propertyConfigs.map(c => {
-            const pricePerSqft = parseFloat(c.pricePerSqft.toString());
-            const builtUpArea = c.builtUpArea;
-            return pricePerSqft * builtUpArea;
-          });
-          const minPrice = Math.min(...prices) / 10000000; // Convert to crores
-          const maxPrice = Math.max(...prices) / 10000000;
-          const budgetMin = preferences.budgetRange[0] / 100; // Convert from lakhs to crores
-          const budgetMax = preferences.budgetRange[1] / 100;
-          
-          if (minPrice <= budgetMax && maxPrice >= budgetMin) {
-            score += 25;
+          try {
+            // Calculate actual prices using pricePerSqft * builtUpArea
+            const prices = propertyConfigs.map(c => {
+              const pricePerSqft = parseFloat(c.pricePerSqft.toString()) || 0;
+              const builtUpArea = c.builtUpArea || 1000; // Default area if missing
+              return pricePerSqft * builtUpArea;
+            }).filter(price => price > 0);
+            
+            if (prices.length > 0) {
+              const minPrice = Math.min(...prices) / 1000000; // Convert to lakhs
+              const maxPrice = Math.max(...prices) / 1000000;
+              const budgetMin = preferences.budgetRange[0]; // Already in lakhs
+              const budgetMax = preferences.budgetRange[1];
+              
+              // Check if there's any overlap in price ranges
+              if (minPrice <= budgetMax && maxPrice >= budgetMin) {
+                score += 25;
+              } else if (Math.abs(minPrice - budgetMax) < budgetMax * 0.3 || Math.abs(maxPrice - budgetMin) < budgetMin * 0.3) {
+                score += 15; // Close to budget range
+              } else {
+                score += 5; // Outside budget but still show
+              }
+            } else {
+              score += 10; // Invalid price data
+            }
+          } catch (error) {
+            score += 10; // Error in price calculation
           }
         }
         
@@ -242,21 +294,28 @@ export default function PropertyResults() {
         } else if (propertyConfigs.length === 0) {
           score += 2; // Partial score when no configuration data
         } else {
-          const hasMatchingBHK = propertyConfigs.some(config => 
-            preferences.bhkType.some(bhk => config.configuration.includes(bhk))
-          );
+          const hasMatchingBHK = propertyConfigs.some(config => {
+            const configLower = config.configuration.toLowerCase();
+            return preferences.bhkType.some(bhk => {
+              const bhkLower = bhk.toLowerCase().replace(' ', '');
+              // Check for various BHK formats: "2 BHK", "2BHK", "2-BHK", etc.
+              return configLower.includes(bhkLower) || 
+                     configLower.includes(bhk.toLowerCase()) ||
+                     configLower.includes(bhk.replace(' BHK', 'bhk').replace(' ', ''));
+            });
+          });
           if (hasMatchingBHK) score += 5;
         }
 
         const finalProperty = {
           ...property,
           configurations: propertyConfigs,
-          matchScore: Math.round(score)
+          matchScore: Math.round(Math.max(score, 20)) // Ensure minimum score of 20
         };
         
         return finalProperty;
       })
-      .filter(property => property.matchScore > 10) // Lower threshold to show more results
+      .filter(property => property.matchScore >= 15) // Lower threshold to show more results
       .sort((a, b) => b.matchScore - a.matchScore);
   };
 
@@ -313,29 +372,40 @@ export default function PropertyResults() {
   };
 
   const handleViewProperty = (property: PropertyWithConfigurations) => {
-    navigate(`/property/${property.id}/${generatePropertySlug(property)}`);
+    // Store current preferences and property data for the detail page
+    localStorage.setItem('propertyPreferences', JSON.stringify(preferences));
+    localStorage.setItem('currentProperty', JSON.stringify(property));
+    navigate(`/property/${property.id}`);
   };
 
   const getPriceRange = (configurations: PropertyConfiguration[]) => {
     if (!configurations.length) {
       // Show default pricing if no configurations available
-      return "₹45 L - ₹2.5 Cr";
+      return "Price on Request";
     }
     
-    // Calculate actual prices using pricePerSqft * builtUpArea
-    const prices = configurations.map(c => {
-      const pricePerSqft = parseFloat(c.pricePerSqft.toString());
-      const builtUpArea = c.builtUpArea;
-      return pricePerSqft * builtUpArea;
-    });
-    
-    const minPrice = Math.min(...prices);
-    const maxPrice = Math.max(...prices);
-    
-    if (minPrice === maxPrice) {
-      return formatPriceDisplay(minPrice);
+    try {
+      // Calculate actual prices using pricePerSqft * builtUpArea
+      const prices = configurations.map(c => {
+        const pricePerSqft = parseFloat(c.pricePerSqft.toString()) || 0;
+        const builtUpArea = c.builtUpArea || 1000;
+        return pricePerSqft * builtUpArea;
+      }).filter(price => price > 0);
+      
+      if (prices.length === 0) {
+        return "Price on Request";
+      }
+      
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      
+      if (minPrice === maxPrice) {
+        return formatPriceDisplay(minPrice);
+      }
+      return `${formatPriceDisplay(minPrice)} - ${formatPriceDisplay(maxPrice)}`;
+    } catch (error) {
+      return "Price on Request";
     }
-    return `${formatPriceDisplay(minPrice)} - ${formatPriceDisplay(maxPrice)}`;
   };
 
   const getMatchLabel = (score: number) => {

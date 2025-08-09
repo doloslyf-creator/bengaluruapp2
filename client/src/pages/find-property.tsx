@@ -110,10 +110,20 @@ export default function FindProperty() {
   const bhkOptions = ["1 BHK", "2 BHK", "3 BHK", "4 BHK", "4+ BHK"];
 
   const handlePreferenceChange = (key: keyof PropertyPreferences, value: any) => {
-    setPreferences(prev => ({
-      ...prev,
+    const newPreferences = {
+      ...preferences,
       [key]: value
-    }));
+    };
+    
+    // When zone changes, also store the zone name for filtering
+    if (key === 'zoneId' && value) {
+      const selectedZone = zones.find(zone => zone.id === value);
+      if (selectedZone) {
+        newPreferences.zone = selectedZone.name;
+      }
+    }
+    
+    setPreferences(newPreferences);
   };
 
   const handleArrayToggle = (key: keyof PropertyPreferences, value: string) => {
@@ -141,11 +151,10 @@ export default function FindProperty() {
   const isFormValid = () => {
     const hasIntent = preferences.intent !== "";
     const hasPropertyType = preferences.propertyType !== "";
-    const hasCity = preferences.cityId !== "";
-    const hasZone = preferences.zoneId !== "";
-    const hasBhkType = preferences.propertyType === "plot" || preferences.bhkType.length > 0;
+    // Make city and zone optional for better user experience
+    const hasBhkType = preferences.propertyType === "plot" || preferences.bhkType.length > 0 || !preferences.propertyType;
     
-    return hasIntent && hasPropertyType && hasCity && hasZone && hasBhkType;
+    return hasIntent && (hasPropertyType || !hasIntent) && hasBhkType;
   };
 
   const getIntentSpecificFields = () => {
