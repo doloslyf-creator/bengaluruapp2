@@ -141,7 +141,8 @@ export default function EnhancedLeads() {
           }
         }
       });
-      const result = await apiRequest("GET", `/api/leads/enhanced?${params.toString()}`);
+      const response = await apiRequest("GET", `/api/leads/enhanced?${params.toString()}`);
+      const result = await response.json();
       console.log("Enhanced leads data:", result);
       return result;
     }
@@ -455,7 +456,7 @@ export default function EnhancedLeads() {
                             {lead.leadId}
                           </div>
                           <div className="text-xs text-gray-400">
-                            {format(new Date(lead.createdAt), "MMM dd, yyyy")}
+                            {lead.createdAt ? format(new Date(lead.createdAt), "MMM dd, yyyy") : "N/A"}
                           </div>
                         </div>
                       </TableCell>
@@ -555,7 +556,7 @@ export default function EnhancedLeads() {
                 Lead Details: {selectedLead?.customerName}
               </DialogTitle>
               <DialogDescription>
-                {selectedLead?.leadId} • Created {selectedLead && format(new Date(selectedLead.createdAt), "MMM dd, yyyy")}
+                {selectedLead?.leadId} • Created {selectedLead?.createdAt ? format(new Date(selectedLead.createdAt), "MMM dd, yyyy") : "N/A"}
               </DialogDescription>
             </DialogHeader>
             
@@ -700,7 +701,7 @@ export default function EnhancedLeads() {
                             )}
                           </div>
                           <div className="text-xs text-gray-500">
-                            {format(new Date(activity.createdAt), "MMM dd, HH:mm")}
+                            {activity.createdAt ? format(new Date(activity.createdAt), "MMM dd, HH:mm") : "N/A"}
                           </div>
                         </div>
                       </Card>
@@ -750,7 +751,7 @@ export default function EnhancedLeads() {
                               </div>
                             </div>
                             <div className="text-xs text-gray-500">
-                              {format(new Date(note.createdAt), "MMM dd, HH:mm")}
+                              {note.createdAt ? format(new Date(note.createdAt), "MMM dd, HH:mm") : "N/A"}
                             </div>
                           </div>
                         </Card>
