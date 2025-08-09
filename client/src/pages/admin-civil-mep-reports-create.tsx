@@ -33,23 +33,26 @@ const formSchema = z.object({
   recommendations: z.string().default(""),
   conclusions: z.string().default(""),
   investmentRecommendation: z.enum(["highly-recommended", "recommended", "conditional", "not-recommended"]).default("conditional"),
-  // JSON fields
-  siteInformation: z.any().default({}),
-  foundationDetails: z.any().default({}),
-  superstructureDetails: z.any().default({}),
-  wallsFinishes: z.any().default({}),
-  roofingDetails: z.any().default({}),
-  doorsWindows: z.any().default({}),
-  flooringDetails: z.any().default({}),
-  staircasesElevators: z.any().default({}),
-  externalWorks: z.any().default({}),
-  mechanicalSystems: z.any().default({}),
-  electricalSystems: z.any().default({}),
-  plumbingSystems: z.any().default({}),
-  fireSafetySystems: z.any().default({}),
-  bmsAutomation: z.any().default({}),
-  greenSustainability: z.any().default({}),
-  documentation: z.any().default({}),
+  // Simplified form fields for basic site information and key details
+  siteLocation: z.string().default(""),
+  plotArea: z.string().default(""),
+  builtUpArea: z.string().default(""),
+  foundationType: z.string().default(""),
+  structuralSystem: z.string().default(""),
+  concreteGrade: z.string().default(""),
+  steelGrade: z.string().default(""),
+  structuralCondition: z.string().default(""),
+  wallMaterial: z.string().default(""),
+  roofType: z.string().default(""),
+  electricalLoad: z.string().default(""),
+  plumbingType: z.string().default(""),
+  hvacSystem: z.string().default(""),
+  fireSafetyGrade: z.string().default(""),
+  // Detailed notes fields
+  civilNotes: z.string().default(""),
+  mechanicalNotes: z.string().default(""),
+  electricalNotes: z.string().default(""),
+  plumbingNotes: z.string().default(""),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -92,23 +95,25 @@ export function AdminCivilMepReportsCreate() {
       recommendations: "",
       conclusions: "",
       investmentRecommendation: "conditional",
-      // Initialize JSON fields as empty objects
-      siteInformation: {},
-      foundationDetails: {},
-      superstructureDetails: {},
-      wallsFinishes: {},
-      roofingDetails: {},
-      doorsWindows: {},
-      flooringDetails: {},
-      staircasesElevators: {},
-      externalWorks: {},
-      mechanicalSystems: {},
-      electricalSystems: {},
-      plumbingSystems: {},
-      fireSafetySystems: {},
-      bmsAutomation: {},
-      greenSustainability: {},
-      documentation: {},
+      // Initialize simplified fields
+      siteLocation: "",
+      plotArea: "",
+      builtUpArea: "",
+      foundationType: "",
+      structuralSystem: "",
+      concreteGrade: "",
+      steelGrade: "",
+      structuralCondition: "",
+      wallMaterial: "",
+      roofType: "",
+      electricalLoad: "",
+      plumbingType: "",
+      hvacSystem: "",
+      fireSafetyGrade: "",
+      civilNotes: "",
+      mechanicalNotes: "",
+      electricalNotes: "",
+      plumbingNotes: "",
     },
   });
 
@@ -136,22 +141,24 @@ export function AdminCivilMepReportsCreate() {
         conclusions: report.conclusions || "",
         investmentRecommendation: report.investmentRecommendation || "conditional",
         // Populate JSON fields with existing data or empty objects
-        siteInformation: report.siteInformation || {},
-        foundationDetails: report.foundationDetails || {},
-        superstructureDetails: report.superstructureDetails || {},
-        wallsFinishes: report.wallsFinishes || {},
-        roofingDetails: report.roofingDetails || {},
-        doorsWindows: report.doorsWindows || {},
-        flooringDetails: report.flooringDetails || {},
-        staircasesElevators: report.staircasesElevators || {},
-        externalWorks: report.externalWorks || {},
-        mechanicalSystems: report.mechanicalSystems || {},
-        electricalSystems: report.electricalSystems || {},
-        plumbingSystems: report.plumbingSystems || {},
-        fireSafetySystems: report.fireSafetySystems || {},
-        bmsAutomation: report.bmsAutomation || {},
-        greenSustainability: report.greenSustainability || {},
-        documentation: report.documentation || {},
+        siteLocation: report.siteLocation || "",
+        plotArea: report.plotArea || "",
+        builtUpArea: report.builtUpArea || "",
+        foundationType: report.foundationType || "",
+        structuralSystem: report.structuralSystem || "",
+        concreteGrade: report.concreteGrade || "",
+        steelGrade: report.steelGrade || "",
+        structuralCondition: report.structuralCondition || "",
+        wallMaterial: report.wallMaterial || "",
+        roofType: report.roofType || "",
+        electricalLoad: report.electricalLoad || "",
+        plumbingType: report.plumbingType || "",
+        hvacSystem: report.hvacSystem || "",
+        fireSafetyGrade: report.fireSafetyGrade || "",
+        civilNotes: report.civilNotes || "",
+        mechanicalNotes: report.mechanicalNotes || "",
+        electricalNotes: report.electricalNotes || "",
+        plumbingNotes: report.plumbingNotes || "",
       });
     }
   }, [existingReport, isEditMode, form]);
@@ -221,22 +228,24 @@ export function AdminCivilMepReportsCreate() {
       recommendations: data.recommendations,
       conclusions: data.conclusions,
       investmentRecommendation: data.investmentRecommendation,
-      siteInformation: data.siteInformation,
-      foundationDetails: data.foundationDetails,
-      superstructureDetails: data.superstructureDetails,
-      wallsFinishes: data.wallsFinishes,
-      roofingDetails: data.roofingDetails,
-      doorsWindows: data.doorsWindows,
-      flooringDetails: data.flooringDetails,
-      staircasesElevators: data.staircasesElevators,
-      externalWorks: data.externalWorks,
-      mechanicalSystems: data.mechanicalSystems,
-      electricalSystems: data.electricalSystems,
-      plumbingSystems: data.plumbingSystems,
-      fireSafetySystems: data.fireSafetySystems,
-      bmsAutomation: data.bmsAutomation,
-      greenSustainability: data.greenSustainability,
-      documentation: data.documentation,
+      siteLocation: data.siteLocation,
+      plotArea: data.plotArea,
+      builtUpArea: data.builtUpArea,
+      foundationType: data.foundationType,
+      structuralSystem: data.structuralSystem,
+      concreteGrade: data.concreteGrade,
+      steelGrade: data.steelGrade,
+      structuralCondition: data.structuralCondition,
+      wallMaterial: data.wallMaterial,
+      roofType: data.roofType,
+      electricalLoad: data.electricalLoad,
+      plumbingType: data.plumbingType,
+      hvacSystem: data.hvacSystem,
+      fireSafetyGrade: data.fireSafetyGrade,
+      civilNotes: data.civilNotes,
+      mechanicalNotes: data.mechanicalNotes,
+      electricalNotes: data.electricalNotes,
+      plumbingNotes: data.plumbingNotes,
     };
     
     console.log("Submitting data to API:", submitData);
@@ -592,128 +601,237 @@ export function AdminCivilMepReportsCreate() {
               {/* Site Information */}
               <Card>
                 <CardHeader>
-                  <CardTitle>1. Site Information</CardTitle>
+                  <CardTitle>Site Information</CardTitle>
                   <CardDescription>Basic project and location details</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label>Project Name</Label>
-                      <Input placeholder="Enter project name" />
-                    </div>
-                    <div>
-                      <Label>Location</Label>
-                      <Input placeholder="Project location" />
-                    </div>
-                    <div>
-                      <Label>Latitude</Label>
-                      <Input type="number" placeholder="Latitude coordinates" />
-                    </div>
-                    <div>
-                      <Label>Longitude</Label>
-                      <Input type="number" placeholder="Longitude coordinates" />
-                    </div>
-                    <div>
-                      <Label>Address</Label>
-                      <Input placeholder="Complete address" />
-                    </div>
-                    <div>
-                      <Label>Site Area (sq ft)</Label>
-                      <Input type="number" placeholder="Total site area" />
-                    </div>
-                    <div>
-                      <Label>Built-up Area (sq ft)</Label>
-                      <Input type="number" placeholder="Built-up area" />
-                    </div>
-                    <div>
-                      <Label>Number of Floors</Label>
-                      <Input type="number" placeholder="Total floors" />
-                    </div>
+                    <FormField
+                      control={form.control}
+                      name="siteLocation"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Site Location</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Site address/location" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="plotArea"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Plot Area (sq ft)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Total plot area" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="builtUpArea"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Built-up Area (sq ft)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Total built-up area" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
-                  <div>
-                    <Label>Site Description</Label>
-                    <Textarea placeholder="Detailed site description and observations..." />
-                  </div>
+                  <FormField
+                    control={form.control}
+                    name="civilNotes"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Site Description & Notes</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder="Detailed site description and observations..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </CardContent>
               </Card>
 
-              {/* Foundation Details */}
+              {/* Foundation & Structure */}
               <Card>
                 <CardHeader>
-                  <CardTitle>2. Foundation Details</CardTitle>
-                  <CardDescription>Foundation and basement assessment</CardDescription>
+                  <CardTitle>Foundation & Structure</CardTitle>
+                  <CardDescription>Foundation and structural assessment</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label>Foundation Type</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select foundation type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="isolated">Isolated Footing</SelectItem>
-                          <SelectItem value="combined">Combined Footing</SelectItem>
-                          <SelectItem value="raft">Raft Foundation</SelectItem>
-                          <SelectItem value="pile">Pile Foundation</SelectItem>
-                          <SelectItem value="strip">Strip Foundation</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Foundation Depth (ft)</Label>
-                      <Input type="number" placeholder="Foundation depth" />
-                    </div>
-                    <div>
-                      <Label>Soil Type</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select soil type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="clay">Clay</SelectItem>
-                          <SelectItem value="sandy">Sandy</SelectItem>
-                          <SelectItem value="rocky">Rocky</SelectItem>
-                          <SelectItem value="mixed">Mixed</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Waterproofing</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Waterproofing status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="excellent">Excellent</SelectItem>
-                          <SelectItem value="good">Good</SelectItem>
-                          <SelectItem value="fair">Fair</SelectItem>
-                          <SelectItem value="poor">Poor</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Basement Levels</Label>
-                      <Input type="number" placeholder="Number of basement levels" />
-                    </div>
-                    <div>
-                      <Label>Basement Condition</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Basement condition" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="excellent">Excellent</SelectItem>
-                          <SelectItem value="good">Good</SelectItem>
-                          <SelectItem value="fair">Fair</SelectItem>
-                          <SelectItem value="poor">Poor</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div>
-                    <Label>Foundation Notes</Label>
-                    <Textarea placeholder="Additional foundation observations and notes..." />
+                    <FormField
+                      control={form.control}
+                      name="foundationType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Foundation Type</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select foundation type" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="isolated">Isolated Footing</SelectItem>
+                              <SelectItem value="combined">Combined Footing</SelectItem>
+                              <SelectItem value="raft">Raft Foundation</SelectItem>
+                              <SelectItem value="pile">Pile Foundation</SelectItem>
+                              <SelectItem value="strip">Strip Foundation</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="structuralSystem"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Structural System</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select structural system" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="rcc-frame">RCC Frame</SelectItem>
+                              <SelectItem value="load-bearing">Load Bearing</SelectItem>
+                              <SelectItem value="steel-frame">Steel Frame</SelectItem>
+                              <SelectItem value="composite">Composite</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="concreteGrade"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Concrete Grade</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Concrete grade" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="m20">M20</SelectItem>
+                              <SelectItem value="m25">M25</SelectItem>
+                              <SelectItem value="m30">M30</SelectItem>
+                              <SelectItem value="m35">M35</SelectItem>
+                              <SelectItem value="m40">M40</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="steelGrade"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Steel Grade</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Steel grade" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="fe415">Fe 415</SelectItem>
+                              <SelectItem value="fe500">Fe 500</SelectItem>
+                              <SelectItem value="fe550">Fe 550</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="structuralCondition"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Structural Condition</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Overall condition" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="excellent">Excellent</SelectItem>
+                              <SelectItem value="good">Good</SelectItem>
+                              <SelectItem value="fair">Fair</SelectItem>
+                              <SelectItem value="poor">Poor</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="wallMaterial"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Wall Material</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Wall material" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="brick">Clay Brick</SelectItem>
+                              <SelectItem value="concrete-block">Concrete Block</SelectItem>
+                              <SelectItem value="aac">AAC Block</SelectItem>
+                              <SelectItem value="flyash">Fly Ash Brick</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="roofType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Roof Type</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Roof type" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="flat">Flat Roof</SelectItem>
+                              <SelectItem value="sloped">Sloped Roof</SelectItem>
+                              <SelectItem value="terrace">Terrace</SelectItem>
+                              <SelectItem value="mixed">Mixed Type</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -1385,611 +1503,146 @@ export function AdminCivilMepReportsCreate() {
               {/* Mechanical Systems */}
               <Card>
                 <CardHeader>
-                  <CardTitle>1. Mechanical Systems</CardTitle>
+                  <CardTitle>Mechanical Systems</CardTitle>
                   <CardDescription>HVAC and mechanical equipment assessment</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label>HVAC System Type</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="HVAC system type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="central-ac">Central AC</SelectItem>
-                          <SelectItem value="split-ac">Split AC</SelectItem>
-                          <SelectItem value="vrf">VRF System</SelectItem>
-                          <SelectItem value="chilled-water">Chilled Water</SelectItem>
-                          <SelectItem value="package-unit">Package Unit</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Ventilation System</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Ventilation type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="natural">Natural Ventilation</SelectItem>
-                          <SelectItem value="mechanical">Mechanical Ventilation</SelectItem>
-                          <SelectItem value="mixed">Mixed Mode</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Cooling Capacity (TR)</Label>
-                      <Input type="number" placeholder="Total cooling capacity" />
-                    </div>
-                    <div>
-                      <Label>Air Quality</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Indoor air quality" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="excellent">Excellent</SelectItem>
-                          <SelectItem value="good">Good</SelectItem>
-                          <SelectItem value="fair">Fair</SelectItem>
-                          <SelectItem value="poor">Poor</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Equipment Condition</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Equipment condition" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="excellent">Excellent</SelectItem>
-                          <SelectItem value="good">Good</SelectItem>
-                          <SelectItem value="fair">Fair</SelectItem>
-                          <SelectItem value="poor">Poor</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Maintenance Status</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Maintenance status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="well-maintained">Well Maintained</SelectItem>
-                          <SelectItem value="regular">Regular</SelectItem>
-                          <SelectItem value="poor">Poor</SelectItem>
-                          <SelectItem value="none">No Maintenance</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    <FormField
+                      control={form.control}
+                      name="hvacSystem"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>HVAC System Type</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="HVAC system type" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="central-ac">Central AC</SelectItem>
+                              <SelectItem value="split-ac">Split AC</SelectItem>
+                              <SelectItem value="vrf">VRF System</SelectItem>
+                              <SelectItem value="chilled-water">Chilled Water</SelectItem>
+                              <SelectItem value="package-unit">Package Unit</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="electricalLoad"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Total Electrical Load (KW)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Total electrical load" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="plumbingType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Plumbing System</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Plumbing system type" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="cpvc">CPVC Pipes</SelectItem>
+                              <SelectItem value="pvc">PVC Pipes</SelectItem>
+                              <SelectItem value="copper">Copper Pipes</SelectItem>
+                              <SelectItem value="ppr">PPR Pipes</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="fireSafetyGrade"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Fire Safety Grade</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Fire safety grade" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="excellent">Excellent</SelectItem>
+                              <SelectItem value="good">Good</SelectItem>
+                              <SelectItem value="fair">Fair</SelectItem>
+                              <SelectItem value="poor">Poor</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
-                  <div>
-                    <Label>Mechanical Systems Notes</Label>
-                    <Textarea placeholder="Detailed mechanical systems observations..." />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Electrical Systems */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>2. Electrical Systems</CardTitle>
-                  <CardDescription>Electrical infrastructure and systems</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label>Main Supply (KVA)</Label>
-                      <Input type="number" placeholder="Main electrical supply capacity" />
-                    </div>
-                    <div>
-                      <Label>Backup Power</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Backup power type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="generator">Generator</SelectItem>
-                          <SelectItem value="ups">UPS</SelectItem>
-                          <SelectItem value="inverter">Inverter</SelectItem>
-                          <SelectItem value="solar">Solar Power</SelectItem>
-                          <SelectItem value="none">None</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Panel Board Type</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Panel board type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="mcb">MCB Panel</SelectItem>
-                          <SelectItem value="mccb">MCCB Panel</SelectItem>
-                          <SelectItem value="acb">ACB Panel</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Wiring Type</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Wiring type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="concealed">Concealed Wiring</SelectItem>
-                          <SelectItem value="conduit">Conduit Wiring</SelectItem>
-                          <SelectItem value="cable-tray">Cable Tray</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Lighting Type</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Lighting type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="led">LED</SelectItem>
-                          <SelectItem value="cfl">CFL</SelectItem>
-                          <SelectItem value="fluorescent">Fluorescent</SelectItem>
-                          <SelectItem value="incandescent">Incandescent</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Earthing System</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Earthing system" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="excellent">Excellent</SelectItem>
-                          <SelectItem value="good">Good</SelectItem>
-                          <SelectItem value="fair">Fair</SelectItem>
-                          <SelectItem value="poor">Poor</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Safety Systems</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Safety systems" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="excellent">Excellent</SelectItem>
-                          <SelectItem value="good">Good</SelectItem>
-                          <SelectItem value="fair">Fair</SelectItem>
-                          <SelectItem value="poor">Poor</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Electrical Condition</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Overall condition" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="excellent">Excellent</SelectItem>
-                          <SelectItem value="good">Good</SelectItem>
-                          <SelectItem value="fair">Fair</SelectItem>
-                          <SelectItem value="poor">Poor</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    <FormField
+                      control={form.control}
+                      name="mechanicalNotes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Mechanical Systems Notes</FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="HVAC and mechanical observations..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="electricalNotes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Electrical Systems Notes</FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="Electrical systems observations..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
-                  <div>
-                    <Label>Electrical Systems Notes</Label>
-                    <Textarea placeholder="Detailed electrical systems observations..." />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Plumbing Systems */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>3. Plumbing Systems</CardTitle>
-                  <CardDescription>Water supply and drainage systems</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label>Water Supply Source</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Water supply source" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="municipal">Municipal Supply</SelectItem>
-                          <SelectItem value="borewell">Borewell</SelectItem>
-                          <SelectItem value="tanker">Water Tanker</SelectItem>
-                          <SelectItem value="mixed">Mixed Sources</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Water Storage (Liters)</Label>
-                      <Input type="number" placeholder="Total water storage capacity" />
-                    </div>
-                    <div>
-                      <Label>Pipe Material</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Pipe material" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="cpvc">CPVC</SelectItem>
-                          <SelectItem value="pvc">PVC</SelectItem>
-                          <SelectItem value="ppr">PPR</SelectItem>
-                          <SelectItem value="gi">GI Pipes</SelectItem>
-                          <SelectItem value="copper">Copper</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Drainage System</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Drainage system" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="gravity">Gravity Flow</SelectItem>
-                          <SelectItem value="pumped">Pumped System</SelectItem>
-                          <SelectItem value="mixed">Mixed System</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Sewage Treatment</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sewage treatment" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="stp">STP Available</SelectItem>
-                          <SelectItem value="septic">Septic Tank</SelectItem>
-                          <SelectItem value="municipal">Municipal Connection</SelectItem>
-                          <SelectItem value="none">No Treatment</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Water Quality</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Water quality" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="excellent">Excellent</SelectItem>
-                          <SelectItem value="good">Good</SelectItem>
-                          <SelectItem value="fair">Fair</SelectItem>
-                          <SelectItem value="poor">Poor</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Pressure System</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Water pressure" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="excellent">Excellent</SelectItem>
-                          <SelectItem value="good">Good</SelectItem>
-                          <SelectItem value="fair">Fair</SelectItem>
-                          <SelectItem value="poor">Poor</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Plumbing Condition</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Overall condition" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="excellent">Excellent</SelectItem>
-                          <SelectItem value="good">Good</SelectItem>
-                          <SelectItem value="fair">Fair</SelectItem>
-                          <SelectItem value="poor">Poor</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div>
-                    <Label>Plumbing Systems Notes</Label>
-                    <Textarea placeholder="Detailed plumbing systems observations..." />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Fire Safety Systems */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>4. Fire Safety Systems</CardTitle>
-                  <CardDescription>Fire detection and suppression systems</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label>Fire Detection System</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Fire detection type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="addressable">Addressable System</SelectItem>
-                          <SelectItem value="conventional">Conventional System</SelectItem>
-                          <SelectItem value="wireless">Wireless System</SelectItem>
-                          <SelectItem value="none">No System</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Sprinkler System</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sprinkler system" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="wet">Wet Pipe System</SelectItem>
-                          <SelectItem value="dry">Dry Pipe System</SelectItem>
-                          <SelectItem value="deluge">Deluge System</SelectItem>
-                          <SelectItem value="none">No Sprinkler</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Fire Extinguishers</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Fire extinguisher coverage" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="adequate">Adequate</SelectItem>
-                          <SelectItem value="partial">Partial Coverage</SelectItem>
-                          <SelectItem value="minimal">Minimal</SelectItem>
-                          <SelectItem value="none">None</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Emergency Exits</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Emergency exit status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="adequate">Adequate</SelectItem>
-                          <SelectItem value="partial">Partial</SelectItem>
-                          <SelectItem value="minimal">Minimal</SelectItem>
-                          <SelectItem value="none">None</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Fire Safety Compliance</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="NOC compliance" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="full">Full Compliance</SelectItem>
-                          <SelectItem value="partial">Partial Compliance</SelectItem>
-                          <SelectItem value="non-compliant">Non-Compliant</SelectItem>
-                          <SelectItem value="unknown">Unknown</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Evacuation Plan</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Evacuation plan" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="excellent">Excellent</SelectItem>
-                          <SelectItem value="good">Good</SelectItem>
-                          <SelectItem value="fair">Fair</SelectItem>
-                          <SelectItem value="poor">Poor</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div>
-                    <Label>Fire Safety Notes</Label>
-                    <Textarea placeholder="Detailed fire safety observations..." />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* BMS & Automation */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>5. BMS & Automation</CardTitle>
-                  <CardDescription>Building management and automation systems</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label>BMS Available</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="BMS availability" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="full">Full BMS</SelectItem>
-                          <SelectItem value="partial">Partial BMS</SelectItem>
-                          <SelectItem value="basic">Basic Control</SelectItem>
-                          <SelectItem value="none">No BMS</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Security System</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Security system" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="cctv">CCTV Surveillance</SelectItem>
-                          <SelectItem value="access-control">Access Control</SelectItem>
-                          <SelectItem value="intrusion">Intrusion Detection</SelectItem>
-                          <SelectItem value="integrated">Integrated System</SelectItem>
-                          <SelectItem value="basic">Basic Security</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Home Automation</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Home automation level" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="smart-home">Smart Home</SelectItem>
-                          <SelectItem value="partial">Partial Automation</SelectItem>
-                          <SelectItem value="basic">Basic Controls</SelectItem>
-                          <SelectItem value="none">No Automation</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Energy Management</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Energy management" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="advanced">Advanced EMS</SelectItem>
-                          <SelectItem value="basic">Basic Monitoring</SelectItem>
-                          <SelectItem value="manual">Manual Control</SelectItem>
-                          <SelectItem value="none">No Management</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div>
-                    <Label>BMS & Automation Notes</Label>
-                    <Textarea placeholder="BMS and automation system details..." />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Green & Sustainability */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>6. Green & Sustainability</CardTitle>
-                  <CardDescription>Environmental and sustainability features</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label>Green Building Certification</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Green certification" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="leed">LEED Certified</SelectItem>
-                          <SelectItem value="griha">GRIHA Rated</SelectItem>
-                          <SelectItem value="igbc">IGBC Certified</SelectItem>
-                          <SelectItem value="breeam">BREEAM</SelectItem>
-                          <SelectItem value="none">No Certification</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Solar Power System</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Solar power" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="grid-tied">Grid Tied</SelectItem>
-                          <SelectItem value="off-grid">Off Grid</SelectItem>
-                          <SelectItem value="hybrid">Hybrid System</SelectItem>
-                          <SelectItem value="none">No Solar</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Rainwater Harvesting</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Rainwater harvesting" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="implemented">Implemented</SelectItem>
-                          <SelectItem value="partial">Partial System</SelectItem>
-                          <SelectItem value="planned">Planned</SelectItem>
-                          <SelectItem value="none">Not Available</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Waste Management</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Waste management" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="segregation">Waste Segregation</SelectItem>
-                          <SelectItem value="composting">Composting</SelectItem>
-                          <SelectItem value="recycling">Recycling Program</SelectItem>
-                          <SelectItem value="basic">Basic Collection</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Energy Efficiency</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Energy efficiency rating" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="excellent">Excellent</SelectItem>
-                          <SelectItem value="good">Good</SelectItem>
-                          <SelectItem value="fair">Fair</SelectItem>
-                          <SelectItem value="poor">Poor</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Indoor Air Quality</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Indoor air quality" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="excellent">Excellent</SelectItem>
-                          <SelectItem value="good">Good</SelectItem>
-                          <SelectItem value="fair">Fair</SelectItem>
-                          <SelectItem value="poor">Poor</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div>
-                    <Label>Sustainability Notes</Label>
-                    <Textarea placeholder="Green features and sustainability observations..." />
-                  </div>
+                  <FormField
+                    control={form.control}
+                    name="plumbingNotes"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Plumbing & Fire Safety Notes</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder="Plumbing and fire safety observations..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </CardContent>
               </Card>
             </TabsContent>
 
-            {/* Summary & Assessment Tab */}
+            {/* Summary Tab */}
             <TabsContent value="summary" className="tab-content-transition space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Executive Summary & Assessment</CardTitle>
-                  <CardDescription>
-                    Final assessment, recommendations, and conclusions
-                  </CardDescription>
+                  <CardTitle>Report Summary</CardTitle>
+                  <CardDescription>Executive summary, recommendations, and conclusions</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <FormField
@@ -1999,19 +1652,17 @@ export function AdminCivilMepReportsCreate() {
                       <FormItem>
                         <FormLabel>Executive Summary</FormLabel>
                         <FormControl>
-                          <Textarea
-                            placeholder="Provide a comprehensive executive summary of the assessment..."
-                            className="min-h-[100px]"
-                            value={field.value || ""}
-                            onChange={field.onChange}
-                            data-testid="textarea-executive-summary"
+                          <Textarea 
+                            placeholder="Overall assessment summary..." 
+                            className="min-h-[120px]"
+                            {...field} 
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
+                  
                   <FormField
                     control={form.control}
                     name="recommendations"
@@ -2019,19 +1670,17 @@ export function AdminCivilMepReportsCreate() {
                       <FormItem>
                         <FormLabel>Recommendations</FormLabel>
                         <FormControl>
-                          <Textarea
-                            placeholder="List specific recommendations for the property..."
-                            className="min-h-[100px]"
-                            value={field.value || ""}
-                            onChange={field.onChange}
-                            data-testid="textarea-recommendations"
+                          <Textarea 
+                            placeholder="Key recommendations for improvements..." 
+                            className="min-h-[120px]"
+                            {...field} 
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
+                  
                   <FormField
                     control={form.control}
                     name="conclusions"
@@ -2039,12 +1688,10 @@ export function AdminCivilMepReportsCreate() {
                       <FormItem>
                         <FormLabel>Conclusions</FormLabel>
                         <FormControl>
-                          <Textarea
-                            placeholder="Final conclusions based on the assessment..."
-                            className="min-h-[100px]"
-                            value={field.value || ""}
-                            onChange={field.onChange}
-                            data-testid="textarea-conclusions"
+                          <Textarea 
+                            placeholder="Final conclusions and observations..." 
+                            className="min-h-[120px]"
+                            {...field} 
                           />
                         </FormControl>
                         <FormMessage />
@@ -2058,10 +1705,10 @@ export function AdminCivilMepReportsCreate() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Investment Recommendation</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value || "conditional"}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
-                            <SelectTrigger data-testid="select-investment-recommendation">
-                              <SelectValue />
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select recommendation" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -2078,48 +1725,43 @@ export function AdminCivilMepReportsCreate() {
                 </CardContent>
               </Card>
             </TabsContent>
-              </div>
             </div>
           </Tabs>
 
-          {/* Form Actions */}
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex justify-between">
-                <Button variant="outline" asChild data-testid="button-cancel">
-                  <Link href="/admin-panel/civil-mep-reports">
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Cancel
-                  </Link>
-                </Button>
-                <div className="flex gap-2">
-                  {isEditMode && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => form.handleSubmit((data) => onSubmit(data, false))()}
-                      disabled={saveReportMutation.isPending}
-                      data-testid="button-save-changes"
-                    >
-                      <Save className="w-4 h-4 mr-2" />
-                      {saveReportMutation.isPending ? "Saving..." : "Save Changes"}
-                    </Button>
-                  )}
-                  <Button
-                    type="submit"
-                    disabled={saveReportMutation.isPending}
-                    data-testid="button-create-report"
-                  >
-                    <Save className="w-4 h-4 mr-2" />
-                    {saveReportMutation.isPending ? (isEditMode ? "Updating..." : "Creating...") : (isEditMode ? "Save & Close" : "Create Report")}
-                  </Button>
+          {/* Action Buttons */}
+          <div className="flex items-center justify-between pt-6 border-t">
+            <div className="flex items-center gap-2">
+              {saveReportMutation.isPending && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                  Saving report...
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-          </form>
-        </Form>
-      </div>
-    </AdminLayout>
-  );
+              )}
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => form.handleSubmit((data) => onSubmit(data, false))()}
+                disabled={saveReportMutation.isPending}
+              >
+                <Save className="w-4 h-4 mr-2" />
+                Save Draft
+              </Button>
+              
+              <Button
+                type="submit"
+                disabled={saveReportMutation.isPending}
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {isEditMode ? "Update & Close" : "Save & Close"}
+              </Button>
+            </div>
+          </div>
+            </form>
+          </Form>
+        </div>
+      </AdminLayout>
+    );
 }
