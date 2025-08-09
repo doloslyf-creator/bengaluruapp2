@@ -134,6 +134,7 @@ function ProtectedRouter() {
 
 
       <Route path="/admin-panel/orders" component={Orders} />
+      <Route path="/admin/orders" component={Orders} />
       <Route path="/admin-panel/customers" component={Customers} />
       <Route path="/admin/customers" component={Customers} />
 
@@ -158,7 +159,9 @@ function ProtectedRouter() {
       <Route path="/admin-panel/settings" component={AdminSettings} />
       <Route path="/admin-panel/team-management" component={TeamManagement} />
       <Route path="/admin-panel/whatsapp-management" component={WhatsAppManagement} />
+      <Route path="/admin/whatsapp-management" component={WhatsAppManagement} />
       <Route path="/admin-panel/enhanced-leads" component={EnhancedLeads} />
+      <Route path="/admin/enhanced-leads" component={EnhancedLeads} />
       <Route path="/admin-panel/lead-nurturing" component={LeadNurturingPage} />
       <Route path="/admin-panel/supabase-migration" component={SupabaseMigration} />
       <Route path="/admin-panel/supabase-status" component={SupabaseStatus} />
