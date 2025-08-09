@@ -71,7 +71,7 @@ import AdminCitiesView from "@/pages/admin/cities-view";
 import AdminCitiesEdit from "@/pages/admin/cities-edit";
 
 import Reports from "@/pages/reports";
-import PropertyArchive from "@/pages/property-archive";
+
 import PropertyDetailInvestment from "@/pages/property-detail-investment";
 import PropertyDetailEndUse from "@/pages/property-detail-enduse";
 import ValuationReportsPage from "@/pages/admin/valuation-reports";
@@ -196,7 +196,6 @@ function ProtectedRouter() {
 
       {/* Services */}
       <Route path="/reports" component={Reports} />
-      <Route path="/property-archive" component={PropertyArchive} />
       
       {/* Properties by Location */}
       <Route path="/properties/:location" component={PropertiesLocation} />

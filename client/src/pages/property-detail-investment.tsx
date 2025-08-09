@@ -68,8 +68,8 @@ export default function PropertyDetailInvestment() {
         <div className="text-center">
           <h2 className="text-2xl font-semibold text-gray-900 mb-2">Property Not Found</h2>
           <p className="text-gray-600 mb-4">The property you're looking for doesn't exist.</p>
-          <Button onClick={() => navigate("/property-archive")}>
-            Back to Archive
+          <Button onClick={() => navigate("/find-property")}>
+            Find Properties
           </Button>
         </div>
       </div>
@@ -139,11 +139,11 @@ export default function PropertyDetailInvestment() {
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => navigate("/property-archive")}
-              data-testid="button-back-to-archive"
+              onClick={() => navigate("/find-property")}
+              data-testid="button-back-to-search"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Archive
+              Find Properties
             </Button>
             <div className="flex items-center space-x-2">
               <TrendingUp className="h-5 w-5 text-green-600" />
