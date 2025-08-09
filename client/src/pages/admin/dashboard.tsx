@@ -706,7 +706,7 @@ export default function AdminDashboard() {
                           </div>
                           <div>
                             <div className="font-medium">{property.name}</div>
-                            <div className="text-sm text-gray-500">{property.location}</div>
+                            <div className="text-sm text-gray-500">{property.area}</div>
                           </div>
                         </div>
                         <div className="text-right">
