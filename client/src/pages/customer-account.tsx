@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import {
@@ -79,44 +79,79 @@ interface CustomerStats {
 export default function CustomerAccount() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [profileData, setProfileData] = useState<CustomerProfile>({
-    id: "customer-1",
-    firstName: "Sri",
-    lastName: "Krishna",
-    email: "srikrishna@timeless.co",
-    phone: "+91 98664 43210",
-    avatar: "",
-    memberSince: "December 2024",
-    address: "No.35 Heavens colony",
-    city: "Chennai",
-    dateOfBirth: "25/03/1993",
-    gender: "Male",
-    investorType: "Resident Indian Citizen",
-    notifications: {
-      email: true,
-      sms: true,
-    },
-    privacy: {
-      profileVisible: false,
-    }
-  });
-
+  
   const [location, navigate] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch customer's Civil MEP reports
-  const { data: civilMepReports = [], isLoading: civilMepLoading } = useQuery<CivilMepReport[]>({
+  // Fetch customer's data dynamically based on current user
+  const currentCustomerId = user?.email || "zaks.chaudhary@gmail.com"; // Default to our test customer
+  
+  // Fetch customer profile data
+  const { data: customers = [] } = useQuery({
+    queryKey: ["/api/customers"],
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Find current customer data
+  const currentCustomer = customers.find((c: any) => c.email === currentCustomerId || c.id === currentCustomerId);
+
+  // Fetch customer's Civil MEP reports (filtered by customer if needed)
+  const { data: allCivilMepReports = [], isLoading: civilMepLoading } = useQuery<CivilMepReport[]>({
     queryKey: ["/api/civil-mep-reports"],
     staleTime: 5 * 60 * 1000,
   });
 
   // Fetch customer's Property Valuation reports
-  const { data: valuationReports = [], isLoading: valuationLoading } = useQuery<PropertyValuationReport[]>({
+  const { data: allValuationReports = [], isLoading: valuationLoading } = useQuery<PropertyValuationReport[]>({
     queryKey: ["/api/valuation-reports"],
     staleTime: 5 * 60 * 1000,
   });
+
+  // Filter reports for current customer (for now, show all - in real app would filter by customer assignment)
+  const civilMepReports = allCivilMepReports;
+  const valuationReports = allValuationReports.filter((report: any) => 
+    report.assignedTo === currentCustomerId || !report.assignedTo
+  );
+
+  // Initialize profile data with defaults, will be updated by useEffect
+  const [profileData, setProfileData] = useState<CustomerProfile>({
+    id: "zaks.chaudhary@gmail.com",
+    firstName: "Mohd",
+    lastName: "Zaki",
+    email: "zaks.chaudhary@gmail.com",
+    phone: "+91 98776 54321",
+    avatar: "",
+    memberSince: "January 2025",
+    address: "Koramangala 4th Block",
+    city: "Bengaluru",
+    dateOfBirth: "15/08/1990",
+    gender: "Male",
+    investorType: "First Time Home Buyer",
+    notifications: {
+      email: true,
+      sms: true,
+    },
+    privacy: {
+      profileVisible: true,
+    }
+  });
+
+  // Update profile data when customer data loads
+  useEffect(() => {
+    if (currentCustomer) {
+      setProfileData(prev => ({
+        ...prev,
+        id: currentCustomer.id,
+        firstName: currentCustomer.name?.split(' ')[0] || prev.firstName,
+        lastName: currentCustomer.name?.split(' ').slice(1).join(' ') || prev.lastName,
+        email: currentCustomer.email || prev.email,
+        phone: currentCustomer.phone || prev.phone,
+        memberSince: currentCustomer.lastActivity ? new Date(currentCustomer.lastActivity).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : prev.memberSince,
+      }));
+    }
+  }, [currentCustomer]);
 
   // Update profile mutation
   const updateProfileMutation = useMutation({
