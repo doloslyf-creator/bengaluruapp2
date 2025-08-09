@@ -86,14 +86,11 @@ export default function CustomerHome() {
               <Button
                 onClick={() => navigate('/find-property')}
                 size="lg"
-                className="bg-gradient-to-r from-primary to-blue-600 hover:shadow-lg text-white px-8 py-4 rounded-xl flex flex-col items-center space-y-1"
+                className="bg-gradient-to-r from-primary to-blue-600 hover:shadow-lg text-white px-8 py-4 rounded-xl"
                 data-testid="button-find-property"
               >
-                <div className="flex items-center">
-                  <Search className="h-4 w-4 mr-2" />
-                  <span className="text-sm font-medium">Ready to buy?</span>
-                </div>
-                <div className="text-lg font-bold">Find Perfect Home</div>
+                <Search className="h-4 w-4 mr-2" />
+                <span className="text-lg font-bold">Ready to buy? Find Perfect Home</span>
               </Button>
             </div>
 
