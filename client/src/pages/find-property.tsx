@@ -49,7 +49,7 @@ interface PropertyPreferences {
 
 export default function FindProperty() {
   const [, navigate] = useLocation();
-  
+
   // Load cached preferences if returning from results page
   const getCachedPreferences = (): PropertyPreferences => {
     const cached = localStorage.getItem('propertyPreferences');
@@ -130,7 +130,7 @@ export default function FindProperty() {
       ...preferences,
       [key]: value
     };
-    
+
     // When zone changes, also store the zone name for filtering
     if (key === 'zoneId' && value) {
       const selectedZone = zones.find(zone => zone.id === value);
@@ -138,7 +138,7 @@ export default function FindProperty() {
         newPreferences.zone = selectedZone.name;
       }
     }
-    
+
     setPreferences(newPreferences);
   };
 
@@ -169,7 +169,7 @@ export default function FindProperty() {
     const hasPropertyType = preferences.propertyType !== "";
     // Make city and zone optional for better user experience
     const hasBhkType = preferences.propertyType === "plot" || preferences.bhkType.length > 0 || !preferences.propertyType;
-    
+
     return hasIntent && (hasPropertyType || !hasIntent) && hasBhkType;
   };
 
@@ -181,7 +181,7 @@ export default function FindProperty() {
             <TrendingUp className="h-5 w-5 mr-2" />
             Investment Preferences
           </h3>
-          
+
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <Label className="text-sm font-medium text-gray-700 mb-2 block">
@@ -202,7 +202,7 @@ export default function FindProperty() {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label className="text-sm font-medium text-gray-700 mb-2 block">
                 Investment Horizon
@@ -221,7 +221,7 @@ export default function FindProperty() {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label className="text-sm font-medium text-gray-700 mb-2 block">
                 Risk Tolerance
@@ -250,7 +250,7 @@ export default function FindProperty() {
             <Heart className="h-5 w-5 mr-2" />
             Personal Preferences
           </h3>
-          
+
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <Label className="text-sm font-medium text-gray-700 mb-2 block">
@@ -270,7 +270,7 @@ export default function FindProperty() {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label className="text-sm font-medium text-gray-700 mb-2 block">
                 Lifestyle Priority
@@ -290,7 +290,7 @@ export default function FindProperty() {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label className="text-sm font-medium text-gray-700 mb-2 block">
                 Commute Priority
@@ -320,7 +320,7 @@ export default function FindProperty() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      
+
       {/* Integrated Header */}
       <section className="bg-white pt-24 pb-8 border-b">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -349,7 +349,7 @@ export default function FindProperty() {
               <div className="text-sm text-gray-600 mt-1">Intent-Based Matching</div>
             </div>
           </div>
-          
+
           {/* Data Transparency Trust Banner */}
           <div className="mt-8">
             <DataTransparencyIndicator 
@@ -384,11 +384,11 @@ export default function FindProperty() {
             <div className="space-y-10">
               {/* Step 1: Intent Selection */}
               <div className="space-y-6">
-                <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">What's your purpose?</h2>
-                  <p className="text-gray-600">This helps us show you the most relevant property information</p>
-                </div>
-                
+                <div className="text-center mb-6">
+                    <h2 className="text-xl font-medium text-slate-900 mb-2">What's your purpose?</h2>
+                    <p className="text-slate-500 text-sm">This helps us show you the most relevant property information</p>
+                  </div>
+
                 <div className="grid md:grid-cols-2 gap-6">
                   <motion.button
                     whileHover={{ scale: 1.02 }}
@@ -418,7 +418,7 @@ export default function FindProperty() {
                       <div className="w-4 h-4 bg-green-500 rounded-full ml-auto mt-2" />
                     )}
                   </motion.button>
-                  
+
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -457,11 +457,11 @@ export default function FindProperty() {
                   animate={{ opacity: 1, y: 0 }}
                   className="space-y-6 pt-8 border-t border-gray-100"
                 >
-                  <div className="text-center mb-8">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Property Basics</h2>
-                    <p className="text-gray-600">Tell us about your preferred property type and location</p>
+                  <div className="text-center mb-6">
+                    <h2 className="text-xl font-medium text-slate-900 mb-2">Property Basics</h2>
+                    <p className="text-slate-500 text-sm">Tell us about your preferred property type and location</p>
                   </div>
-                  
+
                   <div className="grid md:grid-cols-3 gap-6">
                     {/* Property Type */}
                     <div>
@@ -613,7 +613,7 @@ export default function FindProperty() {
                   Find My Perfect Properties
                   <Target className="h-5 w-5 ml-3" />
                 </Button>
-                
+
                 {!isFormValid() && (
                   <p className="text-sm text-red-500 mt-4">
                     Please complete all required fields to continue
