@@ -153,9 +153,10 @@ export default function EnhancedLeads() {
 
   // Filter leads based on search query
   const filteredLeads = useMemo(() => {
-    if (!searchQuery) return leads;
+    const leadsArray = Array.isArray(leads) ? leads : [];
+    if (!searchQuery) return leadsArray;
     const query = searchQuery.toLowerCase();
-    return leads.filter(lead => 
+    return leadsArray.filter(lead => 
       lead.customerName.toLowerCase().includes(query) ||
       lead.email.toLowerCase().includes(query) ||
       lead.phone.includes(query) ||

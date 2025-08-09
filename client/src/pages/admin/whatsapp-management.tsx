@@ -328,7 +328,7 @@ export default function WhatsAppManagement() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3 max-h-96 overflow-y-auto">
-                  {customers.map((customer) => (
+                  {Array.isArray(customers) && customers.map((customer) => (
                     <div 
                       key={customer.id}
                       className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
