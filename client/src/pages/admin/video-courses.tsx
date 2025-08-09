@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Play, Edit2, Trash2, Users, Clock, Eye, BookOpen, Video, GraduationCap, List } from "lucide-react";
@@ -14,7 +14,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, AlertCircle } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "wouter";
 
 interface VideoCourse {
   id: string;
@@ -45,7 +45,7 @@ export default function VideoCoursesPage() {
     description: '',
     slug: '',
     thumbnailUrl: '',
-    level: 'beginner' as const,
+    level: 'beginner' as 'beginner' | 'intermediate' | 'advanced',
     estimatedDuration: '',
     category: '',
     tags: '',
@@ -58,7 +58,7 @@ export default function VideoCoursesPage() {
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  const [location, setLocation] = useLocation();
 
   const { data: courses = [], isLoading, error } = useQuery<VideoCourse[]>({
     queryKey: ["/api/video-courses"],
@@ -295,6 +295,9 @@ export default function VideoCoursesPage() {
               <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>{editingCourse ? 'Edit Course' : 'Add New Course'}</DialogTitle>
+                  <DialogDescription>
+                    {editingCourse ? 'Update the course information below.' : 'Create a new video course by filling out the form below.'}
+                  </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
@@ -488,7 +491,7 @@ export default function VideoCoursesPage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => navigate(`/admin-panel/video-courses/${course.id}/chapters`)}
+                        onClick={() => setLocation(`/admin-panel/video-courses/${course.id}/chapters`)}
                         title="Manage Chapters"
                       >
                         <List className="h-3 w-3" />

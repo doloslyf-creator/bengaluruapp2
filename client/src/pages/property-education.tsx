@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Play, Clock, Eye, Search, Filter, BookOpen, GraduationCap, Award, CheckCircle, ArrowRight, Users } from "lucide-react";
 import { updateMetaTags } from "@/utils/seo";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "wouter";
 
 interface VideoContent {
   id: string;
@@ -44,7 +44,7 @@ export default function PropertyEducation() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
-  const navigate = useNavigate();
+  const [location, setLocation] = useLocation();
 
   useEffect(() => {
     updateMetaTags(
@@ -206,7 +206,7 @@ export default function PropertyEducation() {
 
                     <Button 
                       className="w-full"
-                      onClick={() => navigate(`/courses/${course.slug}`)}
+                      onClick={() => setLocation(`/courses/${course.slug}`)}
                     >
                       Start Course
                       <Play className="h-4 w-4 ml-2" />

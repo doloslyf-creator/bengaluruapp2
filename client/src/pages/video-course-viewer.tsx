@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useRoute, useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -69,8 +69,9 @@ interface CourseEnrollment {
 }
 
 export default function VideoCourseViewer() {
-  const { courseSlug } = useParams<{ courseSlug: string }>();
-  const navigate = useNavigate();
+  const [match, params] = useRoute("/courses/:courseSlug");
+  const courseSlug = params?.courseSlug;
+  const [location, setLocation] = useLocation();
   const [selectedChapter, setSelectedChapter] = useState<VideoChapter | null>(null);
   const [isEnrollmentDialogOpen, setIsEnrollmentDialogOpen] = useState(false);
   const [enrollmentData, setEnrollmentData] = useState({
@@ -234,7 +235,7 @@ export default function VideoCourseViewer() {
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Course Not Found</h1>
             <p className="text-gray-600 mb-8">The requested course could not be found.</p>
-            <Button onClick={() => navigate('/property-education')}>
+            <Button onClick={() => setLocation('/property-education')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Education Center
             </Button>
@@ -256,7 +257,7 @@ export default function VideoCourseViewer() {
         <div className="mb-6">
           <Button 
             variant="outline" 
-            onClick={() => navigate('/property-education')}
+            onClick={() => setLocation('/property-education')}
             className="mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />

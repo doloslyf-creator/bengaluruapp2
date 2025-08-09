@@ -1,5 +1,5 @@
 import { Edit, Download, MapPin, Calendar, Building, IndianRupee } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
@@ -56,6 +56,9 @@ export function PropertyDetailsDialog({ property, open, onOpenChange }: Property
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{property.name}</DialogTitle>
+          <DialogDescription>
+            Detailed information about this property including specifications and configurations.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -96,7 +99,7 @@ export function PropertyDetailsDialog({ property, open, onOpenChange }: Property
                 </div>
                 <div>
                   <span className="text-gray-600">Zone:</span>
-                  <span className="font-medium ml-1 capitalize">{property.zone} Bengaluru</span>
+                  <span className="font-medium ml-1 capitalize">{property.zone || 'Unknown Zone'} Bengaluru</span>
                 </div>
                 <div>
                   <span className="text-gray-600">Possession:</span>
@@ -123,7 +126,7 @@ export function PropertyDetailsDialog({ property, open, onOpenChange }: Property
                 Location
               </h4>
               <p className="text-gray-600 mb-2">
-                <strong>{property.area}</strong>, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)} Bengaluru
+                <strong>{property.area}</strong>, {property.zone ? (property.zone.charAt(0).toUpperCase() + property.zone.slice(1)) : 'Unknown Zone'} Bengaluru
               </p>
               <p className="text-gray-600 text-sm">{property.address}</p>
             </div>
@@ -161,8 +164,8 @@ export function PropertyDetailsDialog({ property, open, onOpenChange }: Property
                         )}
                         <div>
                           <span>Status: </span>
-                          <Badge variant={config.isAvailable ? "default" : "secondary"} className="text-xs">
-                            {config.isAvailable ? "Available" : "Sold Out"}
+                          <Badge variant={config.availabilityStatus === "available" ? "default" : "secondary"} className="text-xs">
+                            {config.availabilityStatus === "available" ? "Available" : config.availabilityStatus === "sold-out" ? "Sold Out" : "Limited"}
                           </Badge>
                         </div>
                       </div>

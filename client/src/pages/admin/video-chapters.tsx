@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useRoute, useLocation } from "wouter";
 import AdminLayout from "@/components/layout/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -47,8 +47,9 @@ interface VideoCourse {
 }
 
 export default function VideoChaptersPage() {
-  const { courseId } = useParams<{ courseId: string }>();
-  const navigate = useNavigate();
+  const [match, params] = useRoute("/admin-panel/video-courses/:courseId/chapters");
+  const courseId = params?.courseId;
+  const [location, setLocation] = useLocation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingChapter, setEditingChapter] = useState<VideoChapter | null>(null);
   const [formData, setFormData] = useState({
@@ -244,7 +245,7 @@ export default function VideoChaptersPage() {
           <div className="flex items-center gap-4 mb-4">
             <Button 
               variant="outline" 
-              onClick={() => navigate('/admin-panel/video-courses')}
+              onClick={() => setLocation('/admin-panel/video-courses')}
               className="flex items-center gap-2"
             >
               <ArrowLeft className="h-4 w-4" />

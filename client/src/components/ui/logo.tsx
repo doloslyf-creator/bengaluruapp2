@@ -21,7 +21,7 @@ export default function Logo({ className = "", variant = "default", size = "md",
   };
 
   return (
-    <Link href="/" className={`flex items-center space-x-3 ${className}`}>
+    <div className={`flex items-center space-x-3 ${className}`}>
       <div className={`relative ${sizeClasses[size]} aspect-square`}>
         <svg 
           viewBox="0 0 50 50" 
@@ -76,6 +76,6 @@ export default function Logo({ className = "", variant = "default", size = "md",
           </span>
         )}
       </div>
-    </Link>
+    </div>
   );
 }
