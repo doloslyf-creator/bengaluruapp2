@@ -1518,6 +1518,32 @@ export const insertReraDataSchema = createInsertSchema(reraData).omit({
 export type ReraData = typeof reraData.$inferSelect;
 export type InsertReraData = z.infer<typeof insertReraDataSchema>;
 
+// Video Education table
+export const videoEducation = pgTable("video_education", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  youtubeUrl: text("youtube_url").notNull(),
+  category: text("category").notNull(),
+  difficulty: varchar("difficulty", { enum: ["beginner", "intermediate", "advanced"] }).default("beginner"),
+  duration: text("duration").notNull(),
+  tags: json("tags").$type<string[]>().default([]),
+  isPublished: boolean("is_published").default(false),
+  viewCount: integer("view_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertVideoEducationSchema = createInsertSchema(videoEducation).omit({
+  id: true,
+  viewCount: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type VideoEducation = typeof videoEducation.$inferSelect;
+export type InsertVideoEducation = z.infer<typeof insertVideoEducationSchema>;
+
 // User types - keeping existing ones
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,

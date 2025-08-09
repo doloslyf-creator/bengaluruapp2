@@ -1,13 +1,13 @@
 import { useLocation } from "wouter";
 import { Link } from "wouter";
 import { useState } from "react";
-import { 
-  Home, 
-  BarChart3, 
-  Users2, 
-  MapPin, 
-  FileText, 
-  Building2, 
+import {
+  Home,
+  BarChart3,
+  Users2,
+  MapPin,
+  FileText,
+  Building2,
   UserCheck,
   MessageSquare,
   Bot,
@@ -33,7 +33,8 @@ import {
   Database,
   Archive,
   Wrench,
-  Globe
+  Globe,
+  Play // Import Play icon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -61,38 +62,44 @@ interface NavigationGroup {
 }
 
 const singleNavigation: NavigationItem[] = [
-  { 
-    name: "Dashboard", 
-    href: "/admin-panel", 
+  {
+    name: "Dashboard",
+    href: "/admin-panel",
     icon: Home,
     description: "Overview & Analytics"
   },
 
-  { 
-    name: "Orders", 
-    href: "/admin-panel/orders", 
+  {
+    name: "Orders",
+    href: "/admin-panel/orders",
     icon: ShoppingCart,
     description: "Order Management"
   },
 
 
-  { 
-    name: "Settings", 
-    href: "/admin-panel/settings", 
+  {
+    name: "Settings",
+    href: "/admin-panel/settings",
     icon: Settings,
     description: "App Configuration"
   },
   {
     name: "Database Migration",
-    href: "/admin-panel/supabase-migration", 
+    href: "/admin-panel/supabase-migration",
     icon: Database,
     description: "Migrate to Supabase"
   },
-  { 
-    name: "Backup System", 
-    href: "/admin-panel/backup-system", 
+  {
+    name: "Backup System",
+    href: "/admin-panel/backup-system",
     icon: Archive,
     description: "Data Backup & Recovery"
+  },
+  {
+    name: "Video Education", // Added Video Education navigation item
+    href: "/admin-panel/video-education",
+    icon: Play,
+    description: "Manage Video Content"
   },
 ];
 
@@ -101,39 +108,39 @@ const groupedNavigation: NavigationGroup[] = [
     name: "Customer Relations",
     icon: Users,
     items: [
-      { 
-        name: "Customers", 
-        href: "/admin-panel/customers", 
+      {
+        name: "Customers",
+        href: "/admin-panel/customers",
         icon: Users2,
         description: "Customer CRM"
       },
-      { 
-        name: "Developers", 
-        href: "/admin-panel/developers", 
+      {
+        name: "Developers",
+        href: "/admin-panel/developers",
         icon: Factory,
         description: "Developer Directory"
       },
-      { 
-        name: "Team Management", 
-        href: "/admin-panel/team-management", 
+      {
+        name: "Team Management",
+        href: "/admin-panel/team-management",
         icon: Briefcase,
         description: "Manage Team Members"
       },
-      { 
-        name: "Enhanced Leads", 
-        href: "/admin-panel/enhanced-leads", 
+      {
+        name: "Enhanced Leads",
+        href: "/admin-panel/enhanced-leads",
         icon: Target,
         description: "Advanced Lead Management & Analytics"
       },
-      { 
-        name: "Site Visit Bookings", 
-        href: "/admin-panel/bookings", 
+      {
+        name: "Site Visit Bookings",
+        href: "/admin-panel/bookings",
         icon: Calendar,
         description: "Manage Property Visit Schedules"
       },
-      { 
-        name: "WhatsApp Management", 
-        href: "/admin-panel/whatsapp-management", 
+      {
+        name: "WhatsApp Management",
+        href: "/admin-panel/whatsapp-management",
         icon: MessageSquare,
         description: "Customer Communication & Campaigns"
       },
@@ -144,35 +151,35 @@ const groupedNavigation: NavigationGroup[] = [
     icon: FileSpreadsheet,
     items: [
 
-      { 
-        name: "Civil+MEP Reports", 
-        href: "/admin-panel/civil-mep-reports", 
+      {
+        name: "Civil+MEP Reports",
+        href: "/admin-panel/civil-mep-reports",
         icon: Wrench,
         description: "Engineering Assessments"
       },
-      { 
-        name: "Legal Audit Reports", 
-        href: "/admin-panel/legal-audit-reports", 
+      {
+        name: "Legal Audit Reports",
+        href: "/admin-panel/legal-audit-reports",
         icon: Shield,
         description: "Legal Due Diligence Analysis"
       },
-      { 
-        name: "Valuation Reports", 
-        href: "/admin-panel/valuation-reports", 
+      {
+        name: "Valuation Reports",
+        href: "/admin-panel/valuation-reports",
         icon: TrendingUp,
         description: "Property Valuation Analysis"
       },
 
 
-      { 
-        name: "Property Scoring", 
-        href: "/admin-panel/property-scoring", 
+      {
+        name: "Property Scoring",
+        href: "/admin-panel/property-scoring",
         icon: Target,
         description: "Property Evaluation & Scoring"
       },
-      { 
-        name: "Analytics", 
-        href: "/admin-panel/analytics", 
+      {
+        name: "Analytics",
+        href: "/admin-panel/analytics",
         icon: TrendingUp,
         description: "Data & Insights"
       },
@@ -182,21 +189,21 @@ const groupedNavigation: NavigationGroup[] = [
     name: "Property Management",
     icon: Building2,
     items: [
-      { 
-        name: "Cities", 
-        href: "/admin-panel/cities", 
+      {
+        name: "Cities",
+        href: "/admin-panel/cities",
         icon: Globe,
         description: "City Management"
       },
-      { 
-        name: "Properties", 
-        href: "/admin-panel/properties", 
+      {
+        name: "Properties",
+        href: "/admin-panel/properties",
         icon: Building2,
         description: "Manage Property Listings"
       },
-      { 
-        name: "Zones", 
-        href: "/admin-panel/zones", 
+      {
+        name: "Zones",
+        href: "/admin-panel/zones",
         icon: MapPin,
         description: "Location Management"
       },

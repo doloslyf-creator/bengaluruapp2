@@ -42,7 +42,12 @@ import {
 import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
-import { or, eq, and, sql } from "drizzle-orm";
+import { or, eq, and, sql, desc } from "drizzle-orm";
+import * as crypto from 'crypto';
+
+// Import video education schema (assuming it's in @shared/schema)
+import { videoEducation } from "@shared/schema";
+
 
 // Database connection
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -3583,6 +3588,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating report access:", error);
       res.status(500).json({ error: "Failed to update access" });
+    }
+  });
+
+  // Video Education API routes
+  app.get("/api/video-education", async (req, res) => {
+    try {
+      const videos = await db.select().from(videoEducation).orderBy(desc(videoEducation.createdAt));
+      res.json(videos);
+    } catch (error) {
+      console.error("Error fetching videos:", error);
+      res.status(500).json({ error: "Failed to fetch videos" });
+    }
+  });
+
+  app.get("/api/video-education/public", async (req, res) => {
+    try {
+      const videos = await db.select()
+        .from(videoEducation)
+        .where(eq(videoEducation.isPublished, true))
+        .orderBy(desc(videoEducation.createdAt));
+      res.json(videos);
+    } catch (error) {
+      console.error("Error fetching public videos:", error);
+      res.status(500).json({ error: "Failed to fetch videos" });
+    }
+  });
+
+  app.post("/api/video-education", async (req, res) => {
+    try {
+      const videoData = {
+        ...req.body,
+        id: crypto.randomUUID(),
+        viewCount: 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      const [video] = await db.insert(videoEducation).values(videoData).returning();
+      res.json(video);
+    } catch (error) {
+      console.error("Error creating video:", error);
+      res.status(500).json({ error: "Failed to create video" });
+    }
+  });
+
+  app.put("/api/video-education/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updateData = {
+        ...req.body,
+        updatedAt: new Date().toISOString()
+      };
+
+      const [video] = await db.update(videoEducation)
+        .set(updateData)
+        .where(eq(videoEducation.id, id))
+        .returning();
+
+      res.json(video);
+    } catch (error) {
+      console.error("Error updating video:", error);
+      res.status(500).json({ error: "Failed to update video" });
+    }
+  });
+
+  app.delete("/api/video-education/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      await db.delete(videoEducation).where(eq(videoEducation.id, id));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting video:", error);
+      res.status(500).json({ error: "Failed to delete video" });
+    }
+  });
+
+  app.post("/api/video-education/:id/view", async (req, res) => {
+    try {
+      const { id } = req.params;
+      await db.update(videoEducation)
+        .set({ viewCount: sql`${videoEducation.viewCount} + 1` })
+        .where(eq(videoEducation.id, id));
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error incrementing view count:", error);
+      res.status(500).json({ error: "Failed to increment view count" });
     }
   });
 

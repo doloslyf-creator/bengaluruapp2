@@ -86,6 +86,10 @@ import PropertiesLocation from "@/pages/properties-location";
 import NotFound from "@/pages/not-found";
 import LeadNurturingPage from "@/pages/admin/lead-nurturing";
 import SystemTest from "./pages/system-test";
+// Import video education components
+import VideoEducation from "@/pages/admin/video-education";
+import PropertyEducation from "@/pages/property-education";
+
 
 // Protected Routes Component that shows auth form for admin routes when not authenticated
 function ProtectedRouter() {
@@ -160,7 +164,9 @@ function ProtectedRouter() {
       <Route path="/admin-panel/team-management" component={TeamManagement} />
       <Route path="/admin-panel/whatsapp-management" component={WhatsAppManagement} />
       <Route path="/admin-panel/enhanced-leads" component={EnhancedLeads} />
-      <Route path="/admin-panel/lead-nurturing" component={LeadNurturingPage} />
+      <Route path="/admin-panel/lead-nurturing" element={<LeadNurturingPage />} />
+      <Route path="/admin-panel/video-education" element={<VideoEducation />} />
+      <Route path="/property-education" element={<PropertyEducation />} />
       <Route path="/admin-panel/supabase-migration" component={SupabaseMigration} />
       <Route path="/admin-panel/supabase-status" component={SupabaseStatus} />
       <Route path="/admin-panel/supabase" component={SupabaseStatus} />

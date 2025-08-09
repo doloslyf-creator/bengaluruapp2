@@ -282,6 +282,12 @@ export default function Header() {
                   </PopoverContent>
                 </Popover>
               </div>
+              <Link href="/consultation" className="text-gray-600 hover:text-primary transition-colors">
+                Consultation
+              </Link>
+              <Link href="/property-education" className="text-gray-600 hover:text-primary transition-colors">
+                Learn
+              </Link>
             </nav>
 
             {/* Right side buttons */}
@@ -413,6 +419,18 @@ export default function Header() {
                           <span>{item.name}</span>
                         </Link>
                       ))}
+                      <Link
+                        href="/property-education"
+                        className={`flex items-center space-x-3 px-3 py-3 text-base font-medium rounded-lg transition-colors ${
+                          isActive("/property-education")
+                            ? "text-primary bg-primary/10"
+                            : "text-gray-700 hover:text-primary hover:bg-gray-50"
+                        }`}
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <FileText className="h-5 w-5" /> {/* Changed icon to FileText for example, could be a video icon */}
+                        <span>Learn</span>
+                      </Link>
                     </div>
 
                     {/* Mobile Footer Actions */}
