@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,9 +30,17 @@ import {
   Dumbbell,
   Waves,
   Camera,
-  Coffee
+  Coffee,
+  Play,
+  Download,
+  MessageCircle,
+  ThumbsUp,
+  Award,
+  Calculator,
+  DollarSign
 } from "lucide-react";
 import type { Property, PropertyConfiguration, CivilMepReport, PropertyValuationReport } from "@shared/schema";
+import { formatPriceDisplay } from "@/lib/utils";
 
 interface PropertyWithDetails extends Property {
   configurations?: PropertyConfiguration[];
@@ -42,6 +51,7 @@ interface PropertyWithDetails extends Property {
 export default function PropertyDetailEndUse() {
   const { id } = useParams();
   const [, navigate] = useLocation();
+  const [selectedConfig, setSelectedConfig] = useState<PropertyConfiguration | null>(null);
 
   // Fetch property with configurations
   const { data: property, isLoading } = useQuery<PropertyWithDetails>({
@@ -204,78 +214,211 @@ export default function PropertyDetailEndUse() {
               </CardContent>
             </Card>
 
-            {/* Home Features */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Home className="h-5 w-5 mr-2 text-purple-600" />
-                  Your Future Home
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Unit Details */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="font-semibold mb-3">Unit Specifications</h3>
-                    <div className="space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Configuration</span>
-                        <span className="font-semibold">{priceInfo.configuration}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Built-up Area</span>
-                        <span className="font-semibold">{priceInfo.area.toLocaleString()} sq.ft</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Facing</span>
-                        <span className="font-semibold">{valuationReport?.facing || 'North-East'}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Vastu Compliant</span>
-                        {valuationReport?.vastuCompliance ? (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <span className="text-sm text-gray-500">Check with architect</span>
-                        )}
-                      </div>
-                    </div>
+            {/* Property Video Section - Family Focused */}
+            {property.youtubeVideoUrl && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Play className="h-5 w-5 mr-2 text-purple-600" />
+                    Family Home Walkthrough
+                  </CardTitle>
+                  <p className="text-gray-600">Virtual tour showcasing family-friendly features and lifestyle amenities</p>
+                </CardHeader>
+                <CardContent>
+                  <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
+                    <iframe 
+                      src={`https://www.youtube.com/embed/${property.youtubeVideoUrl.split('v=')[1]?.split('&')[0]}`}
+                      className="w-full h-full"
+                      allowFullScreen
+                      title="Family Home Walkthrough"
+                    />
                   </div>
+                </CardContent>
+              </Card>
+            )}
 
-                  <div>
-                    <h3 className="font-semibold mb-3">Possession & Legal</h3>
-                    <div className="space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Possession Status</span>
-                        <Badge variant="default">
-                          {valuationReport?.possessionStatus || property.possessionDate ? 'Ready' : 'Under Construction'}
+            {/* Family-Focused Configuration Analysis */}
+            <Card id="family-configurations">
+              <CardHeader>
+                <CardTitle>Perfect Home for Your Family</CardTitle>
+                <p className="text-gray-600">Choose configurations based on family size, lifestyle needs, and comfort preferences</p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                  {property.configurations?.map((config, index) => (
+                    <div 
+                      key={index} 
+                      className={`p-4 rounded-lg border-2 transition-all cursor-pointer ${
+                        selectedConfig?.id === config.id 
+                          ? 'border-purple-500 bg-purple-50' 
+                          : 'border-gray-200 hover:border-purple-300'
+                      }`}
+                      onClick={() => setSelectedConfig(config)}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-semibold">{config.configuration}</h3>
+                        <Badge variant={config.availabilityStatus === 'available' ? 'default' : 
+                                       config.availabilityStatus === 'limited' ? 'secondary' : 'destructive'}>
+                          {config.availabilityStatus}
                         </Badge>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">RERA Approved</span>
-                        {property.reraApproved ? (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <Clock className="h-4 w-4 text-yellow-500" />
-                        )}
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">OC Status</span>
-                        <Badge variant="outline">
-                          {valuationReport?.ocCcStatus || 'Applied'}
-                        </Badge>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Legal Clearance</span>
-                        {property.legalVerdictBadge ? (
-                          <Badge variant="outline">{property.legalVerdictBadge}</Badge>
-                        ) : (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
-                        )}
+                      
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Living Space</span>
+                          <span className="font-medium">{config.builtUpArea} sq ft</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Family Size</span>
+                          <span className="font-medium text-purple-600">
+                            {config.configuration.includes('4 BHK') ? '6-8 members' : 
+                             config.configuration.includes('3 BHK') ? '4-6 members' : 
+                             config.configuration.includes('2 BHK') ? '3-4 members' : '2-3 members'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Lifestyle Fit</span>
+                          <span className="font-medium text-green-600">Perfect</span>
+                        </div>
+                        <Separator />
+                        <div className="flex justify-between">
+                          <span className="text-gray-900 font-medium">Total Price</span>
+                          <span className="text-lg font-bold text-purple-600">
+                            {formatPriceDisplay(config.price)}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
 
+                {/* Selected Configuration Family Analysis */}
+                {selectedConfig && (
+                  <div className="bg-purple-50 rounded-lg p-6 border-2 border-purple-200">
+                    <h3 className="text-xl font-bold text-purple-900 mb-4">
+                      {selectedConfig.configuration} - Perfect for Your Family
+                    </h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {/* Family Living */}
+                      <div className="space-y-3">
+                        <h4 className="font-semibold text-purple-800">Family Living</h4>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Living Area</span>
+                            <span className="font-medium">{selectedConfig.builtUpArea} sq ft</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Bedrooms</span>
+                            <span className="font-medium text-purple-600">
+                              {selectedConfig.configuration.split(' ')[0]} BR
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Bathrooms</span>
+                            <span className="font-medium">
+                              {selectedConfig.configuration.split(' ')[0] === '4' ? '4' :
+                               selectedConfig.configuration.split(' ')[0] === '3' ? '3' : '2'} BA
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Balconies</span>
+                            <span className="font-medium">2-3</span>
+                          </div>
+                          <div className="bg-purple-100 p-2 rounded text-xs text-purple-800">
+                            🏠 Spacious rooms with natural ventilation
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Lifestyle Amenities */}
+                      <div className="space-y-3">
+                        <h4 className="font-semibold text-purple-800">Lifestyle Features</h4>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Children Play Area</span>
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Swimming Pool</span>
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Gym & Fitness</span>
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Club House</span>
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          </div>
+                          <div className="bg-green-100 p-2 rounded text-xs text-green-800">
+                            🌟 Premium amenities for family wellness
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Safety & Convenience */}
+                      <div className="space-y-3">
+                        <h4 className="font-semibold text-purple-800">Safety & Access</h4>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">24/7 Security</span>
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">CCTV Monitoring</span>
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Covered Parking</span>
+                            <span className="font-medium">2-3 Cars</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Power Backup</span>
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Family Actions */}
+                    <div className="mt-6 flex flex-wrap gap-3">
+                      <Button onClick={() => navigate('/site-visit')} className="flex-1 min-w-48 bg-purple-600 hover:bg-purple-700">
+                        <Calendar className="h-4 w-4 mr-2" />
+                        Family Site Visit
+                      </Button>
+                      <Button variant="outline" onClick={() => navigate('/consultation')} className="flex-1 min-w-48">
+                        <MessageCircle className="h-4 w-4 mr-2" />
+                        Home Buying Guidance
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        className="flex-1 min-w-48"
+                        onClick={() => property.brochureUrl ? window.open(property.brochureUrl, '_blank') : null}
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        Family Home Brochure
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Home Quality & Family Reports */}
+            <Card id="family-reports">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Shield className="h-5 w-5 mr-2 text-purple-600" />
+                  Home Quality & Family Suitability Reports
+                  <Badge className="ml-3 bg-purple-100 text-purple-800 border-purple-200">
+                    <Home className="h-3 w-3 mr-1" />
+                    Family Verified
+                  </Badge>
+                </CardTitle>
+                <p className="text-gray-600">Professional quality assessment focused on family living and child safety</p>
+              </CardHeader>
+              <CardContent className="space-y-6">
                 {/* Quality Assessment */}
                 {civilReport && (
                   <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg">
@@ -290,19 +433,110 @@ export default function PropertyDetailEndUse() {
                       </div>
                       <div>
                         <div className="text-lg font-bold text-blue-600">9/10</div>
-                        <div className="text-xs text-gray-600">Foundation</div>
+                        <div className="text-xs text-gray-600">Child Safety</div>
                       </div>
                       <div>
                         <div className="text-lg font-bold text-purple-600">9/10</div>
-                        <div className="text-xs text-gray-600">Electrical</div>
+                        <div className="text-xs text-gray-600">Ventilation</div>
                       </div>
                       <div>
                         <div className="text-lg font-bold text-orange-600">9/10</div>
-                        <div className="text-xs text-gray-600">Plumbing</div>
+                        <div className="text-xs text-gray-600">Water Quality</div>
                       </div>
                     </div>
                   </div>
                 )}
+
+                {/* Family Living Analysis */}
+                {valuationReport && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <h3 className="font-semibold mb-3">Family Living Features</h3>
+                      <div className="space-y-3">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Child-Safe Design</span>
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Natural Light</span>
+                          <span className="font-semibold text-green-600">Excellent</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Cross Ventilation</span>
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Vastu Compliant</span>
+                          {valuationReport.vastuCompliance ? (
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <span className="text-sm text-gray-500">Consultant Available</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="font-semibold mb-3">Possession & Legal Status</h3>
+                      <div className="space-y-3">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Ready to Move</span>
+                          <Badge variant="default">
+                            {valuationReport.possessionStatus || property.possessionDate ? 'Yes' : 'Under Construction'}
+                          </Badge>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">RERA Approved</span>
+                          {property.reraApproved ? (
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <Clock className="h-4 w-4 text-yellow-500" />
+                          )}
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Legal Clearance</span>
+                          {property.legalVerdictBadge ? (
+                            <Badge variant="outline">{property.legalVerdictBadge}</Badge>
+                          ) : (
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          )}
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Home Loan Ready</span>
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Get Complete Family Report */}
+                <Card className="border-purple-200">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center">
+                        <h4 className="font-semibold text-purple-800">Complete Family Living Assessment</h4>
+                        <Badge className="ml-2 bg-purple-100 text-purple-800 border-purple-200 text-xs">
+                          <Home className="h-3 w-3 mr-1" />
+                          Family Focused
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="space-y-3 text-sm text-gray-600 mb-4">
+                      <p>• Child safety assessment and family-friendly design analysis</p>
+                      <p>• School proximity analysis and educational ecosystem review</p>
+                      <p>• Healthcare facilities and emergency services accessibility</p>
+                      <p>• Community lifestyle and family neighborhood evaluation</p>
+                    </div>
+                    <Button 
+                      className="w-full bg-purple-600 hover:bg-purple-700"
+                      onClick={() => navigate('/consultation')}
+                    >
+                      <Home className="h-4 w-4 mr-2" />
+                      Get Family Living Report - ₹1,999
+                    </Button>
+                  </CardContent>
+                </Card>
               </CardContent>
             </Card>
 

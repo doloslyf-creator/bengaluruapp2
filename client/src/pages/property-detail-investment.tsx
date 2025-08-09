@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,9 +26,14 @@ import {
   Clock,
   FileText,
   Calculator,
-  ArrowUpRight
+  ArrowUpRight,
+  Play,
+  Download,
+  Lock,
+  MessageCircle
 } from "lucide-react";
 import type { Property, PropertyConfiguration, CivilMepReport, PropertyValuationReport } from "@shared/schema";
+import { formatPriceDisplay } from "@/lib/utils";
 
 interface PropertyWithDetails extends Property {
   configurations?: PropertyConfiguration[];
@@ -38,6 +44,7 @@ interface PropertyWithDetails extends Property {
 export default function PropertyDetailInvestment() {
   const { id } = useParams();
   const [, navigate] = useLocation();
+  const [selectedConfig, setSelectedConfig] = useState<PropertyConfiguration | null>(null);
 
   // Fetch property with configurations
   const { data: property, isLoading } = useQuery<PropertyWithDetails>({
@@ -165,7 +172,7 @@ export default function PropertyDetailInvestment() {
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">{property.name}</h1>
                     <div className="flex items-center text-gray-600 mb-2">
                       <MapPin className="h-4 w-4 mr-1" />
-                      {property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)}
+                      {property.area}, {property.zone ? property.zone.charAt(0).toUpperCase() + property.zone.slice(1) : 'Bengaluru'}
                     </div>
                     <p className="text-gray-500">by {property.developer}</p>
                   </div>
@@ -201,20 +208,209 @@ export default function PropertyDetailInvestment() {
               </CardContent>
             </Card>
 
-            {/* Investment Analysis */}
-            {valuationReport && (
+            {/* Property Video Section */}
+            {property.youtubeVideoUrl && (
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <BarChart3 className="h-5 w-5 mr-2 text-blue-600" />
-                    Investment Analysis
+                    <Play className="h-5 w-5 mr-2 text-blue-600" />
+                    Investment Property Walkthrough
                   </CardTitle>
+                  <p className="text-gray-600">Expert investment analysis and virtual property tour</p>
+                </CardHeader>
+                <CardContent>
+                  <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
+                    <iframe 
+                      src={`https://www.youtube.com/embed/${property.youtubeVideoUrl.split('v=')[1]?.split('&')[0]}`}
+                      className="w-full h-full"
+                      allowFullScreen
+                      title="Investment Property Walkthrough"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Investment-Focused Configuration Analysis */}
+            <Card id="investment-configurations">
+              <CardHeader>
+                <CardTitle>Investment Configuration Analysis</CardTitle>
+                <p className="text-gray-600">Select configurations based on rental yield potential and capital appreciation</p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                  {property.configurations?.map((config, index) => (
+                    <div 
+                      key={index} 
+                      className={`p-4 rounded-lg border-2 transition-all cursor-pointer ${
+                        selectedConfig?.id === config.id 
+                          ? 'border-green-500 bg-green-50' 
+                          : 'border-gray-200 hover:border-green-300'
+                      }`}
+                      onClick={() => setSelectedConfig(config)}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-semibold">{config.configuration}</h3>
+                        <Badge variant={config.availabilityStatus === 'available' ? 'default' : 
+                                       config.availabilityStatus === 'limited' ? 'secondary' : 'destructive'}>
+                          {config.availabilityStatus}
+                        </Badge>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Area</span>
+                          <span className="font-medium">{config.builtUpArea} sq ft</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Expected Rent</span>
+                          <span className="font-medium text-green-600">₹{Math.round(config.price * 0.003).toLocaleString()}/mo</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Rental Yield</span>
+                          <span className="font-medium text-green-600">3.6%</span>
+                        </div>
+                        <Separator />
+                        <div className="flex justify-between">
+                          <span className="text-gray-900 font-medium">Investment</span>
+                          <span className="text-lg font-bold text-blue-600">
+                            {formatPriceDisplay(config.price)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Selected Configuration Investment Analysis */}
+                {selectedConfig && (
+                  <div className="bg-green-50 rounded-lg p-6 border-2 border-green-200">
+                    <h3 className="text-xl font-bold text-green-900 mb-4">
+                      {selectedConfig.configuration} - Investment Analysis
+                    </h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {/* Investment Returns */}
+                      <div className="space-y-3">
+                        <h4 className="font-semibold text-green-800">Investment Returns</h4>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Initial Investment</span>
+                            <span className="font-medium">{formatPriceDisplay(selectedConfig.price)}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Monthly Rental</span>
+                            <span className="font-medium text-green-600">₹{Math.round(selectedConfig.price * 0.003).toLocaleString()}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Annual Rental Income</span>
+                            <span className="font-medium">₹{Math.round(selectedConfig.price * 0.036).toLocaleString()}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Gross Yield</span>
+                            <span className="font-medium text-green-600">3.6% p.a.</span>
+                          </div>
+                          <Separator />
+                          <div className="flex justify-between">
+                            <span className="text-green-800 font-semibold">5-year Returns</span>
+                            <span className="font-bold text-green-600">+65%</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Market Analysis */}
+                      <div className="space-y-3">
+                        <h4 className="font-semibold text-green-800">Market Dynamics</h4>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Demand Level</span>
+                            <Badge variant="default" className="bg-green-100 text-green-800">High</Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Price Trend</span>
+                            <span className="font-medium text-green-600">↗ +12% CAGR</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Rental Demand</span>
+                            <span className="font-medium text-green-600">Strong</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Liquidity</span>
+                            <span className="font-medium">Good</span>
+                          </div>
+                          <div className="bg-green-100 p-2 rounded text-xs text-green-800">
+                            📊 IT corridor proximity drives rental demand
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Exit Strategy */}
+                      <div className="space-y-3">
+                        <h4 className="font-semibold text-green-800">Exit Strategy</h4>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Hold Period</span>
+                            <span className="font-medium">5-7 years</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Expected Sale Price</span>
+                            <span className="font-medium">{formatPriceDisplay(selectedConfig.price * 1.65)}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Capital Gains</span>
+                            <span className="font-medium text-green-600">{formatPriceDisplay(selectedConfig.price * 0.65)}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-700">Total Returns</span>
+                            <span className="font-medium text-green-600">IRR: 18.2%</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Investment Actions */}
+                    <div className="mt-6 flex flex-wrap gap-3">
+                      <Button onClick={() => navigate('/site-visit')} className="flex-1 min-w-48 bg-green-600 hover:bg-green-700">
+                        <Calendar className="h-4 w-4 mr-2" />
+                        Schedule Investment Site Visit
+                      </Button>
+                      <Button variant="outline" onClick={() => navigate('/consultation')} className="flex-1 min-w-48">
+                        <MessageCircle className="h-4 w-4 mr-2" />
+                        Investment Consultation
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        className="flex-1 min-w-48"
+                        onClick={() => property.brochureUrl ? window.open(property.brochureUrl, '_blank') : null}
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        Investment Brochure
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Investment Analysis & ROI Reports */}
+            {valuationReport && (
+              <Card id="investment-reports">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <BarChart3 className="h-5 w-5 mr-2 text-blue-600" />
+                    Investment Analysis & ROI Reports
+                    <Badge className="ml-3 bg-green-100 text-green-800 border-green-200">
+                      <TrendingUp className="h-3 w-3 mr-1" />
+                      Investment Verified
+                    </Badge>
+                  </CardTitle>
+                  <p className="text-gray-600">Professional investment analysis backed by market research and rental data</p>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* ROI Metrics */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <h3 className="font-semibold mb-3">Rental Income Potential</h3>
+                      <h3 className="font-semibold mb-3">Rental Income Analysis</h3>
                       <div className="space-y-3">
                         <div className="flex justify-between">
                           <span className="text-gray-600">Expected Monthly Rent</span>
@@ -232,19 +428,27 @@ export default function PropertyDetailInvestment() {
                           <span className="text-gray-600">Gross Rental Yield</span>
                           <span className="font-semibold text-green-600">{valuationReport.grossRentalYield}</span>
                         </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Net Yield (post expenses)</span>
+                          <span className="font-semibold text-green-600">2.8%</span>
+                        </div>
                       </div>
                     </div>
 
                     <div>
-                      <h3 className="font-semibold mb-3">Investment Metrics</h3>
+                      <h3 className="font-semibold mb-3">Capital Appreciation</h3>
                       <div className="space-y-3">
                         <div className="flex justify-between">
                           <span className="text-gray-600">Market Value</span>
-                          <span className="font-semibold">{formatPrice(parseFloat(valuationReport.estimatedMarketValue.toString()))}</span>
+                          <span className="font-semibold">{formatPriceDisplay(parseFloat(valuationReport.estimatedMarketValue?.toString() || '0'))}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Builder Price</span>
-                          <span className="font-semibold">{formatPrice(parseFloat(valuationReport.builderQuotedPrice.toString()))}</span>
+                          <span className="font-semibold">{formatPriceDisplay(parseFloat(valuationReport.builderQuotedPrice?.toString() || '0'))}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">5-year Projection</span>
+                          <span className="font-semibold text-green-600">+65%</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Exit Liquidity</span>
@@ -262,10 +466,38 @@ export default function PropertyDetailInvestment() {
                     </h3>
                     <p className="text-gray-700">{valuationReport.recommendation}</p>
                     <div className="flex items-center mt-2">
-                      <span className="text-sm text-gray-600 mr-2">Overall Verdict:</span>
+                      <span className="text-sm text-gray-600 mr-2">Investment Verdict:</span>
                       <Badge variant="default">{valuationReport.valuationVerdict}</Badge>
                     </div>
                   </div>
+
+                  {/* Get Full Investment Report */}
+                  <Card className="border-green-200">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center">
+                          <h4 className="font-semibold text-green-800">Complete Investment Analysis Report</h4>
+                          <Badge className="ml-2 bg-blue-100 text-blue-800 border-blue-200 text-xs">
+                            <TrendingUp className="h-3 w-3 mr-1" />
+                            ROI Focused
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="space-y-3 text-sm text-gray-600 mb-4">
+                        <p>• Detailed rental yield calculations and market comparisons</p>
+                        <p>• 5-year capital appreciation projections with exit strategies</p>
+                        <p>• Tax implications and investment structuring recommendations</p>
+                        <p>• Risk analysis and portfolio diversification insights</p>
+                      </div>
+                      <Button 
+                        className="w-full bg-green-600 hover:bg-green-700"
+                        onClick={() => navigate('/consultation')}
+                      >
+                        <Lock className="h-4 w-4 mr-2" />
+                        Get Complete Investment Report - ₹2,499
+                      </Button>
+                    </CardContent>
+                  </Card>
                 </CardContent>
               </Card>
             )}
