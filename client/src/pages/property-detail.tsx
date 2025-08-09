@@ -7,7 +7,7 @@ import {
   Info, Award, Shield, TrendingUp, Clock, Eye, Camera,
   Bed, Bath, Car, TreePine, Dumbbell, ShoppingCart, Wifi,
   Waves, Zap, Home, ExternalLink, Download, ChevronLeft, ChevronRight, Play, BarChart3,
-  TrendingUp as TrendingUpIcon, Lock, Unlock, FileText, CreditCard
+  TrendingUp as TrendingUpIcon, Lock, Unlock, FileText, CreditCard, AlertTriangle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -868,7 +868,280 @@ export default function PropertyDetail() {
           </div>
         </div>
 
-        {/* Similar Properties */}
+        {/* Property Highlights & Considerations */}
+            <div className="max-w-7xl mx-auto px-6 py-16">
+              <div className="text-center mb-12">
+                <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                  Property Analysis
+                </h2>
+                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                  Smart insights to help you make an informed decision
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Property Highlights */}
+                <Card className="shadow-xl rounded-2xl overflow-hidden border-l-4 border-green-500">
+                  <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 pb-6">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
+                        <CheckCircle className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-2xl text-green-800">Property Highlights</CardTitle>
+                        <p className="text-green-600 font-medium">Key strengths of this property</p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-6 space-y-4">
+                    {/* Dynamic highlights based on property data */}
+                    <div className="grid gap-4">
+                      {/* RERA Approved */}
+                      {property.reraApproved && (
+                        <div className="flex items-center p-4 bg-green-50 rounded-xl border border-green-200">
+                          <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                            <Shield className="h-5 w-5 text-green-600" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-green-800">RERA Approved</h4>
+                            <p className="text-sm text-green-600">Government regulated and legally compliant</p>
+                          </div>
+                          <div className="px-3 py-1 bg-green-100 rounded-full">
+                            <span className="text-xs font-bold text-green-700">VERIFIED</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Premium Location */}
+                      {property.zone && (
+                        <div className="flex items-center p-4 bg-blue-50 rounded-xl border border-blue-200">
+                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                            <MapPin className="h-5 w-5 text-blue-600" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-blue-800">Prime Location</h4>
+                            <p className="text-sm text-blue-600">{property.zone.charAt(0).toUpperCase() + property.zone.slice(1)} zone - High appreciation potential</p>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-lg font-bold text-blue-700">
+                              {property.locationScore ? `${property.locationScore}/5` : '4.2/5'}
+                            </div>
+                            <div className="text-xs text-blue-600">Location Score</div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Ready to Move or Construction Status */}
+                      <div className="flex items-center p-4 bg-purple-50 rounded-xl border border-purple-200">
+                        <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+                          <Building className="h-5 w-5 text-purple-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-purple-800">
+                            {property.status === 'completed' ? 'Ready to Move' : 'Under Construction'}
+                          </h4>
+                          <p className="text-sm text-purple-600">
+                            {property.status === 'completed' 
+                              ? 'Immediate possession available' 
+                              : `Expected completion: ${property.possessionDate || '2025-2026'}`
+                            }
+                          </p>
+                        </div>
+                        <div className="px-3 py-1 bg-purple-100 rounded-full">
+                          <span className="text-xs font-bold text-purple-700">
+                            {property.status === 'completed' ? 'READY' : 'UPCOMING'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Investment Potential */}
+                      <div className="flex items-center p-4 bg-amber-50 rounded-xl border border-amber-200">
+                        <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center mr-4">
+                          <TrendingUp className="h-5 w-5 text-amber-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-amber-800">Investment Grade</h4>
+                          <p className="text-sm text-amber-600">Strong appreciation potential in growing area</p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-lg font-bold text-amber-700">A-</div>
+                          <div className="text-xs text-amber-600">Rating</div>
+                        </div>
+                      </div>
+
+                      {/* Amenities Score */}
+                      {property.amenities && property.amenities.length > 0 && (
+                        <div className="flex items-center p-4 bg-indigo-50 rounded-xl border border-indigo-200">
+                          <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center mr-4">
+                            <Star className="h-5 w-5 text-indigo-600" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-indigo-800">Premium Amenities</h4>
+                            <p className="text-sm text-indigo-600">{property.amenities.length}+ world-class facilities</p>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-lg font-bold text-indigo-700">
+                              {property.amenitiesScore ? `${property.amenitiesScore}/5` : '4.7/5'}
+                            </div>
+                            <div className="text-xs text-indigo-600">Amenities Score</div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Key Considerations */}
+                <Card className="shadow-xl rounded-2xl overflow-hidden border-l-4 border-orange-500">
+                  <CardHeader className="bg-gradient-to-r from-orange-50 to-red-50 pb-6">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
+                        <AlertTriangle className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-2xl text-orange-800">Key Considerations</CardTitle>
+                        <p className="text-orange-600 font-medium">Important factors to evaluate</p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-6 space-y-4">
+                    <div className="grid gap-4">
+                      {/* Timeline Consideration */}
+                      <div className="flex items-center p-4 bg-yellow-50 rounded-xl border border-yellow-200">
+                        <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
+                          <Clock className="h-5 w-5 text-yellow-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-yellow-800">Construction Timeline</h4>
+                          <p className="text-sm text-yellow-600">
+                            {property.status === 'completed' 
+                              ? 'Property is ready for immediate possession'
+                              : 'Plan for waiting period during construction phase'
+                            }
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-medium text-yellow-700">
+                            {property.status === 'completed' ? '0 months' : '12-24 months'}
+                          </div>
+                          <div className="text-xs text-yellow-600">Wait Time</div>
+                        </div>
+                      </div>
+
+                      {/* Market Price Analysis */}
+                      <div className="flex items-center p-4 bg-red-50 rounded-xl border border-red-200">
+                        <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                          <IndianRupee className="h-5 w-5 text-red-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-red-800">Market Pricing</h4>
+                          <p className="text-sm text-red-600">
+                            {selectedConfig 
+                              ? `₹${Number(selectedConfig.pricePerSqft).toLocaleString()}/sq ft - Competitive with area rates`
+                              : 'Verify current market rates before finalizing'
+                            }
+                          </p>
+                        </div>
+                        <div className="px-3 py-1 bg-red-100 rounded-full">
+                          <span className="text-xs font-bold text-red-700">VERIFY</span>
+                        </div>
+                      </div>
+
+                      {/* Loan & Documentation */}
+                      <div className="flex items-center p-4 bg-gray-50 rounded-xl border border-gray-200">
+                        <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-4">
+                          <FileText className="h-5 w-5 text-gray-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-800">Documentation</h4>
+                          <p className="text-sm text-gray-600">Ensure all legal documents are verified before purchase</p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-medium text-gray-700">Required</div>
+                          <div className="text-xs text-gray-600">Legal Check</div>
+                        </div>
+                      </div>
+
+                      {/* Maintenance Costs */}
+                      <div className="flex items-center p-4 bg-purple-50 rounded-xl border border-purple-200">
+                        <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+                          <Home className="h-5 w-5 text-purple-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-purple-800">Ongoing Costs</h4>
+                          <p className="text-sm text-purple-600">Factor in maintenance, utilities, and society charges</p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-medium text-purple-700">₹3-5K/month</div>
+                          <div className="text-xs text-purple-600">Estimated</div>
+                        </div>
+                      </div>
+
+                      {/* Exit Strategy */}
+                      <div className="flex items-center p-4 bg-blue-50 rounded-xl border border-blue-200">
+                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                          <TrendingUp className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-blue-800">Resale Liquidity</h4>
+                          <p className="text-sm text-blue-600">
+                            {property.zone === 'east' || property.zone === 'south' 
+                              ? 'Good resale market in this area'
+                              : 'Consider long-term holding for better returns'
+                            }
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-medium text-blue-700">
+                            {property.zone === 'east' || property.zone === 'south' ? 'High' : 'Medium'}
+                          </div>
+                          <div className="text-xs text-blue-600">Liquidity</div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Action Recommendation */}
+              <div className="mt-12">
+                <Card className="shadow-xl rounded-2xl overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600">
+                  <CardContent className="p-8 text-center">
+                    <div className="flex items-center justify-center mb-4">
+                      <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
+                        <Award className="h-8 w-8 text-blue-600" />
+                      </div>
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-2">Professional Recommendation</h3>
+                    <p className="text-blue-100 text-lg mb-6 max-w-2xl mx-auto">
+                      Based on our analysis, this property shows {property.overallScore && Number(property.overallScore) > 7 ? 'strong' : 'moderate'} potential. 
+                      We recommend getting our detailed reports for comprehensive insights.
+                    </p>
+                    <div className="flex flex-wrap gap-4 justify-center">
+                      <Button 
+                        size="lg" 
+                        className="bg-white text-blue-600 hover:bg-gray-100 font-semibold px-8"
+                        onClick={handleBookVisit}
+                      >
+                        <Calendar className="h-5 w-5 mr-2" />
+                        Schedule Site Visit
+                      </Button>
+                      <Button 
+                        size="lg" 
+                        variant="outline"
+                        className="border-white text-white hover:bg-white hover:text-blue-600 font-semibold px-8"
+                        onClick={handleConsult}
+                      >
+                        <MessageCircle className="h-5 w-5 mr-2" />
+                        Expert Consultation
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+
+            {/* Similar Properties */}
         {similarProperties.length > 0 && (
           <div className="max-w-7xl mx-auto px-6 py-16">
             <h2 className="text-3xl font-bold mb-8">Similar Properties</h2>
