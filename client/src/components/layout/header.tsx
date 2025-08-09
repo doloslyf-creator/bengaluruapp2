@@ -78,7 +78,6 @@ export default function Header() {
 
   const navigation = [
     { name: "Home", href: "/", icon: Home },
-    { name: "Find Property", href: "/find-property", icon: Search },
     { name: "About Us", href: "/about", icon: UserCircle },
   ];
 
@@ -198,7 +197,7 @@ export default function Header() {
                 </Button>
               ))}
 
-              {/* Search Component */}
+              {/* Search Component - moved to Find Property button position */}
               <div className="ml-4">
                 <Popover open={searchOpen} onOpenChange={setSearchOpen}>
                   <PopoverTrigger asChild>
@@ -209,7 +208,7 @@ export default function Header() {
                       className="w-64 justify-start text-gray-500"
                     >
                       <Search className="h-4 w-4 mr-2" />
-                      Search properties...
+                      Find Properties...
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-80 p-0" align="start">
@@ -282,9 +281,7 @@ export default function Header() {
                   </PopoverContent>
                 </Popover>
               </div>
-              <Link href="/consultation" className="text-gray-600 hover:text-primary transition-colors">
-                Consultation
-              </Link>
+              
               <Link href="/property-education" className="text-gray-600 hover:text-primary transition-colors">
                 Learn
               </Link>
@@ -331,13 +328,7 @@ export default function Header() {
                 </DropdownMenu>
               )}
 
-              {/* CTA Button */}
-              <Button asChild className="hidden md:flex bg-primary hover:bg-primary/90 text-white px-6">
-                <Link href="/find-property">
-                  <Search className="h-4 w-4 mr-2" />
-                  Find Property
-                </Link>
-              </Button>
+
 
               {/* Mobile Menu */}
               <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -435,12 +426,6 @@ export default function Header() {
 
                     {/* Mobile Footer Actions */}
                     <div className="border-t p-6 space-y-3">
-                      <Button asChild className="w-full" onClick={() => setIsOpen(false)}>
-                        <Link href="/find-property">
-                          <Search className="h-4 w-4 mr-2" />
-                          Find Property
-                        </Link>
-                      </Button>
                       <div className={`grid gap-3 ${isAdmin ? 'grid-cols-2' : 'grid-cols-1'}`}>
                         <Button asChild variant="outline" size="sm" onClick={() => setIsOpen(false)}>
                           <Link href="/my-account">
