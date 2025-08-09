@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, MapPin, Heart, Share2, Calendar, MessageCircle, Phone, Star, Award, Home, Building, CheckCircle, AlertTriangle, X, Users, Car, Building2, Shield, TreePine, Waves, Dumbbell, Wifi, ShoppingCart, Camera, Play, Download, Eye, Lock, CheckCircle2, XCircle, TrendingUp, TrendingDown, ChevronLeft, ChevronRight, BarChart3, Target, FileCheck, Clock, MapPin as MapPinVerified, UserCheck } from 'lucide-react';
+import { ArrowLeft, MapPin, Heart, Share2, Calendar, MessageCircle, Phone, Star, Award, Home, Building, CheckCircle, AlertTriangle, X, Users, Car, Building2, Shield, TreePine, Waves, Dumbbell, Wifi, ShoppingCart, Camera, Play, Download, Eye, Lock, CheckCircle2, XCircle, TrendingUp, TrendingDown, ChevronLeft, ChevronRight, BarChart3, Target, FileCheck, Clock, MapPin as MapPinVerified, UserCheck, ThumbsUp, Calculator, DollarSign } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePayment } from '@/hooks/use-payment';
 import { updateMetaTags, generatePropertySchema, generatePropertySlug, injectSchema } from '@/utils/seo';
@@ -1185,159 +1185,239 @@ export default function PropertyDetailMinimal() {
         {/* Property Highlights & Considerations */}
         <Card className="mb-8" id="pros-cons">
           <CardHeader>
-            <CardTitle>Property Highlights & Considerations</CardTitle>
-            <p className="text-gray-600">Comprehensive analysis of property strengths and key considerations</p>
+            <CardTitle className="flex items-center">
+              <CheckCircle className="h-5 w-5 mr-2 text-green-600" />
+              Property Highlights & Considerations
+            </CardTitle>
+            <p className="text-gray-600">Key strengths and important factors to evaluate for this property</p>
           </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Property Highlights */}
-            <Card className="border-green-200">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-semibold text-green-800">Property Highlights</h4>
-                  <Badge className="bg-green-100 text-green-800">Strengths</Badge>
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              
+              {/* Property Highlights - Card Grid */}
+              <div className="space-y-4">
+                <div className="flex items-center mb-4">
+                  <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                    <ThumbsUp className="h-4 w-4 text-green-600" />
+                  </div>
+                  <h4 className="font-semibold text-green-800 text-lg">Property Highlights</h4>
                 </div>
                 
-                <div className="overflow-hidden rounded-lg border border-green-200">
-                  <table className="w-full">
-                    <thead className="bg-green-50">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Aspect</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Rating/Status</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">Details</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-green-100">
-                      <tr className="hover:bg-green-25">
-                        <td className="px-4 py-3 text-sm text-gray-700 font-medium">RERA Compliance</td>
-                        <td className="px-4 py-3 text-sm">
-                          <Badge className="bg-green-100 text-green-800">
-                            {property.reraApproved ? 'Approved' : 'Process'}
-                          </Badge>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-600">Full regulatory compliance</td>
-                      </tr>
-                      <tr className="hover:bg-green-25">
-                        <td className="px-4 py-3 text-sm text-gray-700 font-medium">Location Score</td>
-                        <td className="px-4 py-3 text-sm">
-                          <div className="flex items-center">
-                            <span className="font-semibold text-green-600">{property.locationScore || 4}/5</span>
-                            <span className="ml-2 text-xs text-green-600">Excellent</span>
+                <div className="grid grid-cols-1 gap-3">
+                  <Card className="border-green-200 bg-green-50/50 hover:bg-green-50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Shield className="h-5 w-5 text-green-600 mr-3" />
+                          <div>
+                            <p className="font-medium text-gray-900">RERA Compliance</p>
+                            <p className="text-sm text-gray-600">Full regulatory compliance</p>
                           </div>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-600">Prime connectivity & infrastructure</td>
-                      </tr>
-                      <tr className="hover:bg-green-25">
-                        <td className="px-4 py-3 text-sm text-gray-700 font-medium">Amenities Rating</td>
-                        <td className="px-4 py-3 text-sm">
-                          <div className="flex items-center">
-                            <span className="font-semibold text-green-600">{property.amenitiesScore || 5}/5</span>
-                            <span className="ml-2 text-xs text-green-600">Premium</span>
+                        </div>
+                        <Badge className="bg-green-100 text-green-800">
+                          {property.reraApproved ? 'Approved' : 'Process'}
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-green-200 bg-green-50/50 hover:bg-green-50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <MapPin className="h-5 w-5 text-green-600 mr-3" />
+                          <div>
+                            <p className="font-medium text-gray-900">Prime Location</p>
+                            <p className="text-sm text-gray-600">Excellent connectivity & infrastructure</p>
                           </div>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-600">World-class facilities & services</td>
-                      </tr>
-                      <tr className="hover:bg-green-25">
-                        <td className="px-4 py-3 text-sm text-gray-700 font-medium">Construction Status</td>
-                        <td className="px-4 py-3 text-sm">
-                          <Badge className="bg-blue-100 text-blue-800">
-                            {property.status === 'completed' ? 'Ready' : 
-                             property.status === 'under-construction' ? 'Ongoing' : 'Pre-launch'}
-                          </Badge>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-600">
-                          {property.status === 'completed' ? 'Immediate possession available' : 
-                           property.status === 'under-construction' ? 'Construction in progress' : 
-                           'Launch phase planning'}
-                        </td>
-                      </tr>
-                      <tr className="hover:bg-green-25">
-                        <td className="px-4 py-3 text-sm text-gray-700 font-medium">Developer Reputation</td>
-                        <td className="px-4 py-3 text-sm">
-                          <Badge className="bg-green-100 text-green-800">Established</Badge>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-600">Proven track record & brand trust</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-semibold text-green-600">{property.locationScore || 4}/5</div>
+                          <div className="text-xs text-green-600">Excellent</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-green-200 bg-green-50/50 hover:bg-green-50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Star className="h-5 w-5 text-green-600 mr-3" />
+                          <div>
+                            <p className="font-medium text-gray-900">Premium Amenities</p>
+                            <p className="text-sm text-gray-600">World-class facilities & services</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-semibold text-green-600">{property.amenitiesScore || 5}/5</div>
+                          <div className="text-xs text-green-600">Premium</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-green-200 bg-green-50/50 hover:bg-green-50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Building className="h-5 w-5 text-green-600 mr-3" />
+                          <div>
+                            <p className="font-medium text-gray-900">Construction Status</p>
+                            <p className="text-sm text-gray-600">
+                              {property.status === 'completed' ? 'Immediate possession available' : 
+                               property.status === 'under-construction' ? 'Construction in progress' : 
+                               'Launch phase planning'}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge className="bg-blue-100 text-blue-800">
+                          {property.status === 'completed' ? 'Ready' : 
+                           property.status === 'under-construction' ? 'Ongoing' : 'Pre-launch'}
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-green-200 bg-green-50/50 hover:bg-green-50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Award className="h-5 w-5 text-green-600 mr-3" />
+                          <div>
+                            <p className="font-medium text-gray-900">Developer Reputation</p>
+                            <p className="text-sm text-gray-600">Proven track record & brand trust</p>
+                          </div>
+                        </div>
+                        <Badge className="bg-green-100 text-green-800">Established</Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
 
-                <div className="bg-green-50 p-3 rounded mt-4">
-                  <p className="text-xs text-green-800">✓ This property meets {getPropertyPros().length} out of 10 key investment criteria for buyers</p>
+                <div className="bg-green-100 p-4 rounded-lg">
+                  <div className="flex items-center">
+                    <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+                    <p className="text-sm font-medium text-green-800">
+                      This property meets {getPropertyPros().length} out of 10 key investment criteria
+                    </p>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
 
-            {/* Property Considerations */}
-            <Card className="border-orange-200">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-semibold text-orange-800">Key Considerations</h4>
-                  <Badge className="bg-orange-100 text-orange-800">Important</Badge>
+              {/* Property Considerations - Card Grid */}
+              <div className="space-y-4">
+                <div className="flex items-center mb-4">
+                  <div className="h-8 w-8 bg-orange-100 rounded-full flex items-center justify-center mr-3">
+                    <AlertTriangle className="h-4 w-4 text-orange-600" />
+                  </div>
+                  <h4 className="font-semibold text-orange-800 text-lg">Key Considerations</h4>
                 </div>
                 
-                <div className="overflow-hidden rounded-lg border border-orange-200">
-                  <table className="w-full">
-                    <thead className="bg-orange-50">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-orange-800 uppercase tracking-wider">Factor</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-orange-800 uppercase tracking-wider">Impact</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-orange-800 uppercase tracking-wider">Recommendation</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-orange-100">
-                      <tr className="hover:bg-orange-25">
-                        <td className="px-4 py-3 text-sm text-gray-700 font-medium">Construction Timeline</td>
-                        <td className="px-4 py-3 text-sm">
-                          <Badge className={`${property.status === 'completed' ? 'bg-green-100 text-green-800' : 
-                                            property.status === 'under-construction' ? 'bg-yellow-100 text-yellow-800' : 
-                                            'bg-red-100 text-red-800'}`}>
-                            {property.status === 'under-construction' ? 'Ongoing' : 
-                             property.status === 'pre-launch' ? 'Future' : 'Immediate'}
-                          </Badge>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-600">
-                          {property.status === 'completed' ? 'Ready to move' : 'Plan for waiting period'}
-                        </td>
-                      </tr>
-                      <tr className="hover:bg-orange-25">
-                        <td className="px-4 py-3 text-sm text-gray-700 font-medium">Price Point</td>
-                        <td className="px-4 py-3 text-sm">
-                          <span className="font-semibold text-orange-600">
+                <div className="grid grid-cols-1 gap-3">
+                  <Card className="border-orange-200 bg-orange-50/50 hover:bg-orange-50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Clock className="h-5 w-5 text-orange-600 mr-3" />
+                          <div>
+                            <p className="font-medium text-gray-900">Construction Timeline</p>
+                            <p className="text-sm text-gray-600">
+                              {property.status === 'completed' ? 'Ready to move' : 'Plan for waiting period'}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge className={`${property.status === 'completed' ? 'bg-green-100 text-green-800' : 
+                                          property.status === 'under-construction' ? 'bg-yellow-100 text-yellow-800' : 
+                                          'bg-red-100 text-red-800'}`}>
+                          {property.status === 'under-construction' ? 'Ongoing' : 
+                           property.status === 'pre-launch' ? 'Future' : 'Immediate'}
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-orange-200 bg-orange-50/50 hover:bg-orange-50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <TrendingUp className="h-5 w-5 text-orange-600 mr-3" />
+                          <div>
+                            <p className="font-medium text-gray-900">Price Point</p>
+                            <p className="text-sm text-gray-600">Compare with similar properties</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-semibold text-orange-600">
                             {property.valueScore && property.valueScore < 4 ? 'Premium' : 'Competitive'}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-600">Compare with similar properties</td>
-                      </tr>
-                      <tr className="hover:bg-orange-25">
-                        <td className="px-4 py-3 text-sm text-gray-700 font-medium">Market Competition</td>
-                        <td className="px-4 py-3 text-sm">
-                          <Badge className="bg-orange-100 text-orange-800">High</Badge>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-600">Act quickly for preferred units</td>
-                      </tr>
-                      <tr className="hover:bg-orange-25">
-                        <td className="px-4 py-3 text-sm text-gray-700 font-medium">Additional Costs</td>
-                        <td className="px-4 py-3 text-sm">
-                          <span className="font-semibold text-orange-600">12-15%</span>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-600">Budget for registration & taxes</td>
-                      </tr>
-                      <tr className="hover:bg-orange-25">
-                        <td className="px-4 py-3 text-sm text-gray-700 font-medium">Rental Yield</td>
-                        <td className="px-4 py-3 text-sm">
-                          <span className="font-semibold text-orange-600">3.2-3.8%</span>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-gray-600">Moderate returns for investors</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-orange-200 bg-orange-50/50 hover:bg-orange-50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Users className="h-5 w-5 text-orange-600 mr-3" />
+                          <div>
+                            <p className="font-medium text-gray-900">Market Competition</p>
+                            <p className="text-sm text-gray-600">Act quickly for preferred units</p>
+                          </div>
+                        </div>
+                        <Badge className="bg-orange-100 text-orange-800">High</Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-orange-200 bg-orange-50/50 hover:bg-orange-50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Calculator className="h-5 w-5 text-orange-600 mr-3" />
+                          <div>
+                            <p className="font-medium text-gray-900">Additional Costs</p>
+                            <p className="text-sm text-gray-600">Budget for registration & taxes</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-semibold text-orange-600">12-15%</div>
+                          <div className="text-xs text-orange-600">of property value</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-orange-200 bg-orange-50/50 hover:bg-orange-50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <DollarSign className="h-5 w-5 text-orange-600 mr-3" />
+                          <div>
+                            <p className="font-medium text-gray-900">Rental Yield</p>
+                            <p className="text-sm text-gray-600">Moderate returns for investors</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-semibold text-orange-600">3.2-3.8%</div>
+                          <div className="text-xs text-orange-600">annual yield</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
 
-                <div className="bg-orange-50 p-3 rounded mt-4">
-                  <p className="text-xs text-orange-800">⚠️ Consider these factors carefully - our experts can help you evaluate and mitigate risks</p>
+                <div className="bg-orange-100 p-4 rounded-lg">
+                  <div className="flex items-center">
+                    <AlertTriangle className="h-5 w-5 text-orange-600 mr-2" />
+                    <p className="text-sm font-medium text-orange-800">
+                      Consider these factors carefully - our experts can help you evaluate risks
+                    </p>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
