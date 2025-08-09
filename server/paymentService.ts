@@ -28,6 +28,8 @@ interface ApiKeysStorage {
   sendgridApiKey?: string;
   sendgridFromEmail?: string;
   surepassApiKey?: string;
+  interaktApiKey?: string;
+  interaktBaseUrl?: string;
 }
 
 class ApiKeysManager {

@@ -4,9 +4,154 @@ import { siteVisitBookings, bookingTimeSlots, bookingStaff, properties, property
 import { insertSiteVisitBookingSchema, insertBookingTimeSlotSchema, insertBookingStaffSchema } from "@shared/schema";
 import { eq, desc, and, gte, lte, sql } from "drizzle-orm";
 import { z } from "zod";
+import { getApiKeys } from "./paymentService";
+
+// WhatsApp messaging function using Interakt
+async function sendWhatsAppNotification(bookingData: any, propertyData: any) {
+  try {
+    const apiKeys = getApiKeys();
+    const { interaktApiKey, interaktBaseUrl } = apiKeys;
+
+    if (!interaktApiKey) {
+      console.log("Interakt API key not configured, skipping WhatsApp notification");
+      return;
+    }
+
+    const baseUrl = interaktBaseUrl || 'https://api.interakt.ai';
+
+    // Method 1: Try to send a template message (if template exists)
+    // First, let's try using Event Track API to trigger an ongoing campaign
+    try {
+      const trackResponse = await fetch(`${baseUrl}/v1/public/track/events/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${interaktApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phoneNumber: "9933701566",
+          countryCode: "+91",
+          event: "site_visit_booking",
+          traits: {
+            customerName: bookingData.customerName,
+            customerPhone: bookingData.customerPhone,
+            customerEmail: bookingData.customerEmail,
+            propertyName: propertyData?.name || 'Unknown Property',
+            propertyDeveloper: propertyData?.developer || 'N/A',
+            propertyLocation: propertyData?.area || 'N/A',
+            preferredDate: bookingData.preferredDate,
+            preferredTime: bookingData.preferredTime,
+            numberOfVisitors: bookingData.numberOfVisitors,
+            visitType: bookingData.visitType === 'site-visit' ? 'Site Visit' : 'Virtual Tour',
+            specialRequests: bookingData.specialRequests || '',
+            bookingId: bookingData.id || 'Pending',
+            source: bookingData.source || 'Website'
+          }
+        })
+      });
+
+      if (trackResponse.ok) {
+        console.log("Site visit booking event tracked successfully via Interakt - this should trigger ongoing campaign if configured");
+        return;
+      } else {
+        console.log("Event tracking failed, will try template method as fallback");
+      }
+    } catch (eventError) {
+      console.log("Event tracking error, trying template method:", eventError);
+    }
+
+    // Method 2: Fallback - Try template message (requires pre-created template)
+    // You would need to create a template in Interakt dashboard first
+    try {
+      const templateResponse = await fetch(`${baseUrl}/v1/public/message/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${interaktApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          countryCode: "+91",
+          phoneNumber: "9933701566",
+          type: "Template",
+          template: {
+            name: "booking_notification", // This template needs to be created in Interakt dashboard
+            languageCode: "en",
+            bodyValues: [
+              bookingData.customerName,
+              bookingData.customerPhone,
+              propertyData?.name || 'Unknown Property',
+              bookingData.preferredDate,
+              bookingData.preferredTime,
+              bookingData.id || 'Pending'
+            ]
+          }
+        })
+      });
+
+      if (templateResponse.ok) {
+        const result = await templateResponse.json();
+        console.log("WhatsApp template notification sent successfully to +919933701566 via Interakt:", result.id);
+      } else {
+        const errorText = await templateResponse.text();
+        console.log("Template method also failed. Please ensure you have either:");
+        console.log("1. Created an ongoing campaign triggered by 'site_visit_booking' event, OR");
+        console.log("2. Created a template named 'booking_notification' in your Interakt dashboard");
+        console.error("Interakt template API error:", templateResponse.status, errorText);
+      }
+    } catch (templateError) {
+      console.error("Template method failed:", templateError);
+    }
+
+  } catch (error) {
+    console.error("Failed to send WhatsApp notification:", error);
+    // Don't throw error - notification failure shouldn't break booking creation
+  }
+}
 
 // Site Visit Booking API Routes
 export function registerBookingRoutes(app: Express) {
+  
+  // Test endpoint for WhatsApp notifications
+  app.post("/api/test-whatsapp", async (req, res) => {
+    try {
+      console.log("Testing WhatsApp notification...");
+      
+      // Create test booking data
+      const testBookingData = {
+        id: "TEST123",
+        customerName: "Test Customer",
+        customerPhone: "+919999999999",
+        customerEmail: "test@example.com",
+        preferredDate: new Date().toLocaleDateString(),
+        preferredTime: "10:00 AM",
+        numberOfVisitors: 2,
+        visitType: "site-visit",
+        specialRequests: "Test booking for WhatsApp integration",
+        source: "API Test"
+      };
+
+      const testPropertyData = {
+        name: "Test Property",
+        developer: "Test Developer",
+        area: "Test Location"
+      };
+
+      // Send test WhatsApp notification
+      await sendWhatsAppNotification(testBookingData, testPropertyData);
+      
+      res.json({
+        success: true,
+        message: "WhatsApp test notification sent. Check console logs for details."
+      });
+    } catch (error) {
+      console.error("WhatsApp test error:", error);
+      res.status(500).json({
+        success: false,
+        message: "WhatsApp test failed",
+        error: error.message
+      });
+    }
+  });
   
   // Get all bookings with property details
   app.get("/api/bookings", async (req, res) => {
@@ -158,6 +303,18 @@ export function registerBookingRoutes(app: Express) {
       console.log("Inserting booking data:", bookingData);
 
       try {
+        // Fetch property details for WhatsApp notification
+        let propertyDetails = null;
+        try {
+          const [property] = await db
+            .select()
+            .from(properties)
+            .where(eq(properties.id, propertyId));
+          propertyDetails = property;
+        } catch (propertyError) {
+          console.log("Could not fetch property details for WhatsApp notification:", propertyError);
+        }
+
         // Insert into database using Drizzle
         const [newBooking] = await db
           .insert(siteVisitBookings)
@@ -165,6 +322,11 @@ export function registerBookingRoutes(app: Express) {
           .returning();
 
         console.log("Booking created successfully:", newBooking);
+
+        // Send WhatsApp notification (don't await to avoid blocking response)
+        sendWhatsAppNotification(newBooking, propertyDetails).catch(err => 
+          console.error("WhatsApp notification failed:", err)
+        );
 
         res.status(201).json({
           bookingId: newBooking.id,
@@ -176,14 +338,21 @@ export function registerBookingRoutes(app: Express) {
         
         // Create a fallback booking response
         const bookingId = `BK${Date.now()}`;
+        const fallbackBooking = {
+          id: bookingId,
+          ...bookingData,
+          createdAt: new Date()
+        };
+
+        // Still try to send WhatsApp notification for fallback bookings
+        sendWhatsAppNotification(fallbackBooking, null).catch(err => 
+          console.error("WhatsApp notification failed for fallback booking:", err)
+        );
+
         res.status(201).json({
           bookingId,
           message: "Booking created successfully",
-          booking: {
-            id: bookingId,
-            ...bookingData,
-            createdAt: new Date()
-          }
+          booking: fallbackBooking
         });
       }
     } catch (error) {

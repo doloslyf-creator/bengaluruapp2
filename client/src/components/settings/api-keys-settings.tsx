@@ -39,6 +39,8 @@ const apiKeysSchema = z.object({
   sendgridApiKey: z.string().optional(),
   sendgridFromEmail: z.string().optional(),
   surepassApiKey: z.string().optional(),
+  interaktApiKey: z.string().optional(),
+  interaktBaseUrl: z.string().optional(),
 });
 
 type ApiKeysData = z.infer<typeof apiKeysSchema>;
@@ -188,6 +190,29 @@ const apiKeySections: ApiKeySection[] = [
         description: "Your Surepass API key for RERA verification"
       }
     ]
+  },
+  {
+    id: "interakt",
+    title: "Interakt WhatsApp API",
+    description: "WhatsApp notifications for booking confirmations",
+    icon: MessageSquare,
+    color: "green",
+    keys: [
+      {
+        name: "interaktApiKey",
+        label: "API Key",
+        type: "password",
+        placeholder: "••••••••••••••••",
+        description: "Your Interakt API key for WhatsApp messaging"
+      },
+      {
+        name: "interaktBaseUrl",
+        label: "Base URL",
+        type: "text",
+        placeholder: "https://api.interakt.ai",
+        description: "Interakt API base URL (optional - defaults to https://api.interakt.ai)"
+      }
+    ]
   }
 ];
 
@@ -231,12 +256,15 @@ export function ApiKeysSettings() {
 
   const testConnectionMutation = useMutation({
     mutationFn: async (service: string) => {
+      if (service === "interakt") {
+        return apiRequest("POST", "/api/test-whatsapp");
+      }
       return apiRequest("POST", `/api/settings/test-connection/${service}`);
     },
     onSuccess: (data: any, service: string) => {
       toast({
         title: "Connection Test Successful",
-        description: `${service} is working correctly`,
+        description: service === "interakt" ? "WhatsApp notification sent successfully" : `${service} is working correctly`,
       });
     },
     onError: (error: any, service: string) => {
@@ -323,7 +351,7 @@ export function ApiKeysSettings() {
                     </div>
                     <div className="flex items-center space-x-2">
                       {getStatusBadge(section.id, apiKeys)}
-                      {(section.id === "razorpay" || section.id === "surepass") && (
+                      {(section.id === "razorpay" || section.id === "surepass" || section.id === "interakt") && (
                         <Button
                           type="button"
                           variant="outline"
