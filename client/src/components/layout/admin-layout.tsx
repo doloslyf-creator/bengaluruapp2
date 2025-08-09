@@ -130,6 +130,12 @@ const groupedNavigation: NavigationGroup[] = [
         icon: Calendar,
         description: "Manage Property Visit Schedules"
       },
+      { 
+        name: "WhatsApp Management", 
+        href: "/admin-panel/whatsapp-management", 
+        icon: MessageSquare,
+        description: "Customer Communication & Campaigns"
+      },
     ]
   },
   {
