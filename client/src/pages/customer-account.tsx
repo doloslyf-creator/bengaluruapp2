@@ -109,11 +109,22 @@ export default function CustomerAccount() {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Filter reports for current customer (for now, show all - in real app would filter by customer assignment)
+  // Fetch customer-assigned reports dynamically
+  const { data: assignedValuationReports = [], isLoading: assignedValuationLoading } = useQuery({
+    queryKey: [`/api/customers/${currentCustomerId}/valuation-reports`],
+    enabled: !!currentCustomerId,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // For now, show all CIVIL MEP reports (would filter by customer in real implementation)
   const civilMepReports = allCivilMepReports;
-  const valuationReports = allValuationReports.filter((report: any) => 
-    report.assignedTo === currentCustomerId || !report.assignedTo
-  );
+  
+  // Use assigned valuation reports or fallback to filtered reports
+  const valuationReports = assignedValuationReports.length > 0 
+    ? assignedValuationReports 
+    : allValuationReports.filter((report: any) => 
+        report.assignedTo === currentCustomerId || !report.assignedTo
+      );
 
   // Initialize profile data with defaults, will be updated by useEffect
   const [profileData, setProfileData] = useState<CustomerProfile>({
@@ -758,7 +769,7 @@ export default function CustomerAccount() {
                   <div className="flex justify-between items-center">
                     <div className="flex space-x-2">
                       <Button variant="default" size="sm" asChild>
-                        <Link href={`/civil-mep-report/${report.id}`}>
+                        <Link href={`/valuation-report/${report.id}`}>
                           <Eye className="h-4 w-4 mr-1" />
                           View Details
                         </Link>
@@ -790,13 +801,15 @@ export default function CustomerAccount() {
                       </div>
                       <div>
                         <h3 className="font-bold text-xl text-gray-900">
-                          {('propertyName' in report && report.propertyName) || 'Property Valuation Report'}
+                          {report.projectName || report.reportTitle || 'Property Valuation Report'}
                         </h3>
-                        <p className="text-purple-600 font-medium">Property Valuation Assessment</p>
+                        <p className="text-purple-600 font-medium">
+                          {report.configuration || 'Property Valuation Assessment'} • {report.towerUnit || 'Assessment Unit'}
+                        </p>
                         <div className="flex items-center space-x-4 mt-1">
                           <p className="text-sm text-gray-500 flex items-center">
                             <MapPin className="h-4 w-4 mr-1" />
-                            {('location' in report && report.location) || 'Location not specified'}
+                            {report.facing ? `${report.facing} Facing` : 'Facing not specified'}
                           </p>
                           <p className="text-sm text-gray-500 flex items-center">
                             <Calendar className="h-4 w-4 mr-1" />
@@ -818,7 +831,7 @@ export default function CustomerAccount() {
                         <div>
                           <p className="text-sm font-medium text-emerald-600">Market Value</p>
                           <p className="text-2xl font-bold text-emerald-900">
-                            {report.overallScore || 'N/A'}
+                            {report.totalEstimatedValue || report.builderQuotedPrice || 'N/A'}
                           </p>
                         </div>
                         <DollarSign className="h-8 w-8 text-emerald-500" />
@@ -827,8 +840,8 @@ export default function CustomerAccount() {
                     <div className="bg-orange-50 rounded-lg p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-orange-600">Growth Potential</p>
-                          <p className="text-lg font-semibold text-orange-900">High</p>
+                          <p className="text-sm font-medium text-orange-600">Appreciation</p>
+                          <p className="text-lg font-semibold text-orange-900">{report.appreciationOutlook || 'Moderate'}</p>
                         </div>
                         <TrendingUp className="h-8 w-8 text-orange-500" />
                       </div>
@@ -836,8 +849,8 @@ export default function CustomerAccount() {
                     <div className="bg-blue-50 rounded-lg p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-blue-600">Investment Grade</p>
-                          <p className="text-lg font-semibold text-blue-900">A+</p>
+                          <p className="text-sm font-medium text-blue-600">Risk Score</p>
+                          <p className="text-lg font-semibold text-blue-900">{report.riskScore ? `${report.riskScore}/10` : 'N/A'}</p>
                         </div>
                         <Star className="h-8 w-8 text-blue-500" />
                       </div>

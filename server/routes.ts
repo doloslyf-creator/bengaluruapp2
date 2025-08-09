@@ -1221,6 +1221,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get valuation reports assigned to a specific customer
+  app.get("/api/customers/:customerId/valuation-reports", async (req, res) => {
+    try {
+      const { customerId } = req.params;
+      
+      // Get reports assigned via the join table
+      const assignedReports = await db.select({
+        report: propertyValuationReports,
+        assignment: propertyValuationReportCustomers
+      })
+      .from(propertyValuationReportCustomers)
+      .innerJoin(
+        propertyValuationReports, 
+        eq(propertyValuationReportCustomers.reportId, propertyValuationReports.id)
+      )
+      .where(eq(propertyValuationReportCustomers.customerId, customerId));
+      
+      // Also get reports directly assigned via assignedTo field
+      const directlyAssigned = await db.select()
+        .from(propertyValuationReports)
+        .where(eq(propertyValuationReports.assignedTo, customerId));
+      
+      // Combine and deduplicate reports
+      const allReports = new Map();
+      
+      assignedReports.forEach(({ report }) => {
+        allReports.set(report.id, report);
+      });
+      
+      directlyAssigned.forEach(report => {
+        allReports.set(report.id, report);
+      });
+      
+      const reports = Array.from(allReports.values())
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      
+      res.json(reports);
+    } catch (error) {
+      console.error("Error fetching customer valuation reports:", error);
+      res.status(500).json({ error: "Failed to fetch customer valuation reports" });
+    }
+  });
+
   // Property Valuation Report Configurations API
   // Get all configurations for a report
   app.get("/api/valuation-reports/:reportId/configurations", async (req, res) => {
