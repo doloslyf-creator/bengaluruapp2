@@ -181,8 +181,7 @@ export default function PropertyDetailMinimal() {
         amount: (baseAmount / 100).toString(), // Convert paise to rupees for storage
         paymentMethod: 'razorpay',
         paymentStatus: 'pending', // Initially pending
-        additionalRequirements: orderData.additionalRequirements || '',
-        address: orderData.address
+        additionalRequirements: orderData.additionalRequirements || ''
       };
 
       // Create order record first

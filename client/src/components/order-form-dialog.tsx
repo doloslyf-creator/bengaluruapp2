@@ -18,7 +18,6 @@ const orderFormSchema = z.object({
   customerName: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
   phone: z.string().min(10, 'Phone number must be at least 10 digits'),
-  address: z.string().min(10, 'Address must be at least 10 characters'),
   reportType: z.enum(['civil-mep', 'valuation', 'both']),
   additionalRequirements: z.string().optional(),
 });
@@ -91,7 +90,6 @@ export default function OrderFormDialog({
       customerName: '',
       email: '',
       phone: '',
-      address: '',
       reportType: reportType,
       additionalRequirements: '',
     },
@@ -235,20 +233,6 @@ export default function OrderFormDialog({
                             <FormLabel>Phone Number *</FormLabel>
                             <FormControl>
                               <Input placeholder="Enter your phone number" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="address"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Address *</FormLabel>
-                            <FormControl>
-                              <Textarea placeholder="Enter your complete address" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
