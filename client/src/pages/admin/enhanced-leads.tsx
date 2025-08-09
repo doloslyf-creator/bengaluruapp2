@@ -120,6 +120,11 @@ export default function EnhancedLeads() {
   const [showEditLeadDialog, setShowEditLeadDialog] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [newNote, setNewNote] = useState("");
+  const [newTimelineEntry, setNewTimelineEntry] = useState({
+    title: "",
+    description: "",
+    type: "milestone"
+  });
   const [smartFilters, setSmartFilters] = useState<SmartFilters>({
     persona: "all",
     urgency: "all", 
@@ -153,6 +158,46 @@ export default function EnhancedLeads() {
 
   const { data: stats } = useQuery<LeadStats>({
     queryKey: ["/api/leads/stats"],
+  });
+
+  // Add note mutation
+  const addNoteMutation = useMutation({
+    mutationFn: async (data: { leadId: string; note: any }) => {
+      const response = await apiRequest("POST", `/api/leads/${data.leadId}/notes`, data.note);
+      return await response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/leads/enhanced"] });
+      setNewNote("");
+      toast({ title: "Success", description: "Note added successfully" });
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Error", 
+        description: error.message || "Failed to add note",
+        variant: "destructive" 
+      });
+    }
+  });
+
+  // Add timeline mutation  
+  const addTimelineMutation = useMutation({
+    mutationFn: async (data: { leadId: string; timeline: any }) => {
+      const response = await apiRequest("POST", `/api/leads/enhanced/${data.leadId}/timeline`, data.timeline);
+      return await response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/leads/enhanced"] });
+      setNewTimelineEntry({ title: "", description: "", type: "milestone" });
+      toast({ title: "Success", description: "Timeline entry added successfully" });
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Error", 
+        description: error.message || "Failed to add timeline entry",
+        variant: "destructive" 
+      });
+    }
   });
 
   // Filter leads based on search query
@@ -190,17 +235,6 @@ export default function EnhancedLeads() {
         description: error.message || "Failed to create lead",
         variant: "destructive" 
       });
-    }
-  });
-
-  // Add note mutation
-  const addNoteMutation = useMutation({
-    mutationFn: ({ leadId, note }: { leadId: string; note: any }) => 
-      apiRequest("POST", `/api/leads/${leadId}/notes`, note),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/leads/enhanced"] });
-      setNewNote("");
-      toast({ title: "Success", description: "Note added successfully" });
     }
   });
 
@@ -784,10 +818,132 @@ export default function EnhancedLeads() {
                 </TabsContent>
 
                 <TabsContent value="timeline" className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Timeline className="w-4 h-4" />
-                      Lead journey timeline will be implemented here
+                  <div className="space-y-4">
+                    <Card className="p-4">
+                      <div className="space-y-4">
+                        <h4 className="font-medium">Add Timeline Entry</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="timeline-title">Title</Label>
+                            <Input
+                              id="timeline-title"
+                              placeholder="e.g., Follow-up call scheduled"
+                              value={newTimelineEntry.title}
+                              onChange={(e) => setNewTimelineEntry(prev => ({ ...prev, title: e.target.value }))}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="timeline-type">Type</Label>
+                            <Select 
+                              value={newTimelineEntry.type} 
+                              onValueChange={(value) => setNewTimelineEntry(prev => ({ ...prev, type: value }))}
+                            >
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="milestone">Milestone</SelectItem>
+                                <SelectItem value="call">Call</SelectItem>
+                                <SelectItem value="email">Email</SelectItem>
+                                <SelectItem value="meeting">Meeting</SelectItem>
+                                <SelectItem value="demo">Demo</SelectItem>
+                                <SelectItem value="follow-up">Follow-up</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="timeline-description">Description</Label>
+                          <Textarea
+                            id="timeline-description"
+                            placeholder="Describe what happened or what's planned..."
+                            value={newTimelineEntry.description}
+                            onChange={(e) => setNewTimelineEntry(prev => ({ ...prev, description: e.target.value }))}
+                            rows={3}
+                          />
+                        </div>
+                        <Button
+                          onClick={() => {
+                            if (newTimelineEntry.title.trim() && selectedLead) {
+                              addTimelineMutation.mutate({
+                                leadId: selectedLead.id,
+                                timeline: {
+                                  subject: newTimelineEntry.title,
+                                  description: newTimelineEntry.description,
+                                  activityType: newTimelineEntry.type,
+                                  outcome: "positive",
+                                  performedBy: "admin"
+                                }
+                              });
+                            }
+                          }}
+                          disabled={!newTimelineEntry.title.trim() || addTimelineMutation.isPending}
+                          className="bg-[#004445] hover:bg-[#002223] text-white"
+                        >
+                          {addTimelineMutation.isPending ? "Adding..." : "Add Timeline Entry"}
+                        </Button>
+                      </div>
+                    </Card>
+                    
+                    <div className="space-y-3">
+                      <h4 className="font-medium">Timeline History</h4>
+                      {selectedLead.activities && selectedLead.activities.length > 0 ? (
+                        selectedLead.activities
+                          .sort((a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime())
+                          .map((activity, index) => (
+                          <Card key={activity.id || index} className="p-4">
+                            <div className="flex items-start gap-3">
+                              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#004445] flex items-center justify-center">
+                                {activity.activityType === 'call' && <PhoneCall className="w-4 h-4 text-white" />}
+                                {activity.activityType === 'email' && <Mail className="w-4 h-4 text-white" />}
+                                {activity.activityType === 'meeting' && <Users className="w-4 h-4 text-white" />}
+                                {activity.activityType === 'note' && <MessageSquare className="w-4 h-4 text-white" />}
+                                {activity.activityType === 'milestone' && <Target className="w-4 h-4 text-white" />}
+                                {!['call', 'email', 'meeting', 'note', 'milestone'].includes(activity.activityType) && 
+                                  <Calendar className="w-4 h-4 text-white" />
+                                }
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between">
+                                  <h5 className="font-medium">{activity.subject}</h5>
+                                  <div className="text-xs text-gray-500">
+                                    {activity.createdAt ? format(new Date(activity.createdAt), "MMM dd, yyyy HH:mm") : "N/A"}
+                                  </div>
+                                </div>
+                                {activity.description && (
+                                  <p className="text-sm text-gray-600 mt-1">{activity.description}</p>
+                                )}
+                                <div className="flex items-center gap-2 mt-2">
+                                  <Badge variant="outline" className="text-xs">
+                                    {activity.activityType}
+                                  </Badge>
+                                  {activity.outcome && (
+                                    <Badge variant={activity.outcome === 'positive' ? 'default' : activity.outcome === 'negative' ? 'destructive' : 'secondary'} className="text-xs">
+                                      {activity.outcome}
+                                    </Badge>
+                                  )}
+                                  {activity.performedBy && (
+                                    <span className="text-xs text-gray-500">by {activity.performedBy}</span>
+                                  )}
+                                </div>
+                                {activity.nextAction && (
+                                  <div className="mt-2 p-2 bg-yellow-50 rounded-md border border-yellow-200">
+                                    <p className="text-xs text-yellow-800">
+                                      <strong>Next Action:</strong> {activity.nextAction}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </Card>
+                        ))
+                      ) : (
+                        <div className="text-center py-8 text-gray-500">
+                          <Timeline className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                          <p>No timeline entries yet</p>
+                          <p className="text-sm">Add the first entry above to start tracking this lead's journey</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </TabsContent>

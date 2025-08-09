@@ -870,6 +870,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Add note to lead
+  app.post("/api/leads/:leadId/notes", async (req, res) => {
+    try {
+      const note = await storage.addLeadNote({
+        leadId: req.params.leadId,
+        ...req.body,
+        createdBy: req.body.createdBy || "admin",
+      });
+      res.status(201).json(note);
+    } catch (error) {
+      console.error("Error adding lead note:", error);
+      res.status(500).json({ error: "Failed to add note" });
+    }
+  });
+
   // Qualify/disqualify lead
   app.post("/api/leads/:leadId/qualify", async (req, res) => {
     try {
