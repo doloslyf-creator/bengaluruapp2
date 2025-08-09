@@ -9,7 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Play, Edit, Trash2, Eye, Clock, Users, BarChart3 } from "lucide-react";
+import { Plus, Play, Edit, Trash2, Eye, Clock, Users, BarChart3, AlertCircle, Loader2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface VideoContent {
   id: string;
@@ -43,8 +44,11 @@ export default function VideoEducation() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: videos = [], isLoading } = useQuery<VideoContent[]>({
-    queryKey: ["/api/video-education"]
+  const { data: videos = [], isLoading, error } = useQuery<VideoContent[]>({
+    queryKey: ["/api/video-education"],
+    retry: 3,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: false
   });
 
   const createMutation = useMutation({
@@ -134,6 +138,55 @@ export default function VideoEducation() {
     'Property Inspection',
     'Negotiation Tips'
   ];
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">Video Education Center</h1>
+            <p className="text-muted-foreground">Manage educational video content for property buyers</p>
+          </div>
+        </div>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-blue-600" />
+            <p className="text-lg font-semibold">Loading video education content...</p>
+            <p className="text-muted-foreground">Please wait while we fetch your videos</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">Video Education Center</h1>
+            <p className="text-muted-foreground">Manage educational video content for property buyers</p>
+          </div>
+        </div>
+        <Alert className="border-red-200 bg-red-50">
+          <AlertCircle className="h-4 w-4 text-red-600" />
+          <AlertDescription className="text-red-800">
+            Failed to load video education content. Please check your connection and try again.
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="ml-2" 
+              onClick={() => window.location.reload()}
+            >
+              Retry
+            </Button>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -303,8 +356,19 @@ export default function VideoEducation() {
       </div>
 
       {/* Videos Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {videos.map((video) => (
+      {videos.length === 0 ? (
+        <div className="text-center py-12">
+          <Play className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">No videos yet</h3>
+          <p className="text-gray-600 mb-4">Get started by creating your first educational video</p>
+          <Button onClick={() => { setEditingVideo(null); resetForm(); setIsDialogOpen(true); }}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Your First Video
+          </Button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {videos.map((video) => (
           <Card key={video.id} className="overflow-hidden">
             <div className="aspect-video bg-muted relative">
               <iframe
@@ -381,8 +445,9 @@ export default function VideoEducation() {
               </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

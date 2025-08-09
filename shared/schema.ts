@@ -7,13 +7,13 @@ import { z } from "zod";
 export const propertyScores = pgTable("property_scores", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   propertyId: varchar("property_id").notNull(),
-  
+
   // Scoring metadata
   scoringVersion: text("scoring_version").default("1.0"),
   scoredBy: text("scored_by"), // Admin user who created the score
   scoringDate: timestamp("scoring_date").defaultNow(),
   lastUpdated: timestamp("last_updated").defaultNow(),
-  
+
   // Location Score (25 points total)
   transportConnectivity: integer("transport_connectivity").default(0), // 0-8 points
   transportNotes: text("transport_notes"),
@@ -23,7 +23,7 @@ export const propertyScores = pgTable("property_scores", {
   socialNotes: text("social_notes"),
   employmentHubs: integer("employment_hubs").default(0), // 0-5 points
   employmentNotes: text("employment_notes"),
-  
+
   // Amenities & Features Score (20 points total)
   basicAmenities: integer("basic_amenities").default(0), // 0-8 points
   basicAmenitiesNotes: text("basic_amenities_notes"),
@@ -31,7 +31,7 @@ export const propertyScores = pgTable("property_scores", {
   lifestyleAmenitiesNotes: text("lifestyle_amenities_notes"),
   modernFeatures: integer("modern_features").default(0), // 0-5 points
   modernFeaturesNotes: text("modern_features_notes"),
-  
+
   // Legal & Compliance Score (20 points total)
   reraCompliance: integer("rera_compliance").default(0), // 0-8 points
   reraComplianceNotes: text("rera_compliance_notes"),
@@ -39,7 +39,7 @@ export const propertyScores = pgTable("property_scores", {
   titleClarityNotes: text("title_clarity_notes"),
   approvals: integer("approvals").default(0), // 0-5 points
   approvalsNotes: text("approvals_notes"),
-  
+
   // Value Proposition Score (15 points total)
   priceCompetitiveness: integer("price_competitiveness").default(0), // 0-8 points
   priceCompetitivenessNotes: text("price_competitiveness_notes"),
@@ -47,7 +47,7 @@ export const propertyScores = pgTable("property_scores", {
   appreciationPotentialNotes: text("appreciation_potential_notes"),
   rentalYield: integer("rental_yield").default(0), // 0-3 points
   rentalYieldNotes: text("rental_yield_notes"),
-  
+
   // Developer Credibility Score (10 points total)
   trackRecord: integer("track_record").default(0), // 0-5 points
   trackRecordNotes: text("track_record_notes"),
@@ -55,7 +55,7 @@ export const propertyScores = pgTable("property_scores", {
   financialStabilityNotes: text("financial_stability_notes"),
   customerSatisfaction: integer("customer_satisfaction").default(0), // 0-2 points
   customerSatisfactionNotes: text("customer_satisfaction_notes"),
-  
+
   // Construction Quality Score (10 points total)
   structuralQuality: integer("structural_quality").default(0), // 0-5 points
   structuralQualityNotes: text("structural_quality_notes"),
@@ -63,7 +63,7 @@ export const propertyScores = pgTable("property_scores", {
   finishingStandardsNotes: text("finishing_standards_notes"),
   maintenanceStandards: integer("maintenance_standards").default(0), // 0-2 points
   maintenanceStandardsNotes: text("maintenance_standards_notes"),
-  
+
   // Calculated scores
   locationScoreTotal: integer("location_score_total").default(0), // max 25
   amenitiesScoreTotal: integer("amenities_score_total").default(0), // max 20
@@ -73,12 +73,12 @@ export const propertyScores = pgTable("property_scores", {
   constructionScoreTotal: integer("construction_score_total").default(0), // max 10
   overallScoreTotal: integer("overall_score_total").default(0), // max 100
   overallGrade: varchar("overall_grade", { enum: ["A+", "A", "B+", "B", "C+", "C", "D"] }),
-  
+
   // Additional insights
   keyStrengths: json("key_strengths").$type<string[]>().default([]),
   areasOfConcern: json("areas_of_concern").$type<string[]>().default([]),
   recommendationSummary: text("recommendation_summary"),
-  
+
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -89,47 +89,47 @@ export const properties = pgTable("properties", {
   type: varchar("type", { enum: ["apartment", "villa", "plot"] }).notNull(),
   developer: text("developer").notNull(),
   status: varchar("status", { enum: ["pre-launch", "active", "under-construction", "completed", "sold-out"] }).notNull(),
-  
+
   // Location details - Updated for city-wise hierarchy
   cityId: varchar("city_id").notNull(),
   zoneId: varchar("zone_id").notNull(),
   area: text("area").notNull(),
   address: text("address").notNull(),
-  
+
   // Legacy fields (kept for backward compatibility)
   zone: varchar("zone", { enum: ["north", "south", "east", "west", "central"] }),
-  
+
   // Property specifications (simplified - detailed configs in separate table)
   possessionDate: text("possession_date"), // YYYY-MM format
-  
+
   // Legal and regulatory
   reraNumber: text("rera_number"),
   reraApproved: boolean("rera_approved").default(false),
-  
+
   // Infrastructure and zoning
   infrastructureVerdict: text("infrastructure_verdict"),
   zoningInfo: text("zoning_info"),
-  
+
   // Tags and flags
   tags: json("tags").$type<string[]>().notNull().default([]),
-  
+
   // Media
   images: json("images").$type<string[]>().notNull().default([]),
   videos: json("videos").$type<string[]>().notNull().default([]),
   youtubeVideoUrl: text("youtube_video_url"), // YouTube video URL for property overview
   brochureUrl: text("brochure_url"), // URL to downloadable property brochure/PDF
-  
 
-  
+
+
   // Property Scoring (linked to propertyScores table)
   propertyScoreId: varchar("property_score_id").references(() => propertyScores.id),
-  
+
   // Widget Data - Legacy scoring (kept for backward compatibility)
   locationScore: integer("location_score").default(0), // 1-5
   amenitiesScore: integer("amenities_score").default(0), // 1-5
   valueScore: integer("value_score").default(0), // 1-5
   overallScore: decimal("overall_score", { precision: 3, scale: 1 }).default("0.0"), // calculated average
-  
+
   // Widget Data - Price Comparison
   areaAvgPriceMin: integer("area_avg_price_min"), // in lakhs
   areaAvgPriceMax: integer("area_avg_price_max"), // in lakhs
@@ -159,14 +159,14 @@ export const properties = pgTable("properties", {
   hasCivilMepReport: boolean("has_civil_mep_report").default(false), // Does this property have a report
   civilMepReportPrice: decimal("civil_mep_report_price", { precision: 10, scale: 2 }).default("2999.00"), // Price in INR
   civilMepReportStatus: varchar("civil_mep_report_status", { enum: ["draft", "completed", "reviewing"] }).default("draft"),
-  
+
   // Property Valuation Report System
   hasValuationReport: boolean("has_valuation_report").default(false),
   valuationReportPrice: decimal("valuation_report_price", { precision: 10, scale: 2 }).default("15000.00"),
   valuationReportStatus: varchar("valuation_report_status", { 
     enum: ["draft", "in-progress", "completed", "archived"] 
   }).default("draft"),
-  
+
   // Timestamps
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -185,12 +185,12 @@ export const reportPayments = pgTable("report_payments", {
   reportId: varchar("report_id"), // Can be null for general service orders
   reportType: varchar("report_type", { enum: ["civil-mep", "property-valuation"] }).notNull().default("civil-mep"),
   propertyId: varchar("property_id").references(() => properties.id), // Can be null for general service orders
-  
+
   // Customer Information
   customerName: text("customer_name").notNull(),
   customerEmail: text("customer_email").notNull(),
   customerPhone: text("customer_phone"),
-  
+
   // Payment Details
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   currency: text("currency").default("INR"),
@@ -198,16 +198,16 @@ export const reportPayments = pgTable("report_payments", {
   paymentStatus: varchar("payment_status", { 
     enum: ["pending", "processing", "completed", "failed", "refunded", "pay-later-pending"] 
   }).default("pending"),
-  
+
   // Stripe Integration
   stripePaymentIntentId: text("stripe_payment_intent_id"),
   stripeCustomerId: text("stripe_customer_id"),
-  
+
   // Pay Later System
   payLaterDueDate: timestamp("pay_later_due_date"), // 7 days from access
   payLaterRemindersSent: integer("pay_later_reminders_sent").default(0),
   accessGrantedAt: timestamp("access_granted_at"), // When user got access
-  
+
   // Timestamps
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -272,28 +272,28 @@ export const bookings = pgTable("bookings", {
   propertyId: varchar("property_id").references(() => properties.id),
   propertyName: text("property_name").notNull(),
   bookingType: varchar("booking_type", { enum: ["site-visit", "consultation"] }).notNull(),
-  
+
   // Customer details
   name: text("name").notNull(),
   phone: text("phone").notNull(),
   email: text("email").notNull(),
-  
+
   // Visit specific details
   preferredDate: text("preferred_date"),
   preferredTime: text("preferred_time"),
   visitType: varchar("visit_type", { enum: ["site-visit", "virtual-tour"] }),
   numberOfVisitors: text("number_of_visitors"),
-  
+
   // Consultation specific details
   consultationType: varchar("consultation_type", { enum: ["financing", "legal", "property-advice", "investment"] }),
   preferredContactTime: text("preferred_contact_time"),
   urgency: varchar("urgency", { enum: ["immediate", "within-24hrs", "within-week", "flexible"] }),
-  
+
   // Common fields
   questions: text("questions"),
   specialRequests: text("special_requests"),
   status: varchar("status", { enum: ["pending", "confirmed", "completed", "cancelled"] }).notNull(),
-  
+
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -322,66 +322,66 @@ export type InsertReportPayment = z.infer<typeof insertReportPaymentSchema>;
 export const leads = pgTable("leads", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   leadId: varchar("lead_id").notNull().unique(), // User-facing lead ID like LD1754081800724
-  
+
   // Lead source and type
   source: varchar("source", { enum: ["site-visit", "consultation", "property-inquiry", "referral", "social-media", "walk-in", "advertisement"] }).notNull(),
   leadType: varchar("lead_type", { enum: ["hot", "warm", "cold"] }).notNull().default("warm"),
   priority: varchar("priority", { enum: ["high", "medium", "low"] }).notNull().default("medium"),
-  
+
   // Customer information
   customerName: text("customer_name").notNull(),
   phone: text("phone").notNull(),
   email: text("email").notNull(),
   preferredContactTime: text("preferred_contact_time"), // Morning, Afternoon, Evening
   referredBy: text("referred_by"), // Source of referral
-  
+
   // Buyer Persona Information
   buyerPersona: varchar("buyer_persona", { 
     enum: ["end-user-family", "nri-investor", "first-time-buyer", "senior-buyer", "working-couple", "research-oriented"] 
   }),
   buyingFor: varchar("buying_for", { enum: ["self", "parents", "investment", "resale-flip"] }),
   urgency: varchar("urgency", { enum: ["immediate", "3-6-months", "6-12-months", "exploratory"] }),
-  
+
   // Budget & Financing Details
   budgetMin: integer("budget_min"), // In lakhs
   budgetMax: integer("budget_max"), // In lakhs
   financing: varchar("financing", { enum: ["own-funds", "bank-loan", "inheritance", "mixed"] }),
   preferredLoanPartner: text("preferred_loan_partner"),
   hasPreApproval: boolean("has_pre_approval").default(false),
-  
+
   // Location Preferences
   preferredAreas: json("preferred_areas").$type<string[]>().default([]), // Array of preferred locations
   commuteRequirements: text("commute_requirements"), // Specific commute needs
   schoolWorkplaceConsiderations: text("school_workplace_considerations"),
-  
+
   // Property Type & Layout Preferences
   propertyType: varchar("property_type", { enum: ["villa", "apartment", "plot", "duplex"] }),
   bhkPreference: varchar("bhk_preference", { enum: ["1bhk", "2bhk", "3bhk", "4bhk", "5bhk+"] }),
   floorPreference: text("floor_preference"), // Ground floor, top floor, etc.
   gatedPreference: varchar("gated_preference", { enum: ["gated", "standalone", "no-preference"] }),
-  
+
   // Lifestyle Preferences
   amenitiesNeeded: json("amenities_needed").$type<string[]>().default([]), // Pool, park, EV charging, solar, etc.
   vastuFacingRequirements: text("vastu_facing_requirements"),
   seniorCitizenFriendly: boolean("senior_citizen_friendly").default(false),
   petsChildrenConsideration: text("pets_children_consideration"),
   greenZonesPreference: boolean("green_zones_preference").default(false),
-  
+
   // Legal & Documentation Needs
   wantsLegalSupport: boolean("wants_legal_support").default(false),
   interestedInReports: json("interested_in_reports").$type<string[]>().default([]), // valuation, civil-mep, legal, infra
-  
+
   // Investment Criteria (For Investors)
   preferredRentalYield: real("preferred_rental_yield"), // Percentage
   exitHorizon: varchar("exit_horizon", { enum: ["2-years", "5-years", "10-years"] }),
   legalStatusFocus: varchar("legal_status_focus", { enum: ["rera-only", "oc", "a-khata", "clear-title"] }),
-  
+
   // Legacy fields for backward compatibility
   propertyId: varchar("property_id").references(() => properties.id),
   propertyName: text("property_name"),
   interestedConfiguration: text("interested_configuration"), // Specific BHK/configuration
   budgetRange: text("budget_range"), // e.g., "50L-1Cr", "1Cr-2Cr" - legacy field
-  
+
   // Lead details (expanded)
   leadDetails: json("lead_details").$type<{
     visitType?: string;
@@ -395,29 +395,29 @@ export const leads = pgTable("leads", {
     personalizedNotes?: string;
     keyNonNegotiables?: string[];
   }>().notNull().default({}),
-  
+
   // Lead scoring and qualification
   leadScore: integer("lead_score").default(0), // 0-100 scoring
   qualificationNotes: text("qualification_notes"),
-  
+
   // Smart Tags for Quick Filtering
   smartTags: json("smart_tags").$type<string[]>().default([]), // hot-lead, ready-to-visit, needs-legal-handholding, first-time-buyer
-  
+
   // Lead status and assignment
   status: varchar("status", { 
     enum: ["new", "contacted", "qualified", "demo-scheduled", "proposal-sent", "negotiation", "closed-won", "closed-lost", "follow-up"] 
   }).notNull().default("new"),
   assignedTo: text("assigned_to"), // Sales person/agent
-  
+
   // Follow-up and communication
   lastContactDate: timestamp("last_contact_date"),
   nextFollowUpDate: timestamp("next_follow_up_date"),
   communicationPreference: varchar("communication_preference", { enum: ["phone", "email", "whatsapp"] }).default("phone"),
-  
+
   // Conversion tracking
   expectedCloseDate: timestamp("expected_close_date"),
   dealValue: integer("deal_value"), // Expected deal value in lakhs
-  
+
   // Timestamps and tracking
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -427,30 +427,30 @@ export const leads = pgTable("leads", {
 export const leadActivities = pgTable("lead_activities", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   leadId: varchar("lead_id").notNull().references(() => leads.id, { onDelete: "cascade" }),
-  
+
   // Activity details
   activityType: varchar("activity_type", { 
     enum: ["call", "email", "meeting", "site-visit", "proposal", "follow-up", "note", "whatsapp", "document-shared", "report-sent"] 
   }).notNull(),
   subject: text("subject").notNull(),
   description: text("description"),
-  
+
   // Activity outcome
   outcome: varchar("outcome", { enum: ["positive", "neutral", "negative", "no-response", "rescheduled", "interested", "not-interested"] }),
   nextAction: text("next_action"),
-  
+
   // Enhanced tracking
   duration: integer("duration"), // Duration in minutes for calls/meetings
   attendees: json("attendees").$type<string[]>().default([]), // People involved
   attachments: json("attachments").$type<string[]>().default([]), // File URLs or names
-  
+
   // Scheduling
   scheduledAt: timestamp("scheduled_at"),
   completedAt: timestamp("completed_at"),
-  
+
   // Assignment
   performedBy: text("performed_by").notNull(),
-  
+
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -458,25 +458,25 @@ export const leadActivities = pgTable("lead_activities", {
 export const leadNotes = pgTable("lead_notes", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   leadId: varchar("lead_id").notNull().references(() => leads.id, { onDelete: "cascade" }),
-  
+
   // Note details
   title: text("title"),
   content: text("content").notNull(),
   noteType: varchar("note_type", { 
     enum: ["general", "important", "follow-up", "concern", "opportunity", "persona-insight", "non-negotiable", "preference"] 
   }).default("general"),
-  
+
   // Note metadata
   isPinned: boolean("is_pinned").default(false),
   isPrivate: boolean("is_private").default(false),
   tags: json("tags").$type<string[]>().default([]),
-  
+
   // Enhanced categorization
   category: varchar("category", { 
     enum: ["budget", "location", "timeline", "family", "lifestyle", "legal", "investment", "concerns", "opportunities"] 
   }),
   sentiment: varchar("sentiment", { enum: ["positive", "neutral", "negative", "mixed"] }),
-  
+
   // Timestamps
   createdAt: timestamp("created_at").defaultNow(),
   createdBy: text("created_by"),
@@ -486,7 +486,7 @@ export const leadNotes = pgTable("lead_notes", {
 export const leadTimeline = pgTable("lead_timeline", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   leadId: varchar("lead_id").notNull().references(() => leads.id, { onDelete: "cascade" }),
-  
+
   // Milestone details
   milestone: varchar("milestone", {
     enum: ["first-contact", "qualified", "site-visit-scheduled", "site-visit-completed", "proposal-presented", 
@@ -494,16 +494,16 @@ export const leadTimeline = pgTable("lead_timeline", {
   }).notNull(),
   title: text("title").notNull(),
   description: text("description"),
-  
+
   // Milestone metadata
   isCompleted: boolean("is_completed").default(false),
   completedAt: timestamp("completed_at"),
   dueDate: timestamp("due_date"),
-  
+
   // Associated data
   attachments: json("attachments").$type<string[]>().default([]),
   relatedActivityId: varchar("related_activity_id").references(() => leadActivities.id),
-  
+
   // Timestamps
   createdAt: timestamp("created_at").defaultNow(),
   createdBy: text("created_by"),
@@ -513,24 +513,24 @@ export const leadTimeline = pgTable("lead_timeline", {
 export const leadDocuments = pgTable("lead_documents", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   leadId: varchar("lead_id").notNull().references(() => leads.id, { onDelete: "cascade" }),
-  
+
   // Document details
   fileName: text("file_name").notNull(),
   fileUrl: text("file_url").notNull(),
   fileType: varchar("file_type", { enum: ["pdf", "image", "document", "spreadsheet", "presentation"] }),
   fileSize: integer("file_size"), // In bytes
-  
+
   // Document categorization
   category: varchar("category", {
     enum: ["property-brochure", "floor-plan", "legal-document", "financial-document", "site-photos", 
            "valuation-report", "civil-mep-report", "loan-documents", "booking-form", "agreement"]
   }),
-  
+
   // Document metadata
   isPublic: boolean("is_public").default(false), // Can be shared with customer
   tags: json("tags").$type<string[]>().default([]),
   description: text("description"),
-  
+
   // Timestamps
   uploadedAt: timestamp("uploaded_at").defaultNow(),
   uploadedBy: text("uploaded_by"),
@@ -621,7 +621,7 @@ export type CustomerNote = typeof customerNotes.$inferSelect;
 // Valuation Requests table
 export const valuationRequests = pgTable("valuation_requests", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  
+
   // Property details
   propertyType: text("property_type").notNull(),
   location: text("location").notNull(),
@@ -630,30 +630,30 @@ export const valuationRequests = pgTable("valuation_requests", {
   bedrooms: text("bedrooms").notNull(),
   amenities: json("amenities").$type<string[]>().default([]),
   additionalInfo: text("additional_info"),
-  
+
   // Contact details
   contactName: text("contact_name").notNull(),
   contactPhone: text("contact_phone").notNull(),
   contactEmail: text("contact_email").notNull(),
-  
+
   // Status and processing
   status: varchar("status", { enum: ["pending", "in-progress", "completed", "cancelled"] }).default("pending"),
   requestSource: text("request_source").default("website"),
-  
+
   // Valuation results (filled after processing)
   estimatedValue: decimal("estimated_value", { precision: 12, scale: 2 }),
   valueRange: json("value_range").$type<{ min: number; max: number }>(),
   confidenceLevel: varchar("confidence_level", { enum: ["high", "medium", "low"] }),
-  
+
   // Report generation
   reportGenerated: boolean("report_generated").default(false),
   reportUrl: text("report_url"),
   reportNotes: text("report_notes"),
-  
+
   // Processing details
   assignedTo: text("assigned_to"),
   processedAt: timestamp("processed_at"),
-  
+
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -661,42 +661,42 @@ export const valuationRequests = pgTable("valuation_requests", {
 // App Settings table for general application configuration
 export const appSettings = pgTable("app_settings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  
+
   // General Branding Settings
   businessName: text("business_name").default("OwnItRight – Curated Property Advisors"),
   logoUrl: text("logo_url"), // PNG/SVG logo for navbar and reports
   faviconUrl: text("favicon_url"), // Favicon file URL
-  
+
   // Contact Information
   contactEmail: text("contact_email").default("contact@ownitright.com"),
   phoneNumber: text("phone_number").default("+91 98765 43210"),
   whatsappNumber: text("whatsapp_number").default("+91 98765 43210"),
   officeAddress: text("office_address").default("Bengaluru, Karnataka, India"),
-  
+
   // Localization Settings
   defaultCurrency: varchar("default_currency", { enum: ["INR", "USD", "EUR"] }).default("INR"),
   currencySymbol: text("currency_symbol").default("₹"),
   timezone: text("timezone").default("Asia/Kolkata"),
   dateFormat: varchar("date_format", { enum: ["DD/MM/YYYY", "MM/DD/YYYY", "YYYY-MM-DD"] }).default("DD/MM/YYYY"),
-  
+
   // Application Behavior
   maintenanceMode: boolean("maintenance_mode").default(false),
   maintenanceMessage: text("maintenance_message").default("We are currently performing maintenance. Please check back later."),
-  
+
   // Theme and UI Settings (for future expansion)
   primaryColor: text("primary_color").default("#2563eb"), // Default blue
   secondaryColor: text("secondary_color").default("#64748b"), // Default slate
-  
+
   // SEO Settings
   metaTitle: text("meta_title").default("OwnItRight - Property Discovery Platform"),
   metaDescription: text("meta_description").default("Discover your perfect property in Bengaluru with our advanced property discovery platform"),
-  
+
   // Feature Toggles
   enableBookings: boolean("enable_bookings").default(true),
   enableConsultations: boolean("enable_consultations").default(true),
   enableReports: boolean("enable_reports").default(true),
 
-  
+
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -707,27 +707,27 @@ export const cities = pgTable("cities", {
   name: text("name").notNull().unique(),
   state: text("state").notNull(),
   country: text("country").notNull().default("India"),
-  
+
   // Basic information
   description: text("description"),
   population: integer("population"),
   area: decimal("area", { precision: 10, scale: 2 }), // in sq km
-  
+
   // Economic indicators
   averagePropertyPrice: integer("average_property_price"), // in lakhs
   priceAppreciationRate: decimal("price_appreciation_rate", { precision: 5, scale: 2 }), // percentage
   rentalYieldRange: text("rental_yield_range"), // e.g., "3-5%"
-  
+
   // Infrastructure scores
   transportScore: integer("transport_score").default(0), // 1-10
   educationScore: integer("education_score").default(0), // 1-10
   healthcareScore: integer("healthcare_score").default(0), // 1-10
   employmentScore: integer("employment_score").default(0), // 1-10
-  
+
   // Status and settings
   isActive: boolean("is_active").default(true),
   displayOrder: integer("display_order").default(0),
-  
+
   // Metadata
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -740,28 +740,28 @@ export const zones = pgTable("zones", {
   description: text("description"),
   cityId: varchar("city_id").notNull(),
   locationType: varchar("location_type", { enum: ["urban", "suburban", "rural"] }).default("urban"),
-  
+
   // Price and market data
   priceRangeMin: integer("price_range_min"), // in lakhs
   priceRangeMax: integer("price_range_max"), // in lakhs
   appreciationRate: decimal("appreciation_rate", { precision: 5, scale: 2 }), // percentage per year
   rentalYield: decimal("rental_yield", { precision: 5, scale: 2 }), // percentage
-  
+
   // Infrastructure and development scores (1-10)
   infrastructureScore: integer("infrastructure_score").default(5),
   connectivityScore: integer("connectivity_score").default(5),
   amenitiesScore: integer("amenities_score").default(5),
   educationScore: integer("education_score").default(5),
-  
+
   // Geographic and administrative data
   area: decimal("area", { precision: 10, scale: 2 }), // in sq km
   population: integer("population"),
   pincodesServed: json("pincodes_served").$type<string[]>().default([]),
-  
+
   // Status
   isActive: boolean("is_active").default(true),
   displayOrder: integer("display_order").default(0),
-  
+
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -769,42 +769,42 @@ export const zones = pgTable("zones", {
 // API Keys Settings table for secure storage of third-party integrations
 export const apiKeysSettings = pgTable("api_keys_settings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  
+
   // Payment Integration
   razorpayKeyId: text("razorpay_key_id"),
   razorpayKeySecret: text("razorpay_key_secret"), // Encrypted
   razorpayWebhookSecret: text("razorpay_webhook_secret"), // Encrypted
   razorpayTestMode: boolean("razorpay_test_mode").default(true),
-  
+
   // Google Services
   googleMapsApiKey: text("google_maps_api_key"), // Encrypted
   googleAnalyticsId: text("google_analytics_id"),
-  
+
   // Communication APIs
   twilioAccountSid: text("twilio_account_sid"),
   twilioAuthToken: text("twilio_auth_token"), // Encrypted
   twilioPhoneNumber: text("twilio_phone_number"),
-  
+
   // WhatsApp Business
   whatsappBusinessApiKey: text("whatsapp_business_api_key"), // Encrypted
   whatsappPhoneNumberId: text("whatsapp_phone_number_id"),
-  
+
   // Email Services
   sendgridApiKey: text("sendgrid_api_key"), // Encrypted
   sendgridFromEmail: text("sendgrid_from_email"),
-  
+
   // Government Verification APIs
   surepassApiKey: text("surepass_api_key"), // Encrypted
   signzyApiKey: text("signzy_api_key"), // Encrypted
-  
+
   // Real Estate Data APIs
   magicbricksApiKey: text("magicbricks_api_key"), // Encrypted
   acres99ApiKey: text("acres_99_api_key"), // Encrypted
-  
+
   // Status tracking
   lastUpdated: timestamp("last_updated").defaultNow(),
   updatedBy: text("updated_by").default("admin"),
-  
+
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -968,7 +968,7 @@ export const propertyValuationReports = pgTable("property_valuation_reports", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   propertyId: varchar("property_id").notNull(),
   customerId: varchar("customer_id"), // Optional - can be assigned to customers
-  
+
   // Report metadata
   reportTitle: text("report_title").notNull(),
   reportStatus: varchar("report_status", { enum: ["draft", "in_progress", "completed", "delivered"] }).default("draft"),
@@ -977,7 +977,7 @@ export const propertyValuationReports = pgTable("property_valuation_reports", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   deliveredAt: timestamp("delivered_at"),
-  
+
   // 1. Executive Summary (new fields)
   projectName: text("project_name"), // e.g., "Assetz Marq 3.0, 3BHK, Tower B"  
   towerUnit: text("tower_unit"),
@@ -989,7 +989,7 @@ export const propertyValuationReports = pgTable("property_valuation_reports", {
   appreciationOutlook: text("appreciation_outlook"), // Moderate – 7% CAGR expected
   riskScore: integer("risk_score").default(0), // 0-10 scale (3 = Low)
   recommendation: text("recommendation"), // ✅ Buy if negotiated ~₹10L lower
-  
+
   // 2. Property Profile (mix of existing and new fields)
   unitType: varchar("unit_type", { enum: ["apartment", "villa", "rowhouse", "plot"] }),
   configuration: text("configuration"), // 3BHK, 1550 sq.ft
@@ -1004,7 +1004,7 @@ export const propertyValuationReports = pgTable("property_valuation_reports", {
   landTitleStatus: text("land_title_status"),
   builderReputationScore: integer("builder_reputation_score").default(0), // Keep existing numeric
   builderReputationScoreText: text("builder_reputation_score_text"), // New text field
-  
+
   // 3. Market Valuation Estimate
   builderQuotedPrice: text("builder_quoted_price"), // vs Actual Market Value
   totalEstimatedValue: text("total_estimated_value"),
@@ -1013,13 +1013,13 @@ export const propertyValuationReports = pgTable("property_valuation_reports", {
   constructionValue: text("construction_value"),
   guidanceValueZoneRate: text("guidance_value_zone_rate"), // BDA/BBMP/BIAPPA
   marketPremiumDiscount: text("market_premium_discount"), // Unit is priced 14% above average resale
-  
+
   // 4. Comparable Sales Analysis
   comparableSales: json("comparable_sales"), // Array of {project, config, area, date, rate, source}
   benchmarkingSources: text("benchmarking_sources"), // MagicBricks, 99acres, local brokers
   volatilityIndex: text("volatility_index"), // 6-month price trend
   averageDaysOnMarket: integer("average_days_on_market"), // 72 days for resale units nearby
-  
+
   // 5. Location & Infrastructure Assessment
   // Zoning & Authority
   planningAuthority: varchar("planning_authority", { enum: ["BDA", "BBMP", "BMRDA", "BIAPPA"] }),
@@ -1032,7 +1032,7 @@ export const propertyValuationReports = pgTable("property_valuation_reports", {
   socialInfrastructure: text("social_infrastructure"), // Schools, Hospitals, Malls within 5 km
   // Future Developments
   futureInfrastructure: json("future_infrastructure"), // PRR Plan, Metro Phase 3, SEZs/Tech Parks
-  
+
   // 6. Legal & Compliance Snapshot
   reraRegistration: text("rera_registration"), // PRM/KA/RERA/xxx
   khataVerification: text("khata_verification"), // A (verified from BBMP)
@@ -1041,27 +1041,29 @@ export const propertyValuationReports = pgTable("property_valuation_reports", {
   planApproval: text("plan_approval"), // From BDA/BMRDA
   loanApproval: json("loan_approval"), // HDFC, ICICI, SBI confirmed
   titleClarityNotes: text("title_clarity_notes"), // No ongoing disputes / pending litigations
-  
+
   // 7. Rental & Yield Potential
   expectedMonthlyRent: text("expected_monthly_rent"), // ₹45,000–₹48,000
   grossRentalYield: text("gross_rental_yield"), // ~2.5% p.a.
   tenantDemand: varchar("tenant_demand", { enum: ["high", "moderate", "low"] }), // High in 3–4 km radius
   exitLiquidity: text("exit_liquidity"), // Moderate, 3–6 months
   yieldScore: text("yield_score"), // 6.5/10
-  
+
   // 8. Cost Sheet Breakdown
   baseUnitCost: text("base_unit_cost"), // ₹1.95 Cr
   amenitiesCharges: text("amenities_charges"), // Clubhouse + Amenities + Corpus ₹5.5 L
+  maintenanceCharges: text("maintenance_charges"), // ₹5,000/month
+  parkingCharges: text("parking_charges"), // ₹4 L for 1 covered slot
   floorRiseCharges: text("floor_rise_charges"), // ₹2.4 L
   gstAmount: text("gst_amount"), // GST @5% ₹9.75 L
   stampDutyRegistration: text("stamp_duty_registration"), // ₹13 L (approx)
   totalAllInPrice: text("total_all_in_price"), // ₹2.26 Cr
   khataTransferCosts: text("khata_transfer_costs"), // ₹30–50K
-  
+
   // 9. Pros & Cons Summary
   pros: json("pros"), // Array of pros
   cons: json("cons"), // Array of cons
-  
+
   // 10. Final Recommendation
   buyerTypeFit: text("buyer_type_fit"), // Ideal for End Users prioritizing legal clarity
   negotiationAdvice: text("negotiation_advice"), // Ask builder for ₹1,000/sqft discount
@@ -1069,7 +1071,7 @@ export const propertyValuationReports = pgTable("property_valuation_reports", {
   appreciationOutlook5yr: text("appreciation_outlook_5yr"), // ₹2.6–2.8 Cr expected
   exitPlan: text("exit_plan"), // Hold minimum 5–6 years for ROI
   overallScore: text("overall_score"),
-  
+
   // Additional Optional Fields
   appendices: json("appendices"), // Optional additional documents/data
   customNotes: text("custom_notes"),
@@ -1078,33 +1080,33 @@ export const propertyValuationReports = pgTable("property_valuation_reports", {
 // Site Visit Bookings System
 export const siteVisitBookings = pgTable("site_visit_bookings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  
+
   // Customer Information
   customerName: varchar("customer_name", { length: 255 }).notNull(),
   customerPhone: varchar("customer_phone", { length: 15 }).notNull(),
   customerEmail: varchar("customer_email", { length: 255 }).notNull(),
-  
+
   // Property Information
   propertyId: varchar("property_id").notNull().references(() => properties.id),
   // configurationId: varchar("configuration_id").references(() => propertyConfigurations.id), // Optional field, removed from actual DB
-  
+
   // Visit Details
   visitType: varchar("visit_type", { enum: ["site-visit", "virtual-tour", "model-unit"] }).notNull().default("site-visit"),
   preferredDate: date("preferred_date").notNull(),
   preferredTime: varchar("preferred_time", { length: 20 }).notNull(),
   numberOfVisitors: integer("number_of_visitors").default(1),
-  
+
   // Booking Status
   status: varchar("status", { 
     enum: ["pending", "confirmed", "rescheduled", "completed", "cancelled", "no-show"] 
   }).notNull().default("pending"),
-  
+
   // Additional Information
   specialRequests: text("special_requests"),
   source: varchar("source", { 
     enum: ["website", "phone", "email", "walk-in", "referral", "social-media"] 
   }).default("website"),
-  
+
   // Admin Management Fields
   assignedTo: varchar("assigned_to"), // Staff member assigned
   confirmedDate: date("confirmed_date"),
@@ -1112,19 +1114,19 @@ export const siteVisitBookings = pgTable("site_visit_bookings", {
   meetingPoint: text("meeting_point"), // Where to meet at the site
   staffNotes: text("staff_notes"), // Internal notes
   customerNotes: text("customer_notes"), // Notes from customer interaction
-  
+
   // Follow-up tracking
   followUpRequired: boolean("follow_up_required").default(true),
   followUpDate: date("follow_up_date"),
   followUpStatus: varchar("follow_up_status", { 
     enum: ["pending", "completed", "not-required"] 
   }).default("pending"),
-  
+
   // Lead conversion tracking
   // leadId: varchar("lead_id").references(() => leads.id), // Commented out as this column doesn't exist in DB
   convertedToLead: boolean("converted_to_lead").default(false),
   // conversionDate: timestamp("conversion_date"), // Commented out as this column doesn't exist in DB
-  
+
   // Timestamps
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -1136,20 +1138,20 @@ export const siteVisitBookings = pgTable("site_visit_bookings", {
 // Booking Time Slots Management
 export const bookingTimeSlots = pgTable("booking_time_slots", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  
+
   // Time slot details
   timeSlot: varchar("time_slot", { length: 20 }).notNull(), // "09:00 AM", "02:30 PM"
   displayName: varchar("display_name", { length: 50 }).notNull(), // "Morning 9:00 AM"
-  
+
   // Availability
   isActive: boolean("is_active").default(true),
   dayOfWeek: varchar("day_of_week", { 
     enum: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] 
   }),
-  
+
   // Capacity management
   maxBookings: integer("max_bookings").default(5), // Max bookings per time slot per day
-  
+
   // Created/Updated
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -1158,22 +1160,22 @@ export const bookingTimeSlots = pgTable("booking_time_slots", {
 // Staff/Team Members for booking assignments
 export const bookingStaff = pgTable("booking_staff", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  
+
   // Staff details
   name: varchar("name", { length: 255 }).notNull(),
   phone: varchar("phone", { length: 15 }).notNull(),
   email: varchar("email", { length: 255 }).notNull(),
   role: varchar("role", { length: 100 }).default("Site Visit Coordinator"),
-  
+
   // Availability
   isActive: boolean("is_active").default(true),
   workingDays: json("working_days").$type<string[]>().default([]), // ["monday", "tuesday", ...]
   workingHours: json("working_hours").$type<{start: string, end: string}>(),
-  
+
   // Contact preferences
   preferredContact: varchar("preferred_contact", { enum: ["phone", "email", "whatsapp"] }).default("phone"),
   whatsappNumber: varchar("whatsapp_number", { length: 15 }),
-  
+
   // Timestamps
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -1254,53 +1256,53 @@ export type PropertyValuationReportCustomer = typeof propertyValuationReportCust
 export const propertyValuationReportConfigurations = pgTable("property_valuation_report_configurations", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   reportId: varchar("report_id").notNull().references(() => propertyValuationReports.id, { onDelete: "cascade" }),
-  
+
   // Configuration Details
   configurationType: text("configuration_type").notNull(), // 3BHK, 4BHK, 5BHK, Villa, Plot, etc.
   configurationName: text("configuration_name"), // Custom name like "3BHK Premium", "Garden Villa"
   isPrimary: boolean("is_primary").default(false), // Mark one as primary configuration
-  
+
   // Area Details
   builtUpArea: decimal("built_up_area", { precision: 8, scale: 2 }), // BUA in sq.ft
   superBuiltUpArea: decimal("super_built_up_area", { precision: 8, scale: 2 }), // Super BUA in sq.ft
   carpetArea: decimal("carpet_area", { precision: 8, scale: 2 }), // Carpet area in sq.ft
   plotArea: decimal("plot_area", { precision: 8, scale: 2 }), // Plot area in sq.ft
   balconyArea: decimal("balcony_area", { precision: 8, scale: 2 }), // Balcony area in sq.ft
-  
+
   // UDS and Land Details
   udsShare: decimal("uds_share", { precision: 8, scale: 2 }), // Undivided share in sq.ft
   udsPercentage: decimal("uds_percentage", { precision: 5, scale: 2 }), // UDS as percentage
   landShareValue: decimal("land_share_value", { precision: 12, scale: 2 }), // Land share value in INR
-  
+
   // Pricing Details
   basicPrice: decimal("basic_price", { precision: 12, scale: 2 }), // Basic unit price
   ratePerSqft: decimal("rate_per_sqft", { precision: 10, scale: 2 }), // Rate per sq.ft
   ratePerSqftBua: decimal("rate_per_sqft_bua", { precision: 10, scale: 2 }), // Rate per BUA sq.ft
   ratePerSqftSba: decimal("rate_per_sqft_sba", { precision: 10, scale: 2 }), // Rate per SBA sq.ft
   totalPrice: decimal("total_price", { precision: 12, scale: 2 }), // Total configuration price
-  
+
   // Additional Charges
   amenitiesCharges: decimal("amenities_charges", { precision: 10, scale: 2 }),
   maintenanceCharges: decimal("maintenance_charges", { precision: 10, scale: 2 }),
   parkingCharges: decimal("parking_charges", { precision: 10, scale: 2 }),
   floorRiseCharges: decimal("floor_rise_charges", { precision: 10, scale: 2 }),
-  
+
   // Configuration Specific Details
   numberOfBedrooms: integer("number_of_bedrooms"),
   numberOfBathrooms: integer("number_of_bathrooms"),
   numberOfBalconies: integer("number_of_balconies"),
   facing: text("facing"), // North, South, East, West, North-East, etc.
   floorNumber: text("floor_number"), // Floor details
-  
+
   // Availability
   totalUnits: integer("total_units"), // Total units of this configuration
   availableUnits: integer("available_units"), // Available units
   soldUnits: integer("sold_units"), // Sold units
-  
+
   // Configuration Notes
   configurationNotes: text("configuration_notes"), // Additional notes for this configuration
   amenitiesIncluded: json("amenities_included").$type<string[]>().default([]), // Configuration specific amenities
-  
+
   // Timestamps
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -1356,7 +1358,7 @@ export type TeamMember = typeof teamMembers.$inferSelect;
 // Developers table - property developers and builders
 export const developers = pgTable("developers", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  
+
   // 🧱 Core Builder Information
   name: text("name").notNull(), // Official name (e.g., Prestige Group)
   legalEntity: text("legal_entity"), // Registered company name
@@ -1368,7 +1370,7 @@ export const developers = pgTable("developers", {
   headquarters: text("headquarters"), // City, state of main office
   establishedYear: varchar("established_year", { length: 4 }),
   promoters: json("promoters").$type<string[]>().default([]), // Founders or key people
-  
+
   // 🔢 Track Record
   totalProjects: integer("total_projects").default(0),
   activeProjects: integer("active_projects").default(0), // Ongoing Projects
@@ -1376,13 +1378,13 @@ export const developers = pgTable("developers", {
   operatingCities: json("operating_cities").$type<string[]>().default([]), // List of cities/regions
   flagshipProjects: json("flagship_projects").$type<{name: string; description?: string; imageUrl?: string}[]>().default([]),
   totalUnitsDelivered: integer("total_units_delivered").default(0),
-  
+
   // 🕐 Delivery Track Record
   onTimeDeliveryPercent: decimal("on_time_delivery_percent", { precision: 5, scale: 2 }), // Ratio of on-time vs delayed
   majorDelays: json("major_delays").$type<{projectName: string; reason?: string; delayMonths?: number}[]>().default([]),
   avgDeliveryDelay: integer("avg_delivery_delay").default(0), // In months
   complaintsHistory: text("complaints_history"), // Summary of legal disputes/customer issues
-  
+
   // 🏢 Company Type & Market Positioning
   companyType: varchar("company_type", { enum: ["public", "private", "partnership", "llp"] }).default("private"),
   stockTicker: varchar("stock_ticker"), // If applicable (e.g., NSE: PRESTIGE)
@@ -1392,7 +1394,7 @@ export const developers = pgTable("developers", {
     enum: ["bootstrap", "pe-backed", "listed", "debt-ridden", "government-backed"] 
   }).default("bootstrap"),
   auditHistory: text("audit_history"), // Any financial audits, controversies
-  
+
   // 🧱 Quality & Construction Practices
   civilQualityRating: integer("civil_quality_rating").default(3), // 1-5 score
   constructionModel2: varchar("construction_model2", { 
@@ -1402,30 +1404,30 @@ export const developers = pgTable("developers", {
   certifications: json("certifications").$type<string[]>().default([]), // IGBC, RERA, ISO, OC/CC compliance
   technologiesUsed: json("technologies_used").$type<string[]>().default([]), // Mivan, Precast, RCC, SmartTech
   vendorNetwork: json("vendor_network").$type<string[]>().default([]), // Known vendors or PMC
-  
+
   // 📜 Legal & Regulatory
   reraRegistrationNo: json("rera_registration_no").$type<{state: string; regNo: string}[]>().default([]),
   legalRedFlags: text("legal_red_flags"), // Known disputes, NGT issues, A-Khata issues
   projectApprovals: json("project_approvals").$type<string[]>().default([]), // BBMP, BDA, BMRDA, EC, Fire
   litigationsSummary: text("litigations_summary"), // High-profile legal cases
-  
+
   // ⭐ Reputation & Reviews
   averageRating: decimal("average_rating", { precision: 3, scale: 2 }).default("0.00"),
   clientFeedbackHighlights: json("client_feedback_highlights").$type<string[]>().default([]),
   popularFor: text("popular_for"), // e.g., "Great clubhouse but slow possession"
   mediaMentions: json("media_mentions").$type<{type: string; title: string; url?: string; date?: string}[]>().default([]),
-  
+
   // 🔗 Crosslinking & Integration
   filterTags: json("filter_tags").$type<string[]>().default([]), // "Top 10 in Whitefield", "Known for on-time delivery"
   specialization: varchar("specialization", { 
     enum: ["residential", "commercial", "mixed-use", "affordable-housing", "luxury-housing", "plotted-development"] 
   }).default("residential"),
-  
+
   // Optional SEO-Driven Fields
   builderSlug: varchar("builder_slug").unique(), // prestige-group, sobha-ltd, etc.
   seoMetaTitle: text("seo_meta_title"),
   seoDescription: text("seo_description"), // 140-160 chars
-  
+
   // Media and Social
   logo: varchar("logo"), // URL to logo image
   coverImage: varchar("cover_image"), // URL to cover image
@@ -1436,7 +1438,7 @@ export const developers = pgTable("developers", {
     instagram?: string;
     youtube?: string;
   }>().default({}),
-  
+
   // System fields
   isActive: boolean("is_active").default(true),
   verificationStatus: varchar("verification_status", { 
@@ -1472,14 +1474,14 @@ export const reraData = pgTable("rera_data", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   reraId: text("rera_id").unique().notNull(),
   propertyId: varchar("property_id").references(() => properties.id),
-  
+
   // Basic Project Information
   projectName: text("project_name").notNull(),
   promoterName: text("promoter_name").notNull(),
   location: text("location").notNull(),
   district: text("district").notNull(),
   state: text("state").default("Karnataka"),
-  
+
   // Project Details
   projectType: varchar("project_type", { 
     enum: ["residential", "commercial", "mixed", "plotted-development", "other"] 
@@ -1487,7 +1489,7 @@ export const reraData = pgTable("rera_data", {
   totalUnits: integer("total_units"),
   projectArea: text("project_area"),
   builtUpArea: text("built_up_area"),
-  
+
   // Legal and Compliance Status
   registrationDate: text("registration_date"),
   approvalDate: text("approval_date"),
@@ -1499,11 +1501,11 @@ export const reraData = pgTable("rera_data", {
   complianceStatus: varchar("compliance_status", { 
     enum: ["active", "non-compliant", "suspended", "cancelled"] 
   }).default("active"),
-  
+
   // Financial Information
   projectCost: text("project_cost"),
   amountCollected: text("amount_collected"),
-  
+
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -1525,18 +1527,18 @@ export const videoEducation = pgTable("video_education", {
   description: text("description").notNull(),
   youtubeUrl: text("youtube_url").notNull(),
   category: text("category").notNull(),
-  difficulty: varchar("difficulty", { enum: ["beginner", "intermediate", "advanced"] }).default("beginner"),
-  duration: text("duration").notNull(),
-  tags: json("tags").$type<string[]>().default([]),
+  difficulty: varchar("difficulty", { enum: ["beginner", "intermediate", "advanced"] }).notNull().default("beginner"),
+  duration: text("duration").notNull(), // Format: "5:30"
+  tags: text("tags").array().default(sql`ARRAY[]::text[]`),
   isPublished: boolean("is_published").default(false),
   viewCount: integer("view_count").default(0),
+
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const insertVideoEducationSchema = createInsertSchema(videoEducation).omit({
   id: true,
-  viewCount: true,
   createdAt: true,
   updatedAt: true,
 });
@@ -1567,12 +1569,12 @@ export const civilMepReports = pgTable("civil_mep_reports", {
   reportDate: date("report_date").notNull(),
   status: varchar("status", { enum: ["draft", "in-progress", "completed", "approved"] }).notNull().default("draft"),
   overallScore: real("overall_score").default(0),
-  
+
   // Simplified site information fields
   siteLocation: text("site_location"),
   plotArea: text("plot_area"),
   builtUpArea: text("built_up_area"),
-  
+
   // Foundation & Structure fields
   foundationType: text("foundation_type"),
   structuralSystem: text("structural_system"),
@@ -1581,19 +1583,19 @@ export const civilMepReports = pgTable("civil_mep_reports", {
   structuralCondition: text("structural_condition"),
   wallMaterial: text("wall_material"),
   roofType: text("roof_type"),
-  
+
   // MEP Systems fields
   hvacSystem: text("hvac_system"),
   electricalLoad: text("electrical_load"),
   plumbingType: text("plumbing_type"),
   fireSafetyGrade: text("fire_safety_grade"),
-  
+
   // Detailed notes fields
   civilNotes: text("civil_notes"),
   mechanicalNotes: text("mechanical_notes"),
   electricalNotes: text("electrical_notes"),
   plumbingNotes: text("plumbing_notes"),
-  
+
   // Report conclusions
   executiveSummary: text("executive_summary"),
   recommendations: text("recommendations"),
@@ -1601,10 +1603,10 @@ export const civilMepReports = pgTable("civil_mep_reports", {
   investmentRecommendation: varchar("investment_recommendation", { 
     enum: ["highly-recommended", "recommended", "conditional", "not-recommended"] 
   }).default("conditional"),
-  
+
   // Customer assignment
   assignedCustomerIds: json("assigned_customer_ids").$type<string[]>().default([]),
-  
+
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()
 });
@@ -1623,14 +1625,14 @@ export type InsertCivilMepReport = z.infer<typeof insertCivilMepReportSchema>;
 export const legalAuditReports = pgTable("legal_audit_reports", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   propertyId: varchar("property_id").notNull().references(() => properties.id),
-  
+
   // Report metadata
   reportTitle: text("report_title").notNull(),
   auditorName: text("auditor_name").notNull(),
   auditorLicense: text("auditor_license").notNull(),
   auditDate: date("audit_date").notNull(),
   reportDate: date("report_date").notNull(),
-  
+
   // Report status and scoring
   status: varchar("status", { 
     enum: ["draft", "in-progress", "completed", "approved"] 
@@ -1638,19 +1640,19 @@ export const legalAuditReports = pgTable("legal_audit_reports", {
   overallScore: real("overall_score").default(0), // 0-10 scale
   overallGrade: varchar("overall_grade", { enum: ["A+", "A", "B+", "B", "C+", "C", "D"] }),
   riskLevel: varchar("risk_level", { enum: ["low", "medium", "high", "critical"] }).default("medium"),
-  
+
   // Executive summary and conclusions
   executiveSummary: text("executive_summary"),
   keyFindings: text("key_findings"),
   criticalIssues: text("critical_issues"),
   recommendations: text("recommendations"),
   conclusions: text("conclusions"),
-  
+
   // Legal recommendation
   legalRecommendation: varchar("legal_recommendation", {
     enum: ["proceed-confidently", "proceed-with-caution", "requires-resolution", "avoid"]
   }).default("proceed-with-caution"),
-  
+
   // Detailed audit sections (JSON fields for flexibility)
   propertyOwnership: json("property_ownership").$type<{
     currentLandowner?: string;
@@ -1667,7 +1669,7 @@ export const legalAuditReports = pgTable("legal_audit_reports", {
     score?: number; // 0-10
     notes?: string;
   }>().default({}),
-  
+
   landPropertyDocuments: json("land_property_documents").$type<{
     saleDeedAvailable?: boolean;
     rtcKhataDetails?: string;
@@ -1684,7 +1686,7 @@ export const legalAuditReports = pgTable("legal_audit_reports", {
     score?: number;
     notes?: string;
   }>().default({}),
-  
+
   builderLegalStatus: json("builder_legal_status").$type<{
     reraRegistration?: {
       number?: string;
@@ -1700,8 +1702,8 @@ export const legalAuditReports = pgTable("legal_audit_reports", {
     pastLitigation?: Array<{
       caseType?: string;
       court?: string;
-      status?: string;
       caseNumber?: string;
+      status?: string;
     }>;
     deliveryDelays?: Array<{
       project?: string;
@@ -1712,7 +1714,7 @@ export const legalAuditReports = pgTable("legal_audit_reports", {
     score?: number;
     notes?: string;
   }>().default({}),
-  
+
   approvalsPermissions: json("approvals_permissions").$type<{
     buildingPlanSanction?: {
       available?: boolean;
@@ -1733,7 +1735,7 @@ export const legalAuditReports = pgTable("legal_audit_reports", {
     score?: number;
     notes?: string;
   }>().default({}),
-  
+
   zoningEnvironmental: json("zoning_environmental").$type<{
     zoningClassification?: string;
     bufferZoneProximity?: Array<{
@@ -1747,7 +1749,7 @@ export const legalAuditReports = pgTable("legal_audit_reports", {
     score?: number;
     notes?: string;
   }>().default({}),
-  
+
   litigationDisputes: json("litigation_disputes").$type<{
     activeCases?: Array<{
       caseType?: string;
@@ -1773,7 +1775,7 @@ export const legalAuditReports = pgTable("legal_audit_reports", {
     score?: number;
     notes?: string;
   }>().default({}),
-  
+
   loanabilityBankApprovals: json("loanability_bank_approvals").$type<{
     approvedBanks?: Array<{
       bankName?: string;
@@ -1791,7 +1793,7 @@ export const legalAuditReports = pgTable("legal_audit_reports", {
     score?: number;
     notes?: string;
   }>().default({}),
-  
+
   // Calculated section scores (0-10 each)
   ownershipScore: real("ownership_score").default(0),
   documentsScore: real("documents_score").default(0),
@@ -1800,7 +1802,7 @@ export const legalAuditReports = pgTable("legal_audit_reports", {
   zoningScore: real("zoning_score").default(0),
   litigationScore: real("litigation_score").default(0),
   loanabilityScore: real("loanability_score").default(0),
-  
+
   // Timestamps
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -1864,31 +1866,31 @@ export interface PropertyWithLocation extends Property {
 // Customer table for report assignments
 export const customers = pgTable("customers", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  
+
   // Customer Information
   name: text("name").notNull(),
   email: text("email").unique().notNull(),
   phone: text("phone"),
-  
+
   // Account Information
   isActive: boolean("is_active").default(true),
   accountType: varchar("account_type", { enum: ["individual", "corporate", "nri"] }).default("individual"),
-  
+
   // Profile Details
   address: text("address"),
   city: text("city"),
   state: text("state"),
   pincode: text("pincode"),
-  
+
   // Engagement
   registrationSource: varchar("registration_source", { 
     enum: ["website", "referral", "direct", "admin_created"] 
   }).default("website"),
-  
+
   // Metadata
   notes: text("notes"),
   createdBy: text("created_by"), // Admin who created the customer
-  
+
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -1898,20 +1900,20 @@ export const civilMepReportAssignments = pgTable("civil_mep_report_assignments",
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   reportId: varchar("report_id").notNull().references(() => civilMepReports.id, { onDelete: "cascade" }),
   customerId: varchar("customer_id").notNull().references(() => customers.id, { onDelete: "cascade" }),
-  
+
   // Assignment details
   assignedBy: text("assigned_by").notNull(), // Admin who made the assignment
   assignedAt: timestamp("assigned_at").defaultNow(),
-  
+
   // Access control
   accessGranted: boolean("access_granted").default(true),
   accessLevel: varchar("access_level", { enum: ["view", "download", "share"] }).default("view"),
   expiresAt: timestamp("expires_at"), // Optional expiration date
-  
+
   // Tracking
   lastAccessedAt: timestamp("last_accessed_at"),
   accessCount: integer("access_count").default(0),
-  
+
   notes: text("notes"),
 });
 
@@ -1920,20 +1922,20 @@ export const legalReportAssignments = pgTable("legal_report_assignments", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   reportId: varchar("report_id").notNull().references(() => legalAuditReports.id, { onDelete: "cascade" }),
   customerId: varchar("customer_id").notNull().references(() => customers.id, { onDelete: "cascade" }),
-  
+
   // Assignment details
   assignedBy: text("assigned_by").notNull(),
   assignedAt: timestamp("assigned_at").defaultNow(),
-  
+
   // Access control
   accessGranted: boolean("access_granted").default(true),
   accessLevel: varchar("access_level", { enum: ["view", "download", "share"] }).default("view"),
   expiresAt: timestamp("expires_at"),
-  
+
   // Tracking
   lastAccessedAt: timestamp("last_accessed_at"),
   accessCount: integer("access_count").default(0),
-  
+
   notes: text("notes"),
 });
 
@@ -1942,20 +1944,20 @@ export const propertyValuationReportAssignments = pgTable("property_valuation_re
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   reportId: varchar("report_id").notNull().references(() => propertyValuationReports.id, { onDelete: "cascade" }),
   customerId: varchar("customer_id").notNull().references(() => customers.id, { onDelete: "cascade" }),
-  
+
   // Assignment details
   assignedBy: text("assigned_by").notNull(),
   assignedAt: timestamp("assigned_at").defaultNow(),
-  
+
   // Access control
   accessGranted: boolean("access_granted").default(true),
   accessLevel: varchar("access_level", { enum: ["view", "download", "share"] }).default("view"),
   expiresAt: timestamp("expires_at"),
-  
+
   // Tracking
   lastAccessedAt: timestamp("last_accessed_at"),
   accessCount: integer("access_count").default(0),
-  
+
   notes: text("notes"),
 });
 
