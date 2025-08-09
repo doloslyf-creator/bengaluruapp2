@@ -380,4 +380,60 @@
       opacity: 0.7;
     }
   }
+
+  /* OwnitWise Brand Typography - Elegant Script Style */
+  @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap');
+  
+  .ownitwise-wordmark {
+    font-family: 'Dancing Script', 'Brush Script MT', cursive;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    display: inline-block;
+    position: relative;
+    font-style: normal;
+    transform: scale(1.02);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .ownitwise-wordmark .text-blue-700,
+  .ownitwise-wordmark .text-blue-400 {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #6366f1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+  }
+
+  .ownitwise-wordmark .text-emerald-600,
+  .ownitwise-wordmark .text-emerald-400 {
+    background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+  }
+
+  /* Alternative modern minimalist style for admin panels */
+  .ownitwise-wordmark-modern {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    text-transform: lowercase;
+    font-size: 0.95em;
+  }
+
+  /* Alternative elegant serif style for documents */
+  .ownitwise-wordmark-serif {
+    font-family: 'Playfair Display', 'Times New Roman', serif;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    font-style: italic;
+  }
+
+  /* Hover effect for interactive logos */
+  .ownitwise-wordmark:hover {
+    transform: scale(1.05);
+    transition: transform 0.2s ease-out;
+  }
 }

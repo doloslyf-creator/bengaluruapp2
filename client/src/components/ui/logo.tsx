@@ -17,9 +17,18 @@ export default function Logo({ variant = 'default', size = 'md', showTagline = t
     lg: 'text-base'
   };
 
+  const getWordmarkClass = () => {
+    switch (variant) {
+      case 'admin':
+        return 'ownitwise-wordmark-modern';
+      default:
+        return 'ownitwise-wordmark';
+    }
+  };
+
   return (
     <div className="flex flex-col items-start">
-      <div className={`font-black tracking-tight ${sizeClasses[size]} ownitwise-wordmark`}>
+      <div className={`${sizeClasses[size]} ${getWordmarkClass()}`}>
         <span className="text-blue-700 dark:text-blue-400">Ownit</span>
         <span className="text-emerald-600 dark:text-emerald-400">Wise</span>
       </div>
