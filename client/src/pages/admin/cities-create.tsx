@@ -25,6 +25,8 @@ const formSchema = z.object({
   description: z.string().optional(),
   isActive: z.boolean().default(true),
   displayOrder: z.number().min(1, "Display order must be at least 1").default(1),
+  metaTitle: z.string().optional(),
+  metaDescription: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -33,7 +35,7 @@ export default function AdminCitiesCreate() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   // Extract city ID from URL if in edit mode
   const currentPath = window.location.pathname;
   const editMatch = currentPath.match(/\/edit$/) && currentPath.includes('/cities/');
@@ -58,6 +60,8 @@ export default function AdminCitiesCreate() {
       description: "",
       isActive: true,
       displayOrder: 1,
+      metaTitle: "",
+      metaDescription: "",
     },
   });
 
@@ -75,15 +79,17 @@ export default function AdminCitiesCreate() {
         description: city.description || "",
         isActive: city.isActive !== false,
         displayOrder: city.displayOrder || 1,
+        metaTitle: city.metaTitle || "",
+        metaDescription: city.metaDescription || "",
       });
     }
   }, [existingCity, isEditMode, form]);
 
   const saveCityMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const url = isEditMode ? `/api/cities/${cityId}` : "/api/cities";
-      const method = isEditMode ? "PUT" : "POST";
-      
+      const url = "/api/cities";
+      const method = "POST";
+
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -91,7 +97,37 @@ export default function AdminCitiesCreate() {
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || `Failed to ${isEditMode ? 'update' : 'create'} city`);
+        throw new Error(error.error || `Failed to create city`);
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/cities"] });
+      toast({ title: `City created successfully` });
+      setLocation("/admin-panel/cities");
+    },
+    onError: (error: any) => {
+      toast({
+        title: `Error creating city`,
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateCityMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: FormData }) => {
+      const url = `/api/cities/${id}`;
+      const method = "PUT";
+
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || `Failed to update city`);
       }
       return response.json();
     },
@@ -100,20 +136,54 @@ export default function AdminCitiesCreate() {
       if (isEditMode) {
         queryClient.invalidateQueries({ queryKey: [`/api/cities/${cityId}`] });
       }
-      toast({ title: `City ${isEditMode ? 'updated' : 'created'} successfully` });
+      toast({ title: `City updated successfully` });
       setLocation("/admin-panel/cities");
     },
     onError: (error: any) => {
       toast({
-        title: `Error ${isEditMode ? 'updating' : 'creating'} city`,
+        title: `Error updating city`,
         description: error.message,
         variant: "destructive",
       });
     },
   });
 
-  const onSubmit = (data: FormData) => {
-    saveCityMutation.mutate(data);
+
+  const onSubmit = async (data: any) => {
+    try {
+      // Ensure required fields are present
+      const cityData = {
+        ...data,
+        isActive: data.isActive ?? true,
+        displayOrder: data.displayOrder ?? 0,
+        metaTitle: data.metaTitle || data.name,
+        metaDescription: data.metaDescription || `Discover properties in ${data.name}`,
+      };
+
+      if (isEditMode && cityId) {
+        await updateCityMutation.mutateAsync({ id: cityId, data: cityData });
+        toast({
+          title: "City Updated",
+          description: `${cityData.name} has been updated successfully.`,
+        });
+      } else {
+        await saveCityMutation.mutateAsync(cityData);
+        toast({
+          title: "City Created",
+          description: `${cityData.name} has been created successfully.`,
+        });
+      }
+
+      // Navigate back to cities list
+      setLocation("/admin-panel/cities");
+    } catch (error) {
+      console.error("Error saving city:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save city. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (isLoadingCity) {
@@ -340,6 +410,46 @@ export default function AdminCitiesCreate() {
               </CardContent>
             </Card>
 
+            {/* SEO Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MapPin className="h-5 w-5" />
+                  SEO Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="metaTitle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Meta Title</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Meta title for the city page" data-testid="input-meta-title" />
+                      </FormControl>
+                      <FormDescription>Appears in search engine results</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="metaDescription"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Meta Description</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} rows={3} placeholder="Meta description for the city page" data-testid="input-meta-description" />
+                      </FormControl>
+                      <FormDescription>Appears in search engine results below the title</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
             {/* Submit Button */}
             <div className="flex justify-end space-x-4">
               <Button
@@ -352,11 +462,11 @@ export default function AdminCitiesCreate() {
               </Button>
               <Button 
                 type="submit" 
-                disabled={saveCityMutation.isPending}
+                disabled={saveCityMutation.isPending || updateCityMutation.isPending}
                 data-testid="button-submit"
               >
                 <Save className="h-4 w-4 mr-2" />
-                {saveCityMutation.isPending 
+                {saveCityMutation.isPending || updateCityMutation.isPending
                   ? `${isEditMode ? 'Updating' : 'Creating'}...` 
                   : `${isEditMode ? 'Update' : 'Create'} City`
                 }

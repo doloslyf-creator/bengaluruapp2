@@ -221,8 +221,9 @@ export function ApiKeysSettings() {
   const queryClient = useQueryClient();
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
   const [testingService, setTestingService] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false); // State for save button
 
-  const { data: apiKeys, isLoading } = useQuery<ApiKeysData>({
+  const { data: apiKeys, isLoading, refetch } = useQuery<ApiKeysData>({
     queryKey: ["/api/settings/api-keys"],
   });
 
@@ -236,7 +237,18 @@ export function ApiKeysSettings() {
 
   const updateApiKeysMutation = useMutation({
     mutationFn: async (data: ApiKeysData) => {
-      return apiRequest("PUT", "/api/settings/api-keys", data);
+      // Use the existing `onSubmit` logic here as it's already refactored
+      // to handle API calls and toast messages.
+      // The original onSubmit function is being replaced by the one in <changes>.
+      // Therefore, we need to redefine the mutationFn to call that new onSubmit logic.
+      // However, since we are directly replacing the onSubmit function, we can call it here.
+      // The provided <changes> snippet replaces the onSubmit function entirely.
+      // So, the mutationFn should not be defined separately but rather the onSubmit should be used directly.
+      // For the purpose of this merge, we will assume the onSubmit function is the primary handler.
+      
+      // The following line is a placeholder to satisfy the mutation structure, 
+      // but the actual logic will be in the onSubmit function which is being replaced.
+      return apiRequest("PUT", "/api/settings/api-keys", data); 
     },
     onSuccess: () => {
       toast({
@@ -253,6 +265,7 @@ export function ApiKeysSettings() {
       });
     },
   });
+
 
   const testConnectionMutation = useMutation({
     mutationFn: async (service: string) => {
@@ -279,8 +292,58 @@ export function ApiKeysSettings() {
     }
   });
 
-  const onSubmit = (data: ApiKeysData) => {
-    updateApiKeysMutation.mutate(data);
+  // This onSubmit function replaces the original one.
+  const onSubmit = async (data: ApiKeysData) => {
+    try {
+      setIsSaving(true);
+
+      // Validate required fields if any are being set
+      const requiredPairs = [
+        ['razorpayKeyId', 'razorpayKeySecret'],
+        ['twilioAccountSid', 'twilioAuthToken'],
+      ];
+
+      for (const [key1, key2] of requiredPairs) {
+        if ((data[key1] && !data[key2]) || (!data[key1] && data[key2])) {
+          throw new Error(`Both ${key1} and ${key2} are required when setting up this service.`);
+        }
+      }
+
+      // Only send non-empty values
+      const filteredData = Object.fromEntries(
+        Object.entries(data).filter(([_, value]) => value !== "" && value !== undefined)
+      );
+
+      const response = await fetch('/api/settings/api-keys', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(filteredData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update API keys');
+      }
+
+      toast({
+        title: "API Keys Updated",
+        description: "Your API keys have been saved successfully.",
+      });
+
+      // Refresh the data
+      await refetch();
+    } catch (error) {
+      console.error('Error updating API keys:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to update API keys. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const togglePasswordVisibility = (fieldName: string) => {
@@ -295,19 +358,24 @@ export function ApiKeysSettings() {
     testConnectionMutation.mutate(service);
   };
 
-  const getStatusBadge = (sectionId: string, keys: any) => {
-    const hasRequiredKeys = apiKeySections
-      .find(s => s.id === sectionId)?.keys
-      .filter(k => k.type !== "boolean")
-      .some(k => keys && keys[k.name]);
+  const getStatusBadge = (sectionId: string, keys: ApiKeysData) => {
+    const section = apiKeySections.find(s => s.id === sectionId);
+    if (!section) return null;
 
-    if (hasRequiredKeys) {
+    const hasConfiguredKeys = section.keys.some(k => {
+      if (k.type === "boolean") {
+        return keys && keys[k.name] !== undefined;
+      }
+      return keys && keys[k.name] && (keys[k.name] as string).trim() !== "";
+    });
+
+    if (hasConfiguredKeys) {
       return <Badge variant="secondary" className="text-green-600 bg-green-50 border-green-200">
         <CheckCircle className="h-3 w-3 mr-1" />
         Configured
       </Badge>;
     }
-    
+
     return <Badge variant="outline" className="text-gray-500">
       <AlertTriangle className="h-3 w-3 mr-1" />
       Not Configured
@@ -350,7 +418,7 @@ export function ApiKeysSettings() {
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      {getStatusBadge(section.id, apiKeys)}
+                      {getStatusBadge(section.id, apiKeys!)}
                       {(section.id === "razorpay" || section.id === "surepass" || section.id === "interakt") && (
                         <Button
                           type="button"
@@ -433,9 +501,9 @@ export function ApiKeysSettings() {
             </Button>
             <Button
               type="submit"
-              disabled={updateApiKeysMutation.isPending}
+              disabled={isSaving} // Use isSaving state for the submit button
             >
-              {updateApiKeysMutation.isPending ? "Saving..." : "Save API Keys"}
+              {isSaving ? "Saving..." : "Save API Keys"}
             </Button>
           </div>
         </form>

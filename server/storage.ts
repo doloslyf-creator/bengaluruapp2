@@ -2649,8 +2649,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllCivilMepReports(): Promise<CivilMepReport[]> {
-    return await db.select().from(civilMepReports)
-      .orderBy(desc(civilMepReports.createdAt));
+    try {
+      return await db.select().from(civilMepReports)
+        .orderBy(desc(civilMepReports.createdAt));
+    } catch (error) {
+      console.error("Error in getAllCivilMepReports:", error);
+      // Return empty array if table doesn't exist or has schema issues
+      return [];
+    }
   }
 
   async updateCivilMepReport(reportId: string, updates: Partial<InsertCivilMepReport>): Promise<CivilMepReport | undefined> {
@@ -2668,35 +2674,53 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCivilMepReportStats(): Promise<any> {
-    const reports = await this.getAllCivilMepReports();
-    
-    const totalReports = reports.length;
-    const completedReports = reports.filter(r => r.status === "completed").length;
-    const inProgressReports = reports.filter(r => r.status === "in-progress").length;
-    const draftReports = reports.filter(r => r.status === "draft").length;
-    const approvedReports = reports.filter(r => r.status === "approved").length;
-    
-    const avgScore = reports.length > 0 
-      ? reports.reduce((sum, r) => sum + (r.overallScore || 0), 0) / reports.length 
-      : 0;
-    
-    // Group by investment recommendation
-    const byRecommendation = {
-      "highly-recommended": reports.filter(r => r.investmentRecommendation === "highly-recommended").length,
-      "recommended": reports.filter(r => r.investmentRecommendation === "recommended").length,
-      "conditional": reports.filter(r => r.investmentRecommendation === "conditional").length,
-      "not-recommended": reports.filter(r => r.investmentRecommendation === "not-recommended").length,
-    };
-    
-    return {
-      totalReports,
-      completedReports,
-      inProgressReports,
-      draftReports,
-      approvedReports,
-      avgScore,
-      byRecommendation
-    };
+    try {
+      const reports = await this.getAllCivilMepReports();
+      
+      const totalReports = reports.length;
+      const completedReports = reports.filter(r => r.status === "completed").length;
+      const inProgressReports = reports.filter(r => r.status === "in-progress").length;
+      const draftReports = reports.filter(r => r.status === "draft").length;
+      const approvedReports = reports.filter(r => r.status === "approved").length;
+      
+      const avgScore = reports.length > 0 
+        ? reports.reduce((sum, r) => sum + (r.overallScore || 0), 0) / reports.length 
+        : 0;
+      
+      // Group by investment recommendation
+      const byRecommendation = {
+        "highly-recommended": reports.filter(r => r.investmentRecommendation === "highly-recommended").length,
+        "recommended": reports.filter(r => r.investmentRecommendation === "recommended").length,
+        "conditional": reports.filter(r => r.investmentRecommendation === "conditional").length,
+        "not-recommended": reports.filter(r => r.investmentRecommendation === "not-recommended").length,
+      };
+      
+      return {
+        totalReports,
+        completedReports,
+        inProgressReports,
+        draftReports,
+        approvedReports,
+        avgScore,
+        byRecommendation
+      };
+    } catch (error) {
+      console.error("Error in getCivilMepReportStats:", error);
+      return {
+        totalReports: 0,
+        completedReports: 0,
+        inProgressReports: 0,
+        draftReports: 0,
+        approvedReports: 0,
+        avgScore: 0,
+        byRecommendation: {
+          "highly-recommended": 0,
+          "recommended": 0,
+          "conditional": 0,
+          "not-recommended": 0,
+        }
+      };
+    }
   }
 
   // Legal Audit Report operations

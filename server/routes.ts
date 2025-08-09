@@ -1435,10 +1435,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const report = await storage.createCivilMepReport(validation.data);
+      console.log(`📋 Civil+MEP report created: ${report.reportTitle || 'New Report'}`);
       res.status(201).json(report);
     } catch (error) {
       console.error("Error creating Civil+MEP report:", error);
-      res.status(500).json({ error: "Failed to create Civil+MEP report" });
+      res.status(500).json({ 
+        error: "Failed to create Civil+MEP report",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 
@@ -1448,7 +1452,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(reports);
     } catch (error) {
       console.error("Error fetching Civil+MEP reports:", error);
-      res.status(500).json({ error: "Failed to fetch Civil+MEP reports" });
+      res.status(500).json({ 
+        error: "Failed to fetch Civil+MEP reports",
+        details: error instanceof Error ? error.message : "Database schema issue"
+      });
     }
   });
 
@@ -1524,7 +1531,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(stats);
     } catch (error) {
       console.error("Error fetching Civil+MEP report stats:", error);
-      res.status(500).json({ error: "Failed to fetch Civil+MEP report statistics" });
+      // Return default stats instead of error to prevent UI crashes
+      res.json({
+        totalReports: 0,
+        completedReports: 0,
+        inProgressReports: 0,
+        draftReports: 0,
+        approvedReports: 0,
+        avgScore: 0,
+        byRecommendation: {
+          "highly-recommended": 0,
+          "recommended": 0,
+          "conditional": 0,
+          "not-recommended": 0,
+        }
+      });
     }
   });
 

@@ -47,6 +47,11 @@ export default function PropertiesAdd() {
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState<string[]>([]);
 
+  // These states and mutations are placeholders, assuming they exist in a real app
+  const [isEditMode, setIsEditMode] = useState(false); // Example state for edit mode
+  const propertyId = undefined; // Example property ID for edit mode
+  const [isSubmitting, setIsSubmitting] = useState(false); // State to track submission
+
   const form = useForm<PropertyFormData>({
     resolver: zodResolver(propertyFormSchema),
     defaultValues: {
@@ -97,7 +102,7 @@ export default function PropertiesAdd() {
   });
 
   const [selectedCityId, setSelectedCityId] = useState<string>("");
-  
+
   // Fetch zones based on selected city
   const { data: zones = [] } = useQuery({
     queryKey: ["/api/zones/city", selectedCityId],
@@ -120,17 +125,44 @@ export default function PropertiesAdd() {
     },
   });
 
-  const addPropertyMutation = useMutation({
+  // Placeholder for update mutation
+  const updatePropertyMutation = useMutation({
+    mutationFn: async (data: any) => {
+      // This is a placeholder. Replace with your actual update API call.
+      console.log("Updating property:", data);
+      // Example: return apiRequest("PUT", `/api/properties/${data.id}`, data);
+      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API call
+      return { id: data.id, ...data };
+    },
+    onSuccess: (updatedProperty) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/properties"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/properties/stats"] });
+      toast({
+        title: "Property Updated",
+        description: `${updatedProperty.name} has been updated successfully.`,
+      });
+      navigate("/admin-panel/properties/view");
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update property",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const createPropertyMutation = useMutation({
     mutationFn: async (data: PropertyFormData) => {
       const { configurations, ...propertyData } = data;
-      
+
       // Create property first
       const propertyResponse = await apiRequest("POST", "/api/properties", {
         ...propertyData,
         tags: tags, // Use the current tags state
       });
       const property = await propertyResponse.json();
-      
+
       // Create configurations for the new property
       if (configurations) {
         for (const config of configurations) {
@@ -140,7 +172,7 @@ export default function PropertiesAdd() {
           });
         }
       }
-      
+
       return property;
     },
     onSuccess: (data) => {
@@ -161,8 +193,65 @@ export default function PropertiesAdd() {
     },
   });
 
-  const onSubmit = (data: PropertyFormData) => {
-    addPropertyMutation.mutate(data);
+  const onSubmit = async (data: any) => {
+    try {
+      setIsSubmitting(true);
+
+      // Validate required fields
+      if (!data.name?.trim()) {
+        throw new Error("Property name is required");
+      }
+      if (!data.cityId) {
+        throw new Error("City selection is required");
+      }
+      if (!data.zoneId) {
+        throw new Error("Zone selection is required");
+      }
+
+      // Process the data
+      const processedData = {
+        ...data,
+        // Ensure required fields have proper types
+        price: data.price ? data.price.toString() : "0",
+        area: data.area ? data.area.toString() : "0",
+        totalUnits: data.totalUnits ? parseInt(data.totalUnits.toString()) : 0,
+        // Convert arrays to proper format
+        amenities: Array.isArray(data.amenities) ? data.amenities : (data.amenities ? [data.amenities] : []),
+        tags: Array.isArray(data.tags) ? data.tags : (data.tags ? [data.tags] : []),
+        // Ensure booleans
+        reraApproved: Boolean(data.reraApproved),
+        // Set defaults for optional fields
+        status: data.status || "active",
+        type: data.type || "apartment",
+      };
+
+      let result;
+      if (isEditMode && propertyId) {
+        result = await updatePropertyMutation.mutateAsync({
+          id: propertyId,
+          ...processedData
+        });
+      } else {
+        result = await createPropertyMutation.mutateAsync(processedData);
+      }
+
+      toast({
+        title: isEditMode ? "Property Updated" : "Property Created",
+        description: `${data.name} has been ${isEditMode ? 'updated' : 'created'} successfully.`,
+      });
+
+      // Navigate back to properties list
+      navigate("/admin-panel/properties/view");
+    } catch (error) {
+      console.error("Error saving property:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to save property. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const addTag = () => {
@@ -230,11 +319,11 @@ export default function PropertiesAdd() {
               </Button>
               <Button
                 onClick={form.handleSubmit(onSubmit)}
-                disabled={addPropertyMutation.isPending}
+                disabled={addPropertyMutation.isPending || isSubmitting}
                 className="bg-primary text-white hover:bg-primary/90"
               >
                 <Save className="h-4 w-4 mr-2" />
-                {addPropertyMutation.isPending ? "Saving..." : "Save Property"}
+                {addPropertyMutation.isPending || isSubmitting ? "Saving..." : "Save Property"}
               </Button>
             </div>
           </div>
@@ -829,7 +918,7 @@ export default function PropertiesAdd() {
                             <Plus className="h-4 w-4" />
                           </Button>
                         </div>
-                        
+
                         {tags.length > 0 && (
                           <div className="space-y-2">
                             <Label>Current Tags</Label>

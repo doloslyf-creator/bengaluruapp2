@@ -137,7 +137,7 @@ function SystemMonitoringTab() {
                 </div>
                 <Progress value={65} className="h-2" />
               </div>
-              
+
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-sm font-medium">CPU Usage</span>
@@ -145,7 +145,7 @@ function SystemMonitoringTab() {
                 </div>
                 <Progress value={32} className="h-2" />
               </div>
-              
+
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-sm font-medium">Disk Usage</span>
@@ -153,7 +153,7 @@ function SystemMonitoringTab() {
                 </div>
                 <Progress value={78} className="h-2" />
               </div>
-              
+
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-sm font-medium">Response Time</span>
@@ -175,7 +175,7 @@ function SystemMonitoringTab() {
                 </div>
                 <span className="text-xs text-muted-foreground">2 minutes ago</span>
               </div>
-              
+
               <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
@@ -183,7 +183,7 @@ function SystemMonitoringTab() {
                 </div>
                 <span className="text-xs text-muted-foreground">5 minutes ago</span>
               </div>
-              
+
               <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
@@ -203,7 +203,7 @@ function SystemMonitoringTab() {
 function BackupManagementTab() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const { data: backups, isLoading } = useQuery({
     queryKey: ["/api/admin/backups"],
     refetchInterval: 5000, // Refresh every 5 seconds to show progress
@@ -416,7 +416,7 @@ function BackupManagementTab() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label>Retention Period</Label>
                 <Select>
@@ -444,7 +444,7 @@ export default function AdminSettings() {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("general");
 
-  const { data: settings, isLoading } = useQuery<AppSettings>({
+  const { data: settings, isLoading, refetch } = useQuery<AppSettings>({
     queryKey: ["/api/settings"],
   });
 
@@ -1010,7 +1010,7 @@ export default function AdminSettings() {
 
                       <div className="space-y-4">
                         <h3 className="text-lg font-semibold">SEO & Metadata</h3>
-                        
+
                         <FormField
                           control={form.control}
                           name="metaTitle"

@@ -186,7 +186,7 @@ export default function TeamManagement() {
         <div className="w-64 bg-white dark:bg-gray-800 shadow-lg h-screen sticky top-0">
           <div className="p-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Team Management</h2>
-            
+
             {/* Quick Actions */}
             <div className="space-y-3 mb-8">
               <Button 
@@ -320,7 +320,7 @@ export default function TeamManagement() {
                       </CardDescription>
                     </div>
                   </div>
-                  
+
                   <div className="flex gap-2 mt-3">
                     <Badge className={getRoleColor(member.role)}>
                       {member.role}
@@ -330,26 +330,26 @@ export default function TeamManagement() {
                     </Badge>
                   </div>
                 </CardHeader>
-                
+
                 <CardContent className="pt-0">
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                       <Building className="h-4 w-4" />
                       <span className="capitalize">{member.department}</span>
                     </div>
-                    
+
                     {member.phone && (
                       <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                         <Phone className="h-4 w-4" />
                         <span>{member.phone}</span>
                       </div>
                     )}
-                    
+
                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                       <Calendar className="h-4 w-4" />
                       <span>Joined {member.joinDate ? new Date(member.joinDate).toLocaleDateString() : 'Unknown'}</span>
                     </div>
-                    
+
                     {member.performanceScore && (
                       <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                         <Star className="h-4 w-4" />
@@ -357,7 +357,7 @@ export default function TeamManagement() {
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="flex gap-2 mt-4">
                     <Button
                       size="sm"
@@ -421,7 +421,7 @@ export default function TeamManagement() {
               {editingMember ? "Update team member information" : "Add a new member to your team"}
             </DialogDescription>
           </DialogHeader>
-          
+
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
@@ -437,7 +437,7 @@ export default function TeamManagement() {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="email"
@@ -451,7 +451,7 @@ export default function TeamManagement() {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="phone"
@@ -465,7 +465,7 @@ export default function TeamManagement() {
                   </FormItem>
                 )}
               />
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -491,7 +491,7 @@ export default function TeamManagement() {
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="department"
@@ -518,7 +518,7 @@ export default function TeamManagement() {
                   )}
                 />
               </div>
-              
+
               <FormField
                 control={form.control}
                 name="status"
@@ -541,7 +541,7 @@ export default function TeamManagement() {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="performanceScore"
@@ -562,7 +562,7 @@ export default function TeamManagement() {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="specializations"
@@ -576,7 +576,7 @@ export default function TeamManagement() {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="bio"
@@ -594,7 +594,7 @@ export default function TeamManagement() {
                   </FormItem>
                 )}
               />
-              
+
               <div className="flex gap-3 pt-4">
                 <Button
                   type="button"
