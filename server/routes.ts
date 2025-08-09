@@ -4,7 +4,41 @@ import { storage } from "./storage";
 import { registerEnhancedLeadRoutes } from "./enhancedLeadRoutes";
 import { registerBookingRoutes } from "./bookingRoutes";
 import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
-import { insertPropertySchema, insertPropertyConfigurationSchema, insertPropertyScoreSchema, insertBookingSchema, insertLeadSchema, insertLeadActivitySchema, insertLeadNoteSchema, insertCivilMepReportSchema, insertLegalAuditReportSchema, insertAppSettingsSchema, insertValuationRequestSchema, insertPropertyValuationReportSchema, insertPropertyValuationReportConfigurationSchema, insertZoneSchema, insertCitySchema, insertDeveloperSchema, leads, bookings, reportPayments, customerNotes, propertyConfigurations, valuationRequests, propertyValuationReportCustomers, propertyValuationReportConfigurations, userRoles, permissions, rolePermissions, userRoleAssignments, insertUserRoleSchema, insertPermissionSchema, insertRolePermissionSchema, insertUserRoleAssignmentSchema } from "@shared/schema";
+import { 
+  insertPropertySchema, 
+  insertPropertyConfigurationSchema, 
+  insertPropertyScoreSchema, 
+  insertBookingSchema, 
+  insertLeadSchema, 
+  insertLeadActivitySchema, 
+  insertLeadNoteSchema, 
+  insertCivilMepReportSchema, 
+  insertLegalAuditReportSchema, 
+  insertAppSettingsSchema, 
+  insertValuationRequestSchema, 
+  insertPropertyValuationReportSchema, 
+  insertPropertyValuationReportConfigurationSchema, 
+  insertZoneSchema, 
+  insertCitySchema, 
+  insertDeveloperSchema, 
+  leads, 
+  bookings, 
+  reportPayments, 
+  customerNotes, 
+  propertyConfigurations, 
+  valuationRequests, 
+  propertyValuationReports,
+  propertyValuationReportCustomers, 
+  propertyValuationReportConfigurations, 
+  userRoles, 
+  permissions, 
+  rolePermissions, 
+  userRoleAssignments, 
+  insertUserRoleSchema, 
+  insertPermissionSchema, 
+  insertRolePermissionSchema, 
+  insertUserRoleAssignmentSchema 
+} from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
@@ -1255,7 +1289,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       const reports = Array.from(allReports.values())
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        .sort((a, b) => {
+          const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return bTime - aTime;
+        });
       
       res.json(reports);
     } catch (error) {
@@ -1298,7 +1336,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const [configuration] = await db.insert(propertyValuationReportConfigurations)
-        .values(validation.data)
+        .values([validation.data])
         .returning();
 
       console.log(`🏗️ New configuration added to report ${reportId}: ${configuration.configurationType}`);

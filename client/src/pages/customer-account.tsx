@@ -110,17 +110,18 @@ export default function CustomerAccount() {
   });
 
   // Fetch customer-assigned reports dynamically
-  const { data: assignedValuationReports = [], isLoading: assignedValuationLoading } = useQuery({
+  const { data: assignedValuationReports = [], isLoading: assignedValuationLoading, error: assignedValuationError } = useQuery({
     queryKey: [`/api/customers/${currentCustomerId}/valuation-reports`],
     enabled: !!currentCustomerId,
     staleTime: 5 * 60 * 1000,
+    retry: false, // Don't retry on error
   });
 
   // For now, show all CIVIL MEP reports (would filter by customer in real implementation)
   const civilMepReports = allCivilMepReports;
   
   // Use assigned valuation reports or fallback to filtered reports
-  const valuationReports = assignedValuationReports.length > 0 
+  const valuationReports = (!assignedValuationError && assignedValuationReports.length > 0) 
     ? assignedValuationReports 
     : allValuationReports.filter((report: any) => 
         report.assignedTo === currentCustomerId || !report.assignedTo
