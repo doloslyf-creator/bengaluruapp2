@@ -182,7 +182,7 @@ export default function ModernHomePage() {
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-full blur-3xl"></div>
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 pt-20 pb-16">
+        <div className="relative max-w-7xl mx-auto px-4 pt-24 pb-16">
           {/* Trust Indicators */}
           <div className="flex items-center justify-center mb-8">
             <div className="flex items-center space-x-6 bg-white/80 backdrop-blur-sm rounded-full px-6 py-3 shadow-lg border border-white/20">

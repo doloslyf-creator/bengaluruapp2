@@ -297,7 +297,7 @@ export default function FindProperty() {
       <Header />
       
       {/* Integrated Header */}
-      <section className="bg-white py-8 border-b">
+      <section className="bg-white pt-24 pb-8 border-b">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">

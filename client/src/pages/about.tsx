@@ -81,7 +81,7 @@ export default function About() {
       <Header />
       
       {/* Hero Section */}
-      <section className="bg-white py-8 border-b">
+      <section className="bg-white pt-24 pb-8 border-b">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <Badge className="mb-6 text-sm px-4 py-2 bg-blue-100 text-blue-700 border-blue-200">

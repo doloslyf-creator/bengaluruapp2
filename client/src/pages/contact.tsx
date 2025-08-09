@@ -128,7 +128,7 @@ export default function Contact() {
       
       {/* Hero Section */}
       <section className="bg-white/80 backdrop-blur border-b">
-        <div className="max-w-6xl mx-auto px-4 py-12">
+        <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
           <motion.div 
             className="text-center"
             initial={{ opacity: 0, y: 20 }}

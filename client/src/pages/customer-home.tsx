@@ -57,7 +57,7 @@ export default function CustomerHome() {
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 pt-8 pb-12">
+      <section className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 pt-24 pb-12">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div 
             className="text-center max-w-4xl mx-auto"
