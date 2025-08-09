@@ -7,13 +7,16 @@ import {
   Building2, 
   IndianRupee, 
   Search,
-  Sparkles,
-  Filter,
+  TrendingUp,
   Heart,
   ArrowLeft,
-  FileCheck,
+  Target,
   Clock,
-  Shield
+  Shield,
+  Calculator,
+  Users,
+  Briefcase,
+  School
 } from "lucide-react";
 import { type Property } from "@shared/schema";
 import Header from "@/components/layout/header";
@@ -25,16 +28,23 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion";
 
+type UserIntent = 'investment' | 'end-use' | '';
+
 interface PropertyPreferences {
+  intent: UserIntent;
   propertyType: string;
   cityId: string;
   zoneId: string;
   budgetRange: [number, number];
   bhkType: string[];
-  amenities: string[];
-  tags: string[];
-  lifestyle: string;
-  timeline: string;
+  // Investment-specific fields
+  rentalYieldExpected?: number;
+  investmentHorizon?: string;
+  riskTolerance?: string;
+  // End-use specific fields  
+  familySize?: string;
+  lifestyle?: string;
+  commute?: string;
 }
 
 export default function FindProperty() {
@@ -51,15 +61,12 @@ export default function FindProperty() {
       }
     }
     return {
+      intent: '',
       propertyType: "",
       cityId: "",
       zoneId: "",
       budgetRange: [50, 500], // in lakhs
-      bhkType: [],
-      amenities: [],
-      tags: [],
-      lifestyle: "",
-      timeline: ""
+      bhkType: []
     };
   };
 
@@ -92,31 +99,15 @@ export default function FindProperty() {
     enabled: !!preferences.cityId,
   });
 
-  // Extract real options from properties data  
-  const propertyTypes = Array.from(new Set(properties.map(p => p.type).filter(Boolean))).map(type => ({
-    value: type,
-    label: type.charAt(0).toUpperCase() + type.slice(1)
-  }));
-  
-  const allTags = Array.from(new Set(properties.flatMap(p => p.tags || []))).filter(Boolean).sort();
-  const tags = allTags.map(tag => ({
-    value: tag,
-    label: tag.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())
-  }));
-
-  // Enhanced property types for display
-  const displayPropertyTypes = propertyTypes.length > 0 ? propertyTypes : [
-    { value: 'apartment', label: 'Apartment' },
-    { value: 'villa', label: 'Villa' },
-    { value: 'plot', label: 'Plot' }
+  // Extract unique property types from database
+  const displayPropertyTypes = [
+    { value: "villa", label: "Villa" },
+    { value: "apartment", label: "Apartment" },
+    { value: "plot", label: "Plot/Land" }
   ];
 
-  // Static options
-  const bhkOptions = ["1BHK", "2BHK", "3BHK", "4BHK", "5BHK+"];
-  const amenities = [
-    "Swimming Pool", "Gym", "Parking", "Security", "Garden",
-    "Clubhouse", "Children's Play Area", "Power Backup", "Lift"
-  ];
+  // Extract BHK options
+  const bhkOptions = ["1 BHK", "2 BHK", "3 BHK", "4 BHK", "4+ BHK"];
 
   const handlePreferenceChange = (key: keyof PropertyPreferences, value: any) => {
     setPreferences(prev => ({
@@ -148,12 +139,157 @@ export default function FindProperty() {
   };
 
   const isFormValid = () => {
+    const hasIntent = preferences.intent !== "";
     const hasPropertyType = preferences.propertyType !== "";
     const hasCity = preferences.cityId !== "";
     const hasZone = preferences.zoneId !== "";
     const hasBhkType = preferences.propertyType === "plot" || preferences.bhkType.length > 0;
     
-    return hasPropertyType && hasCity && hasZone && hasBhkType;
+    return hasIntent && hasPropertyType && hasCity && hasZone && hasBhkType;
+  };
+
+  const getIntentSpecificFields = () => {
+    if (preferences.intent === 'investment') {
+      return (
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold text-green-600 flex items-center">
+            <TrendingUp className="h-5 w-5 mr-2" />
+            Investment Preferences
+          </h3>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                Expected Rental Yield
+              </Label>
+              <Select 
+                value={preferences.rentalYieldExpected?.toString()} 
+                onValueChange={(value) => handlePreferenceChange('rentalYieldExpected', Number(value))}
+              >
+                <SelectTrigger className="h-12 border-2 border-gray-200 focus:border-green-500">
+                  <SelectValue placeholder="Select expected yield" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="3">3% - 4%</SelectItem>
+                  <SelectItem value="4">4% - 5%</SelectItem>
+                  <SelectItem value="5">5% - 6%</SelectItem>
+                  <SelectItem value="6">6%+</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                Investment Horizon
+              </Label>
+              <Select 
+                value={preferences.investmentHorizon} 
+                onValueChange={(value) => handlePreferenceChange('investmentHorizon', value)}
+              >
+                <SelectTrigger className="h-12 border-2 border-gray-200 focus:border-green-500">
+                  <SelectValue placeholder="Investment timeline" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="short">1-3 years (Short term)</SelectItem>
+                  <SelectItem value="medium">3-7 years (Medium term)</SelectItem>
+                  <SelectItem value="long">7+ years (Long term)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                Risk Tolerance
+              </Label>
+              <Select 
+                value={preferences.riskTolerance} 
+                onValueChange={(value) => handlePreferenceChange('riskTolerance', value)}
+              >
+                <SelectTrigger className="h-12 border-2 border-gray-200 focus:border-green-500">
+                  <SelectValue placeholder="Risk appetite" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low Risk (Established areas)</SelectItem>
+                  <SelectItem value="medium">Medium Risk (Developing areas)</SelectItem>
+                  <SelectItem value="high">High Risk (Emerging areas)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+      );
+    } else if (preferences.intent === 'end-use') {
+      return (
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold text-purple-600 flex items-center">
+            <Heart className="h-5 w-5 mr-2" />
+            Personal Preferences
+          </h3>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                Family Size
+              </Label>
+              <Select 
+                value={preferences.familySize} 
+                onValueChange={(value) => handlePreferenceChange('familySize', value)}
+              >
+                <SelectTrigger className="h-12 border-2 border-gray-200 focus:border-purple-500">
+                  <SelectValue placeholder="Family members" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="single">Single/Couple</SelectItem>
+                  <SelectItem value="small">Small family (3-4 members)</SelectItem>
+                  <SelectItem value="large">Large family (5+ members)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                Lifestyle Priority
+              </Label>
+              <Select 
+                value={preferences.lifestyle} 
+                onValueChange={(value) => handlePreferenceChange('lifestyle', value)}
+              >
+                <SelectTrigger className="h-12 border-2 border-gray-200 focus:border-purple-500">
+                  <SelectValue placeholder="What matters most?" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="peaceful">Peaceful & Quiet</SelectItem>
+                  <SelectItem value="social">Social & Community</SelectItem>
+                  <SelectItem value="convenient">Convenient & Central</SelectItem>
+                  <SelectItem value="luxury">Luxury & Premium</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                Commute Priority
+              </Label>
+              <Select 
+                value={preferences.commute} 
+                onValueChange={(value) => handlePreferenceChange('commute', value)}
+              >
+                <SelectTrigger className="h-12 border-2 border-gray-200 focus:border-purple-500">
+                  <SelectValue placeholder="Work location" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="tech-parks">IT Parks (Whitefield, Electronic City)</SelectItem>
+                  <SelectItem value="city-center">City Center (MG Road, Brigade Road)</SelectItem>
+                  <SelectItem value="airport">Airport Area</SelectItem>
+                  <SelectItem value="flexible">Work from Home/Flexible</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return null;
   };
 
   return (
@@ -168,8 +304,8 @@ export default function FindProperty() {
               Find Your Perfect Property
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Answer a few questions about your preferences and we'll match you with properties 
-              that fit your lifestyle and budget. Our AI-powered matching saves you time and effort.
+              Tell us your purpose and preferences - we'll match you with properties 
+              that fit your specific needs and show relevant insights.
             </p>
           </div>
 
@@ -185,7 +321,7 @@ export default function FindProperty() {
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-purple-600">AI</div>
-              <div className="text-sm text-gray-600 mt-1">Powered Matching</div>
+              <div className="text-sm text-gray-600 mt-1">Intent-Based Matching</div>
             </div>
           </div>
           
@@ -207,179 +343,215 @@ export default function FindProperty() {
             <div className="flex items-center justify-center space-x-4 mb-4">
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">1</div>
-                <span className="text-sm font-medium text-gray-900">Preferences</span>
+                <span className="text-sm font-medium text-gray-900">Intent & Preferences</span>
               </div>
               <div className="w-16 h-1 bg-gray-200 rounded"></div>
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center text-sm font-medium">2</div>
-                <span className="text-sm text-gray-500">Results</span>
+                <span className="text-sm text-gray-500">Smart Results</span>
               </div>
             </div>
-            <p className="text-center text-gray-600">Tell us what you're looking for</p>
+            <p className="text-center text-gray-600">Tell us your purpose and get tailored property matches</p>
           </div>
 
           {/* Main Form */}
           <div className="bg-white rounded-3xl shadow-lg p-8 md:p-12">
             <div className="space-y-10">
-              {/* Step 1: Property Type & Location */}
+              {/* Step 1: Intent Selection */}
               <div className="space-y-6">
                 <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">What are you looking for?</h2>
-                  <p className="text-gray-600">Choose your property type and preferred area</p>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">What's your purpose?</h2>
+                  <p className="text-gray-600">This helps us show you the most relevant property information</p>
                 </div>
                 
-                <div className="grid md:grid-cols-2 gap-8">
-                  {/* Property Type */}
-                  <div>
-                    <label className="block text-lg font-semibold text-gray-900 mb-4">
-                      Property Type <span className="text-red-500">*</span>
-                    </label>
-                    <Select 
-                      value={preferences.propertyType} 
-                      onValueChange={(value) => handlePreferenceChange('propertyType', value)}
-                    >
-                      <SelectTrigger className="h-14 text-lg border-2 border-gray-200 focus:border-blue-600" data-testid="select-property-type">
-                        <div className="flex items-center space-x-3">
-                          <Home className="w-5 h-5 text-gray-600" />
-                          <SelectValue placeholder="Select property type" />
+                <div className="grid md:grid-cols-2 gap-6">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handlePreferenceChange('intent', 'investment')}
+                    className={`p-6 rounded-2xl border-2 transition-all duration-200 text-left ${
+                      preferences.intent === 'investment'
+                        ? 'border-green-500 bg-green-50'
+                        : 'border-gray-200 hover:border-green-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex items-start space-x-4">
+                      <div className="p-3 bg-green-100 rounded-full">
+                        <TrendingUp className="h-6 w-6 text-green-600" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Investment</h3>
+                        <p className="text-sm text-gray-600">
+                          Looking for rental income, capital appreciation, or portfolio expansion
+                        </p>
+                        <div className="mt-3 text-xs text-green-600 font-medium">
+                          • ROI Analysis • Rental Yields • Market Trends • Exit Strategy
                         </div>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {displayPropertyTypes.map((type) => (
-                          <SelectItem key={type.value} value={type.value} data-testid={`option-property-type-${type.value}`}>
-                            <div className="flex items-center space-x-3">
-                              <Home className="w-4 h-4" />
-                              <span>{type.label}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* City Selection */}
-                  <div>
-                    <label className="block text-lg font-semibold text-gray-900 mb-4">
-                      City <span className="text-red-500">*</span>
-                    </label>
-                    <Select 
-                      value={preferences.cityId} 
-                      onValueChange={(value) => {
-                        handlePreferenceChange('cityId', value);
-                        handlePreferenceChange('zoneId', ''); // Reset zone when city changes
-                      }}
-                    >
-                      <SelectTrigger className="h-14 text-lg border-2 border-gray-200 focus:border-blue-600" data-testid="select-city">
-                        <div className="flex items-center space-x-3">
-                          <Building2 className="w-5 h-5 text-gray-600" />
-                          <SelectValue placeholder="Select city" />
+                      </div>
+                    </div>
+                    {preferences.intent === 'investment' && (
+                      <div className="w-4 h-4 bg-green-500 rounded-full ml-auto mt-2" />
+                    )}
+                  </motion.button>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handlePreferenceChange('intent', 'end-use')}
+                    className={`p-6 rounded-2xl border-2 transition-all duration-200 text-left ${
+                      preferences.intent === 'end-use'
+                        ? 'border-purple-500 bg-purple-50'
+                        : 'border-gray-200 hover:border-purple-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex items-start space-x-4">
+                      <div className="p-3 bg-purple-100 rounded-full">
+                        <Heart className="h-6 w-6 text-purple-600" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Personal Home</h3>
+                        <p className="text-sm text-gray-600">
+                          Looking for a home to live in with your family
+                        </p>
+                        <div className="mt-3 text-xs text-purple-600 font-medium">
+                          • Lifestyle Fit • Amenities • Commute • Schools • Community
                         </div>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {cities.map((city: any) => (
-                          <SelectItem key={city.id} value={city.id} data-testid={`option-city-${city.id}`}>
-                            <div className="flex items-center space-x-3">
-                              <Building2 className="w-4 h-4" />
-                              <span>{city.name}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Zone Selection */}
-                  <div>
-                    <label className="block text-lg font-semibold text-gray-900 mb-4">
-                      Preferred Zone <span className="text-red-500">*</span>
-                    </label>
-                    <Select 
-                      value={preferences.zoneId} 
-                      onValueChange={(value) => handlePreferenceChange('zoneId', value)}
-                      disabled={!preferences.cityId}
-                    >
-                      <SelectTrigger className="h-14 text-lg border-2 border-gray-200 focus:border-blue-600" data-testid="select-zone">
-                        <div className="flex items-center space-x-3">
-                          <MapPin className="w-5 h-5 text-gray-600" />
-                          <SelectValue placeholder={preferences.cityId ? "Select preferred zone" : "First select a city"} />
-                        </div>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {zones.map((zone: any) => (
-                          <SelectItem key={zone.id} value={zone.id} data-testid={`option-zone-${zone.id}`}>
-                            <div className="flex items-center space-x-3">
-                              <MapPin className="w-4 h-4" />
-                              <span className="capitalize">{zone.name}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                      </div>
+                    </div>
+                    {preferences.intent === 'end-use' && (
+                      <div className="w-4 h-4 bg-purple-500 rounded-full ml-auto mt-2" />
+                    )}
+                  </motion.button>
                 </div>
               </div>
 
-              {/* Step 2: Configuration & Budget */}
-              <div className="space-y-6 pt-8 border-t border-gray-100">
-                <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Configuration & Budget</h2>
-                  <p className="text-gray-600">Select your preferred configuration and budget range</p>
-                </div>
-                
-                <div className="grid md:grid-cols-2 gap-8">
-                  {/* BHK Configuration - Hidden for Plot */}
-                  {preferences.propertyType !== "plot" && (
+              {/* Step 2: Property Basics - Only show after intent selection */}
+              {preferences.intent && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="space-y-6 pt-8 border-t border-gray-100"
+                >
+                  <div className="text-center mb-8">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Property Basics</h2>
+                    <p className="text-gray-600">Tell us about your preferred property type and location</p>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-3 gap-6">
+                    {/* Property Type */}
                     <div>
-                      <label className="block text-lg font-semibold text-gray-900 mb-4">
+                      <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                        Property Type <span className="text-red-500">*</span>
+                      </Label>
+                      <Select 
+                        value={preferences.propertyType} 
+                        onValueChange={(value) => handlePreferenceChange('propertyType', value)}
+                      >
+                        <SelectTrigger className="h-12 border-2 border-gray-200 focus:border-blue-500">
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {displayPropertyTypes.map((type) => (
+                            <SelectItem key={type.value} value={type.value}>
+                              {type.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* City Selection */}
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                        City <span className="text-red-500">*</span>
+                      </Label>
+                      <Select 
+                        value={preferences.cityId} 
+                        onValueChange={(value) => {
+                          handlePreferenceChange('cityId', value);
+                          handlePreferenceChange('zoneId', ''); // Reset zone when city changes
+                        }}
+                      >
+                        <SelectTrigger className="h-12 border-2 border-gray-200 focus:border-blue-500">
+                          <SelectValue placeholder="Select city" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {cities.map((city: any) => (
+                            <SelectItem key={city.id} value={city.id}>
+                              {city.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Zone Selection */}
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                        Zone <span className="text-red-500">*</span>
+                      </Label>
+                      <Select 
+                        value={preferences.zoneId} 
+                        onValueChange={(value) => handlePreferenceChange('zoneId', value)}
+                        disabled={!preferences.cityId}
+                      >
+                        <SelectTrigger className="h-12 border-2 border-gray-200 focus:border-blue-500">
+                          <SelectValue placeholder={preferences.cityId ? "Select zone" : "Select city first"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {zones.map((zone: any) => (
+                            <SelectItem key={zone.id} value={zone.id}>
+                              <span className="capitalize">{zone.name}</span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* BHK Configuration - Hidden for Plot */}
+                  {preferences.propertyType && preferences.propertyType !== "plot" && (
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700 mb-4 block">
                         Configuration <span className="text-red-500">*</span>
-                      </label>
-                      <div className="grid grid-cols-2 gap-3">
+                      </Label>
+                      <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
                         {bhkOptions.map((bhk) => (
                           <button
                             key={bhk}
-                            className={`p-4 rounded-xl border-2 text-center transition-all duration-200 ${
+                            className={`p-3 rounded-xl border-2 text-center transition-all duration-200 ${
                               preferences.bhkType.includes(bhk)
-                                ? 'border-blue-600 bg-blue-50 text-blue-600'
+                                ? 'border-blue-500 bg-blue-50 text-blue-600'
                                 : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
                             }`}
                             onClick={() => handleArrayToggle('bhkType', bhk)}
-                            data-testid={`select-bhk-${bhk.toLowerCase().replace('+', 'plus')}`}
                           >
-                            <div className="flex items-center justify-center space-x-2">
-                              <Building2 className="w-4 h-4" />
-                              <span className="font-medium">{bhk}</span>
-                            </div>
-                            {preferences.bhkType.includes(bhk) && (
-                              <div className="w-2 h-2 bg-blue-600 rounded-full mx-auto mt-2" />
-                            )}
+                            <span className="font-medium text-sm">{bhk}</span>
                           </button>
                         ))}
                       </div>
-                      <p className="text-xs text-gray-500 mt-3 text-center">Select all that work for you</p>
                     </div>
                   )}
 
                   {/* Budget Range */}
-                  <div className={preferences.propertyType === "plot" ? "md:col-span-2" : ""}>
-                    <label className="block text-lg font-semibold text-gray-900 mb-4">
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-4 block">
                       Budget Range
-                    </label>
-                    <div className="bg-gray-50 p-6 rounded-xl">
-                      <div className="mb-6 relative">
-                        <Slider
-                          value={preferences.budgetRange}
-                          onValueChange={(value) => handlePreferenceChange('budgetRange', value)}
-                          max={1000}
-                          min={20}
-                          step={10}
-                          className="w-full [&>span:first-child]:h-6 [&>span:first-child]:w-6 [&>span:first-child]:border-4 [&>span:first-child]:border-white [&>span:first-child]:bg-blue-600 [&>span:first-child]:shadow-lg [&>span:last-child]:h-6 [&>span:last-child]:w-6 [&>span:last-child]:border-4 [&>span:last-child]:border-white [&>span:last-child]:bg-blue-600 [&>span:last-child]:shadow-lg"
-                        />
-                      </div>
-                      <div className="flex justify-between text-sm text-gray-600 mb-4">
+                    </Label>
+                    <div className="px-4">
+                      <Slider
+                        value={preferences.budgetRange}
+                        onValueChange={(value) => handlePreferenceChange('budgetRange', value)}
+                        max={1000}
+                        min={25}
+                        step={5}
+                        className="w-full"
+                      />
+                      <div className="flex justify-between text-sm text-gray-600 mt-2">
                         <span>{formatBudget(preferences.budgetRange[0])}</span>
                         <span>{formatBudget(preferences.budgetRange[1])}</span>
                       </div>
-                      <div className="text-center">
+                      <div className="text-center mt-4">
                         <div className="inline-flex items-center space-x-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full font-medium">
                           <IndianRupee className="w-4 h-4" />
                           <span>{formatBudget(preferences.budgetRange[0])} - {formatBudget(preferences.budgetRange[1])}</span>
@@ -387,84 +559,19 @@ export default function FindProperty() {
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
+                </motion.div>
+              )}
 
-              {/* Step 3: Optional Preferences */}
-              <div className="space-y-6 pt-8 border-t border-gray-100">
-                <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Additional Preferences</h2>
-                  <p className="text-gray-600">Tell us about amenities and features you'd love to have (optional)</p>
-                </div>
-                
-                <div className="space-y-6">
-                  {/* Amenities */}
-                  <div>
-                    <label className="block text-lg font-semibold text-gray-900 mb-4">
-                      Preferred Amenities
-                    </label>
-                    <div className="overflow-x-auto pb-2">
-                      <div className="flex gap-3 min-w-max">
-                        {amenities.map((amenity) => (
-                          <button
-                            key={amenity}
-                            onClick={() => handleArrayToggle('amenities', amenity)}
-                            data-testid={`select-amenity-${amenity.toLowerCase().replace(/\s+/g, '-')}`}
-                            className={`flex-shrink-0 px-4 py-3 rounded-xl border-2 transition-all duration-200 min-w-[140px] ${
-                              preferences.amenities.includes(amenity)
-                                ? 'border-blue-600 bg-blue-50 text-blue-600'
-                                : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
-                            }`}
-                          >
-                            <div className="flex items-center justify-center space-x-2">
-                              <Sparkles className="w-4 h-4" />
-                              <span className="font-medium text-sm">{amenity}</span>
-                            </div>
-                            {preferences.amenities.includes(amenity) && (
-                              <div className="w-2 h-2 bg-blue-600 rounded-full mx-auto mt-2" />
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-2">← Scroll horizontally to see more options</p>
-                  </div>
-
-                  {/* Special Features */}
-                  {tags.length > 0 && (
-                    <div>
-                      <label className="block text-lg font-semibold text-gray-900 mb-4">
-                        Special Features
-                      </label>
-                      <div className="overflow-x-auto pb-2">
-                        <div className="flex gap-3 min-w-max">
-                          {tags.slice(0, 12).map((tag) => (
-                            <button
-                              key={tag.value}
-                              onClick={() => handleArrayToggle('tags', tag.value)}
-                              data-testid={`select-tag-${tag.value}`}
-                              className={`flex-shrink-0 px-4 py-3 rounded-xl border-2 transition-all duration-200 min-w-[160px] ${
-                                preferences.tags.includes(tag.value)
-                                  ? 'border-blue-600 bg-blue-50 text-blue-600'
-                                  : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
-                              }`}
-                            >
-                              <div className="flex items-center justify-center space-x-2">
-                                <Filter className="w-4 h-4" />
-                                <span className="font-medium text-sm">{tag.label}</span>
-                              </div>
-                              {preferences.tags.includes(tag.value) && (
-                                <div className="w-2 h-2 bg-blue-600 rounded-full mx-auto mt-2" />
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-2">← Scroll horizontally to see more options</p>
-                    </div>
-                  )}
-                </div>
-              </div>
+              {/* Step 3: Intent-Specific Fields */}
+              {preferences.intent && preferences.propertyType && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="space-y-6 pt-8 border-t border-gray-100"
+                >
+                  {getIntentSpecificFields()}
+                </motion.div>
+              )}
 
               {/* Search Button */}
               <div className="text-center pt-8">
@@ -476,19 +583,15 @@ export default function FindProperty() {
                       ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
-                  data-testid="button-search-properties"
                 >
                   <Search className="h-5 w-5 mr-3" />
                   Find My Perfect Properties
-                  <Sparkles className="h-5 w-5 ml-3" />
+                  <Target className="h-5 w-5 ml-3" />
                 </Button>
                 
                 {!isFormValid() && (
                   <p className="text-sm text-red-500 mt-4">
-                    {preferences.propertyType === "plot" 
-                      ? "Please select property type and zone to continue"
-                      : "Please select property type, zone, and at least one configuration to continue"
-                    }
+                    Please complete all required fields to continue
                   </p>
                 )}
               </div>
