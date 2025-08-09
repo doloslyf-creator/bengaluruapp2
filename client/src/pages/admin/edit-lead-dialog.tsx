@@ -97,6 +97,7 @@ export default function EditLeadDialog({ open, onOpenChange, lead }: EditLeadDia
       buyerPersona: formData.buyerPersona || undefined,
       urgency: formData.urgency || undefined,
       propertyType: formData.propertyType || undefined,
+      bhkPreference: formData.bhkPreference || undefined,
       financing: formData.financing || undefined,
       buyingFor: formData.buyingFor || undefined,
       preferredContactTime: formData.preferredContactTime || undefined
