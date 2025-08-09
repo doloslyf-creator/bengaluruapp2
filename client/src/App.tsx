@@ -43,7 +43,7 @@ import EnhancedLeads from "@/pages/admin/enhanced-leads";
 
 import CustomerHome from "@/pages/customer-home";
 import CustomerAccount from "@/pages/customer-account";
-import Home from "@/pages/home";
+import Home from "@/pages/home-new";
 import About from "@/pages/about";
 import LeadsPage from "@/pages/leads";
 import FAQ from "@/pages/faq";

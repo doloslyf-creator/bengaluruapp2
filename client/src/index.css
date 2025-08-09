@@ -160,6 +160,29 @@
   --spacing-3xl: 4rem;
 }
 
+/* OwnitWise Color Utility Classes */
+.text-navy { color: hsl(var(--navy)); }
+.bg-navy { background-color: hsl(var(--navy)); }
+.text-gold { color: hsl(var(--gold)); }
+.bg-gold { background-color: hsl(var(--gold)); }
+.text-sage { color: hsl(var(--sage)); }
+.bg-sage { background-color: hsl(var(--sage)); }
+.text-warm-grey { color: hsl(var(--warm-grey)); }
+.bg-warm-grey { background-color: hsl(var(--warm-grey)); }
+.border-navy { border-color: hsl(var(--navy)); }
+.border-gold { border-color: hsl(var(--gold)); }
+.border-sage { border-color: hsl(var(--sage)); }
+
+/* Hover variations */
+.hover\:bg-gold\/90:hover { background-color: hsl(var(--gold) / 0.9); }
+.hover\:bg-navy:hover { background-color: hsl(var(--navy)); }
+.hover\:text-white:hover { color: white; }
+
+/* Gradient backgrounds */
+.bg-sage\/5 { background-color: hsl(var(--sage) / 0.05); }
+.bg-sage\/10 { background-color: hsl(var(--sage) / 0.1); }
+.bg-gold\/10 { background-color: hsl(var(--gold) / 0.1); }
+
 .dark {
   --background: hsl(240, 10%, 3.9%);
   --foreground: hsl(0, 0%, 98%);

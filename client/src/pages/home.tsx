@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -29,16 +29,29 @@ import {
   Star,
   Quote,
   AlertTriangle,
-  Award
+  Award,
+  Search,
+  Eye,
+  Building2,
+  TreePine,
+  Banknote,
+  Clock,
+  ChevronRight,
+  Play,
+  DollarSign,
+  Phone,
+  Mail
 } from "lucide-react";
 
-export default function Home() {
+export default function HomePage() {
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
+  
   // SEO optimization
   useEffect(() => {
     updateMetaTags(
-      'OwnitWise - Property Advisory Services in Bangalore | Expert Real Estate Analysis',
-      'Professional property advisory services in Bangalore. Get expert property valuations, CIVIL+MEP reports, legal due diligence, and personalized real estate investment guidance. Own homes With Confidence.',
-      'property advisory bangalore, real estate valuation, property reports, CIVIL MEP analysis, property investment bangalore, real estate consultant, ownitwise',
+      'OwnitWise - Be Wise Before You Buy | Property Due Diligence Experts',
+      'From luxury villas to city apartments and open plots — we uncover hidden legal, civil, and builder risks so you invest with confidence. Expert property advisory services in Bangalore.',
+      'property due diligence bangalore, legal title verification, civil MEP inspection, builder background check, villa apartment plot experts, property advisory ownitwise',
       undefined,
       window.location.origin
     );
@@ -47,20 +60,28 @@ export default function Home() {
     injectSchema(generateOrganizationSchema(), 'organization-schema');
   }, []);
   
-  // Fetch real statistics for admin dashboard
+  // Fetch dynamic data from admin panel
   const { data: propertiesStats } = useQuery({
     queryKey: ["/api/properties/stats"],
-  });
-
-  const { data: leadsData } = useQuery({
-    queryKey: ["/api/leads"],
   });
 
   const { data: ordersData } = useQuery({
     queryKey: ["/api/orders"],
   });
 
-  const adminFeatures = [
+  const { data: properties = [] } = useQuery({
+    queryKey: ["/api/properties"],
+  });
+
+  // Dynamic content data
+  const stats = {
+    totalValue: "100+ Cr",
+    propertiesChecked: propertiesStats?.totalProperties || 0,
+    ordersProcessed: ordersData?.length || 0,
+    currentProjects: propertiesStats?.activeProjects || 0
+  };
+
+  const heroContent = {
     {
       icon: <Building className="w-8 h-8 text-primary" />,
       title: "Property Management",
