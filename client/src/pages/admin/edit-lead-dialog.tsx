@@ -214,7 +214,7 @@ export default function EditLeadDialog({ open, onOpenChange, lead }: EditLeadDia
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="immediate">Immediate (within 1 month)</SelectItem>
-                  <SelectItem value="3-months">Within 3 months</SelectItem>
+                  <SelectItem value="3-6-months">3-6 months</SelectItem>
                   <SelectItem value="6-12-months">6-12 months</SelectItem>
                   <SelectItem value="exploratory">Exploratory</SelectItem>
                 </SelectContent>
