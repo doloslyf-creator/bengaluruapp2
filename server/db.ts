@@ -12,13 +12,13 @@ function getDatabaseUrl() {
     console.log('Using Supabase as primary database');
     return process.env.SUPABASE_DATABASE_URL;
   }
-  
+
   // Fallback to existing DATABASE_URL for backward compatibility
   if (process.env.DATABASE_URL) {
     console.log('Using existing DATABASE_URL (consider migrating to Supabase)');
     return process.env.DATABASE_URL;
   }
-  
+
   throw new Error(
     "DATABASE_URL or SUPABASE_DATABASE_URL must be set. Please provide a database connection string.",
   );
