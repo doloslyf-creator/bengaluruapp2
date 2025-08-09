@@ -60,6 +60,7 @@ import { supabaseMigrator } from "./supabaseMigrator";
 
 import { backupService } from "./backupService";
 import { whatsappService } from "./whatsappService";
+import { leadNurturingService } from "./leadNurturingService";
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -2847,6 +2848,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: "Migration verification failed", 
         details: error instanceof Error ? error.message : "Unknown error" 
       });
+    }
+  });
+
+  // Lead Nurturing Automation API Routes
+  // =====================================
+
+  // Get nurturing statistics
+  app.get("/api/nurturing/stats", async (req, res) => {
+    try {
+      const stats = await leadNurturingService.getNurturingStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching nurturing stats:", error);
+      res.status(500).json({ error: "Failed to fetch nurturing statistics" });
+    }
+  });
+
+  // Manually trigger nurturing cycle
+  app.post("/api/nurturing/run", async (req, res) => {
+    try {
+      await leadNurturingService.processNurturingRules();
+      res.json({ success: true, message: "Nurturing cycle completed successfully" });
+    } catch (error) {
+      console.error("Error running nurturing cycle:", error);
+      res.status(500).json({ error: "Failed to run nurturing cycle" });
+    }
+  });
+
+  // Trigger specific nurturing actions
+  app.post("/api/nurturing/trigger/price-alert", async (req, res) => {
+    try {
+      const { propertyId, oldPrice, newPrice } = req.body;
+      await leadNurturingService.triggerPropertyPriceAlert(propertyId, oldPrice, newPrice);
+      res.json({ success: true, message: "Price alert triggered successfully" });
+    } catch (error) {
+      console.error("Error triggering price alert:", error);
+      res.status(500).json({ error: "Failed to trigger price alert" });
+    }
+  });
+
+  app.post("/api/nurturing/trigger/site-visit-reminder", async (req, res) => {
+    try {
+      const { bookingId } = req.body;
+      await leadNurturingService.triggerSiteVisitReminder(bookingId);
+      res.json({ success: true, message: "Site visit reminder triggered successfully" });
+    } catch (error) {
+      console.error("Error triggering site visit reminder:", error);
+      res.status(500).json({ error: "Failed to trigger site visit reminder" });
     }
   });
 

@@ -10,6 +10,7 @@ import {
   Building2, 
   UserCheck,
   MessageSquare,
+  Bot,
 
   Settings,
   ArrowLeft,
