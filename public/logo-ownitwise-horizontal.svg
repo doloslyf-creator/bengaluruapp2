@@ -1,0 +1,47 @@
+<svg width="280" height="50" viewBox="0 0 280 50" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background organic shape -->
+  <ellipse cx="25" cy="25" rx="20" ry="18" fill="#6FB98F" opacity="0.1"/>
+  
+  <!-- Home icon with natural, rounded styling -->
+  <path d="M10 30 L25 15 L40 30 L37 30 L37 36 C37 37.1 36.1 38 35 38 L15 38 C13.9 38 13 37.1 13 36 L13 30 Z" 
+        fill="#2C7873" stroke="#004445" stroke-width="1.5" stroke-linejoin="round"/>
+  
+  <!-- Door with rounded corners -->
+  <rect x="22" y="32" width="6" height="6" rx="1" fill="#004445"/>
+  
+  <!-- Circular windows -->
+  <circle cx="19" cy="28" r="1.8" fill="#004445" opacity="0.7"/>
+  <circle cx="31" cy="28" r="1.8" fill="#004445" opacity="0.7"/>
+  
+  <!-- Organic sprouting elements -->
+  <path d="M15 22 Q13 19 15 17 Q17 19 15 22" fill="#6FB98F"/>
+  <path d="M35 22 Q37 19 35 17 Q33 19 35 22" fill="#6FB98F"/>
+  
+  <!-- Growth dots -->
+  <circle cx="20" cy="14" r="1.2" fill="#6FB98F"/>
+  <circle cx="30" cy="14" r="1.2" fill="#6FB98F"/>
+  
+  <!-- Main text with organic spacing -->
+  <text x="55" y="32" font-family="Georgia, serif" font-size="28" font-weight="600" fill="#021C1E" letter-spacing="1px">
+    OWN
+  </text>
+  <text x="125" y="32" font-family="Georgia, serif" font-size="28" font-weight="400" fill="#004445">
+    IT
+  </text>
+  <text x="155" y="32" font-family="Georgia, serif" font-size="24" font-weight="400" fill="#2C7873" letter-spacing="3px">
+    WISE
+  </text>
+  
+  <!-- Decorative organic separator -->
+  <circle cx="220" cy="25" r="2.5" fill="#6FB98F"/>
+  <circle cx="225" cy="22" r="1.5" fill="#6FB98F" opacity="0.7"/>
+  <circle cx="225" cy="28" r="1.5" fill="#6FB98F" opacity="0.7"/>
+  
+  <!-- Tagline -->
+  <text x="235" y="20" font-family="Georgia, serif" font-size="11" fill="#2C7873" opacity="0.9">
+    Be Wise
+  </text>
+  <text x="235" y="32" font-family="Georgia, serif" font-size="11" fill="#2C7873" opacity="0.9">
+    Before You Buy
+  </text>
+</svg>

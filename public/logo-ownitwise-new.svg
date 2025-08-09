@@ -1,0 +1,45 @@
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with organic feel -->
+  <circle cx="30" cy="30" r="25" fill="#6FB98F" opacity="0.1"/>
+  
+  <!-- Home/property icon with organic styling -->
+  <path d="M15 35 L30 20 L45 35 L42 35 L42 42 C42 43.1 41.1 44 40 44 L20 44 C18.9 44 18 43.1 18 42 L18 35 Z" 
+        fill="#2C7873" stroke="#004445" stroke-width="1"/>
+  
+  <!-- Door -->
+  <rect x="27" y="37" width="6" height="7" fill="#004445"/>
+  
+  <!-- Windows -->
+  <circle cx="24" cy="33" r="2" fill="#004445" opacity="0.7"/>
+  <circle cx="36" cy="33" r="2" fill="#004445" opacity="0.7"/>
+  
+  <!-- Decorative leaves/growth elements -->
+  <path d="M20 25 Q18 22 20 20 Q22 22 20 25" fill="#6FB98F"/>
+  <path d="M40 25 Q42 22 40 20 Q38 22 40 25" fill="#6FB98F"/>
+  
+  <!-- Small sprouting elements -->
+  <circle cx="25" cy="18" r="1.5" fill="#6FB98F"/>
+  <circle cx="35" cy="18" r="1.5" fill="#6FB98F"/>
+  
+  <!-- Text -->
+  <text x="65" y="25" font-family="Georgia, serif" font-size="18" font-weight="600" fill="#021C1E">
+    OWN
+  </text>
+  <text x="105" y="25" font-family="Georgia, serif" font-size="18" font-weight="400" fill="#004445">
+    IT
+  </text>
+  <text x="65" y="42" font-family="Georgia, serif" font-size="16" font-weight="400" fill="#2C7873" letter-spacing="2px">
+    WISE
+  </text>
+  
+  <!-- Decorative dot -->
+  <circle cx="125" cy="22" r="2" fill="#6FB98F"/>
+  
+  <!-- Tagline -->
+  <text x="135" y="20" font-family="Georgia, serif" font-size="9" fill="#2C7873" opacity="0.8">
+    Be Wise
+  </text>
+  <text x="135" y="30" font-family="Georgia, serif" font-size="9" fill="#2C7873" opacity="0.8">
+    Before You Buy
+  </text>
+</svg>
