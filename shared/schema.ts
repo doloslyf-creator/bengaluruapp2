@@ -1713,31 +1713,25 @@ export const civilMepReports = pgTable("civil_mep_reports", {
   status: varchar("status", { enum: ["draft", "in-progress", "completed", "approved"] }).notNull().default("draft"),
   overallScore: real("overall_score").default(0),
 
-  // Simplified site information fields
-  siteLocation: text("site_location"),
-  plotArea: text("plot_area"),
-  builtUpArea: text("built_up_area"),
+  // Site and structure information (matching actual database columns)
+  siteInformation: json("site_information").default('{}'),
+  foundationDetails: json("foundation_details").default('{}'),
+  superstructureDetails: json("superstructure_details").default('{}'),
+  wallsFinishes: json("walls_finishes").default('{}'),
+  roofingDetails: json("roofing_details").default('{}'),
+  doorsWindows: json("doors_windows").default('{}'),
+  flooringDetails: json("flooring_details").default('{}'),
+  staircasesElevators: json("staircases_elevators").default('{}'),
+  externalWorks: json("external_works").default('{}'),
 
-  // Foundation & Structure fields
-  foundationType: text("foundation_type"),
-  structuralSystem: text("structural_system"),
-  concreteGrade: text("concrete_grade"),
-  steelGrade: text("steel_grade"),
-  structuralCondition: text("structural_condition"),
-  wallMaterial: text("wall_material"),
-  roofType: text("roof_type"),
-
-  // MEP Systems fields
-  hvacSystem: text("hvac_system"),
-  electricalLoad: text("electrical_load"),
-  plumbingType: text("plumbing_type"),
-  fireSafetyGrade: text("fire_safety_grade"),
-
-  // Detailed notes fields
-  civilNotes: text("civil_notes"),
-  mechanicalNotes: text("mechanical_notes"),
-  electricalNotes: text("electrical_notes"),
-  plumbingNotes: text("plumbing_notes"),
+  // MEP Systems (matching actual database columns)
+  mechanicalSystems: json("mechanical_systems").default('{}'),
+  electricalSystems: json("electrical_systems").default('{}'),
+  plumbingSystems: json("plumbing_systems").default('{}'),
+  fireSafetySystems: json("fire_safety_systems").default('{}'),
+  bmsAutomation: json("bms_automation").default('{}'),
+  greenSustainability: json("green_sustainability").default('{}'),
+  documentation: json("documentation").default('{}'),
 
   // Report conclusions
   executiveSummary: text("executive_summary"),
