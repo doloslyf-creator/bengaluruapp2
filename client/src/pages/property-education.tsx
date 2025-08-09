@@ -115,7 +115,7 @@ export default function PropertyEducation() {
 
       {/* Hero Section */}
       <section className="py-20 px-4">
-        <div className="w-full text-center">
+        <div className="max-w-7xl mx-auto text-center">
           <div className="inline-flex items-center bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
             <Play className="h-4 w-4 mr-2" />
             Video Education Center
@@ -150,7 +150,7 @@ export default function PropertyEducation() {
 
       {/* Structured Courses */}
       <section className="py-16 px-4 bg-white">
-        <div className="w-full">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
               Structured Video Courses
@@ -226,7 +226,7 @@ export default function PropertyEducation() {
 
       {/* Learning Paths */}
       <section className="py-16 px-4 bg-gray-50">
-        <div className="w-full">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
               Individual Video Library
@@ -261,7 +261,7 @@ export default function PropertyEducation() {
 
       {/* Search and Filters */}
       <section className="py-8 px-4 bg-white/50">
-        <div className="w-full">
+        <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row gap-4 items-center">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -302,7 +302,7 @@ export default function PropertyEducation() {
 
       {/* Video Grid */}
       <section className="py-16 px-4">
-        <div className="w-full">
+        <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-3xl font-bold">
               {filteredVideos.length} Video{filteredVideos.length !== 1 ? 's' : ''} Available

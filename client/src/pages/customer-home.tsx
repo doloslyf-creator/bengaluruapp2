@@ -58,7 +58,7 @@ export default function CustomerHome() {
 
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 pt-24 pb-12">
-        <div className="w-full px-4">
+        <div className="max-w-7xl mx-auto px-4">
           <motion.div 
             className="text-center max-w-4xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
@@ -114,7 +114,7 @@ export default function CustomerHome() {
 
       {/* Simulated Savings Demo */}
       <section className="py-16 bg-gray-50">
-        <div className="w-full px-4">
+        <div className="max-w-6xl mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -193,7 +193,7 @@ export default function CustomerHome() {
 
       {/* Value Proposition */}
       <section className="py-16 bg-white">
-        <div className="w-full px-4">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Buy Smart. Save Big.
@@ -269,7 +269,7 @@ export default function CustomerHome() {
 
       {/* How It Works */}
       <section className="py-16 bg-gray-50">
-        <div className="w-full px-4">
+        <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               How OwnitWise Works
@@ -341,7 +341,7 @@ export default function CustomerHome() {
 
       {/* Pricing Section */}
       <section className="py-16 bg-white">
-        <div className="w-full px-4 text-center">
+        <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Simple, Fair Pricing
           </h2>
@@ -389,7 +389,7 @@ export default function CustomerHome() {
 
       {/* Testimonials */}
       <section className="py-16 bg-gray-50">
-        <div className="w-full px-4">
+        <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               What Our Families Say
