@@ -1348,7 +1348,7 @@ export default function PropertyDetailMinimal() {
               <TrendingUp className="h-5 w-5 mr-2" />
               Similar Properties Price Analysis
             </CardTitle>
-            <p className="text-gray-600">Compare pricing with similar properties in {property.area} for better decision making</p>
+            <p className="text-gray-600">Compare pricing with similar {property.type} properties in {property.area} for better decision making</p>
           </CardHeader>
           <CardContent>
             <div className="overflow-hidden rounded-lg border border-gray-200">
@@ -1409,9 +1409,9 @@ export default function PropertyDetailMinimal() {
                     </td>
                   </tr>
                   
-                  {/* Similar Properties Rows - Same Location Only */}
-                  {getSimilarProperties().filter(prop => prop.area === property.area).length > 0 ? 
-                    getSimilarProperties().filter(prop => prop.area === property.area).slice(0, 4).map((similarProp, index) => {
+                  {/* Similar Properties Rows - Same Location and Type Only */}
+                  {getSimilarProperties().filter(prop => prop.area === property.area && prop.type === property.type).length > 0 ? 
+                    getSimilarProperties().filter(prop => prop.area === property.area && prop.type === property.type).slice(0, 4).map((similarProp, index) => {
                     const currentPrice = property.configurations[0] ? property.configurations[0].price : 28500000;
                     
                     // Create stable price calculations using property ID as seed for consistency
@@ -1488,9 +1488,9 @@ export default function PropertyDetailMinimal() {
                       <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
                         <div>
                           <Building2 className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                          <div className="font-medium">No similar properties found in {property.area}</div>
+                          <div className="font-medium">No similar {property.type} properties found in {property.area}</div>
                           <div className="text-sm text-gray-400 mt-1">
-                            Properties from nearby areas would be shown here for broader comparison
+                            {property.type.charAt(0).toUpperCase() + property.type.slice(1)} properties from nearby areas would be shown here for broader comparison
                           </div>
                         </div>
                       </td>
@@ -1512,7 +1512,7 @@ export default function PropertyDetailMinimal() {
                     <div>
                       <div className="text-sm font-medium text-green-900">Price Advantage</div>
                       <div className="text-xs text-green-700">
-                        {getSimilarProperties().filter(prop => prop.area === property.area).length > 0 
+                        {getSimilarProperties().filter(prop => prop.area === property.area && prop.type === property.type).length > 0 
                           ? '8% below area average'
                           : 'Competitive pricing'}
                       </div>
