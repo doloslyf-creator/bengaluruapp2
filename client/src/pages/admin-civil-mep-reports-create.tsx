@@ -160,7 +160,7 @@ export function AdminCivilMepReportsCreate() {
   const saveReportMutation = useMutation({
     mutationFn: async (data: FormData) => {
       const url = isEditMode ? `/api/civil-mep-reports/${reportId}` : "/api/civil-mep-reports";
-      const method = isEditMode ? "PUT" : "POST";
+      const method = isEditMode ? "PATCH" : "POST";
       
       const response = await fetch(url, {
         method,
