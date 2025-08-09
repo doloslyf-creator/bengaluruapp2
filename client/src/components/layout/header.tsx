@@ -3,8 +3,11 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import Logo from "@/components/ui/logo";
+import { useQuery } from "@tanstack/react-query";
+import { type Property } from "@shared/schema";
 import { 
   Home, 
   Search, 
@@ -29,12 +32,33 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 export default function Header() {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   const { user } = useAuth();
+
+  // Fetch properties for search functionality
+  const { data: properties = [] } = useQuery<Property[]>({
+    queryKey: ["/api/properties"],
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
 
   // Check if user has admin privileges
   const isAdmin = user ? (
@@ -70,6 +94,31 @@ export default function Header() {
   const isActive = (href: string) => {
     if (href === "/") return location === href;
     return location.startsWith(href);
+  };
+
+  // Filter properties based on search value
+  const filteredProperties = properties.filter((property: Property) => {
+    if (!searchValue.trim()) return false;
+    const searchLower = searchValue.toLowerCase();
+    return (
+      property.name?.toLowerCase().includes(searchLower) ||
+      property.developer?.toLowerCase().includes(searchLower) ||
+      property.area?.toLowerCase().includes(searchLower) ||
+      property.address?.toLowerCase().includes(searchLower)
+    );
+  }).slice(0, 8); // Limit to 8 results
+
+  const handlePropertySelect = (propertyId: string, propertyName: string) => {
+    setSearchValue("");
+    setSearchOpen(false);
+    navigate(`/property/${propertyId}/${propertyName.toLowerCase().replace(/\s+/g, '-')}`);
+  };
+
+  const handleSearchSubmit = () => {
+    if (searchValue.trim()) {
+      setSearchOpen(false);
+      navigate(`/find-property?search=${encodeURIComponent(searchValue)}`);
+    }
   };
 
   return (
@@ -111,6 +160,91 @@ export default function Header() {
                   <Link href={item.href}>{item.name}</Link>
                 </Button>
               ))}
+              
+              {/* Search Component */}
+              <div className="ml-4">
+                <Popover open={searchOpen} onOpenChange={setSearchOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={searchOpen}
+                      className="w-64 justify-start text-gray-500"
+                    >
+                      <Search className="h-4 w-4 mr-2" />
+                      Search properties...
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80 p-0" align="start">
+                    <Command>
+                      <CommandInput
+                        placeholder="Search by property name, developer, area..."
+                        value={searchValue}
+                        onValueChange={setSearchValue}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && filteredProperties.length === 0) {
+                            handleSearchSubmit();
+                          }
+                        }}
+                      />
+                      <CommandList>
+                        {searchValue.trim() && (
+                          <>
+                            {filteredProperties.length === 0 ? (
+                              <CommandEmpty>
+                                <div className="py-6 text-center">
+                                  <p className="text-sm text-gray-600 mb-3">No properties found</p>
+                                  <Button
+                                    size="sm"
+                                    onClick={handleSearchSubmit}
+                                    className="bg-primary hover:bg-primary/90"
+                                  >
+                                    Search all properties
+                                  </Button>
+                                </div>
+                              </CommandEmpty>
+                            ) : (
+                              <CommandGroup heading="Properties">
+                                {filteredProperties.map((property: Property) => (
+                                  <CommandItem
+                                    key={property.id}
+                                    value={property.name}
+                                    onSelect={() => handlePropertySelect(property.id, property.name)}
+                                    className="cursor-pointer"
+                                  >
+                                    <div className="flex items-center space-x-3 w-full">
+                                      <Building2 className="h-4 w-4 text-gray-400" />
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-medium text-gray-900 truncate">
+                                          {property.name}
+                                        </p>
+                                        <p className="text-xs text-gray-500 truncate">
+                                          {property.developer} • {property.area}
+                                        </p>
+                                      </div>
+                                      <Badge variant="secondary" className="text-xs">
+                                        {property.type}
+                                      </Badge>
+                                    </div>
+                                  </CommandItem>
+                                ))}
+                                {filteredProperties.length > 0 && (
+                                  <CommandItem onSelect={handleSearchSubmit} className="cursor-pointer border-t">
+                                    <div className="flex items-center space-x-2 w-full justify-center py-2">
+                                      <Search className="h-4 w-4" />
+                                      <span className="text-sm font-medium">View all search results</span>
+                                    </div>
+                                  </CommandItem>
+                                )}
+                              </CommandGroup>
+                            )}
+                          </>
+                        )}
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
             </nav>
 
             {/* Right side buttons */}
@@ -178,6 +312,51 @@ export default function Header() {
                         <Building2 className="h-6 w-6 text-primary" />
                         <Logo size="sm" showTagline={false} />
                       </Link>
+                    </div>
+
+                    {/* Mobile Search */}
+                    <div className="px-6 py-4 border-b">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                        <Input
+                          placeholder="Search properties..."
+                          value={searchValue}
+                          onChange={(e) => setSearchValue(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              handleSearchSubmit();
+                              setIsOpen(false);
+                            }
+                          }}
+                          className="pl-10"
+                        />
+                      </div>
+                      {searchValue.trim() && filteredProperties.length > 0 && (
+                        <div className="mt-2 max-h-48 overflow-y-auto space-y-1">
+                          {filteredProperties.slice(0, 4).map((property: Property) => (
+                            <button
+                              key={property.id}
+                              onClick={() => {
+                                handlePropertySelect(property.id, property.name);
+                                setIsOpen(false);
+                              }}
+                              className="w-full text-left p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                            >
+                              <div className="flex items-center space-x-2">
+                                <Building2 className="h-4 w-4 text-gray-400" />
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-gray-900 truncate">
+                                    {property.name}
+                                  </p>
+                                  <p className="text-xs text-gray-500 truncate">
+                                    {property.developer} • {property.area}
+                                  </p>
+                                </div>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     {/* Mobile Navigation */}

@@ -72,6 +72,22 @@ export default function FindProperty() {
 
   const [preferences, setPreferences] = useState<PropertyPreferences>(getCachedPreferences());
 
+  // Check for search parameter from header search
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchParam = urlParams.get('search');
+    if (searchParam) {
+      // If there's a search parameter, redirect directly to results
+      const searchPreferences = {
+        ...preferences,
+        searchTerm: searchParam,
+        intent: preferences.intent || 'end-use' // Default to end-use if no intent set
+      };
+      localStorage.setItem('propertyPreferences', JSON.stringify(searchPreferences));
+      navigate('/property-results', { state: { preferences: searchPreferences } });
+    }
+  }, [navigate, preferences]);
+
   // Fetch properties to extract real options
   const { data: properties = [], isLoading: propertiesLoading } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
