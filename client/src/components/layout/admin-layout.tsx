@@ -9,6 +9,7 @@ import {
   FileText, 
   Building2, 
   UserCheck,
+  MessageSquare,
 
   Settings,
   ArrowLeft,
@@ -217,7 +218,7 @@ export function AdminLayout({ children, title, showBackButton = false, backUrl =
       const groupNav = group.items.find(nav => isActive(nav.href));
       if (groupNav) return groupNav.name;
     }
-    
+
     return "Admin Panel";
   };
 
@@ -331,7 +332,7 @@ export function AdminLayout({ children, title, showBackButton = false, backUrl =
               {groupedNavigation.map((group) => {
                 const isOpen = openGroups.has(group.name);
                 const groupActive = isGroupActive(group);
-                
+
                 return (
                   <div key={group.name} className="space-y-1">
                     {/* Group Header */}

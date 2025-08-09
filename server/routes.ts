@@ -59,6 +59,7 @@ import { supabaseMigration } from "./supabaseMigration";
 import { supabaseMigrator } from "./supabaseMigrator";
 
 import { backupService } from "./backupService";
+import { whatsappService } from "./whatsappService";
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -2845,6 +2846,208 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: "Migration verification failed", 
         details: error instanceof Error ? error.message : "Unknown error" 
       });
+    }
+  });
+
+  // WhatsApp Management API Routes
+  // =====================================
+
+  // Send individual WhatsApp message
+  app.post("/api/whatsapp/send-message", async (req, res) => {
+    try {
+      const { phoneNumber, message, customerName } = req.body;
+      
+      if (!phoneNumber || !message) {
+        return res.status(400).json({ error: "Phone number and message are required" });
+      }
+
+      const result = await whatsappService.sendTextMessage(phoneNumber, message);
+      
+      if (result.success) {
+        // Track the message in database if needed
+        console.log(`📱 Admin sent WhatsApp message to ${customerName || phoneNumber}`);
+        res.json({ success: true, messageId: result.messageId });
+      } else {
+        res.status(500).json({ error: result.error });
+      }
+    } catch (error) {
+      console.error("Error sending WhatsApp message:", error);
+      res.status(500).json({ error: "Failed to send WhatsApp message" });
+    }
+  });
+
+  // Send bulk WhatsApp messages
+  app.post("/api/whatsapp/send-bulk", async (req, res) => {
+    try {
+      const { contacts, message, messageType = "custom" } = req.body;
+      
+      if (!contacts || !Array.isArray(contacts) || contacts.length === 0) {
+        return res.status(400).json({ error: "Contacts array is required" });
+      }
+
+      // Prepare messages based on type
+      let messagesToSend = [];
+      
+      if (messageType === "custom" && message) {
+        messagesToSend = contacts.map(contact => ({
+          phoneNumber: contact.phoneNumber,
+          message: message.replace(/\{name\}/g, contact.name || "Customer")
+        }));
+      } else if (messageType === "follow-up") {
+        messagesToSend = contacts.map(contact => ({
+          phoneNumber: contact.phoneNumber,
+          message: whatsappService.getFollowUpMessage(
+            contact.name || "Customer", 
+            contact.propertyName || "your property of interest",
+            contact.daysSinceInquiry || 7
+          )
+        }));
+      }
+
+      const results = await whatsappService.sendBulkMessages(messagesToSend);
+      
+      const successCount = results.filter(r => r.success).length;
+      const failureCount = results.length - successCount;
+      
+      console.log(`📱 Bulk WhatsApp: ${successCount} sent, ${failureCount} failed`);
+      
+      res.json({
+        success: true,
+        totalSent: successCount,
+        totalFailed: failureCount,
+        results
+      });
+    } catch (error) {
+      console.error("Error sending bulk WhatsApp messages:", error);
+      res.status(500).json({ error: "Failed to send bulk messages" });
+    }
+  });
+
+  // Send template message
+  app.post("/api/whatsapp/send-template", async (req, res) => {
+    try {
+      const { phoneNumber, templateName, params, customerName } = req.body;
+      
+      if (!phoneNumber || !templateName) {
+        return res.status(400).json({ error: "Phone number and template name are required" });
+      }
+
+      const result = await whatsappService.sendTemplateMessage(phoneNumber, templateName, params);
+      
+      if (result.success) {
+        console.log(`📱 Template message sent to ${customerName || phoneNumber}: ${templateName}`);
+        res.json({ success: true, messageId: result.messageId });
+      } else {
+        res.status(500).json({ error: result.error });
+      }
+    } catch (error) {
+      console.error("Error sending template message:", error);
+      res.status(500).json({ error: "Failed to send template message" });
+    }
+  });
+
+  // Quick message templates
+  app.get("/api/whatsapp/templates", async (req, res) => {
+    try {
+      const templates = [
+        {
+          id: "property_inquiry",
+          name: "Property Inquiry Response",
+          description: "Send when customer inquires about a property",
+          variables: ["customerName", "propertyName"]
+        },
+        {
+          id: "site_visit_confirmation", 
+          name: "Site Visit Confirmation",
+          description: "Confirm scheduled site visit",
+          variables: ["customerName", "propertyName", "visitDate", "visitTime"]
+        },
+        {
+          id: "report_ready",
+          name: "Report Ready Notification",
+          description: "Notify when report is ready for download",
+          variables: ["customerName", "reportType", "accessLink"]
+        },
+        {
+          id: "follow_up",
+          name: "Follow Up Message",
+          description: "Follow up with interested customers",
+          variables: ["customerName", "propertyName", "daysSinceInquiry"]
+        },
+        {
+          id: "payment_reminder",
+          name: "Payment Reminder", 
+          description: "Remind about pending payments",
+          variables: ["customerName", "amount", "dueDate"]
+        }
+      ];
+      
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching templates:", error);
+      res.status(500).json({ error: "Failed to fetch templates" });
+    }
+  });
+
+  // Get customer WhatsApp status and engagement
+  app.get("/api/whatsapp/customer-status/:phoneNumber", async (req, res) => {
+    try {
+      const { phoneNumber } = req.params;
+      
+      // In a real implementation, you'd fetch this from your WhatsApp provider
+      // For now, return mock data based on your existing customer data
+      const customerData = await db.select()
+        .from(leadTable)
+        .where(eq(leadTable.phone, phoneNumber))
+        .limit(1);
+
+      if (customerData.length === 0) {
+        return res.status(404).json({ error: "Customer not found" });
+      }
+
+      // Mock WhatsApp status - in production, fetch from Interakt API
+      const status = {
+        phoneNumber,
+        isWhatsAppUser: true,
+        lastSeen: new Date(),
+        messagesSent: 5,
+        messagesDelivered: 4,
+        messagesRead: 3,
+        lastMessageSent: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+        engagementScore: 75,
+        preferredTime: "10:00-18:00",
+        timezone: "Asia/Kolkata"
+      };
+      
+      res.json(status);
+    } catch (error) {
+      console.error("Error fetching customer WhatsApp status:", error);
+      res.status(500).json({ error: "Failed to fetch customer status" });
+    }
+  });
+
+  // Track WhatsApp campaign performance
+  app.get("/api/whatsapp/campaign-stats", async (req, res) => {
+    try {
+      // Mock campaign stats - in production, fetch from your analytics
+      const stats = {
+        totalMessagesSent: 1250,
+        totalDelivered: 1180,
+        totalRead: 890,
+        totalReplies: 145,
+        deliveryRate: 94.4,
+        readRate: 75.4,
+        replyRate: 16.3,
+        topPerformingTemplate: "property_inquiry",
+        lastCampaignDate: new Date(),
+        activeContacts: 456,
+        optedOutContacts: 23
+      };
+      
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching campaign stats:", error);
+      res.status(500).json({ error: "Failed to fetch campaign statistics" });
     }
   });
 
