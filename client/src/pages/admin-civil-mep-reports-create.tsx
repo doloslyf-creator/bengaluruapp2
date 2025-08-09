@@ -173,16 +173,25 @@ export function AdminCivilMepReportsCreate() {
       }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
+      console.log("Report saved successfully:", response);
       queryClient.invalidateQueries({ queryKey: ["/api/civil-mep-reports"] });
       queryClient.invalidateQueries({ queryKey: ["/api/civil-mep-reports-stats"] });
       if (isEditMode) {
         queryClient.invalidateQueries({ queryKey: [`/api/civil-mep-reports/${reportId}`] });
       }
-      toast({ title: `Civil+MEP Report ${isEditMode ? 'updated' : 'created'} successfully` });
-      setLocation("/admin-panel/civil-mep-reports");
+      toast({ 
+        title: `Civil+MEP Report ${isEditMode ? 'updated' : 'created'} successfully`,
+        description: `Report "${response.reportTitle}" has been ${isEditMode ? 'updated' : 'created'}.`,
+      });
+      
+      // Only redirect if shouldRedirect is true (Save & Close)
+      if (shouldRedirect || !isEditMode) {
+        setLocation("/admin-panel/civil-mep-reports");
+      }
     },
     onError: (error: any) => {
+      console.error("Error saving report:", error);
       toast({
         title: `Error ${isEditMode ? 'updating' : 'creating'} report`,
         description: error.message,
@@ -191,7 +200,13 @@ export function AdminCivilMepReportsCreate() {
     },
   });
 
-  const onSubmit = (data: FormData) => {
+  // Track whether to redirect after save
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+
+  const onSubmit = (data: FormData, redirect: boolean = true) => {
+    console.log("Form submitted with data:", data);
+    setShouldRedirect(redirect);
+    
     // Keep date strings as strings for submission
     const submitData = {
       propertyId: data.propertyId,
@@ -223,6 +238,8 @@ export function AdminCivilMepReportsCreate() {
       greenSustainability: data.greenSustainability,
       documentation: data.documentation,
     };
+    
+    console.log("Submitting data to API:", submitData);
     saveReportMutation.mutate(submitData);
   };
 
@@ -257,7 +274,7 @@ export function AdminCivilMepReportsCreate() {
         </div>
         
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit((data) => onSubmit(data, true))} className="space-y-6">
           {/* Header Section */}
           <Card>
             <CardHeader>
@@ -2076,13 +2093,25 @@ export function AdminCivilMepReportsCreate() {
                   </Link>
                 </Button>
                 <div className="flex gap-2">
+                  {isEditMode && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => form.handleSubmit((data) => onSubmit(data, false))()}
+                      disabled={saveReportMutation.isPending}
+                      data-testid="button-save-changes"
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      {saveReportMutation.isPending ? "Saving..." : "Save Changes"}
+                    </Button>
+                  )}
                   <Button
                     type="submit"
                     disabled={saveReportMutation.isPending}
                     data-testid="button-create-report"
                   >
                     <Save className="w-4 h-4 mr-2" />
-                    {saveReportMutation.isPending ? (isEditMode ? "Updating..." : "Creating...") : (isEditMode ? "Update Report" : "Create Report")}
+                    {saveReportMutation.isPending ? (isEditMode ? "Updating..." : "Creating...") : (isEditMode ? "Save & Close" : "Create Report")}
                   </Button>
                 </div>
               </div>
