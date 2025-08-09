@@ -603,15 +603,11 @@ export default function FindProperty() {
                 <Button
                   onClick={handleSearch}
                   disabled={!isFormValid()}
-                  className={`px-12 py-4 text-lg font-semibold rounded-2xl transition-all duration-200 ${
-                    isFormValid()
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
+                  size="lg"
+                  className="bg-gradient-to-r from-primary to-blue-600 hover:shadow-lg text-white px-8 py-4 rounded-xl"
                 >
-                  <Search className="h-5 w-5 mr-3" />
-                  Find My Perfect Properties
-                  <Target className="h-5 w-5 ml-3" />
+                  <Search className="h-4 w-4 mr-2" />
+                  <span className="text-lg font-bold">Find My Perfect Properties</span>
                 </Button>
 
                 {!isFormValid() && (
