@@ -3691,8 +3691,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body,
         id: crypto.randomUUID(),
         viewCount: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
 
       const [video] = await db.insert(videoEducation).values(videoData).returning();
@@ -3708,8 +3708,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { id } = req.params;
       const updateData = {
         ...req.body,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date()
       };
+
+      // Convert ISO string dates to Date objects if they exist
+      if (updateData.createdAt && typeof updateData.createdAt === 'string') {
+        updateData.createdAt = new Date(updateData.createdAt);
+      }
 
       const [video] = await db.update(videoEducation)
         .set(updateData)
