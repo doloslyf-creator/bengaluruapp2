@@ -7,6 +7,8 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        serif: ['Playfair Display', 'Georgia', 'serif'],
+        display: ['Playfair Display', 'Georgia', 'serif'],
       },
       fontSize: {
         'display': ['3.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
@@ -93,6 +95,18 @@ export default {
           "accent-foreground": "var(--sidebar-accent-foreground)",
           border: "var(--sidebar-border)",
           ring: "var(--sidebar-ring)",
+        },
+        gold: {
+          DEFAULT: "var(--gold)",
+          foreground: "var(--gold-foreground)",
+        },
+        navy: {
+          DEFAULT: "var(--navy)",
+          foreground: "var(--navy-foreground)",
+        },
+        sage: {
+          DEFAULT: "var(--sage)",
+          foreground: "var(--sage-foreground)",
         },
       },
       keyframes: {
