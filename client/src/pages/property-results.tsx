@@ -556,7 +556,7 @@ export default function PropertyResults() {
             </div>
           ) : (
             viewMode === 'grid' ? (
-              <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
                 {matchingProperties.map(property => {
                   const matchInfo = getMatchLabel(property.matchScore);
                   
@@ -621,15 +621,11 @@ export default function PropertyResults() {
                             </div>
                           </div>
                           
-                          {/* Developer with Enhanced Styling */}
-                          <div className="flex items-center">
-                            <Building className="h-4 w-4 mr-2 text-slate-400" />
-                            <p className="text-sm text-slate-600 font-medium">By {property.developer}</p>
-                          </div>
+
                           
                           {/* Enhanced Price Display */}
                           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-100">
-                            <div className="text-2xl font-black text-blue-700 mb-1">
+                            <div className="text-lg font-black text-blue-700 mb-1">
                               {getPriceRange(property.configurations)}
                             </div>
                             <div className="text-xs text-blue-600 font-medium uppercase tracking-wide">Starting Price</div>
@@ -741,7 +737,7 @@ export default function PropertyResults() {
                                 <span className="line-clamp-1">{property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)}</span>
                               </div>
                               
-                              <p className="text-sm text-gray-500">By {property.developer}</p>
+
                             </div>
                             
                             <Badge className={`${matchInfo.color} text-sm font-semibold shrink-0`}>
