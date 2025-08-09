@@ -1,6 +1,6 @@
 import { useLocation } from "wouter";
 import { Link } from "wouter";
-import { Home, BarChart3, Users, MapPin, FileText } from "lucide-react";
+import { Home, BarChart3, Users, MapPin, FileText, Target } from "lucide-react";
 
 const navigation = [
   { name: "Properties", href: "/", icon: Home },
@@ -19,7 +19,7 @@ export function Sidebar() {
         <h1 className="text-2xl font-bold text-primary">PropertyPro</h1>
         <p className="text-sm text-gray-600 mt-1">Bengaluru Real Estate</p>
       </div>
-      
+
       <nav className="flex-1 px-4 py-6 space-y-2">
         {navigation.map((item) => {
           const isActive = location === item.href;
@@ -43,7 +43,7 @@ export function Sidebar() {
           );
         })}
       </nav>
-      
+
       <div className="p-4 border-t border-border">
         <div className="bg-gray-50 rounded-lg p-4">
           <p className="text-sm font-medium text-gray-900">Admin Panel</p>

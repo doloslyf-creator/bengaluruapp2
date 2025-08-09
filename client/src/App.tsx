@@ -158,6 +158,7 @@ function ProtectedRouter() {
       <Route path="/admin-panel/settings" component={AdminSettings} />
       <Route path="/admin-panel/team-management" component={TeamManagement} />
       <Route path="/admin-panel/whatsapp-management" element={<WhatsAppManagement />} />
+        <Route path="/admin-panel/enhanced-leads" element={<EnhancedLeads />} />
         <Route path="/admin-panel/lead-nurturing" element={<LeadNurturingPage />} />
       <Route path="/admin-panel/supabase-migration" component={SupabaseMigration} />
       <Route path="/admin-panel/supabase-status" component={SupabaseStatus} />
