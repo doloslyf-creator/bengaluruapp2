@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Grid3X3, List, MapPin, Calendar, Phone, ArrowLeft, Star, Eye, Heart, Filter, X, SlidersHorizontal, IndianRupee, Building, Shield, FileCheck, Clock, BarChart3, TrendingUp } from "lucide-react";
+import { Grid3X3, List, MapPin, Calendar, Phone, ArrowLeft, Star, Eye, Heart, Filter, X, SlidersHorizontal, IndianRupee, Building, Shield, FileCheck, Clock, BarChart3 } from "lucide-react";
 import Header from "@/components/layout/header";
 import { DataTransparencyIndicator } from "@/components/data-transparency-indicator";
 import { Button } from "@/components/ui/button";
@@ -310,15 +310,7 @@ export default function PropertyResults() {
   };
 
   const handleViewProperty = (property: PropertyWithConfigurations) => {
-    // Route to intent-specific property detail pages
-    if (preferences.intent === 'investment') {
-      navigate(`/property/${property.id}/investment`);
-    } else if (preferences.intent === 'end-use') {
-      navigate(`/property/${property.id}/end-use`);
-    } else {
-      // Fallback to general property page
-      navigate(`/property/${property.id}/${generatePropertySlug(property)}`);
-    }
+    navigate(`/property/${property.id}/${generatePropertySlug(property)}`);
   };
 
   const getPriceRange = (configurations: PropertyConfiguration[]) => {
@@ -395,49 +387,39 @@ export default function PropertyResults() {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        {/* Enhanced Modern Header */}
-        <header className="bg-white/95 backdrop-blur-md shadow-lg border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between space-y-4 lg:space-y-0">
-              <div className="flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-6">
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <header className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
                 <Button 
                   variant="ghost" 
                   onClick={() => navigate('/find-property')}
-                  className="self-start flex items-center space-x-2 hover:bg-blue-50 rounded-xl transition-all duration-300 transform hover:scale-105"
+                  className="flex items-center space-x-2 hover:bg-gray-100"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  <span>Back to Search</span>
+                  <span>Back</span>
                 </Button>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-3">
-                    <h1 className="text-2xl md:text-3xl font-black text-slate-900">
-                      {preferences.intent === 'investment' ? 'Investment Properties' : 
-                       preferences.intent === 'end-use' ? 'Homes for You' : 
-                       'Property Results'}
-                    </h1>
+                <div>
+                  <h1 className="text-xl font-bold text-gray-900">
+                    {preferences.intent === 'investment' ? 'Investment Properties' : 
+                     preferences.intent === 'end-use' ? 'Homes for You' : 
+                     'Property Results'}
+                  </h1>
+                  <p className="text-sm text-gray-600">
+                    {matchingProperties.length} {preferences.intent === 'investment' ? 'investment opportunities' : 
+                    preferences.intent === 'end-use' ? 'family homes' : 'properties'} found
                     {preferences.intent && (
-                      <Badge 
-                        className={`${
-                          preferences.intent === 'investment' 
-                            ? 'bg-green-100 text-green-700 border-green-200' 
-                            : 'bg-purple-100 text-purple-700 border-purple-200'
-                        } px-4 py-1.5 font-semibold rounded-full border-2`}
-                      >
-                        {preferences.intent === 'investment' ? '📈 Investment Focus' : '🏡 Family Focus'}
-                      </Badge>
+                      <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                        {preferences.intent === 'investment' ? '💰 Investment Focus' : '🏡 Family Focus'}
+                      </span>
                     )}
-                  </div>
-                  
-                  <p className="text-lg font-medium text-slate-600">
-                    <span className="text-3xl font-bold text-blue-600">{matchingProperties.length}</span> {preferences.intent === 'investment' ? 'investment opportunities' : 
-                    preferences.intent === 'end-use' ? 'family homes' : 'properties'} found matching your criteria
                   </p>
                 </div>
                 
-                {/* Enhanced Data Transparency Indicator */}
-                <div className="bg-white/80 rounded-xl p-3 shadow-md border border-blue-200">
+                {/* Data Transparency Indicator */}
+                <div className="ml-6">
                   <DataTransparencyIndicator 
                     variant="compact" 
                     sources={["RERA Database", "Site Verification"]}
@@ -556,29 +538,26 @@ export default function PropertyResults() {
             </div>
           ) : (
             viewMode === 'grid' ? (
-              <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {matchingProperties.map(property => {
                   const matchInfo = getMatchLabel(property.matchScore);
                   
                   return (
-                    <Card key={property.id} className="group hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer border-2 border-slate-200 hover:border-blue-300 bg-white rounded-2xl overflow-hidden card-hover-effect">
+                    <Card key={property.id} className="group hover:shadow-lg transition-all duration-200 cursor-pointer border border-gray-200 hover:border-primary/30 bg-white">
                       <div onClick={() => handleViewProperty(property)} className="relative">
-                        {/* Compact Property Image */}
-                        <div className="aspect-[3/2] bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 relative overflow-hidden">
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
-                          <div className="text-slate-400 text-center absolute inset-0 flex items-center justify-center">
-                            <div>
-                              <div className="text-4xl mb-2 group-hover:scale-110 transition-transform duration-300">🏢</div>
-                              <p className="text-sm font-medium">Property Image</p>
-                            </div>
+                        {/* Property Image */}
+                        <div className="aspect-[4/3] bg-gradient-to-br from-blue-50 to-indigo-100 rounded-t-lg flex items-center justify-center relative overflow-hidden">
+                          <div className="text-primary/60 text-center">
+                            <div className="text-3xl mb-1">🏢</div>
+                            <p className="text-xs font-medium text-gray-600">Property Image</p>
                           </div>
                           
-                          {/* Enhanced Match Badge - Top Left */}
-                          <Badge className={`absolute top-4 left-4 ${matchInfo.color} text-xs font-bold shadow-lg backdrop-blur-sm border border-white/20 px-3 py-1.5 rounded-full`}>
-                            ⭐ {property.matchScore}% Match
+                          {/* Match Badge - Top Left */}
+                          <Badge className={`absolute top-3 left-3 ${matchInfo.color} text-xs font-semibold shadow-sm`}>
+                            {property.matchScore}% Match
                           </Badge>
                           
-                          {/* Enhanced Heart Button - Top Right */}
+                          {/* Heart Button - Top Right */}
                           <Button
                             variant="ghost"
                             size="sm"
@@ -586,68 +565,83 @@ export default function PropertyResults() {
                               e.stopPropagation();
                               toggleFavorite(property.id);
                             }}
-                            className="absolute top-4 right-4 h-10 w-10 bg-white/90 hover:bg-white backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300"
+                            className="absolute top-2 right-2 h-8 w-8 bg-white/80 hover:bg-white backdrop-blur-sm"
                           >
                             <Heart 
-                              className={`h-5 w-5 ${
+                              className={`h-4 w-4 ${
                                 favorites.has(property.id) 
-                                  ? 'fill-red-500 text-red-500 animate-pulse' 
-                                  : 'text-slate-400 hover:text-red-500'
+                                  ? 'fill-red-500 text-red-500' 
+                                  : 'text-gray-400 hover:text-red-400'
                               }`} 
                             />
                           </Button>
-
-                          {/* Hover Overlay */}
-                          <div className="absolute inset-0 bg-blue-600/80 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
-                            <div className="text-white text-center transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                              <Eye className="h-8 w-8 mx-auto mb-2" />
-                              <p className="font-semibold">View Details</p>
-                            </div>
-                          </div>
                         </div>
 
-                        {/* Compact Card Content */}
-                        <div className="p-4 space-y-3">
-                          {/* Property Title - Moved below image */}
-                          <h3 className="font-bold text-lg text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-tight">
+                        {/* Card Content */}
+                        <div className="p-4">
+                          {/* Property Title */}
+                          <h3 className="font-bold text-lg text-gray-900 group-hover:text-primary transition-colors line-clamp-1 mb-1">
                             {property.name}
                           </h3>
                           
-                          {/* Location - Simplified */}
-                          <div className="flex items-center text-sm text-slate-600">
-                            <MapPin className="h-4 w-4 mr-1 text-slate-400" />
+                          {/* Location */}
+                          <div className="flex items-center text-sm text-gray-600 mb-2">
+                            <MapPin className="h-3 w-3 mr-1 text-gray-400" />
                             <span className="line-clamp-1">{property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)}</span>
                           </div>
                           
-                          {/* Simple Price Display */}
-                          <div className="text-lg font-bold text-slate-900">
+                          {/* Developer */}
+                          <p className="text-xs text-gray-500 mb-3">By {property.developer}</p>
+                          
+                          {/* Price */}
+                          <div className="text-lg font-bold text-primary mb-3">
                             {getPriceRange(property.configurations)}
                           </div>
                           
-                          {/* Investment Insights */}
-                          {preferences.intent && (
-                            <div className="flex flex-wrap gap-2">
-                              {getIntentHighlights(property).slice(0, 2).map((highlight, index) => (
-                                <div key={index} className="flex items-center space-x-1 bg-gray-50 border border-gray-200 rounded-md px-2 py-1">
-                                  <highlight.icon className={`w-3 h-3 ${highlight.color}`} />
-                                  <span className="text-xs font-medium text-gray-700">{highlight.label}:</span>
-                                  <span className={`text-xs font-semibold ${highlight.color}`}>{highlight.value}</span>
-                                </div>
-                              ))}
+                          {/* Configurations */}
+                          {property.configurations.length > 0 && (
+                            <div className="mb-3">
+                              <div className="flex flex-wrap gap-1">
+                                {property.configurations.slice(0, 3).map((config, index) => (
+                                  <Badge key={index} variant="outline" className="text-xs px-2 py-0.5 bg-blue-50 border-blue-200 text-blue-700">
+                                    {config.configuration}
+                                  </Badge>
+                                ))}
+                                {property.configurations.length > 3 && (
+                                  <Badge variant="outline" className="text-xs px-2 py-0.5 bg-gray-50 border-gray-200 text-gray-600">
+                                    +{property.configurations.length - 3}
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
                           )}
-
-                          {/* Compact Configurations */}
-                          {property.configurations.length > 0 && (
+                          
+                          {/* Intent-Based Highlights */}
+                          {preferences.intent && (
+                            <div className="mb-3">
+                              <div className="flex flex-wrap gap-2">
+                                {getIntentHighlights(property).slice(0, 2).map((highlight, index) => (
+                                  <div key={index} className="flex items-center space-x-1 bg-gray-50 border border-gray-200 rounded-md px-2 py-1">
+                                    <highlight.icon className={`w-3 h-3 ${highlight.color}`} />
+                                    <span className="text-xs font-medium text-gray-700">{highlight.label}:</span>
+                                    <span className={`text-xs font-semibold ${highlight.color}`}>{highlight.value}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Key Features - Only show if no intent or as fallback */}
+                          {(!preferences.intent || property.tags.length > 0) && (
                             <div className="flex flex-wrap gap-1">
-                              {property.configurations.slice(0, 2).map((config, index) => (
-                                <Badge key={index} variant="secondary" className="text-xs px-2 py-1">
-                                  {config.configuration}
+                              {property.tags.slice(0, preferences.intent ? 1 : 2).map(tag => (
+                                <Badge key={tag} variant="secondary" className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600">
+                                  {tag.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                                 </Badge>
                               ))}
-                              {property.configurations.length > 2 && (
-                                <Badge variant="secondary" className="text-xs px-2 py-1">
-                                  +{property.configurations.length - 2}
+                              {property.tags.length > (preferences.intent ? 1 : 2) && (
+                                <Badge variant="secondary" className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600">
+                                  +{property.tags.length - (preferences.intent ? 1 : 2)}
                                 </Badge>
                               )}
                             </div>
@@ -709,7 +703,7 @@ export default function PropertyResults() {
                                 <span className="line-clamp-1">{property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)}</span>
                               </div>
                               
-
+                              <p className="text-sm text-gray-500">By {property.developer}</p>
                             </div>
                             
                             <Badge className={`${matchInfo.color} text-sm font-semibold shrink-0`}>

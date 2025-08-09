@@ -29,10 +29,7 @@ import {
   Star,
   Quote,
   AlertTriangle,
-  Award,
-  Search,
-  MessageCircle,
-  Clock
+  Award
 } from "lucide-react";
 
 export default function Home() {
@@ -116,103 +113,79 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 overflow-hidden">
+    <div className="min-h-screen hero-gradient">
       <Header />
       
-      {/* Market Alert Banner - Critical Urgency */}
-      <NotificationBanner 
-        message="⚡ Bangalore Market Alert: Properties appreciating 18% annually - Limited inventory in premium locations!"
-        type="urgent"
-        actionText="Find Properties Now"
-        actionUrl="/find-property"
-      />
-
-      {/* Enhanced Premium Trust Banner with Animations */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 text-white py-4 border-b border-yellow-400/20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-indigo-600/10 animate-pulse"></div>
-        <div className="max-w-7xl mx-auto px-4 text-center relative">
-          <div className="flex flex-col md:flex-row items-center justify-center space-y-2 md:space-y-0 md:space-x-8 text-sm">
-            <span className="flex items-center group hover:text-yellow-300 transition-colors duration-300">
-              <Award className="h-4 w-4 mr-2 text-yellow-400 group-hover:rotate-12 transition-transform duration-300" />
+      {/* Premium Trust Banner */}
+      <div className="bg-navy text-white py-3 border-b border-yellow-400/20">
+        <div className="container-premium text-center">
+          <div className="flex items-center justify-center space-x-6 text-sm">
+            <span className="flex items-center">
+              <Award className="h-4 w-4 mr-2 text-yellow-600" />
               RERA Certified Experts
             </span>
-            <span className="flex items-center group hover:text-yellow-300 transition-colors duration-300">
-              <Shield className="h-4 w-4 mr-2 text-yellow-400 group-hover:scale-110 transition-transform duration-300" />
+            <span className="flex items-center">
+              <Shield className="h-4 w-4 mr-2 text-yellow-400" />
               680+ Properties Verified
             </span>
-            <span className="flex items-center group hover:text-yellow-300 transition-colors duration-300">
-              <CheckCircle className="h-4 w-4 mr-2 text-yellow-400 group-hover:bounce transition-transform duration-300" />
+            <span className="flex items-center">
+              <CheckCircle className="h-4 w-4 mr-2 text-yellow-400" />
               ₹50+ Cr Investments Guided
             </span>
           </div>
         </div>
       </div>
 
-      {/* Enhanced Hero Section with Modern Animations */}
-      <section className="relative py-16 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0">
-          <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-blue-200 rounded-full opacity-20 animate-pulse"></div>
-          <div className="absolute top-3/4 right-1/4 w-24 h-24 bg-indigo-200 rounded-full opacity-20 animate-pulse delay-1000"></div>
-          <div className="absolute bottom-1/4 left-1/3 w-40 h-40 bg-purple-200 rounded-full opacity-10 animate-pulse delay-2000"></div>
-        </div>
-
-        <div className="max-w-7xl mx-auto relative">
+      {/* Hero Section */}
+      <section className="section-premium">
+        <div className="container-premium">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Left Column - Enhanced Content with Animations */}
-            <div className="space-y-8 animate-slide-up">
-              <div className="inline-flex items-center bg-white/80 backdrop-blur-sm border border-blue-200 rounded-full px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                <Award className="h-4 w-4 mr-2 text-blue-600" />
-                <span className="text-sm font-semibold text-slate-700">Premium Villa Consultation Services</span>
+            {/* Left Column - Content */}
+            <div className="fade-in-up">
+              <div className="trust-badge mb-6">
+                <Award className="h-4 w-4 mr-2" />
+                Premium Villa Consultation Services
               </div>
               
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 leading-tight animate-slide-up delay-100">
-                <span className="bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 bg-clip-text text-transparent">
-                  Expert Property Advisory
-                </span>
-                <span className="block text-orange-600 mt-2">
-                  for Discerning Investors
-                </span>
+              <h1 className="text-display mb-6 text-gradient-premium fade-in-up-delay">
+                Expert Property Advisory for Discerning Investors
               </h1>
               
-              <p className="text-xl text-slate-600 leading-relaxed font-medium animate-slide-up delay-200">
+              <p className="text-body-large text-muted-foreground mb-8 fade-in-up-delay-2">
                 Our RERA-certified experts provide comprehensive property analysis, 
                 structural assessments, and investment guidance to help you make 
                 informed decisions in Bangalore's premium real estate market.
               </p>
               
-              {/* Enhanced Key Benefits with Staggered Animations */}
-              <div className="space-y-4 animate-slide-up delay-300">
-                {[
-                  "Professional CIVIL+MEP Reports", 
-                  "Independent Property Valuations", 
-                  "Legal Due Diligence Support"
-                ].map((benefit, index) => (
-                  <div 
-                    key={index}
-                    className="flex items-center space-x-3 group hover:bg-white/50 hover:shadow-lg rounded-lg p-3 transition-all duration-300"
-                    style={{ animationDelay: `${300 + index * 100}ms` }}
-                  >
-                    <CheckCircle className="h-5 w-5 text-green-600 group-hover:scale-110 transition-transform duration-300" />
-                    <span className="text-slate-700 font-medium group-hover:text-slate-900">{benefit}</span>
-                  </div>
-                ))}
+              {/* Key Benefits */}
+              <div className="space-y-4 mb-8 fade-in-up-delay-2">
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="h-5 w-5 text-success" />
+                  <span className="text-body">Professional CIVIL+MEP Reports</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="h-5 w-5 text-success" />
+                  <span className="text-body">Independent Property Valuations</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="h-5 w-5 text-success" />
+                  <span className="text-body">Legal Due Diligence Support</span>
+                </div>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-4 animate-slide-up delay-500">
-                <Link href="/find-property">
-                  <Button size="lg" className="group bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white px-8 py-4 rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
-                    <Search className="h-5 w-5 mr-3 group-hover:rotate-12 transition-transform duration-300" />
-                    <span>Explore Properties</span>
-                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
-                  </Button>
-                </Link>
-                <Link href="/property-reports">
-                  <Button variant="outline" size="lg" className="group px-8 py-4 rounded-xl border-2 border-slate-300 hover:border-blue-500 hover:bg-blue-50 transform hover:scale-105 transition-all duration-300">
-                    <FileText className="h-5 w-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
+              <div className="flex flex-col sm:flex-row gap-4 fade-in-up-delay-2">
+                <Button asChild className="btn-premium">
+                  <Link href="/find-property">
+                    <Search className="h-5 w-5 mr-2" />
+                    Explore Properties
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" className="btn-secondary-premium">
+                  <Link href="/property-reports">
+                    <FileText className="h-5 w-5 mr-2" />
                     Get Expert Report
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </div>
             </div>
             
