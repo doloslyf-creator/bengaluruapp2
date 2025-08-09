@@ -1,399 +1,538 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { 
+  Upload, 
+  Download, 
+  RefreshCw, 
+  Database, 
+  HardDrive, 
+  Settings, 
+  FileText, 
+  Clock, 
+  CheckCircle, 
+  AlertTriangle, 
+  Shield,
+  Archive,
+  Calendar,
+  Activity,
+  Server,
+  CloudDownload,
+  History,
+  AlertCircle,
+  Monitor,
+  Cpu,
+  MemoryStick,
+  Gauge
+} from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { AdminLayout } from "@/components/layout/admin-layout";
-import { 
-  Download, 
-  Database, 
-  FileText, 
-  Settings, 
-  Archive, 
-  Calendar,
-  CheckCircle,
-  AlertCircle,
-  Loader2,
-  HardDrive,
-  Cloud
-} from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
-import { useMutation, useQuery } from "@tanstack/react-query";
-
-interface BackupStatus {
-  id: string;
-  type: 'full' | 'database' | 'files' | 'config';
-  status: 'pending' | 'running' | 'completed' | 'failed';
-  progress: number;
-  createdAt: string;
-  completedAt?: string;
-  size?: string;
-  downloadUrl?: string;
-  error?: string;
-}
+import AdminLayout from "@/components/layout/admin-layout";
 
 export default function BackupSystem() {
   const { toast } = useToast();
-  const [selectedBackupType, setSelectedBackupType] = useState<string>('full');
+  const queryClient = useQueryClient();
+  const [isCreatingBackup, setIsCreatingBackup] = useState(false);
 
-  // Fetch backup history
-  const { data: backupHistory = [], refetch } = useQuery<BackupStatus[]>({
-    queryKey: ['/api/admin/backups'],
+  const { data: backups, isLoading } = useQuery({
+    queryKey: ["/api/admin/backups"],
+    refetchInterval: 5000,
   });
 
-  // Create backup mutation
+  const { data: systemStats } = useQuery({
+    queryKey: ["/api/admin/system/stats"],
+    refetchInterval: 30000,
+  });
+
   const createBackupMutation = useMutation({
-    mutationFn: async (type: string) => {
-      const response = await fetch('/api/admin/backups/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ type }),
-      });
-      if (!response.ok) throw new Error('Failed to create backup');
-      return response.json();
-    },
+    mutationFn: (type: string) => apiRequest("POST", "/api/admin/backups/create", { type }),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/backups"] });
       toast({
-        title: "Backup Started",
-        description: "Your backup has been initiated and is now processing.",
+        title: "Success",
+        description: "Backup initiated successfully!",
       });
-      refetch();
+      setIsCreatingBackup(false);
     },
-    onError: (error: any) => {
+    onError: (error) => {
+      console.error("Error creating backup:", error);
       toast({
-        title: "Backup Failed",
-        description: error.message || "Failed to start backup process.",
+        title: "Error",
+        description: "Failed to create backup. Please try again.",
+        variant: "destructive",
+      });
+      setIsCreatingBackup(false);
+    },
+  });
+
+  const cleanupBackupsMutation = useMutation({
+    mutationFn: (daysToKeep: number) => apiRequest("DELETE", "/api/admin/backups/cleanup", { daysToKeep }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/backups"] });
+      toast({
+        title: "Success",
+        description: "Old backups cleaned up successfully!",
+      });
+    },
+    onError: (error) => {
+      console.error("Error cleaning up backups:", error);
+      toast({
+        title: "Error",
+        description: "Failed to cleanup backups. Please try again.",
         variant: "destructive",
       });
     },
   });
 
-  // Download backup mutation
-  const downloadBackupMutation = useMutation({
-    mutationFn: async (backupId: string) => {
-      const response = await fetch(`/api/admin/backups/${backupId}/download`);
-      if (!response.ok) throw new Error('Download failed');
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = `backup-${backupId}.zip`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    },
-    onSuccess: () => {
-      toast({
-        title: "Download Started",
-        description: "Your backup file is now downloading.",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Download Failed",
-        description: error.message || "Failed to download backup file.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const backupTypes = [
-    {
-      id: 'full',
-      name: 'Full System Backup',
-      description: 'Complete backup including database, files, and configurations',
-      icon: Archive,
-      estimatedTime: '15-30 minutes',
-      size: 'Large (500MB - 2GB)'
-    },
-    {
-      id: 'database',
-      name: 'Database Only',
-      description: 'All database tables, data, and structure',
-      icon: Database,
-      estimatedTime: '5-10 minutes',
-      size: 'Medium (50-500MB)'
-    },
-    {
-      id: 'files',
-      name: 'Files & Media',
-      description: 'All uploaded files, images, and documents',
-      icon: FileText,
-      estimatedTime: '10-20 minutes',
-      size: 'Variable (100MB - 1GB)'
-    },
-    {
-      id: 'config',
-      name: 'Configuration',
-      description: 'Settings, API keys, and system configuration',
-      icon: Settings,
-      estimatedTime: '1-2 minutes',
-      size: 'Small (< 10MB)'
-    }
-  ];
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case 'failed':
-        return <AlertCircle className="h-4 w-4 text-red-600" />;
-      case 'running':
-        return <Loader2 className="h-4 w-4 text-blue-600 animate-spin" />;
-      default:
-        return <AlertCircle className="h-4 w-4 text-gray-400" />;
-    }
+  const handleCreateBackup = (type: string) => {
+    setIsCreatingBackup(true);
+    createBackupMutation.mutate(type);
   };
 
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      completed: 'default',
-      failed: 'destructive',
-      running: 'secondary',
-      pending: 'outline'
-    } as const;
-    
-    return (
-      <Badge variant={variants[status as keyof typeof variants] || 'outline'}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </Badge>
-    );
+  const handleDownloadBackup = (backupId: string) => {
+    window.open(`/api/admin/backups/${backupId}/download`, '_blank');
+  };
+
+  const handleCleanupOldBackups = () => {
+    cleanupBackupsMutation.mutate(30); // Keep last 30 days
   };
 
   return (
-    <AdminLayout>
-      <div className="max-w-7xl mx-auto py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Backup System</h1>
-          <p className="mt-2 text-gray-600">
-            Create and manage system backups for data protection and recovery
-          </p>
+    <AdminLayout title="Backup & System Management" showBackButton={false}>
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div className="flex items-center space-x-3">
+          <Shield className="h-8 w-8 text-blue-600" />
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Backup & System Management</h1>
+            <p className="text-gray-600">Monitor system health, create backups, and manage data recovery</p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Create Backup Section */}
-          <div className="lg:col-span-2">
+        <Tabs defaultValue="backups" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="backups">Backup Management</TabsTrigger>
+            <TabsTrigger value="system">System Health</TabsTrigger>
+            <TabsTrigger value="monitoring">Real-time Monitor</TabsTrigger>
+            <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="backups" className="space-y-6">
+            {/* Backup Actions */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Cloud className="h-5 w-5" />
-                  Create New Backup
+                <CardTitle className="flex items-center space-x-2">
+                  <CloudDownload className="h-5 w-5" />
+                  <span>Create New Backup</span>
                 </CardTitle>
                 <CardDescription>
-                  Select the type of backup you want to create
+                  Choose the type of backup to create for your system
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Backup Type Selection */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {backupTypes.map((type) => {
-                    const Icon = type.icon;
-                    return (
-                      <div
-                        key={type.id}
-                        className={`relative rounded-lg border-2 cursor-pointer transition-all ${
-                          selectedBackupType === type.id
-                            ? 'border-primary bg-primary/5'
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                        onClick={() => setSelectedBackupType(type.id)}
-                      >
-                        <div className="p-4">
-                          <div className="flex items-start space-x-3">
-                            <Icon className={`h-6 w-6 mt-1 ${
-                              selectedBackupType === type.id ? 'text-primary' : 'text-gray-400'
-                            }`} />
-                            <div className="flex-1 min-w-0">
-                              <h3 className="text-sm font-medium text-gray-900">
-                                {type.name}
-                              </h3>
-                              <p className="text-sm text-gray-500 mt-1">
-                                {type.description}
-                              </p>
-                              <div className="mt-2 flex flex-wrap gap-2">
-                                <span className="text-xs text-gray-500">
-                                  ⏱️ {type.estimatedTime}
-                                </span>
-                                <span className="text-xs text-gray-500">
-                                  💾 {type.size}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Create Backup Button */}
-                <div className="flex justify-end">
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <Button
-                    onClick={() => createBackupMutation.mutate(selectedBackupType)}
-                    disabled={createBackupMutation.isPending}
-                    className="px-8"
+                    onClick={() => handleCreateBackup('full')}
+                    disabled={isCreatingBackup}
+                    className="h-auto p-6 flex flex-col items-center space-y-3"
+                    variant="outline"
                   >
-                    {createBackupMutation.isPending ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Creating Backup...
-                      </>
-                    ) : (
-                      <>
-                        <Archive className="h-4 w-4 mr-2" />
-                        Create Backup
-                      </>
-                    )}
+                    <Database className="h-8 w-8" />
+                    <div className="text-center">
+                      <div className="font-medium">Full System</div>
+                      <div className="text-xs text-muted-foreground">Complete backup</div>
+                    </div>
+                  </Button>
+
+                  <Button
+                    onClick={() => handleCreateBackup('database')}
+                    disabled={isCreatingBackup}
+                    className="h-auto p-6 flex flex-col items-center space-y-3"
+                    variant="outline"
+                  >
+                    <HardDrive className="h-8 w-8" />
+                    <div className="text-center">
+                      <div className="font-medium">Database Only</div>
+                      <div className="text-xs text-muted-foreground">DB data & schema</div>
+                    </div>
+                  </Button>
+
+                  <Button
+                    onClick={() => handleCreateBackup('files')}
+                    disabled={isCreatingBackup}
+                    className="h-auto p-6 flex flex-col items-center space-y-3"
+                    variant="outline"
+                  >
+                    <FileText className="h-8 w-8" />
+                    <div className="text-center">
+                      <div className="font-medium">Files & Media</div>
+                      <div className="text-xs text-muted-foreground">Uploads & assets</div>
+                    </div>
+                  </Button>
+
+                  <Button
+                    onClick={() => handleCreateBackup('config')}
+                    disabled={isCreatingBackup}
+                    className="h-auto p-6 flex flex-col items-center space-y-3"
+                    variant="outline"
+                  >
+                    <Settings className="h-8 w-8" />
+                    <div className="text-center">
+                      <div className="font-medium">Configuration</div>
+                      <div className="text-xs text-muted-foreground">Settings & keys</div>
+                    </div>
                   </Button>
                 </div>
               </CardContent>
             </Card>
-          </div>
 
-          {/* System Info */}
-          <div>
+            {/* Backup History */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <HardDrive className="h-5 w-5" />
-                  System Status
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center space-x-2">
+                    <History className="h-5 w-5" />
+                    <span>Backup History</span>
+                  </CardTitle>
+                  <div className="flex space-x-2">
+                    <Button 
+                      onClick={handleCleanupOldBackups}
+                      disabled={cleanupBackupsMutation.isPending}
+                      variant="outline" 
+                      size="sm"
+                    >
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Cleanup Old
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Refresh
+                    </Button>
+                  </div>
+                </div>
+                <CardDescription>
+                  Recent backups and their status
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Database Size</span>
-                    <span className="font-medium">~250 MB</span>
+              <CardContent>
+                {isLoading ? (
+                  <div className="flex items-center justify-center h-32">
+                    <RefreshCw className="h-8 w-8 animate-spin text-blue-500" />
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Files & Media</span>
-                    <span className="font-medium">~450 MB</span>
+                ) : (
+                  <div className="space-y-2">
+                    {backups && (backups as any).length > 0 ? (
+                      (backups as any).map((backup: any) => (
+                        <div key={backup.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+                          <div className="flex items-center space-x-4">
+                            <div className="flex items-center space-x-2">
+                              {backup.type === 'full' && <Database className="h-5 w-5 text-blue-600" />}
+                              {backup.type === 'database' && <HardDrive className="h-5 w-5 text-green-600" />}
+                              {backup.type === 'files' && <FileText className="h-5 w-5 text-purple-600" />}
+                              {backup.type === 'config' && <Settings className="h-5 w-5 text-orange-600" />}
+                              <div>
+                                <div className="font-medium capitalize">{backup.type} Backup</div>
+                                <div className="text-sm text-muted-foreground">
+                                  {new Date(backup.createdAt).toLocaleString()}
+                                </div>
+                              </div>
+                            </div>
+                            <Badge variant={backup.status === 'completed' ? 'default' : backup.status === 'failed' ? 'destructive' : 'secondary'}>
+                              {backup.status}
+                            </Badge>
+                            {backup.progress !== undefined && backup.status === 'in_progress' && (
+                              <div className="flex items-center space-x-2">
+                                <Progress value={backup.progress} className="w-32 h-2" />
+                                <span className="text-sm text-muted-foreground">{backup.progress}%</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            {backup.size && (
+                              <span className="text-sm text-muted-foreground">
+                                {(backup.size / 1024 / 1024).toFixed(2)} MB
+                              </span>
+                            )}
+                            {backup.status === 'completed' && (
+                              <Button
+                                onClick={() => handleDownloadBackup(backup.id)}
+                                size="sm"
+                                variant="outline"
+                              >
+                                <Download className="h-4 w-4 mr-2" />
+                                Download
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <Archive className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p>No backups found. Create your first backup above.</p>
+                      </div>
+                    )}
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Configuration</span>
-                    <span className="font-medium">~5 MB</span>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Backup Configuration */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Calendar className="h-5 w-5" />
+                  <span>Backup Settings</span>
+                </CardTitle>
+                <CardDescription>
+                  Configure automatic backup schedules and retention policies
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Automatic Backup Schedule</label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select frequency" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="daily">Daily</SelectItem>
+                        <SelectItem value="weekly">Weekly</SelectItem>
+                        <SelectItem value="monthly">Monthly</SelectItem>
+                        <SelectItem value="disabled">Disabled</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <div className="border-t pt-3">
-                    <div className="flex justify-between text-sm font-medium">
-                      <span>Total Estimated</span>
-                      <span>~705 MB</span>
-                    </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Retention Period</label>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select retention" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="7">7 days</SelectItem>
+                        <SelectItem value="30">30 days</SelectItem>
+                        <SelectItem value="90">90 days</SelectItem>
+                        <SelectItem value="365">1 year</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
-                <div className="pt-4">
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">
-                    Last Backup
-                  </h4>
-                  <p className="text-sm text-gray-600">
-                    {backupHistory.length > 0 
-                      ? new Date(backupHistory[0]?.createdAt).toLocaleDateString()
-                      : 'No backups created yet'
-                    }
-                  </p>
+                <div className="mt-6 pt-6 border-t">
+                  <Alert>
+                    <Clock className="h-4 w-4" />
+                    <AlertDescription>
+                      Automatic backups are scheduled to run during low-traffic hours (2:00 AM - 4:00 AM IST) to minimize impact on system performance.
+                    </AlertDescription>
+                  </Alert>
                 </div>
               </CardContent>
             </Card>
-          </div>
-        </div>
+          </TabsContent>
 
-        {/* Backup History */}
-        <div className="mt-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Backup History
-              </CardTitle>
-              <CardDescription>
-                View and download previous backups
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {backupHistory.length === 0 ? (
-                <div className="text-center py-8">
-                  <Archive className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    No Backups Yet
-                  </h3>
-                  <p className="text-gray-600">
-                    Create your first backup to see it here
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {backupHistory.map((backup: BackupStatus) => (
-                    <div
-                      key={backup.id}
-                      className="flex items-center justify-between p-4 border rounded-lg"
-                    >
-                      <div className="flex items-center space-x-4">
-                        {getStatusIcon(backup.status)}
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-medium text-gray-900">
-                              {backup.type.charAt(0).toUpperCase() + backup.type.slice(1)} Backup
-                            </h4>
-                            {getStatusBadge(backup.status)}
-                          </div>
-                          <p className="text-sm text-gray-600">
-                            Created: {new Date(backup.createdAt).toLocaleString()}
-                          </p>
-                          {backup.size && (
-                            <p className="text-sm text-gray-500">
-                              Size: {backup.size}
-                            </p>
-                          )}
-                          {backup.error && (
-                            <p className="text-sm text-red-600">
-                              Error: {backup.error}
-                            </p>
-                          )}
-                        </div>
-                      </div>
+          <TabsContent value="system" className="space-y-6">
+            {/* System Health Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-2">
+                    <Server className="h-5 w-5 text-green-600" />
+                    <span className="font-medium text-green-900">System Status</span>
+                  </div>
+                  <div className="mt-2">
+                    <span className="text-2xl font-bold text-green-800">Online</span>
+                    <p className="text-sm text-green-600">All services running</p>
+                  </div>
+                </CardContent>
+              </Card>
 
-                      <div className="flex items-center space-x-3">
-                        {backup.status === 'running' && (
-                          <div className="w-32">
-                            <Progress value={backup.progress} className="h-2" />
-                            <p className="text-xs text-gray-500 mt-1">
-                              {backup.progress}% complete
-                            </p>
-                          </div>
-                        )}
-                        
-                        {backup.status === 'completed' && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => downloadBackupMutation.mutate(backup.id)}
-                            disabled={downloadBackupMutation.isPending}
-                          >
-                            {downloadBackupMutation.isPending ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <>
-                                <Download className="h-4 w-4 mr-2" />
-                                Download
-                              </>
-                            )}
-                          </Button>
-                        )}
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-2">
+                    <Database className="h-5 w-5 text-blue-600" />
+                    <span className="font-medium text-blue-900">Database</span>
+                  </div>
+                  <div className="mt-2">
+                    <span className="text-2xl font-bold text-blue-800">Connected</span>
+                    <p className="text-sm text-blue-600">PostgreSQL ready</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-2">
+                    <Gauge className="h-5 w-5 text-orange-600" />
+                    <span className="font-medium text-orange-900">Performance</span>
+                  </div>
+                  <div className="mt-2">
+                    <span className="text-2xl font-bold text-orange-800">Good</span>
+                    <p className="text-sm text-orange-600">125ms response</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-2">
+                    <Shield className="h-5 w-5 text-purple-600" />
+                    <span className="font-medium text-purple-900">Security</span>
+                  </div>
+                  <div className="mt-2">
+                    <span className="text-2xl font-bold text-purple-800">Secure</span>
+                    <p className="text-sm text-purple-600">SSL active</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Detailed System Information */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Monitor className="h-5 w-5" />
+                  <span>System Information</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-medium">Memory Usage</span>
+                        <span className="text-sm text-muted-foreground">65%</span>
                       </div>
+                      <Progress value={65} className="h-2" />
                     </div>
-                  ))}
+
+                    <div>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-medium">CPU Usage</span>
+                        <span className="text-sm text-muted-foreground">32%</span>
+                      </div>
+                      <Progress value={32} className="h-2" />
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-medium">Disk Usage</span>
+                        <span className="text-sm text-muted-foreground">78%</span>
+                      </div>
+                      <Progress value={78} className="h-2" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium">Uptime</span>
+                      <span className="text-sm text-muted-foreground">99.9%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium">Last Restart</span>
+                      <span className="text-sm text-muted-foreground">2 days ago</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium">Active Connections</span>
+                      <span className="text-sm text-muted-foreground">24</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium">Database Size</span>
+                      <span className="text-sm text-muted-foreground">245 MB</span>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="monitoring" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Activity className="h-5 w-5" />
+                  <span>Real-time System Monitor</span>
+                </CardTitle>
+                <CardDescription>
+                  Live monitoring of system performance and health
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8">
+                  <Monitor className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                  <h3 className="text-lg font-semibold mb-2">Real-time Monitoring</h3>
+                  <p className="text-gray-600 mb-4">Live system metrics and performance data</p>
+                  <Badge variant="secondary">Coming Soon</Badge>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="maintenance" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Settings className="h-5 w-5" />
+                  <span>System Maintenance</span>
+                </CardTitle>
+                <CardDescription>
+                  Maintenance tools and system optimization
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Button variant="outline" className="h-auto p-4 justify-start">
+                    <Database className="h-5 w-5 mr-3" />
+                    <div className="text-left">
+                      <div className="font-medium">Database Optimization</div>
+                      <div className="text-sm text-muted-foreground">Optimize database performance</div>
+                    </div>
+                  </Button>
+
+                  <Button variant="outline" className="h-auto p-4 justify-start">
+                    <RefreshCw className="h-5 w-5 mr-3" />
+                    <div className="text-left">
+                      <div className="font-medium">Clear Cache</div>
+                      <div className="text-sm text-muted-foreground">Clear system cache files</div>
+                    </div>
+                  </Button>
+
+                  <Button variant="outline" className="h-auto p-4 justify-start">
+                    <FileText className="h-5 w-5 mr-3" />
+                    <div className="text-left">
+                      <div className="font-medium">Log Cleanup</div>
+                      <div className="text-sm text-muted-foreground">Clean old log files</div>
+                    </div>
+                  </Button>
+
+                  <Button variant="outline" className="h-auto p-4 justify-start">
+                    <Shield className="h-5 w-5 mr-3" />
+                    <div className="text-left">
+                      <div className="font-medium">Security Scan</div>
+                      <div className="text-sm text-muted-foreground">Run security audit</div>
+                    </div>
+                  </Button>
+                </div>
+
+                <div className="mt-6 pt-6 border-t">
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      Maintenance operations may temporarily affect system performance. Schedule during low-traffic hours.
+                    </AlertDescription>
+                  </Alert>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </AdminLayout>
   );

@@ -535,6 +535,7 @@ export default function AdminSettings() {
     { id: "features", label: "Features", icon: ToggleLeft },
     { id: "system", label: "System", icon: Monitor },
     { id: "backup", label: "Backup", icon: Upload },
+    { id: "analytics", label: "Analytics", icon: BarChart3 },
   ];
 
   if (isLoading) {
@@ -1137,8 +1138,26 @@ export default function AdminSettings() {
                 {/* Backup Management */}
                 {activeTab === "backup" && <BackupManagementTab />}
 
+                {/* Analytics Configuration */}
+                {activeTab === "analytics" && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <BarChart3 className="h-5 w-5" />
+                        <span>Analytics & Tracking</span>
+                      </CardTitle>
+                      <CardDescription>
+                        Configure Google Analytics and other tracking services
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <GoogleAnalyticsSettings />
+                    </CardContent>
+                  </Card>
+                )}
+
                 {/* Save Button - Only show for form-based tabs */}
-                {!["api-keys", "roles", "system", "backup"].includes(activeTab) && (
+                {!["api-keys", "roles", "system", "backup", "analytics"].includes(activeTab) && (
                 <div className="flex justify-end">
                   <Button 
                     type="submit" 
