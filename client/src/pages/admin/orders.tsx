@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { Eye, Phone, Mail, Calendar, DollarSign, Clock, CheckCircle, XCircle, AlertCircle, Filter, Wrench, Calculator } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -191,8 +191,9 @@ export default function Orders() {
                   </SelectItem>
                 </SelectContent>
               </Select>
+              {/* Status Filter moved to Tabs below */}
             </div>
-            
+
             <Tabs value={statusFilter} onValueChange={setStatusFilter}>
               <TabsList className="grid w-full grid-cols-7">
                 <TabsTrigger value="all">All Orders</TabsTrigger>
@@ -202,6 +203,7 @@ export default function Orders() {
                 <TabsTrigger value="failed">Failed</TabsTrigger>
                 <TabsTrigger value="pay-later-pending">Pay Later</TabsTrigger>
                 <TabsTrigger value="overdue">Overdue</TabsTrigger>
+                <TabsTrigger value="refunded">Refunded</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
@@ -369,7 +371,7 @@ export default function Orders() {
                                   </div>
 
                                   {/* Status Update Actions */}
-                                  {selectedOrder.paymentStatus === "pay-later-pending" && (
+                                  {["pending", "processing", "pay-later-pending", "overdue", "failed"].includes(selectedOrder.paymentStatus) && (
                                     <div>
                                       <h4 className="font-medium mb-3">Update Payment Status</h4>
                                       <div className="flex space-x-2">
@@ -384,8 +386,25 @@ export default function Orders() {
                                           size="sm" 
                                           variant="outline"
                                           onClick={() => handleStatusUpdate(selectedOrder.id, "overdue")}
+                                          className={selectedOrder.paymentStatus === "overdue" ? "hidden" : ""}
                                         >
                                           Mark as Overdue
+                                        </Button>
+                                        <Button 
+                                          size="sm" 
+                                          variant="outline"
+                                          onClick={() => handleStatusUpdate(selectedOrder.id, "failed")}
+                                          className={selectedOrder.paymentStatus === "failed" ? "hidden" : ""}
+                                        >
+                                          Mark as Failed
+                                        </Button>
+                                        <Button 
+                                          size="sm" 
+                                          variant="outline"
+                                          onClick={() => handleStatusUpdate(selectedOrder.id, "refunded")}
+                                          className={selectedOrder.paymentStatus === "refunded" ? "hidden" : ""}
+                                        >
+                                          Mark as Refunded
                                         </Button>
                                       </div>
                                     </div>
