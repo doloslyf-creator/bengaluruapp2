@@ -1652,6 +1652,7 @@ export const insertVideoCourseSchema = createInsertSchema(videoCourses).omit({
 
 export const insertVideoChapterSchema = createInsertSchema(videoChapters).omit({
   id: true,
+  courseId: true,
   createdAt: true,
   updatedAt: true,
 });

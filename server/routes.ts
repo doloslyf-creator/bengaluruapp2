@@ -3747,6 +3747,300 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Video Courses API Routes
+  app.get("/api/video-courses", async (req, res) => {
+    try {
+      const courses = await db.select().from(videoCourses).orderBy(desc(videoCourses.createdAt));
+      res.json(courses);
+    } catch (error) {
+      console.error("Error fetching video courses:", error);
+      res.status(500).json({ error: "Failed to fetch video courses" });
+    }
+  });
+
+  app.get("/api/courses/public", async (req, res) => {
+    try {
+      const courses = await db.select()
+        .from(videoCourses)
+        .where(eq(videoCourses.isPublished, true))
+        .orderBy(desc(videoCourses.displayOrder), desc(videoCourses.createdAt));
+      res.json(courses);
+    } catch (error) {
+      console.error("Error fetching public courses:", error);
+      res.status(500).json({ error: "Failed to fetch courses" });
+    }
+  });
+
+  app.get("/api/video-courses/slug/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const [course] = await db.select()
+        .from(videoCourses)
+        .where(eq(videoCourses.slug, slug));
+      
+      if (!course) {
+        return res.status(404).json({ error: "Course not found" });
+      }
+      
+      res.json(course);
+    } catch (error) {
+      console.error("Error fetching course by slug:", error);
+      res.status(500).json({ error: "Failed to fetch course" });
+    }
+  });
+
+  app.get("/api/video-courses/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const [course] = await db.select()
+        .from(videoCourses)
+        .where(eq(videoCourses.id, id));
+      
+      if (!course) {
+        return res.status(404).json({ error: "Course not found" });
+      }
+      
+      res.json(course);
+    } catch (error) {
+      console.error("Error fetching course:", error);
+      res.status(500).json({ error: "Failed to fetch course" });
+    }
+  });
+
+  app.post("/api/video-courses", async (req, res) => {
+    try {
+      const courseData = insertVideoCourseSchema.parse(req.body);
+      const newCourseData = {
+        ...courseData,
+        id: crypto.randomUUID(),
+        enrollmentCount: 0,
+        completionCount: 0,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      const [course] = await db.insert(videoCourses).values(newCourseData).returning();
+      res.status(201).json(course);
+    } catch (error) {
+      console.error("Error creating video course:", error);
+      res.status(500).json({ error: "Failed to create video course" });
+    }
+  });
+
+  app.put("/api/video-courses/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updateData = insertVideoCourseSchema.partial().parse(req.body);
+      
+      const [course] = await db.update(videoCourses)
+        .set({ ...updateData, updatedAt: new Date() })
+        .where(eq(videoCourses.id, id))
+        .returning();
+
+      if (!course) {
+        return res.status(404).json({ error: "Course not found" });
+      }
+
+      res.json(course);
+    } catch (error) {
+      console.error("Error updating video course:", error);
+      res.status(500).json({ error: "Failed to update video course" });
+    }
+  });
+
+  app.delete("/api/video-courses/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Delete related chapters and enrollments first
+      await db.delete(videoChapters).where(eq(videoChapters.courseId, id));
+      await db.delete(courseEnrollments).where(eq(courseEnrollments.courseId, id));
+      
+      const result = await db.delete(videoCourses).where(eq(videoCourses.id, id));
+      
+      if (result.rowCount === 0) {
+        return res.status(404).json({ error: "Course not found" });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting video course:", error);
+      res.status(500).json({ error: "Failed to delete video course" });
+    }
+  });
+
+  // Video Chapters API Routes
+  app.get("/api/video-courses/:courseId/chapters", async (req, res) => {
+    try {
+      const { courseId } = req.params;
+      const chapters = await db.select()
+        .from(videoChapters)
+        .where(eq(videoChapters.courseId, courseId))
+        .orderBy(videoChapters.chapterNumber);
+      res.json(chapters);
+    } catch (error) {
+      console.error("Error fetching chapters:", error);
+      res.status(500).json({ error: "Failed to fetch chapters" });
+    }
+  });
+
+  app.get("/api/video-courses/:courseId/chapters/public", async (req, res) => {
+    try {
+      const { courseId } = req.params;
+      const chapters = await db.select()
+        .from(videoChapters)
+        .where(and(
+          eq(videoChapters.courseId, courseId),
+          eq(videoChapters.isPublished, true)
+        ))
+        .orderBy(videoChapters.chapterNumber);
+      res.json(chapters);
+    } catch (error) {
+      console.error("Error fetching public chapters:", error);
+      res.status(500).json({ error: "Failed to fetch chapters" });
+    }
+  });
+
+  app.post("/api/video-courses/:courseId/chapters", async (req, res) => {
+    try {
+      const { courseId } = req.params;
+      
+      console.log("Creating chapter with data:", req.body);
+      console.log("Course ID from params:", courseId);
+      
+      const chapterData = insertVideoChapterSchema.parse(req.body);
+      
+      const newChapterData = {
+        ...chapterData,
+        id: crypto.randomUUID(),
+        courseId,
+        viewCount: 0,
+        learningObjectives: [],
+        keyTakeaways: [],
+        resources: [],
+        isPreview: false,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      console.log("Inserting chapter data:", newChapterData);
+      const [chapter] = await db.insert(videoChapters).values(newChapterData).returning();
+      res.status(201).json(chapter);
+    } catch (error) {
+      console.error("Error creating chapter:", error);
+      if (error instanceof z.ZodError) {
+        console.error("Validation errors:", error.errors);
+        res.status(400).json({ error: "Validation failed", details: error.errors });
+      } else {
+        res.status(500).json({ error: "Failed to create chapter" });
+      }
+    }
+  });
+
+  app.put("/api/video-courses/:courseId/chapters/:chapterId", async (req, res) => {
+    try {
+      const { chapterId } = req.params;
+      const updateData = insertVideoChapterSchema.partial().parse(req.body);
+      
+      const [chapter] = await db.update(videoChapters)
+        .set({ ...updateData, updatedAt: new Date() })
+        .where(eq(videoChapters.id, chapterId))
+        .returning();
+
+      if (!chapter) {
+        return res.status(404).json({ error: "Chapter not found" });
+      }
+
+      res.json(chapter);
+    } catch (error) {
+      console.error("Error updating chapter:", error);
+      res.status(500).json({ error: "Failed to update chapter" });
+    }
+  });
+
+  app.delete("/api/video-courses/:courseId/chapters/:chapterId", async (req, res) => {
+    try {
+      const { chapterId } = req.params;
+      
+      const result = await db.delete(videoChapters).where(eq(videoChapters.id, chapterId));
+      
+      if (result.rowCount === 0) {
+        return res.status(404).json({ error: "Chapter not found" });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting chapter:", error);
+      res.status(500).json({ error: "Failed to delete chapter" });
+    }
+  });
+
+  // Course Enrollment API Routes
+  app.post("/api/video-courses/:courseId/enroll", async (req, res) => {
+    try {
+      const { courseId } = req.params;
+      const { userEmail, userName } = req.body;
+      
+      // Check if already enrolled
+      const [existingEnrollment] = await db.select()
+        .from(courseEnrollments)
+        .where(and(
+          eq(courseEnrollments.courseId, courseId),
+          eq(courseEnrollments.userEmail, userEmail)
+        ));
+      
+      if (existingEnrollment) {
+        return res.status(400).json({ error: "Already enrolled in this course" });
+      }
+      
+      const enrollmentData = {
+        id: crypto.randomUUID(),
+        courseId,
+        userEmail,
+        userName,
+        progressPercentage: 0,
+        completedChapters: [],
+        totalWatchTime: 0,
+        enrolledAt: new Date(),
+        lastAccessedAt: new Date()
+      };
+
+      const [enrollment] = await db.insert(courseEnrollments).values(enrollmentData).returning();
+      
+      // Update course enrollment count
+      await db.update(videoCourses)
+        .set({ enrollmentCount: sql`${videoCourses.enrollmentCount} + 1` })
+        .where(eq(videoCourses.id, courseId));
+      
+      res.status(201).json(enrollment);
+    } catch (error) {
+      console.error("Error enrolling in course:", error);
+      res.status(500).json({ error: "Failed to enroll in course" });
+    }
+  });
+
+  app.get("/api/video-courses/:courseId/enrollment/:userEmail", async (req, res) => {
+    try {
+      const { courseId, userEmail } = req.params;
+      
+      const [enrollment] = await db.select()
+        .from(courseEnrollments)
+        .where(and(
+          eq(courseEnrollments.courseId, courseId),
+          eq(courseEnrollments.userEmail, userEmail)
+        ));
+      
+      if (!enrollment) {
+        return res.status(404).json({ error: "Enrollment not found" });
+      }
+      
+      res.json(enrollment);
+    } catch (error) {
+      console.error("Error fetching enrollment:", error);
+      res.status(500).json({ error: "Failed to fetch enrollment" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
