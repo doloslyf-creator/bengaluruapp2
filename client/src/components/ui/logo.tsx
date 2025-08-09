@@ -29,11 +29,11 @@ export default function Logo({ variant = 'default', size = 'md', showTagline = t
   return (
     <div className="flex flex-col items-start">
       <div className={`${sizeClasses[size]} ${getWordmarkClass()}`}>
-        <span className="text-blue-700 dark:text-blue-400">Ownit</span>
-        <span className="text-emerald-600 dark:text-emerald-400">Wise</span>
+        <span className="own-it">Own It</span>
+        <span className="wise">Wise</span>
       </div>
       {showTagline && (
-        <p className={`text-gray-600 dark:text-gray-300 font-medium -mt-1 ${taglineSizeClasses[size]}`}>
+        <p className={`text-muted-foreground font-medium -mt-1 ${taglineSizeClasses[size]}`}>
           Own homes With Confidence
         </p>
       )}

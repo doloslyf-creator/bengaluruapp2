@@ -113,40 +113,42 @@
 }
 
 :root {
-  /* Premium villa consultation color system */
-  --background: hsl(0, 0%, 100%);
-  --foreground: hsl(240, 10%, 10%);
-  --muted: hsl(240, 4.9%, 97%);
-  --muted-foreground: hsl(240, 3.8%, 46%);
+  /* OwnitWise Premium Brand Color System */
+  --background: hsl(44, 13%, 96%); /* Warm Grey #F5F4F1 - Clean Background */
+  --foreground: hsl(210, 29%, 22%); /* Deep Navy #1E2A38 - Authority & Trust */
+  --muted: hsl(44, 13%, 91%);
+  --muted-foreground: hsl(210, 29%, 45%);
   --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(240, 10%, 10%);
+  --popover-foreground: hsl(210, 29%, 22%);
   --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(240, 10%, 10%);
-  --border: hsl(240, 5.9%, 90%);
-  --input: hsl(240, 5.9%, 95%);
-  --primary: hsl(221, 83%, 53%); /* Premium blue - Trustworthy */
+  --card-foreground: hsl(210, 29%, 22%);
+  --border: hsl(44, 13%, 88%);
+  --input: hsl(44, 13%, 92%);
+  --primary: hsl(210, 29%, 22%); /* Deep Navy #1E2A38 */
   --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(220, 14%, 96%);
-  --secondary-foreground: hsl(240, 5.9%, 10%);
-  --accent: hsl(46, 69%, 95%); /* Warm gold accent */
-  --accent-foreground: hsl(46, 69%, 15%);
+  --secondary: hsl(45, 78%, 45%); /* Gold Accent #D4A017 */
+  --secondary-foreground: hsl(210, 29%, 22%);
+  --accent: hsl(120, 13%, 67%); /* Soft Sage #A6BBA6 */
+  --accent-foreground: hsl(210, 29%, 22%);
   --destructive: hsl(0, 84%, 60%);
   --destructive-foreground: hsl(0, 0%, 100%);
-  --success: hsl(142, 76%, 36%); /* Professional green */
-  --success-foreground: hsl(0, 0%, 100%);
-  --warning: hsl(38, 92%, 50%);
-  --warning-foreground: hsl(0, 0%, 100%);
-  --ring: hsl(221, 83%, 53%);
+  --success: hsl(120, 13%, 67%); /* Soft Sage for success */
+  --success-foreground: hsl(210, 29%, 22%);
+  --warning: hsl(45, 78%, 45%); /* Gold for warnings */
+  --warning-foreground: hsl(210, 29%, 22%);
+  --ring: hsl(45, 78%, 45%);
   --radius: 0.5rem;
-  --neutral: hsl(240, 4.9%, 97%);
+  --neutral: hsl(44, 13%, 96%);
   
-  /* Premium color extensions */
-  --gold: hsl(46, 69%, 65%); /* Premium gold */
-  --gold-foreground: hsl(46, 69%, 15%);
-  --navy: hsl(221, 83%, 25%); /* Deep navy */
+  /* OwnitWise Brand Colors */
+  --navy: hsl(210, 29%, 22%); /* Deep Navy #1E2A38 - Authority & Stability */
   --navy-foreground: hsl(0, 0%, 100%);
-  --sage: hsl(120, 13%, 60%); /* Sophisticated sage */
-  --sage-foreground: hsl(120, 13%, 15%);
+  --gold: hsl(45, 78%, 45%); /* Gold Accent #D4A017 - Premium & CTAs */
+  --gold-foreground: hsl(210, 29%, 22%);
+  --sage: hsl(120, 13%, 67%); /* Soft Sage #A6BBA6 - Calm & Balanced */
+  --sage-foreground: hsl(210, 29%, 22%);
+  --warm-grey: hsl(44, 13%, 96%); /* Warm Grey #F5F4F1 */
+  --warm-grey-foreground: hsl(210, 29%, 22%);
   
   /* Stripe spacing system */
   --spacing-xs: 0.25rem;
@@ -381,37 +383,51 @@
     }
   }
 
-  /* OwnitWise Brand Typography - Elegant Script Style */
-  @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap');
+  /* OwnitWise Brand Typography - Premium Wordmark */
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap');
   
   .ownitwise-wordmark {
-    font-family: 'Dancing Script', 'Brush Script MT', cursive;
-    font-weight: 600;
-    letter-spacing: 0.02em;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.1em;
     text-decoration: none;
-    display: inline-block;
-    position: relative;
-    font-style: normal;
-    transform: scale(1.02);
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-
-  .ownitwise-wordmark .text-blue-700,
-  .ownitwise-wordmark .text-blue-400 {
-    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #6366f1 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
     position: relative;
   }
 
-  .ownitwise-wordmark .text-emerald-600,
-  .ownitwise-wordmark .text-emerald-400 {
-    background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .ownitwise-wordmark .own-it {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-style: italic;
+    color: hsl(var(--navy));
+    letter-spacing: -0.02em;
+  }
+
+  .ownitwise-wordmark .wise {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: hsl(var(--gold));
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.9em;
+  }
+
+  /* Icon styling for optional key + checkmark + villa */
+  .ownitwise-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, hsl(var(--navy)) 0%, hsl(var(--gold)) 100%);
+    border-radius: 6px;
+    margin-right: 8px;
     position: relative;
+  }
+
+  .ownitwise-icon svg {
+    width: 18px;
+    height: 18px;
+    color: white;
   }
 
   /* Alternative modern minimalist style for admin panels */
