@@ -75,7 +75,8 @@ export default function WhatsAppManagement() {
   const { data: customers = [] } = useQuery({
     queryKey: ["/api/customers"],
     queryFn: async () => {
-      const result = await apiRequest("GET", "/api/customers");
+      const response = await apiRequest("GET", "/api/customers");
+      const result = await response.json();
       console.log("WhatsApp customers data:", result);
       return result;
     }
@@ -83,8 +84,10 @@ export default function WhatsAppManagement() {
 
   // Send individual message mutation
   const sendMessageMutation = useMutation({
-    mutationFn: (data: { phoneNumber: string; message: string; customerName?: string }) =>
-      apiRequest("POST", "/api/whatsapp/send-message", data),
+    mutationFn: async (data: { phoneNumber: string; message: string; customerName?: string }) => {
+      const response = await apiRequest("POST", "/api/whatsapp/send-message", data);
+      return await response.json();
+    },
     onSuccess: (data) => {
       const isSimulated = data?.simulated;
       toast({
@@ -108,8 +111,10 @@ export default function WhatsAppManagement() {
 
   // Send bulk messages mutation
   const sendBulkMessageMutation = useMutation({
-    mutationFn: (data: { contacts: any[]; message: string; messageType: string }) =>
-      apiRequest("POST", "/api/whatsapp/send-bulk", data),
+    mutationFn: async (data: { contacts: any[]; message: string; messageType: string }) => {
+      const response = await apiRequest("POST", "/api/whatsapp/send-bulk", data);
+      return await response.json();
+    },
     onSuccess: (data) => {
       const hasSimulated = data.results?.some((r: any) => r.simulated);
       toast({
