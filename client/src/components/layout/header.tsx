@@ -23,7 +23,8 @@ import {
   TrendingUp,
   UserCircle,
   MessageCircle,
-  Calendar
+  Calendar,
+  BookOpen
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -78,6 +79,8 @@ export default function Header() {
 
   const navigation = [
     { name: "Home", href: "/", icon: Home },
+    { name: "Find Properties", href: "/find-property", icon: Building2 },
+    { name: "Learn", href: "/property-education", icon: BookOpen },
     { name: "About Us", href: "/about", icon: UserCircle },
   ];
 
@@ -169,21 +172,17 @@ export default function Header() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 lg:h-18 items-center justify-between">
-            {/* Logo */}
+            {/* Logo - Bigger house logo without building */}
             <div className="flex-shrink-0">
               <Link href="/" className="flex items-center space-x-3 group">
-                <div className="relative">
-                  <Building2 className="h-8 w-8 text-primary group-hover:scale-110 transition-transform duration-200" />
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
-                </div>
                 <div className="hidden sm:block">
-                  <Logo size="sm" showTagline={false} />
+                  <Logo size="md" showTagline={false} />
                 </div>
               </Link>
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-1">
+            {/* Desktop Navigation - centered */}
+            <nav className="hidden lg:flex items-center space-x-1 flex-1 justify-center">
               {navigation.map((item) => (
                 <Button 
                   key={item.name}
@@ -196,23 +195,24 @@ export default function Header() {
                   <Link href={item.href}>{item.name}</Link>
                 </Button>
               ))}
+            </nav>
 
-              {/* Search Component - moved to Find Property button position */}
-              <div className="ml-4">
-                <Popover open={searchOpen} onOpenChange={setSearchOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={searchOpen}
-                      className="w-64 justify-start text-gray-500"
-                    >
-                      <Search className="h-4 w-4 mr-2" />
-                      Find Properties...
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-80 p-0" align="start">
-                    <Command>
+            {/* Search Component - moved to right side */}
+            <div className="hidden lg:flex items-center">
+              <Popover open={searchOpen} onOpenChange={setSearchOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={searchOpen}
+                    className="w-64 justify-start text-gray-500"
+                  >
+                    <Search className="h-4 w-4 mr-2" />
+                    Search Properties...
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80 p-0" align="end">
+                  <Command>
                       <CommandInput
                         placeholder="Search by property name, developer, area..."
                         value={searchValue}
@@ -280,12 +280,7 @@ export default function Header() {
                     </Command>
                   </PopoverContent>
                 </Popover>
-              </div>
-              
-              <Link href="/property-education" className="text-gray-600 hover:text-primary transition-colors">
-                Learn
-              </Link>
-            </nav>
+            </div>
 
             {/* Right side buttons */}
             <div className="flex items-center space-x-3">

@@ -297,7 +297,7 @@ export default function VideoCourseViewer() {
                   {course.estimatedDuration || 'Self-paced'}
                 </span>
                 <span className="flex items-center">
-                  <Users className="h-4 w-4 mr-1" />
+                  <User className="h-4 w-4 mr-1" />
                   {course.enrollmentCount} enrolled
                 </span>
                 <span className="flex items-center">
