@@ -44,7 +44,7 @@ export const updateMetaTags = (
   updateMetaTag('og:title', title, 'property');
   updateMetaTag('og:description', description, 'property');
   updateMetaTag('og:type', 'website', 'property');
-  updateMetaTag('og:site_name', 'OwnItRight - Property Advisory Services', 'property');
+  updateMetaTag('og:site_name', 'OwnitWise - Property Advisory Services', 'property');
   
   if (ogImage) {
     updateMetaTag('og:image', ogImage, 'property');

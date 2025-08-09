@@ -5,9 +5,9 @@ import { updateMetaTags } from '@/utils/seo';
 export default function RefundPolicy() {
   useEffect(() => {
     updateMetaTags(
-      'Refund Policy - OwnItRight Property Advisory',
-      'OwnItRight refund policy for property reports and advisory services. Learn about eligibility, process, and timelines for refunds.',
-      'refund policy, money back guarantee, property reports, valuation reports, OwnItRight',
+      'Refund Policy - OwnitWise Property Advisory',
+      'OwnitWise refund policy for property reports and advisory services. Learn about eligibility, process, and timelines for refunds.',
+      'refund policy, money back guarantee, property reports, valuation reports, OwnitWise',
       undefined,
       `${window.location.origin}/refund-policy`
     );
@@ -25,7 +25,7 @@ export default function RefundPolicy() {
             <section>
               <h2 className="text-2xl font-semibold mb-4">1. Overview</h2>
               <p className="text-gray-700 mb-4">
-                At OwnItRight, we are committed to providing high-quality property advisory services. This refund policy outlines the circumstances under which refunds may be granted for our services.
+                At OwnitWise, we are committed to providing high-quality property advisory services. This refund policy outlines the circumstances under which refunds may be granted for our services.
               </p>
             </section>
 
@@ -72,7 +72,7 @@ export default function RefundPolicy() {
               <div className="space-y-4">
                 <h3 className="text-lg font-medium mb-2">Step 1: Contact Us</h3>
                 <p className="text-gray-700 mb-4">
-                  Email us at refunds@ownitright.com with your order details and reason for refund request within 7 days of service delivery.
+                  Email us at refunds@ownitwise.com with your order details and reason for refund request within 7 days of service delivery.
                 </p>
 
                 <h3 className="text-lg font-medium mb-2">Step 2: Review Process</h3>

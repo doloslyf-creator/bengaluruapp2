@@ -7,7 +7,7 @@ export function DataTransparencyFooter() {
         <div className="text-center mb-4">
           <h3 className="text-lg font-semibold text-gray-900 mb-2">Data Transparency Promise</h3>
           <p className="text-sm text-gray-600 max-w-2xl mx-auto">
-            All property information on OwnItRight is verified through multiple authoritative sources to ensure accuracy and trustworthiness.
+            All property information on OwnitWise is verified through multiple authoritative sources to ensure accuracy and trustworthiness.
           </p>
         </div>
         

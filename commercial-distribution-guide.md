@@ -1,7 +1,7 @@
-# Commercial Distribution Guide - OwnItRight Platform
+# Commercial Distribution Guide - OwnitWise Platform
 
 ## Overview
-This guide explains how to distribute and deploy the OwnItRight platform for commercial buyers, including automated Supabase setup for seamless onboarding.
+This guide explains how to distribute and deploy the OwnitWise platform for commercial buyers, including automated Supabase setup for seamless onboarding.
 
 ## Distribution Methods
 

@@ -25,9 +25,9 @@ import { Link } from "wouter";
 export default function About() {
   useEffect(() => {
     updateMetaTags(
-      'About OwnItRight - Your Trusted Property Advisory Partner',
-      'Learn about OwnItRight\'s mission to help home buyers make informed decisions. We provide independent property analysis, legal verification, and expert guidance to ensure you buy the right home at the right price.',
-      'about ownright, property advisory, real estate consultant bangalore, independent property analysis, home buying guidance',
+      'About OwnitWise - Your Trusted Property Advisory Partner',
+      'Learn about OwnitWise\'s mission to help home buyers make informed decisions. We provide independent property analysis, legal verification, and expert guidance to ensure you buy the right home at the right price. Own homes With Confidence.',
+      'about ownitwise, property advisory, real estate consultant bangalore, independent property analysis, home buying guidance',
       undefined,
       window.location.origin + '/about'
     );
@@ -85,7 +85,7 @@ export default function About() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <Badge className="mb-6 text-sm px-4 py-2 bg-blue-100 text-blue-700 border-blue-200">
-              About OwnItRight
+              About OwnitWise
             </Badge>
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               We Help You Buy Right, Not Just Buy Fast

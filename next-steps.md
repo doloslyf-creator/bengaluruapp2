@@ -1,4 +1,4 @@
-# OwnItRight Platform - Immediate Next Steps
+# OwnitWise Platform - Immediate Next Steps
 
 ## 🎯 Current Status
 Your comprehensive property advisory platform is **95% complete** with all major systems implemented:
@@ -24,8 +24,8 @@ Your comprehensive property advisory platform is **95% complete** with all major
 
 ### 2. Create Admin Account (2 minutes)
 **Options:**
-- Use `admin@ownitright.com` with any password
-- Use any `@ownitright.com` email domain
+- Use `admin@ownitwise.com` with any password
+- Use any `@ownitwise.com` email domain
 - Add `{"role": "admin"}` to user metadata in Supabase
 
 ### 3. Test Complete System (10 minutes)

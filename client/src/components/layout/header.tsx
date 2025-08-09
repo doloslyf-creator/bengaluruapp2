@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import Logo from "@/components/ui/logo";
 import { 
   Home, 
   Search, 
@@ -38,8 +39,8 @@ export default function Header() {
   // Check if user has admin privileges
   const isAdmin = user ? (
     user.user_metadata?.role === 'admin' || 
-    user.email?.endsWith('@ownitright.com') ||
-    user.email === 'admin@ownitright.com'
+    user.email?.endsWith('@ownitwise.com') ||
+    user.email === 'admin@ownitwise.com'
   ) : false;
 
   useEffect(() => {
@@ -88,13 +89,10 @@ export default function Header() {
               <Link href="/" className="flex items-center space-x-3 group">
                 <div className="relative">
                   <Building2 className="h-8 w-8 text-primary group-hover:scale-110 transition-transform duration-200" />
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
                 </div>
-                <div className="hidden sm:flex flex-col">
-                  <div className="text-xl font-black tracking-tight text-gray-900">
-                    Own<span className="text-orange-500">It</span><span className="text-blue-600">Right</span>
-                  </div>
-                  <span className="text-xs text-gray-500 -mt-1 font-medium">Expert Property Advisors</span>
+                <div className="hidden sm:block">
+                  <Logo size="sm" showTagline={false} />
                 </div>
               </Link>
             </div>
@@ -178,12 +176,7 @@ export default function Header() {
                     <div className="flex items-center justify-between p-6 border-b">
                       <Link href="/" className="flex items-center space-x-2" onClick={() => setIsOpen(false)}>
                         <Building2 className="h-6 w-6 text-primary" />
-                        <div className="flex flex-col">
-                          <div className="text-lg font-black tracking-tight text-gray-900">
-                            Own<span className="text-orange-500">It</span><span className="text-blue-600">Right</span>
-                          </div>
-                          <span className="text-xs text-gray-500 -mt-1">Expert Properties</span>
-                        </div>
+                        <Logo size="sm" showTagline={false} />
                       </Link>
                     </div>
 

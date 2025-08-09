@@ -1,7 +1,7 @@
-# OwnItRight - Property Management Dashboard
+# OwnitWise - Property Management Dashboard
 
 ## Overview
-OwnItRight is a comprehensive full-stack platform for property management and customer discovery for the Indian real estate market. It integrates an admin property management system with a customer-facing property finder, facilitating property search, site visit bookings, and consultation requests. Key capabilities include real-time data integration, RERA compliance features, zoning information, regional categorization, a legal due diligence tracker, and professional property valuation reports. The platform aims to provide a seamless and transparent experience for both property managers and prospective buyers, enhancing efficiency and trust in real estate transactions.
+OwnitWise is a comprehensive full-stack platform for property management and customer discovery for the Indian real estate market. It integrates an admin property management system with a customer-facing property finder, facilitating property search, site visit bookings, and consultation requests. Key capabilities include real-time data integration, RERA compliance features, zoning information, regional categorization, a legal due diligence tracker, and professional property valuation reports. The platform aims to provide a seamless and transparent experience for both property managers and prospective buyers, enhancing efficiency and trust in real estate transactions.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -42,7 +42,7 @@ The API follows RESTful principles, providing standard CRUD operations for entit
 - **Order & Revenue Management**: Comprehensive revenue tracking with monthly trends analysis, payment status monitoring, service-wise revenue breakdown, and financial operation tools.
 - **Lead Management System**: Comprehensive lead management with automated scoring, qualification criteria (BANT methodology), conversion funnel visualization, pipeline management, and nurturing campaigns.
 - **Blog Management System**: Admin panel for full CRUD operations on blog posts, content categories, and SEO metadata.
-- **Branding**: "OwnItRight" brand update across the application with a custom wordmark logo.
+- **Branding**: "OwnitWise" brand update across the application with a custom wordmark logo featuring the tagline "Own homes With Confidence".
 - **Enhanced Home Pages & Global Header**: Redesigned customer-facing and admin home pages with modern, mobile-responsive design. Global header with scroll effects, comprehensive navigation, services dropdown, and enhanced mobile menu.
 - **Team Management System**: Complete CRUD operations with role-based access control, performance scoring, universal sidebar with filters, and professional UI design.
 - **Supabase Integration**: Complete migration to Supabase for unified database and authentication, including email/password authentication, real-time database updates, built-in file storage, automatic API generation, and row-level security. Admin and user dashboards are protected with dedicated authentication forms and role-based access control.

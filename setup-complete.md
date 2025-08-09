@@ -1,4 +1,4 @@
-# OwnItRight Platform Setup Status
+# OwnitWise Platform Setup Status
 
 ## ✅ Completed Components
 
@@ -32,8 +32,8 @@
 
 ### 2. Admin Account Creation
 **Options for Admin Access**:
-- Email: `admin@ownitright.com` 
-- Domain: Any `@ownitright.com` email
+- Email: `admin@ownitwise.com` 
+- Domain: Any `@ownitwise.com` email
 - Metadata: Add `{"role": "admin"}` to user profile
 
 ### 3. Data Migration Testing

@@ -5,9 +5,9 @@ import { updateMetaTags } from '@/utils/seo';
 export default function TermsOfUse() {
   useEffect(() => {
     updateMetaTags(
-      'Terms of Use - OwnItRight Property Advisory',
-      'Terms and conditions for using OwnItRight property advisory services. Understand your rights and responsibilities when using our platform.',
-      'terms of use, terms and conditions, legal, property advisory, OwnItRight',
+      'Terms of Use - OwnitWise Property Advisory',
+      'Terms and conditions for using OwnitWise property advisory services. Understand your rights and responsibilities when using our platform.',
+      'terms of use, terms and conditions, legal, property advisory, OwnitWise',
       undefined,
       `${window.location.origin}/terms-of-use`
     );
@@ -25,14 +25,14 @@ export default function TermsOfUse() {
             <section>
               <h2 className="text-2xl font-semibold mb-4">1. Acceptance of Terms</h2>
               <p className="text-gray-700 mb-4">
-                By accessing and using OwnItRight's website and services ("Platform"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
+                By accessing and using OwnitWise's website and services ("Platform"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
               </p>
             </section>
 
             <section>
               <h2 className="text-2xl font-semibold mb-4">2. Service Description</h2>
               <p className="text-gray-700 mb-4">
-                OwnItRight provides property advisory services including:
+                OwnitWise provides property advisory services including:
               </p>
               <ul className="list-disc pl-6 space-y-2 text-gray-700">
                 <li>Property search and discovery platform</li>

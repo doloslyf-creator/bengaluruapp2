@@ -5,9 +5,9 @@ import { updateMetaTags } from '@/utils/seo';
 export default function PrivacyPolicy() {
   useEffect(() => {
     updateMetaTags(
-      'Privacy Policy - OwnItRight Property Advisory',
-      'Learn how OwnItRight protects your personal information and data privacy. Our comprehensive privacy policy outlines data collection, usage, and protection practices.',
-      'privacy policy, data protection, personal information, OwnItRight, property advisory',
+      'Privacy Policy - OwnitWise Property Advisory',
+      'Learn how OwnitWise protects your personal information and data privacy. Our comprehensive privacy policy outlines data collection, usage, and protection practices.',
+      'privacy policy, data protection, personal information, OwnitWise, property advisory',
       undefined,
       `${window.location.origin}/privacy-policy`
     );
@@ -25,7 +25,7 @@ export default function PrivacyPolicy() {
             <section>
               <h2 className="text-2xl font-semibold mb-4">1. Information We Collect</h2>
               <p className="text-gray-700 mb-4">
-                OwnItRight ("we," "our," or "us") collects information you provide directly to us, such as when you:
+                OwnitWise ("we," "our," or "us") collects information you provide directly to us, such as when you:
               </p>
               <ul className="list-disc pl-6 space-y-2 text-gray-700">
                 <li>Create an account or use our services</li>

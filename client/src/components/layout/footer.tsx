@@ -8,8 +8,10 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           {/* Logo */}
           <div className="flex items-center">
-            <h3 className="text-xl font-bold text-primary">OwnItRight</h3>
-            <span className="text-gray-400 text-sm ml-2">Property Advisory</span>
+            <h3 className="text-xl font-bold text-primary ownitwise-wordmark">
+              <span className="text-blue-400">Ownit</span><span className="text-emerald-400">Wise</span>
+            </h3>
+            <span className="text-gray-400 text-sm ml-2">Own homes With Confidence</span>
           </div>
 
           {/* Navigation & Policy Links */}
@@ -44,7 +46,7 @@ export default function Footer() {
 
         {/* Copyright */}
         <div className="mt-6 pt-6 border-t border-gray-800 text-center text-sm text-gray-400">
-          <p>&copy; 2024 OwnItRight. All rights reserved. Professional property advisory services in Bangalore.</p>
+          <p>&copy; 2024 OwnitWise. All rights reserved. Professional property advisory services in Bangalore.</p>
         </div>
       </div>
     </footer>

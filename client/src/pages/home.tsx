@@ -36,9 +36,9 @@ export default function Home() {
   // SEO optimization
   useEffect(() => {
     updateMetaTags(
-      'OwnItRight - Property Advisory Services in Bangalore | Expert Real Estate Analysis',
-      'Professional property advisory services in Bangalore. Get expert property valuations, CIVIL+MEP reports, legal due diligence, and personalized real estate investment guidance.',
-      'property advisory bangalore, real estate valuation, property reports, CIVIL MEP analysis, property investment bangalore, real estate consultant',
+      'OwnitWise - Property Advisory Services in Bangalore | Expert Real Estate Analysis',
+      'Professional property advisory services in Bangalore. Get expert property valuations, CIVIL+MEP reports, legal due diligence, and personalized real estate investment guidance. Own homes With Confidence.',
+      'property advisory bangalore, real estate valuation, property reports, CIVIL MEP analysis, property investment bangalore, real estate consultant, ownitwise',
       undefined,
       window.location.origin
     );
