@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Building2, 
   User, 
@@ -15,6 +16,7 @@ import {
   Flame, 
   Leaf, 
   CheckCircle,
+  Star,
   Download,
   Printer,
   Share2,
@@ -24,19 +26,21 @@ import {
   Wrench,
   Eye,
   Target,
+  Menu,
+  X,
   ChevronRight,
   ArrowLeft,
   Settings,
   FileText,
+  BarChart3,
   Shield,
   Clock,
-  TrendingUp,
-  X
+  TrendingUp
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 
-export function CivilMepReportView() {
+export function CivilMepReportViewRedesigned() {
   const { id } = useParams<{ id: string }>();
   const [activeSection, setActiveSection] = useState("overview");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -275,17 +279,17 @@ export function CivilMepReportView() {
                           onClick={() => scrollToSection(section.id)}
                           className={`w-full flex items-center justify-between p-4 text-left transition-all group
                             ${isActive 
-                              ? 'bg-blue-50 border-r-4 border-blue-500 text-blue-700' 
+                              ? `bg-${section.color}-50 border-r-4 border-${section.color}-500 text-${section.color}-700` 
                               : 'hover:bg-gray-50 text-gray-600 hover:text-gray-900'
                             }`}
                         >
                           <div className="flex items-center space-x-3">
                             <div className={`w-8 h-8 rounded-lg flex items-center justify-center
                               ${isActive 
-                                ? 'bg-blue-100' 
+                                ? `bg-${section.color}-100` 
                                 : 'bg-gray-100 group-hover:bg-gray-200'
                               }`}>
-                              <IconComponent className={`h-4 w-4 ${isActive ? 'text-blue-600' : 'text-gray-500'}`} />
+                              <IconComponent className={`h-4 w-4 ${isActive ? `text-${section.color}-600` : 'text-gray-500'}`} />
                             </div>
                             {!sidebarCollapsed && (
                               <div>
@@ -492,6 +496,60 @@ export function CivilMepReportView() {
                           {key.replace(/([A-Z])/g, ' $1').trim()}
                         </div>
                         <div className="text-sm font-semibold text-gray-900">{value}</div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
+            {/* Additional Civil Elements */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Walls & Finishes */}
+              {report.wallsFinishes && (
+                <Card id="walls-finishes">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Walls & Finishes</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {Object.entries(report.wallsFinishes).map(([key, value]) => (
+                      <div key={key} className="flex justify-between items-center py-1">
+                        <span className="text-sm text-gray-600 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                        <span className="text-sm font-medium text-gray-900">{value}</span>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Roofing */}
+              {report.roofingDetails && (
+                <Card id="roofing">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Roofing Details</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {Object.entries(report.roofingDetails).map(([key, value]) => (
+                      <div key={key} className="flex justify-between items-center py-1">
+                        <span className="text-sm text-gray-600 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                        <span className="text-sm font-medium text-gray-900">{value}</span>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Doors & Windows */}
+              {report.doorsWindows && (
+                <Card id="doors-windows">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Doors & Windows</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {Object.entries(report.doorsWindows).map(([key, value]) => (
+                      <div key={key} className="flex justify-between items-center py-1">
+                        <span className="text-sm text-gray-600 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                        <span className="text-sm font-medium text-gray-900">{value}</span>
                       </div>
                     ))}
                   </CardContent>
