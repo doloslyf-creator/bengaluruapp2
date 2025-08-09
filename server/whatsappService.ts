@@ -26,21 +26,40 @@ export class WhatsAppService {
   }
 
   private getHeaders() {
+    if (!this.apiKey) {
+      console.warn("⚠️ Interakt API key not configured. WhatsApp messages will be simulated.");
+    }
     return {
-      "Authorization": `Basic ${Buffer.from(`${this.apiKey}:`).toString('base64')}`,
+      "Authorization": `Bearer ${this.apiKey}`,
       "Content-Type": "application/json"
     };
+  }
+
+  private isConfigured(): boolean {
+    return !!this.apiKey && this.apiKey.trim() !== "";
   }
 
   // Send text message
   async sendTextMessage(phoneNumber: string, message: string) {
     try {
+      // If API key not configured, simulate the message
+      if (!this.isConfigured()) {
+        console.log(`📱 [SIMULATED] WhatsApp message to ${phoneNumber}: ${message.substring(0, 50)}...`);
+        return { 
+          success: true, 
+          messageId: `sim_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          simulated: true 
+        };
+      }
+
+      const cleanPhoneNumber = phoneNumber.replace(/^\+91/, "").replace(/\D/g, "");
+      
       const response = await fetch(`${this.baseUrl}/integrations/whatsapp/generic/messages`, {
         method: "POST",
         headers: this.getHeaders(),
         body: JSON.stringify({
           countryCode: "+91",
-          phoneNumber: phoneNumber.replace(/^\+91/, ""),
+          phoneNumber: cleanPhoneNumber,
           callbackData: "text_message",
           type: "text",
           data: { message }
@@ -49,16 +68,16 @@ export class WhatsAppService {
 
       if (response.ok) {
         const result = await response.json();
-        console.log(`✅ WhatsApp message sent to ${phoneNumber}:`, result.id);
-        return { success: true, messageId: result.id };
+        console.log(`✅ WhatsApp message sent to ${phoneNumber}:`, result.id || result.messageId);
+        return { success: true, messageId: result.id || result.messageId };
       } else {
-        const error = await response.text();
-        console.error(`❌ WhatsApp message failed for ${phoneNumber}:`, error);
-        return { success: false, error };
+        const errorText = await response.text();
+        console.error(`❌ WhatsApp message failed for ${phoneNumber}:`, response.status, errorText);
+        return { success: false, error: `API Error: ${response.status} - ${errorText}` };
       }
     } catch (error) {
       console.error("WhatsApp service error:", error);
-      return { success: false, error: error.message };
+      return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
     }
   }
 

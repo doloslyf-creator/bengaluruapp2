@@ -80,17 +80,22 @@ export default function WhatsAppManagement() {
   const sendMessageMutation = useMutation({
     mutationFn: (data: { phoneNumber: string; message: string; customerName?: string }) =>
       apiRequest("POST", "/api/whatsapp/send-message", data),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      const isSimulated = data?.simulated;
       toast({
-        title: "Success",
-        description: "WhatsApp message sent successfully!",
+        title: isSimulated ? "Message Simulated" : "Success",
+        description: isSimulated 
+          ? "WhatsApp message simulated successfully! Configure Interakt API key for real messages."
+          : "WhatsApp message sent successfully!",
+        variant: isSimulated ? "default" : "default"
       });
       queryClient.invalidateQueries({ queryKey: ["/api/whatsapp/campaign-stats"] });
+      setMessageText("");
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: "Failed to send WhatsApp message. Please try again.",
+        description: error?.message || "Failed to send WhatsApp message. Please try again.",
         variant: "destructive",
       });
     },
@@ -101,18 +106,21 @@ export default function WhatsAppManagement() {
     mutationFn: (data: { contacts: any[]; message: string; messageType: string }) =>
       apiRequest("POST", "/api/whatsapp/send-bulk", data),
     onSuccess: (data) => {
+      const hasSimulated = data.results?.some((r: any) => r.simulated);
       toast({
-        title: "Bulk Message Sent",
-        description: `${data.totalSent} messages sent successfully, ${data.totalFailed} failed.`,
+        title: hasSimulated ? "Bulk Messages Simulated" : "Bulk Messages Sent",
+        description: hasSimulated
+          ? `${data.totalSent} messages simulated successfully! Configure Interakt API key for real messages.`
+          : `${data.totalSent} messages sent successfully, ${data.totalFailed} failed.`,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/whatsapp/campaign-stats"] });
       setSelectedContacts([]);
       setMessageText("");
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: "Failed to send bulk messages. Please try again.",
+        description: error?.message || "Failed to send bulk messages. Please try again.",
         variant: "destructive",
       });
     },
@@ -213,7 +221,13 @@ export default function WhatsAppManagement() {
             <MessageSquare className="h-8 w-8 text-green-600" />
             <div>
               <h1 className="text-3xl font-bold text-gray-900">WhatsApp Management</h1>
-              <p className="text-gray-600">Manage customer communication and campaigns</p>
+              <div className="flex items-center space-x-2">
+                <p className="text-gray-600">Manage customer communication and campaigns</p>
+                <Badge variant="outline" className="text-xs">
+                  <div className="w-2 h-2 bg-orange-500 rounded-full mr-1"></div>
+                  Demo Mode
+                </Badge>
+              </div>
             </div>
           </div>
           <Button className="bg-green-600 hover:bg-green-700">

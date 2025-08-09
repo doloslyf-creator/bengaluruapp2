@@ -816,6 +816,28 @@ export default function AdminSettings() {
                             </FormItem>
                           )}
                         />
+                        
+                        <FormField
+                          control={form.control}
+                          name="interaktApiKey"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Interakt API Key</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="password"
+                                  {...field} 
+                                  value={field.value || ""} 
+                                  placeholder="Your Interakt API key" 
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                API key for Interakt WhatsApp service integration
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </div>
 
                       <FormField
