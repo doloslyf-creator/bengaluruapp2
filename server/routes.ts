@@ -140,6 +140,10 @@ function calculateContactLeadScore(contactData: any): number {
 // No server-side session management needed
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Register specialized route modules
+  registerEnhancedLeadRoutes(app);
+  registerBookingRoutes(app);
+
   // Firebase authentication - no server-side auth routes needed
   // Authentication is handled entirely by Firebase
 
