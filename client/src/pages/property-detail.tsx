@@ -270,6 +270,35 @@ export default function PropertyDetail() {
     "Covered Parking": Car,
     "Wi-Fi": Wifi,
     "Shopping Center": ShoppingCart,
+    "Jogging Track": Users,
+    "Tennis Court": Users,
+    "Outdoor Tennis Courts": Users,
+    "Security": Shield,
+    "Reserved Parking": Car,
+    "Visitor Parking": Car,
+    "Flower Gardens": TreePine,
+    "Library": Building,
+    "Business Centre": Building,
+    "Recreational Pool": Waves,
+    "Rentable Community Space": Home,
+    "RO Water System": Waves,
+    "Multipurpose Courts": Users,
+    "Basketball Court": Users,
+    "Badminton Court": Users,
+    "Yoga Deck": Users,
+    "Meditation Area": TreePine,
+    "Kids Pool": Waves,
+    "Spa": Star,
+    "Sauna": Star,
+    "Steam Room": Star,
+    "Party Hall": Users,
+    "Banquet Hall": Users,
+    "Mini Theatre": Users,
+    "Game Room": Users,
+    "Indoor Games": Users,
+    "Outdoor Games": Users,
+    "Amphitheatre": Users,
+    "Jogging and Strolling Track": Users,
   };
 
   if (isLoading) {
@@ -540,17 +569,47 @@ export default function PropertyDetail() {
                     <CardTitle className="text-2xl">Premium Amenities</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {property.amenities.map((amenity, index) => {
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+                      {property.amenities.slice(0, 10).map((amenity, index) => {
                         const IconComponent = amenityIcons[amenity as keyof typeof amenityIcons] || Home;
                         return (
-                          <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                            <IconComponent className="h-5 w-5 text-blue-600" />
-                            <span className="text-gray-700 font-medium">{amenity}</span>
+                          <div key={index} className="relative">
+                            {/* Premium badge for special amenities */}
+                            {(amenity.toLowerCase().includes('premium') || amenity.toLowerCase().includes('club') || amenity.toLowerCase().includes('golf')) && (
+                              <div className="absolute -top-1 -right-1 z-10">
+                                <div className="w-4 h-6 bg-gradient-to-b from-yellow-400 to-yellow-600 transform rotate-12 flex items-center justify-center">
+                                  <Star className="h-2 w-2 text-white" />
+                                </div>
+                              </div>
+                            )}
+                            
+                            <div className="bg-white border border-gray-200 rounded-lg p-4 text-center hover:shadow-md transition-all duration-200 hover:border-blue-300 group">
+                              <div className="w-12 h-12 mx-auto mb-3 p-2 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-lg group-hover:from-blue-50 group-hover:to-indigo-50 transition-colors">
+                                <IconComponent className="h-8 w-8 text-amber-600 group-hover:text-blue-600 transition-colors" />
+                              </div>
+                              <h3 className="text-sm font-medium text-gray-900 leading-tight">
+                                {amenity}
+                              </h3>
+                            </div>
                           </div>
                         );
                       })}
                     </div>
+                    
+                    {property.amenities.length > 10 && (
+                      <div className="mt-6 text-center">
+                        <Button 
+                          variant="outline" 
+                          className="text-red-600 border-red-600 hover:bg-red-50"
+                          onClick={() => {
+                            // You can implement a modal or expansion logic here
+                            console.log('Show all amenities');
+                          }}
+                        >
+                          View All Amenities ({property.amenities.length}) →
+                        </Button>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               )}
