@@ -797,6 +797,244 @@ export default function PropertyDetailEndUse() {
               </CardContent>
             </Card>
 
+            {/* Family Home Safety Assessment */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Shield className="h-5 w-5 mr-2 text-purple-600" />
+                  Family Home Safety & Legal Status
+                </CardTitle>
+                <p className="text-gray-600">Complete safety and legal verification for your family's peace of mind</p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium text-green-900">Child Safety Features</h4>
+                        <Badge className="bg-green-600 text-white">✓ Verified</Badge>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center text-green-700">
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          <span>24/7 security with CCTV coverage</span>
+                        </div>
+                        <div className="flex items-center text-green-700">
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          <span>Children's play area & safety measures</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium text-blue-900">Legal Approvals</h4>
+                        <Badge className="bg-blue-600 text-white">✓ Complete</Badge>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center text-blue-700">
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          <span>RERA Registration: {property.reraNumber || 'PRXXXXX'}</span>
+                        </div>
+                        <div className="flex items-center text-blue-700">
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          <span>Occupancy certificate ready</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium text-purple-900">Community Features</h4>
+                        <Badge className="bg-purple-600 text-white">Premium</Badge>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center text-purple-700">
+                          <Heart className="h-4 w-4 mr-2" />
+                          <span>Family-oriented community</span>
+                        </div>
+                        <div className="flex items-center text-purple-700">
+                          <Heart className="h-4 w-4 mr-2" />
+                          <span>Senior citizen care facilities</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-200">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium text-emerald-900">Environmental Health</h4>
+                        <Badge className="bg-emerald-600 text-white">Excellent</Badge>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center text-emerald-700">
+                          <TreePine className="h-4 w-4 mr-2" />
+                          <span>60% green cover & fresh air</span>
+                        </div>
+                        <div className="flex items-center text-emerald-700">
+                          <Waves className="h-4 w-4 mr-2" />
+                          <span>Water quality certified</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-gray-900">Family Home Safety Report</h4>
+                        <p className="text-sm text-gray-600">Complete safety assessment for children & elderly members</p>
+                      </div>
+                      <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white">
+                        <Shield className="h-4 w-4 mr-2" />
+                        Download Report
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Family Expert Consultation */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Users className="h-5 w-5 mr-2 text-purple-600" />
+                  Family Home Consultation
+                </CardTitle>
+                <p className="text-gray-600">Connect with family home specialists and lifestyle advisors</p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-pink-50 p-4 rounded-lg border border-pink-200">
+                      <div className="flex items-start space-x-3">
+                        <div className="w-12 h-12 bg-pink-600 rounded-full flex items-center justify-center text-white font-bold">
+                          PK
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium text-pink-900">Priya Krishnan</h4>
+                          <p className="text-sm text-pink-700 mb-2">Family Home Specialist • 12+ years</p>
+                          <div className="flex items-center text-xs text-pink-600 mb-3">
+                            <Star className="h-3 w-3 mr-1 fill-current" />
+                            <span>4.9 • 180+ families helped</span>
+                          </div>
+                          <Button size="sm" className="bg-pink-600 hover:bg-pink-700 text-white">
+                            <MessageCircle className="h-4 w-4 mr-2" />
+                            Book Call
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
+                      <div className="flex items-start space-x-3">
+                        <div className="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold">
+                          RG
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium text-indigo-900">Rahul Gupta</h4>
+                          <p className="text-sm text-indigo-700 mb-2">Lifestyle & Budget Advisor • 10+ years</p>
+                          <div className="flex items-center text-xs text-indigo-600 mb-3">
+                            <Star className="h-3 w-3 mr-1 fill-current" />
+                            <span>4.8 • 120+ families</span>
+                          </div>
+                          <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white">
+                            <MessageCircle className="h-4 w-4 mr-2" />
+                            Book Call
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-cyan-50 p-4 rounded-lg border border-cyan-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-cyan-900">Free Family Home Planning Session</h4>
+                        <p className="text-sm text-cyan-700">45-minute consultation for complete family home planning</p>
+                      </div>
+                      <Button className="bg-cyan-600 hover:bg-cyan-700 text-white">
+                        <Calendar className="h-4 w-4 mr-2" />
+                        Schedule Now
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Family Home Journey Timeline */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Clock className="h-5 w-5 mr-2 text-purple-600" />
+                  Your Family Home Journey
+                </CardTitle>
+                <p className="text-gray-600">Step-by-step process to secure your dream family home</p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="relative">
+                    <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-purple-200"></div>
+                    
+                    <div className="relative flex items-start space-x-4 pb-6">
+                      <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+                        <CheckCircle className="h-4 w-4 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium text-purple-900">Home Selection & Booking</h4>
+                        <p className="text-sm text-gray-600">Choose your perfect unit • Family-friendly floor plans</p>
+                        <span className="text-xs text-purple-600">Completed ✓</span>
+                      </div>
+                    </div>
+
+                    <div className="relative flex items-start space-x-4 pb-6">
+                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                        <span className="text-white text-sm font-bold">2</span>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium text-blue-900">Loan Approval & Documentation</h4>
+                        <p className="text-sm text-gray-600">Home loan processing • Insurance setup</p>
+                        <span className="text-xs text-blue-600">30-60 days</span>
+                      </div>
+                    </div>
+
+                    <div className="relative flex items-start space-x-4 pb-6">
+                      <div className="w-8 h-8 bg-yellow-600 rounded-full flex items-center justify-center">
+                        <span className="text-white text-sm font-bold">3</span>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium text-yellow-900">Construction Updates</h4>
+                        <p className="text-sm text-gray-600">Regular progress updates • Quality inspections</p>
+                        <span className="text-xs text-yellow-600">24-36 months</span>
+                      </div>
+                    </div>
+
+                    <div className="relative flex items-start space-x-4">
+                      <div className="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center">
+                        <span className="text-white text-sm font-bold">4</span>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium text-emerald-900">Home Handover & Move-in</h4>
+                        <p className="text-sm text-gray-600">Final possession • Home setup assistance</p>
+                        <span className="text-xs text-emerald-600">2026-2027</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-purple-50 p-4 rounded-lg border border-purple-200 mt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-purple-900">Family First Promise</h4>
+                        <p className="text-sm text-purple-700">Home warranty • Moving support • Community integration</p>
+                      </div>
+                      <Badge className="bg-purple-600 text-white">Premium Care</Badge>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Property Header */}
             <Card>
               <CardContent className="p-6">

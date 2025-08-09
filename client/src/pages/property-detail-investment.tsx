@@ -1206,6 +1206,244 @@ export default function PropertyDetailInvestment() {
                 </CardContent>
               </Card>
             )}
+
+            {/* Legal Due Diligence Tracker */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Shield className="h-5 w-5 mr-2 text-green-600" />
+                  Legal Due Diligence Status
+                </CardTitle>
+                <p className="text-gray-600">12-step legal verification process for investment security</p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium text-green-900">Title Verification</h4>
+                        <Badge className="bg-green-600 text-white">✓ Verified</Badge>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center text-green-700">
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          <span>Clear title with proper chain</span>
+                        </div>
+                        <div className="flex items-center text-green-700">
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          <span>No legal disputes found</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium text-blue-900">RERA Compliance</h4>
+                        <Badge className="bg-blue-600 text-white">✓ Compliant</Badge>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center text-blue-700">
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          <span>RERA Registration: {property.reraNumber || 'PRXXXXX'}</span>
+                        </div>
+                        <div className="flex items-center text-blue-700">
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          <span>All approvals in place</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium text-yellow-900">Financial Assessment</h4>
+                        <Badge className="bg-yellow-600 text-white">⏳ In Progress</Badge>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center text-yellow-700">
+                          <Clock className="h-4 w-4 mr-2" />
+                          <span>Builder financial health check</span>
+                        </div>
+                        <div className="flex items-center text-yellow-700">
+                          <Clock className="h-4 w-4 mr-2" />
+                          <span>Project funding verification</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-200">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium text-emerald-900">Investment Grade</h4>
+                        <Badge className="bg-emerald-600 text-white">A+ Grade</Badge>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center text-emerald-700">
+                          <Award className="h-4 w-4 mr-2" />
+                          <span>Premium investment opportunity</span>
+                        </div>
+                        <div className="flex items-center text-emerald-700">
+                          <Award className="h-4 w-4 mr-2" />
+                          <span>Low risk, high appreciation</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-gray-900">Complete Legal Report</h4>
+                        <p className="text-sm text-gray-600">Detailed 12-step verification report available</p>
+                      </div>
+                      <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                        <FileText className="h-4 w-4 mr-2" />
+                        Download Report
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Expert Consultation */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Users className="h-5 w-5 mr-2 text-green-600" />
+                  Expert Investment Consultation
+                </CardTitle>
+                <p className="text-gray-600">Connect with certified real estate investment advisors</p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                      <div className="flex items-start space-x-3">
+                        <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                          RP
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium text-blue-900">Rajesh Patel</h4>
+                          <p className="text-sm text-blue-700 mb-2">Senior Investment Advisor • 15+ years</p>
+                          <div className="flex items-center text-xs text-blue-600 mb-3">
+                            <Star className="h-3 w-3 mr-1 fill-current" />
+                            <span>4.9 • 200+ investments</span>
+                          </div>
+                          <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                            <MessageCircle className="h-4 w-4 mr-2" />
+                            Book Call
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                      <div className="flex items-start space-x-3">
+                        <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center text-white font-bold">
+                          AS
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium text-green-900">Anita Sharma</h4>
+                          <p className="text-sm text-green-700 mb-2">Portfolio Strategist • 12+ years</p>
+                          <div className="flex items-center text-xs text-green-600 mb-3">
+                            <Star className="h-3 w-3 mr-1 fill-current" />
+                            <span>4.8 • 150+ portfolios</span>
+                          </div>
+                          <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                            <MessageCircle className="h-4 w-4 mr-2" />
+                            Book Call
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-yellow-900">Free Investment Strategy Session</h4>
+                        <p className="text-sm text-yellow-700">30-minute consultation to optimize your investment approach</p>
+                      </div>
+                      <Button className="bg-yellow-600 hover:bg-yellow-700 text-white">
+                        <Calendar className="h-4 w-4 mr-2" />
+                        Schedule Now
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Investment Timeline */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Clock className="h-5 w-5 mr-2 text-green-600" />
+                  Investment Timeline & Milestones
+                </CardTitle>
+                <p className="text-gray-600">Strategic investment plan with key milestones</p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="relative">
+                    <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-green-200"></div>
+                    
+                    <div className="relative flex items-start space-x-4 pb-6">
+                      <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+                        <CheckCircle className="h-4 w-4 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium text-green-900">Token Amount & Booking</h4>
+                        <p className="text-sm text-gray-600">₹5-10 Lakhs • Secure your preferred unit</p>
+                        <span className="text-xs text-green-600">Completed ✓</span>
+                      </div>
+                    </div>
+
+                    <div className="relative flex items-start space-x-4 pb-6">
+                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                        <span className="text-white text-sm font-bold">2</span>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium text-blue-900">Agreement & Documentation</h4>
+                        <p className="text-sm text-gray-600">Legal agreements • Loan pre-approval</p>
+                        <span className="text-xs text-blue-600">30-45 days</span>
+                      </div>
+                    </div>
+
+                    <div className="relative flex items-start space-x-4 pb-6">
+                      <div className="w-8 h-8 bg-yellow-600 rounded-full flex items-center justify-center">
+                        <span className="text-white text-sm font-bold">3</span>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium text-yellow-900">Construction Milestones</h4>
+                        <p className="text-sm text-gray-600">Progress-linked payments • Regular updates</p>
+                        <span className="text-xs text-yellow-600">24-36 months</span>
+                      </div>
+                    </div>
+
+                    <div className="relative flex items-start space-x-4">
+                      <div className="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center">
+                        <span className="text-white text-sm font-bold">4</span>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium text-emerald-900">Handover & ROI Realization</h4>
+                        <p className="text-sm text-gray-600">Final possession • Rental/resale opportunities</p>
+                        <span className="text-xs text-emerald-600">2026-2027</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-green-50 p-4 rounded-lg border border-green-200 mt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-green-900">Investment Protection Plan</h4>
+                        <p className="text-sm text-green-700">Guaranteed buyback • Construction warranty • Legal protection</p>
+                      </div>
+                      <Badge className="bg-green-600 text-white">Premium</Badge>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Sidebar */}
