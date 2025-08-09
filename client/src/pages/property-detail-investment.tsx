@@ -31,7 +31,13 @@ import {
   Play,
   Download,
   Lock,
-  MessageCircle
+  MessageCircle,
+  Star,
+  Wifi,
+  Home,
+  TreePine,
+  Waves,
+  Heart
 } from "lucide-react";
 import type { Property, PropertyConfiguration, CivilMepReport, PropertyValuationReport } from "@shared/schema";
 import { formatPriceDisplay } from "@/lib/utils";
@@ -297,8 +303,114 @@ export default function PropertyDetailInvestment() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             
+            {/* Property Header - PDF Style */}
+            <Card className="border-0 shadow-sm">
+              <CardContent className="p-6">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="flex-1">
+                    <h1 className="text-2xl font-semibold text-gray-900 mb-1">{property.name}</h1>
+                    <p className="text-gray-600 text-sm mb-3">by {property.developer || 'Premium Developer'}</p>
+                    <div className="flex items-center text-gray-500 mb-4">
+                      <MapPin className="h-4 w-4 mr-2" />
+                      <span className="text-sm">{property.area}, {property.zone?.charAt(0).toUpperCase() + property.zone?.slice(1)}</span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="flex items-center mb-2">
+                      <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" />
+                      <span className="font-semibold text-gray-900">
+                        {property.overallScore ? (parseFloat(property.overallScore.toString()) / 10).toFixed(1) : '4.2'}/10
+                      </span>
+                    </div>
+                    <div className="text-2xl font-bold text-green-600">
+                      {property.configurations && property.configurations.length > 0 
+                        ? formatPrice(Math.min(...property.configurations.map(c => c.price)))
+                        : '₹2.5 Cr'
+                      }
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      ₹{property.configurations && property.configurations.length > 0 
+                        ? Math.min(...property.configurations.map(c => Math.round(c.pricePerSqft))).toLocaleString()
+                        : '12,000'
+                      }/sq ft
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Action Buttons - PDF Style */}
+                <div className="flex space-x-4">
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Property Valuation
+                  </Button>
+                  <Button variant="outline" className="border-gray-300 text-gray-700 px-6 py-2 rounded-lg">
+                    <Building className="h-4 w-4 mr-2" />
+                    Civil MEP Analysis
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Ratings Based on Features - PDF Style */}
+            <Card className="border-0 shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-900">Ratings based on features</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  <div className="text-center">
+                    <div className="relative w-20 h-20 mx-auto mb-3">
+                      <div className="w-20 h-20 rounded-full border-4 border-green-200 flex items-center justify-center bg-green-50">
+                        <div className="w-12 h-12 rounded-full border-4 border-green-500 flex items-center justify-center">
+                          <Wifi className="h-5 w-5 text-green-600" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="font-semibold text-gray-900">4.4/5</div>
+                    <div className="text-sm text-gray-600">Connectivity</div>
+                  </div>
+                  
+                  <div className="text-center">
+                    <div className="relative w-20 h-20 mx-auto mb-3">
+                      <div className="w-20 h-20 rounded-full border-4 border-green-200 flex items-center justify-center bg-green-50">
+                        <div className="w-12 h-12 rounded-full border-4 border-green-500 flex items-center justify-center">
+                          <Users className="h-5 w-5 text-green-600" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="font-semibold text-gray-900">4.1/5</div>
+                    <div className="text-sm text-gray-600">Neighbourhood</div>
+                  </div>
+                  
+                  <div className="text-center">
+                    <div className="relative w-20 h-20 mx-auto mb-3">
+                      <div className="w-20 h-20 rounded-full border-4 border-green-200 flex items-center justify-center bg-green-50">
+                        <div className="w-12 h-12 rounded-full border-4 border-green-500 flex items-center justify-center">
+                          <Shield className="h-5 w-5 text-green-600" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="font-semibold text-gray-900">4/5</div>
+                    <div className="text-sm text-gray-600">Safety</div>
+                  </div>
+                  
+                  <div className="text-center">
+                    <div className="relative w-20 h-20 mx-auto mb-3">
+                      <div className="w-20 h-20 rounded-full border-4 border-green-200 flex items-center justify-center bg-green-50">
+                        <div className="w-12 h-12 rounded-full border-4 border-green-500 flex items-center justify-center">
+                          <Home className="h-5 w-5 text-green-600" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="font-semibold text-gray-900">4.2/5</div>
+                    <div className="text-sm text-gray-600">Livability</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Image Gallery Section */}
-            <Card className="overflow-hidden">
+            <Card className="overflow-hidden border-0 shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Building2 className="h-5 w-5 mr-2 text-green-600" />
