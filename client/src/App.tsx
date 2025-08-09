@@ -52,7 +52,7 @@ import FirstTimeBuyerOnboarding from "@/pages/first-time-buyer-onboarding";
 
 import AdminSettings from "@/pages/admin/settings";
 import TeamManagement from "@/pages/admin/team-management";
-
+import WhatsAppManagement from "@/pages/admin/whatsapp-management";
 import SupabaseMigration from "@/pages/admin/supabase-migration";
 import SupabaseStatus from "@/pages/admin/supabase-status";
 
@@ -88,13 +88,13 @@ import NotFound from "@/pages/not-found";
 // Protected Routes Component that shows auth form for admin routes when not authenticated
 function ProtectedRouter() {
   const { user, loading } = useAuth();
-  
+
   // Initialize Google Analytics with stored measurement ID
   useAnalyticsInit();
-  
+
   // Track page views when routes change
   useAnalytics();
-  
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -102,13 +102,13 @@ function ProtectedRouter() {
       </div>
     );
   }
-  
+
   // Show admin auth form for admin routes if not authenticated
   const currentPath = window.location.pathname;
   if (!user && (currentPath.startsWith('/admin-panel') || currentPath === '/admin')) {
     return <AdminAuthForm />;
   }
-  
+
   return (
     <Switch>
       <Route path="/" component={CustomerHome} />
@@ -156,18 +156,14 @@ function ProtectedRouter() {
 
       <Route path="/admin-panel/settings" component={AdminSettings} />
       <Route path="/admin-panel/team-management" component={TeamManagement} />
-      <Route path="/admin-panel/enhanced-leads" component={EnhancedLeads} />
-      <Route path="/admin-panel/bookings" component={AdminBookings} />
-
-
-      <Route path="/admin-panel/backup-system" component={BackupSystem} />
+      <Route path="/admin-panel/whatsapp-management" component={WhatsAppManagement} />
       <Route path="/admin-panel/supabase-migration" component={SupabaseMigration} />
       <Route path="/admin-panel/supabase-status" component={SupabaseStatus} />
       <Route path="/admin-panel/supabase" component={SupabaseStatus} />
-      
+
       {/* Setup Wizard */}
       <Route path="/setup" component={SetupWizard} />
-      
+
       {/* Customer-facing routes */}
       <Route path="/about" component={About} />
       <Route path="/find-property" component={FindProperty} />
@@ -179,28 +175,28 @@ function ProtectedRouter() {
       <Route path="/contact/thank-you" component={ContactThankYou} />
       <Route path="/book-visit" component={BookVisit} />
       <Route path="/consultation" component={Consultation} />
-      
+
       {/* Customer Account */}
       <Route path="/my-account" component={CustomerAccount} />
-      
+
       {/* Help & Support */}
       <Route path="/faq" component={FAQ} />
       <Route path="/report-documentation" component={ReportDocumentation} />
-      
+
       {/* Onboarding */}
       <Route path="/first-time-buyer" component={FirstTimeBuyerOnboarding} />
 
       {/* Services */}
       <Route path="/reports" component={Reports} />
-      
+
       {/* Properties by Location */}
       <Route path="/properties/:location" component={PropertiesLocation} />
-      
+
       {/* Legal Pages */}
       <Route path="/privacy-policy" component={PrivacyPolicy} />
       <Route path="/terms-of-use" component={TermsOfUse} />
       <Route path="/refund-policy" component={RefundPolicy} />
-      
+
       <Route component={NotFound} />
     </Switch>
   );
