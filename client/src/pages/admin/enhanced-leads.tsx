@@ -141,7 +141,9 @@ export default function EnhancedLeads() {
           }
         }
       });
-      return apiRequest("GET", `/api/leads/enhanced?${params.toString()}`);
+      const result = await apiRequest("GET", `/api/leads/enhanced?${params.toString()}`);
+      console.log("Enhanced leads data:", result);
+      return result;
     }
   });
 
@@ -410,8 +412,23 @@ export default function EnhancedLeads() {
             <CardTitle>Leads ({filteredLeads.length})</CardTitle>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-[600px]">
-              <Table>
+            {isLoading ? (
+              <div className="flex items-center justify-center h-[200px]">
+                <div className="text-center">
+                  <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+                  <p className="text-gray-600">Loading enhanced leads...</p>
+                </div>
+              </div>
+            ) : filteredLeads.length === 0 ? (
+              <div className="flex items-center justify-center h-[200px]">
+                <div className="text-center">
+                  <p className="text-gray-600 mb-2">No leads found</p>
+                  <p className="text-sm text-gray-500">Try adjusting your filters or create a new lead</p>
+                </div>
+              </div>
+            ) : (
+              <ScrollArea className="h-[600px]">
+                <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Lead</TableHead>
@@ -518,6 +535,7 @@ export default function EnhancedLeads() {
                 </TableBody>
               </Table>
             </ScrollArea>
+            )}
           </CardContent>
         </Card>
 

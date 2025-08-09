@@ -74,6 +74,11 @@ export default function WhatsAppManagement() {
   // Fetch customers for messaging
   const { data: customers = [] } = useQuery({
     queryKey: ["/api/customers"],
+    queryFn: async () => {
+      const result = await apiRequest("GET", "/api/customers");
+      console.log("WhatsApp customers data:", result);
+      return result;
+    }
   });
 
   // Send individual message mutation
