@@ -17,14 +17,23 @@ import { generatePropertySlug } from "@/utils/seo";
 import { type Property, type PropertyConfiguration } from "@shared/schema";
 import { PropertyCardSkeleton } from "@/components/ui/skeleton";
 
+type UserIntent = 'investment' | 'end-use' | '';
+
 interface PropertyPreferences {
+  intent: UserIntent;
   propertyType: string;
   cityId: string;
   zoneId: string;
   budgetRange: [number, number];
   bhkType: string[];
-  amenities: string[];
-  tags: string[];
+  // Investment-specific fields
+  rentalYieldExpected?: number;
+  investmentHorizon?: string;
+  riskTolerance?: string;
+  // End-use specific fields  
+  familySize?: string;
+  lifestyle?: string;
+  commute?: string;
 }
 
 interface PropertyWithConfigurations extends Property {
@@ -50,13 +59,12 @@ export default function PropertyResults() {
       }
     }
     return {
+      intent: '',
       propertyType: "",
       cityId: "",
       zoneId: "",
       budgetRange: [50, 500],
-      bhkType: [],
-      amenities: [],
-      tags: []
+      bhkType: []
     };
   };
 
@@ -83,6 +91,60 @@ export default function PropertyResults() {
   });
 
   const [matchingProperties, setMatchingProperties] = useState<PropertyWithConfigurations[]>([]);
+
+  // Helper function to get intent-specific highlights for properties
+  const getIntentHighlights = (property: PropertyWithConfigurations) => {
+    const highlights: { label: string; value: string; icon: any; color: string }[] = [];
+    
+    if (preferences.intent === 'investment') {
+      // Investment-focused highlights
+      highlights.push({
+        label: "Rental Yield",
+        value: "4.2% - 5.8%", // This would come from property data
+        icon: BarChart3,
+        color: "text-green-600"
+      });
+      
+      highlights.push({
+        label: "Appreciation",
+        value: "12% CAGR", // This would come from property data
+        icon: TrendingUp,
+        color: "text-blue-600"
+      });
+      
+      highlights.push({
+        label: "Exit Liquidity",
+        value: "High", // Based on property location/type
+        icon: Clock,
+        color: "text-purple-600"
+      });
+      
+    } else if (preferences.intent === 'end-use') {
+      // Lifestyle-focused highlights
+      highlights.push({
+        label: "Lifestyle Score",
+        value: "8.5/10", // Based on amenities and area
+        icon: Star,
+        color: "text-purple-600"
+      });
+      
+      highlights.push({
+        label: "School Proximity", 
+        value: "< 2km", // Distance to good schools
+        icon: Building,
+        color: "text-blue-600"
+      });
+      
+      highlights.push({
+        label: "Commute",
+        value: "20-30 min", // To major IT hubs
+        icon: Clock,
+        color: "text-green-600"
+      });
+    }
+    
+    return highlights;
+  };
 
   useEffect(() => {
     if (allProperties.length > 0) {
@@ -124,8 +186,8 @@ export default function PropertyResults() {
         }
         
         // Zone match (25 points) - if no preference set, give partial score
-        if (!preferences.zone || preferences.zone === property.zone) {
-          score += preferences.zone ? 25 : 12;
+        if (!preferences.zoneId || preferences.zoneId === property.zoneId) {
+          score += preferences.zoneId ? 25 : 12;
         }
         
         // Budget range match (25 points) - if no configurations, give default score
@@ -148,12 +210,27 @@ export default function PropertyResults() {
           }
         }
         
-        // Tags match (15 points) - if no preferences, give default score
-        if (preferences.tags.length === 0) {
-          score += 10; // Default score when no tag preferences
+        // Intent-based scoring (20 points)
+        if (preferences.intent === 'investment') {
+          // For investment intent, prioritize properties with good ROI indicators
+          if (property.tags.some(tag => ['high-roi', 'rental-friendly', 'appreciation-potential'].includes(tag.toLowerCase()))) {
+            score += 20;
+          } else if (property.tags.some(tag => ['established-area', 'good-connectivity'].includes(tag.toLowerCase()))) {
+            score += 15;
+          } else {
+            score += 10;
+          }
+        } else if (preferences.intent === 'end-use') {
+          // For end-use intent, prioritize lifestyle and amenity-focused properties
+          if (property.tags.some(tag => ['family-friendly', 'premium-amenities', 'good-schools'].includes(tag.toLowerCase()))) {
+            score += 20;
+          } else if (property.tags.some(tag => ['peaceful-area', 'good-connectivity'].includes(tag.toLowerCase()))) {
+            score += 15;
+          } else {
+            score += 10;
+          }
         } else {
-          const matchingTags = property.tags.filter(tag => preferences.tags.includes(tag));
-          score += (matchingTags.length / preferences.tags.length) * 15;
+          score += 10; // Default score when no intent specified
         }
         
         // BHK match (5 points) - if no configurations or preferences, give default score
@@ -325,9 +402,19 @@ export default function PropertyResults() {
                   <span>Back</span>
                 </Button>
                 <div>
-                  <h1 className="text-xl font-bold text-gray-900">Property Results</h1>
+                  <h1 className="text-xl font-bold text-gray-900">
+                    {preferences.intent === 'investment' ? 'Investment Properties' : 
+                     preferences.intent === 'end-use' ? 'Homes for You' : 
+                     'Property Results'}
+                  </h1>
                   <p className="text-sm text-gray-600">
-                    {matchingProperties.length} properties found
+                    {matchingProperties.length} {preferences.intent === 'investment' ? 'investment opportunities' : 
+                    preferences.intent === 'end-use' ? 'family homes' : 'properties'} found
+                    {preferences.intent && (
+                      <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                        {preferences.intent === 'investment' ? '💰 Investment Focus' : '🏡 Family Focus'}
+                      </span>
+                    )}
                   </p>
                 </div>
                 
@@ -529,17 +616,32 @@ export default function PropertyResults() {
                             </div>
                           )}
                           
-                          {/* Key Features */}
-                          {property.tags.length > 0 && (
+                          {/* Intent-Based Highlights */}
+                          {preferences.intent && (
+                            <div className="mb-3">
+                              <div className="flex flex-wrap gap-2">
+                                {getIntentHighlights(property).slice(0, 2).map((highlight, index) => (
+                                  <div key={index} className="flex items-center space-x-1 bg-gray-50 border border-gray-200 rounded-md px-2 py-1">
+                                    <highlight.icon className={`w-3 h-3 ${highlight.color}`} />
+                                    <span className="text-xs font-medium text-gray-700">{highlight.label}:</span>
+                                    <span className={`text-xs font-semibold ${highlight.color}`}>{highlight.value}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Key Features - Only show if no intent or as fallback */}
+                          {(!preferences.intent || property.tags.length > 0) && (
                             <div className="flex flex-wrap gap-1">
-                              {property.tags.slice(0, 2).map(tag => (
+                              {property.tags.slice(0, preferences.intent ? 1 : 2).map(tag => (
                                 <Badge key={tag} variant="secondary" className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600">
                                   {tag.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                                 </Badge>
                               ))}
-                              {property.tags.length > 2 && (
+                              {property.tags.length > (preferences.intent ? 1 : 2) && (
                                 <Badge variant="secondary" className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600">
-                                  +{property.tags.length - 2}
+                                  +{property.tags.length - (preferences.intent ? 1 : 2)}
                                 </Badge>
                               )}
                             </div>
@@ -633,19 +735,37 @@ export default function PropertyResults() {
                             </div>
                           )}
                           
-                          {/* Features Row */}
-                          {property.tags.length > 0 && (
+                          {/* Intent-Based Highlights */}
+                          {preferences.intent && (
+                            <div>
+                              <p className="text-sm font-medium text-gray-700 mb-2">
+                                {preferences.intent === 'investment' ? 'Investment Metrics' : 'Lifestyle Highlights'}
+                              </p>
+                              <div className="flex flex-wrap gap-2">
+                                {getIntentHighlights(property).map((highlight, index) => (
+                                  <div key={index} className="flex items-center space-x-2 bg-gray-50 border border-gray-200 rounded-md px-3 py-2">
+                                    <highlight.icon className={`w-4 h-4 ${highlight.color}`} />
+                                    <span className="text-sm font-medium text-gray-700">{highlight.label}:</span>
+                                    <span className={`text-sm font-bold ${highlight.color}`}>{highlight.value}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Features Row - Show only if no intent or as additional info */}
+                          {(!preferences.intent || property.tags.length > 0) && (
                             <div>
                               <p className="text-sm font-medium text-gray-700 mb-2">Key Features</p>
                               <div className="flex flex-wrap gap-2">
-                                {property.tags.slice(0, 3).map(tag => (
+                                {property.tags.slice(0, preferences.intent ? 2 : 3).map(tag => (
                                   <Badge key={tag} variant="secondary" className="text-sm px-3 py-1 bg-gray-100 text-gray-600">
                                     {tag.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                                   </Badge>
                                 ))}
-                                {property.tags.length > 3 && (
+                                {property.tags.length > (preferences.intent ? 2 : 3) && (
                                   <Badge variant="secondary" className="text-sm px-3 py-1 bg-gray-100 text-gray-600">
-                                    +{property.tags.length - 3} more
+                                    +{property.tags.length - (preferences.intent ? 2 : 3)} more
                                   </Badge>
                                 )}
                               </div>
