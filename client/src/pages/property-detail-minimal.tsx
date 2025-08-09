@@ -13,6 +13,7 @@ import OrderFormDialog from '@/components/order-form-dialog';
 import { ExpertCredentials } from '@/components/expert-credentials';
 import { ExitIntentPopup } from '@/components/exit-intent-popup';
 import { PropertyGallery } from '@/components/property/property-gallery';
+import Header from '@/components/layout/header';
 
 interface Property {
   id: string;
@@ -669,9 +670,13 @@ export default function PropertyDetailMinimal() {
           setShowOrderForm(true);
         }}
       />
-      {/* Header */}
-      <div className="bg-white border-b sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      
+      {/* Global Header */}
+      <Header />
+      
+      {/* Property Actions Bar */}
+      <div className="bg-white border-b sticky top-16 z-30 shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <Button variant="ghost" onClick={() => window.history.back()} className="text-gray-600">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Search
