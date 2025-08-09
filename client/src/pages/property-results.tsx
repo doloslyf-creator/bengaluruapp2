@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Grid3X3, List, MapPin, Calendar, Phone, ArrowLeft, Star, Eye, Heart, Filter, X, SlidersHorizontal, IndianRupee, Building, Shield, FileCheck, Clock, BarChart3 } from "lucide-react";
+import { Grid3X3, List, MapPin, Calendar, Phone, ArrowLeft, Star, Eye, Heart, Filter, X, SlidersHorizontal, IndianRupee, Building, Shield, FileCheck, Clock, BarChart3, TrendingUp } from "lucide-react";
 import Header from "@/components/layout/header";
 import { DataTransparencyIndicator } from "@/components/data-transparency-indicator";
 import { Button } from "@/components/ui/button";
@@ -24,8 +24,11 @@ interface PropertyPreferences {
   propertyType: string;
   cityId: string;
   zoneId: string;
+  zone?: string;
   budgetRange: [number, number];
   bhkType: string[];
+  tags?: string[];
+  amenities?: string[];
   // Investment-specific fields
   rentalYieldExpected?: number;
   investmentHorizon?: string;
@@ -500,12 +503,12 @@ export default function PropertyResults() {
                     +{preferences.bhkType.length - 2} BHK
                   </Badge>
                 )}
-                {preferences.tags.slice(0, 1).map(tag => (
+                {preferences.tags?.slice(0, 1).map(tag => (
                   <Badge key={tag} variant="outline" className="text-xs">
-                    {tag.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    {tag.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                   </Badge>
                 ))}
-                {preferences.tags.length > 1 && (
+                {preferences.tags && preferences.tags.length > 1 && (
                   <Badge variant="outline" className="text-xs">
                     +{preferences.tags.length - 1} features
                   </Badge>
@@ -587,7 +590,7 @@ export default function PropertyResults() {
                           {/* Location */}
                           <div className="flex items-center text-sm text-gray-600 mb-2">
                             <MapPin className="h-3 w-3 mr-1 text-gray-400" />
-                            <span className="line-clamp-1">{property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)}</span>
+                            <span className="line-clamp-1">{property.area}, {property.zone ? property.zone.charAt(0).toUpperCase() + property.zone.slice(1) : 'Unknown Zone'}</span>
                           </div>
                           
                           {/* Developer */}
@@ -700,7 +703,7 @@ export default function PropertyResults() {
                               
                               <div className="flex items-center text-sm text-gray-600 mb-1">
                                 <MapPin className="h-4 w-4 mr-1 text-gray-400 shrink-0" />
-                                <span className="line-clamp-1">{property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)}</span>
+                                <span className="line-clamp-1">{property.area}, {property.zone ? property.zone.charAt(0).toUpperCase() + property.zone.slice(1) : 'Unknown Zone'}</span>
                               </div>
                               
                               <p className="text-sm text-gray-500">By {property.developer}</p>
@@ -836,7 +839,10 @@ function PropertyFilters({ preferences, onUpdatePreferences, properties }: Prope
 
   const clearAllFilters = () => {
     const clearedPreferences: PropertyPreferences = {
+      intent: '',
       propertyType: "",
+      cityId: "",
+      zoneId: "",
       zone: "",
       budgetRange: [50, 500],
       bhkType: [],
@@ -888,11 +894,11 @@ function PropertyFilters({ preferences, onUpdatePreferences, properties }: Prope
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="any">Any Zone</SelectItem>
-            {zones.map(zone => (
+            {zones.map(zone => zone ? (
               <SelectItem key={zone} value={zone}>
                 {zone.charAt(0).toUpperCase() + zone.slice(1)} Bengaluru
               </SelectItem>
-            ))}
+            ) : null)}
           </SelectContent>
         </Select>
       </div>
@@ -943,7 +949,7 @@ function PropertyFilters({ preferences, onUpdatePreferences, properties }: Prope
             <div key={tag.value} className="flex items-center space-x-2">
               <Checkbox 
                 id={`filter-${tag.value}`}
-                checked={preferences.tags.includes(tag.value)}
+                checked={preferences.tags?.includes(tag.value) || false}
                 onCheckedChange={() => handleArrayToggle('tags', tag.value)}
               />
               <label htmlFor={`filter-${tag.value}`} className="text-sm text-gray-700 cursor-pointer">
