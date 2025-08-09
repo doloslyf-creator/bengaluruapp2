@@ -4,12 +4,12 @@ import { siteVisitBookings, bookingTimeSlots, bookingStaff, properties, property
 import { insertSiteVisitBookingSchema, insertBookingTimeSlotSchema, insertBookingStaffSchema } from "@shared/schema";
 import { eq, desc, and, gte, lte, sql } from "drizzle-orm";
 import { z } from "zod";
-import { getApiKeys } from "./paymentService";
+import { apiKeysManager } from "./paymentService";
 
 // WhatsApp messaging function using Interakt
 async function sendWhatsAppNotification(bookingData: any, propertyData: any) {
   try {
-    const apiKeys = getApiKeys();
+    const apiKeys = apiKeysManager.getKeys();
     const { interaktApiKey, interaktBaseUrl } = apiKeys;
 
     if (!interaktApiKey) {
@@ -19,8 +19,60 @@ async function sendWhatsAppNotification(bookingData: any, propertyData: any) {
 
     const baseUrl = interaktBaseUrl || 'https://api.interakt.ai';
 
-    // Method 1: Try to send a template message (if template exists)
-    // First, let's try using Event Track API to trigger an ongoing campaign
+    // Method 1: Send direct text message using Interakt API
+    try {
+      const textResponse = await fetch(`${baseUrl}/v1/public/message/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${interaktApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fullPhoneNumber: "+919933701566",
+          callbackData: `booking_${bookingData.id || Date.now()}`,
+          type: "Text",
+          data: {
+            message: `🏠 *New Site Visit Booking - OwnItRight*
+
+*Customer Details:*
+👤 Name: ${bookingData.customerName}
+📱 Phone: ${bookingData.customerPhone}
+✉️ Email: ${bookingData.customerEmail}
+
+*Property Details:*
+🏘️ Property: ${propertyData?.name || 'Unknown Property'}
+🏗️ Developer: ${propertyData?.developer || 'N/A'}
+📍 Location: ${propertyData?.area || 'N/A'}
+
+*Visit Details:*
+📅 Preferred Date: ${bookingData.preferredDate}
+🕐 Preferred Time: ${bookingData.preferredTime}
+👥 Number of Visitors: ${bookingData.numberOfVisitors}
+🎯 Visit Type: ${bookingData.visitType === 'site-visit' ? 'Site Visit' : 'Virtual Tour'}
+
+${bookingData.specialRequests ? `*Special Requests:*\n💬 ${bookingData.specialRequests}` : ''}
+
+*Booking ID:* ${bookingData.id || 'Pending'}
+*Source:* ${bookingData.source || 'Website'}
+
+Please contact the customer to confirm the visit details.`
+          }
+        })
+      });
+
+      if (textResponse.ok) {
+        const result = await textResponse.json();
+        console.log("WhatsApp text notification sent successfully to +919933701566 via Interakt:", result.id);
+        return;
+      } else {
+        const errorText = await textResponse.text();
+        console.error("Failed to send WhatsApp text message via Interakt:", textResponse.status, errorText);
+      }
+    } catch (textError) {
+      console.error("Text message method failed:", textError);
+    }
+
+    // Method 2: Fallback - Try Event Track API to trigger an ongoing campaign
     try {
       const trackResponse = await fetch(`${baseUrl}/v1/public/track/events/`, {
         method: 'POST',
@@ -51,55 +103,12 @@ async function sendWhatsAppNotification(bookingData: any, propertyData: any) {
       });
 
       if (trackResponse.ok) {
-        console.log("Site visit booking event tracked successfully via Interakt - this should trigger ongoing campaign if configured");
-        return;
+        console.log("Site visit booking event tracked successfully via Interakt as fallback - configure ongoing campaign if needed");
       } else {
-        console.log("Event tracking failed, will try template method as fallback");
+        console.log("Both text message and event tracking failed. Please check your Interakt API configuration.");
       }
     } catch (eventError) {
-      console.log("Event tracking error, trying template method:", eventError);
-    }
-
-    // Method 2: Fallback - Try template message (requires pre-created template)
-    // You would need to create a template in Interakt dashboard first
-    try {
-      const templateResponse = await fetch(`${baseUrl}/v1/public/message/`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Basic ${interaktApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          countryCode: "+91",
-          phoneNumber: "9933701566",
-          type: "Template",
-          template: {
-            name: "booking_notification", // This template needs to be created in Interakt dashboard
-            languageCode: "en",
-            bodyValues: [
-              bookingData.customerName,
-              bookingData.customerPhone,
-              propertyData?.name || 'Unknown Property',
-              bookingData.preferredDate,
-              bookingData.preferredTime,
-              bookingData.id || 'Pending'
-            ]
-          }
-        })
-      });
-
-      if (templateResponse.ok) {
-        const result = await templateResponse.json();
-        console.log("WhatsApp template notification sent successfully to +919933701566 via Interakt:", result.id);
-      } else {
-        const errorText = await templateResponse.text();
-        console.log("Template method also failed. Please ensure you have either:");
-        console.log("1. Created an ongoing campaign triggered by 'site_visit_booking' event, OR");
-        console.log("2. Created a template named 'booking_notification' in your Interakt dashboard");
-        console.error("Interakt template API error:", templateResponse.status, errorText);
-      }
-    } catch (templateError) {
-      console.error("Template method failed:", templateError);
+      console.error("Event tracking fallback failed:", eventError);
     }
 
   } catch (error) {
@@ -148,7 +157,7 @@ export function registerBookingRoutes(app: Express) {
       res.status(500).json({
         success: false,
         message: "WhatsApp test failed",
-        error: error.message
+        error: error instanceof Error ? error.message : "Unknown error"
       });
     }
   });
@@ -318,7 +327,7 @@ export function registerBookingRoutes(app: Express) {
         // Insert into database using Drizzle
         const [newBooking] = await db
           .insert(siteVisitBookings)
-          .values(bookingData)
+          .values([bookingData])
           .returning();
 
         console.log("Booking created successfully:", newBooking);
@@ -537,7 +546,7 @@ export function registerBookingRoutes(app: Express) {
       
       const [staff] = await db
         .insert(bookingStaff)
-        .values([validatedData])
+        .values(validatedData)
         .returning();
 
       res.status(201).json(staff);
