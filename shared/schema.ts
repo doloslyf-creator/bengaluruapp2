@@ -1546,6 +1546,148 @@ export const insertVideoEducationSchema = createInsertSchema(videoEducation).omi
 export type VideoEducation = typeof videoEducation.$inferSelect;
 export type InsertVideoEducation = z.infer<typeof insertVideoEducationSchema>;
 
+// Video Courses table - For organizing videos into structured learning paths
+export const videoCourses = pgTable("video_courses", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  slug: text("slug").notNull().unique(), // URL-friendly identifier
+  thumbnailUrl: text("thumbnail_url"),
+  
+  // Course metadata
+  level: varchar("level", { enum: ["beginner", "intermediate", "advanced"] }).notNull().default("beginner"),
+  estimatedDuration: text("estimated_duration"), // Total course duration
+  category: text("category").notNull(),
+  tags: text("tags").array().default(sql`ARRAY[]::text[]`),
+  
+  // Course status and visibility
+  isPublished: boolean("is_published").default(false),
+  isFeatured: boolean("is_featured").default(false),
+  
+  // Ordering and organization
+  displayOrder: integer("display_order").default(0),
+  
+  // Engagement metrics
+  enrollmentCount: integer("enrollment_count").default(0),
+  completionCount: integer("completion_count").default(0),
+  
+  // SEO and marketing
+  metaTitle: text("meta_title"),
+  metaDescription: text("meta_description"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Video Chapters table - Individual chapters within a course
+export const videoChapters = pgTable("video_chapters", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  courseId: varchar("course_id").notNull().references(() => videoCourses.id, { onDelete: "cascade" }),
+  
+  // Chapter basic info
+  title: text("title").notNull(),
+  description: text("description"),
+  slug: text("slug").notNull(), // Unique within course
+  
+  // Video content
+  youtubeUrl: text("youtube_url").notNull(),
+  duration: text("duration").notNull(), // Format: "5:30"
+  thumbnailUrl: text("thumbnail_url"),
+  
+  // Chapter organization
+  chapterNumber: integer("chapter_number").notNull(), // Order within course
+  isPreview: boolean("is_preview").default(false), // Can be viewed without enrollment
+  
+  // Content details
+  learningObjectives: json("learning_objectives").$type<string[]>().default([]),
+  keyTakeaways: json("key_takeaways").$type<string[]>().default([]),
+  resources: json("resources").$type<Array<{
+    title: string;
+    url: string;
+    type: string;
+  }>>().default([]),
+  
+  // Engagement
+  viewCount: integer("view_count").default(0),
+  
+  // Status
+  isPublished: boolean("is_published").default(false),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_course_chapter").on(table.courseId, table.chapterNumber),
+]);
+
+// Course Enrollments table - Track user progress
+export const courseEnrollments = pgTable("course_enrollments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  courseId: varchar("course_id").notNull().references(() => videoCourses.id, { onDelete: "cascade" }),
+  userEmail: text("user_email").notNull(), // User identifier
+  userName: text("user_name"),
+  
+  // Progress tracking
+  currentChapterId: varchar("current_chapter_id").references(() => videoChapters.id),
+  completedChapters: json("completed_chapters").$type<string[]>().default([]),
+  progressPercentage: integer("progress_percentage").default(0),
+  
+  // Timestamps
+  enrolledAt: timestamp("enrolled_at").defaultNow(),
+  lastAccessedAt: timestamp("last_accessed_at"),
+  completedAt: timestamp("completed_at"),
+  
+  // Engagement metrics
+  totalWatchTime: integer("total_watch_time").default(0), // in seconds
+  
+}, (table) => [
+  index("idx_user_course").on(table.userEmail, table.courseId),
+]);
+
+// Video Course insert schemas and types
+export const insertVideoCourseSchema = createInsertSchema(videoCourses).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertVideoChapterSchema = createInsertSchema(videoChapters).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertCourseEnrollmentSchema = createInsertSchema(courseEnrollments).omit({
+  id: true,
+  enrolledAt: true,
+  lastAccessedAt: true,
+  completedAt: true,
+});
+
+export type VideoCourse = typeof videoCourses.$inferSelect;
+export type InsertVideoCourse = z.infer<typeof insertVideoCourseSchema>;
+export type VideoChapter = typeof videoChapters.$inferSelect;
+export type InsertVideoChapter = z.infer<typeof insertVideoChapterSchema>;
+export type CourseEnrollment = typeof courseEnrollments.$inferSelect;
+export type InsertCourseEnrollment = z.infer<typeof insertCourseEnrollmentSchema>;
+
+// Enhanced types with relations
+export interface VideoCourseWithChapters extends VideoCourse {
+  chapters: VideoChapter[];
+  enrollmentCount: number;
+  totalDuration: string;
+}
+
+export interface VideoChapterWithCourse extends VideoChapter {
+  course: VideoCourse;
+}
+
+export interface CourseEnrollmentWithProgress extends CourseEnrollment {
+  course: VideoCourse;
+  currentChapter?: VideoChapter;
+  totalChapters: number;
+  completedChaptersCount: number;
+}
+
 // User types - keeping existing ones
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,

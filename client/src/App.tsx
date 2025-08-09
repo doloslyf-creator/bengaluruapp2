@@ -87,8 +87,11 @@ import NotFound from "@/pages/not-found";
 import LeadNurturingPage from "@/pages/admin/lead-nurturing";
 import SystemTest from "./pages/system-test";
 // Import video education components
-import VideoEducation from "@/pages/admin/video-education";
-import PropertyEducation from "@/pages/property-education";
+import VideoEducationPage from "./pages/admin/video-education";
+import VideoCoursesPage from "./pages/admin/video-courses";
+import VideoChaptersPage from "./pages/admin/video-chapters";
+import PropertyEducation from "./pages/property-education";
+import VideoCourseViewer from "./pages/video-course-viewer";
 
 
 // Protected Routes Component that shows auth form for admin routes when not authenticated
@@ -166,8 +169,11 @@ function ProtectedRouter() {
       <Route path="/admin-panel/enhanced-leads" component={EnhancedLeads} />
       <Route path="/admin/enhanced-leads" component={EnhancedLeads} />
       <Route path="/admin-panel/lead-nurturing" component={LeadNurturingPage} />
-      <Route path="/admin-panel/video-education" component={VideoEducation} />
-      <Route path="/property-education" component={PropertyEducation} />
+      <Route path="/admin-panel/video-education" component={VideoEducationPage} />
+      <Route path="/admin-panel/video-courses" element={<VideoCoursesPage />} />
+      <Route path="/admin-panel/video-courses/:courseId/chapters" element={<VideoChaptersPage />} />
+      <Route path="/property-education" element={<PropertyEducation />} />
+      <Route path="/courses/:courseSlug" element={<VideoCourseViewer />} />
       <Route path="/admin-panel/supabase-migration" component={SupabaseMigration} />
       <Route path="/admin-panel/supabase-status" component={SupabaseStatus} />
       <Route path="/admin-panel/supabase" component={SupabaseStatus} />

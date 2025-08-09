@@ -11,7 +11,6 @@ import {
   UserCheck,
   MessageSquare,
   Bot,
-
   Settings,
   ArrowLeft,
   ShoppingCart,
@@ -34,7 +33,8 @@ import {
   Archive,
   Wrench,
   Globe,
-  Play // Import Play icon
+  Play,
+  GraduationCap // Import GraduationCap icon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -100,6 +100,12 @@ const singleNavigation: NavigationItem[] = [
     href: "/admin-panel/video-education",
     icon: Play,
     description: "Manage Video Content"
+  },
+  {
+    name: "Video Courses",
+    href: "/admin-panel/video-courses",
+    icon: GraduationCap,
+    description: "Manage structured video courses"
   },
 ];
 

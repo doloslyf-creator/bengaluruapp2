@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/layout/header";
@@ -9,8 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Play, Clock, Eye, Search, Filter, BookOpen, GraduationCap, Award, CheckCircle } from "lucide-react";
+import { Play, Clock, Eye, Search, Filter, BookOpen, GraduationCap, Award, CheckCircle, ArrowRight, Users } from "lucide-react";
 import { updateMetaTags } from "@/utils/seo";
+import { useNavigate } from "react-router-dom";
 
 interface VideoContent {
   id: string;
@@ -26,11 +26,25 @@ interface VideoContent {
   createdAt: string;
 }
 
+interface Course {
+  id: string;
+  title: string;
+  description: string;
+  slug: string;
+  level: 'beginner' | 'intermediate' | 'advanced';
+  category: string;
+  thumbnailUrl?: string;
+  estimatedDuration?: string;
+  enrollmentCount: number;
+  isFeatured: boolean;
+}
+
 export default function PropertyEducation() {
   const [selectedVideo, setSelectedVideo] = useState<VideoContent | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
+  const navigate = useNavigate();
 
   useEffect(() => {
     updateMetaTags(
@@ -42,8 +56,12 @@ export default function PropertyEducation() {
     );
   }, []);
 
-  const { data: videos = [], isLoading } = useQuery<VideoContent[]>({
+  const { data: videos = [], isLoading: isLoadingVideos } = useQuery<VideoContent[]>({
     queryKey: ["/api/video-education/public"]
+  });
+
+  const { data: courses = [], isLoading: isLoadingCourses } = useQuery<Course[]>({
+    queryKey: ["/api/courses/public"]
   });
 
   const filteredVideos = videos.filter(video => {
@@ -52,12 +70,12 @@ export default function PropertyEducation() {
                          video.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesCategory = selectedCategory === "all" || video.category === selectedCategory;
     const matchesDifficulty = selectedDifficulty === "all" || video.difficulty === selectedDifficulty;
-    
+
     return matchesSearch && matchesCategory && matchesDifficulty && video.isPublished;
   });
 
   const categories = Array.from(new Set(videos.map(v => v.category)));
-  
+
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'beginner': return 'bg-green-100 text-green-800';
@@ -94,7 +112,7 @@ export default function PropertyEducation() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <Header />
-      
+
       {/* Hero Section */}
       <section className="py-20 px-4">
         <div className="max-w-7xl mx-auto text-center">
@@ -102,12 +120,12 @@ export default function PropertyEducation() {
             <Play className="h-4 w-4 mr-2" />
             Video Education Center
           </div>
-          
+
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
             Master Property Investment
             <span className="text-blue-600"> Through Expert Videos</span>
           </h1>
-          
+
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
             Learn from RERA-certified experts with our comprehensive video library. 
             From basic concepts to advanced strategies, we've got your property education covered.
@@ -130,23 +148,109 @@ export default function PropertyEducation() {
         </div>
       </section>
 
-      {/* Learning Paths */}
-      <section className="py-16 px-4">
+      {/* Structured Courses */}
+      <section className="py-16 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">Choose Your Learning Path</h2>
-          
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Structured Video Courses
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Follow step-by-step learning journeys designed by experts. From beginner basics to advanced strategies.
+            </p>
+          </div>
+
+          {(isLoadingCourses || courses.length > 0) && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+              {!isLoadingCourses ? courses.map((course: Course) => (
+                <Card key={course.id} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
+                  <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 rounded-t-lg flex items-center justify-center">
+                    {course.thumbnailUrl ? (
+                      <img
+                        src={course.thumbnailUrl}
+                        alt={course.title}
+                        className="w-full h-full object-cover rounded-t-lg"
+                      />
+                    ) : (
+                      <GraduationCap className="h-12 w-12 text-blue-600" />
+                    )}
+                  </div>
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Badge 
+                        variant={course.level === 'beginner' ? 'default' : 
+                                course.level === 'intermediate' ? 'secondary' : 'destructive'}
+                        className="text-xs"
+                      >
+                        {course.level}
+                      </Badge>
+                      <Badge variant="outline" className="text-xs">{course.category}</Badge>
+                      {course.isFeatured && (
+                        <Badge className="bg-yellow-500 text-xs">Featured</Badge>
+                      )}
+                    </div>
+
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{course.title}</h3>
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">{course.description}</p>
+
+                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                      <span className="flex items-center">
+                        <Clock className="h-4 w-4 mr-1" />
+                        {course.estimatedDuration || 'Self-paced'}
+                      </span>
+                      <span className="flex items-center">
+                        <Users className="h-4 w-4 mr-1" />
+                        {course.enrollmentCount} enrolled
+                      </span>
+                    </div>
+
+                    <Button 
+                      className="w-full"
+                      onClick={() => navigate(`/courses/${course.slug}`)}
+                    >
+                      Start Course
+                      <Play className="h-4 w-4 ml-2" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              )) : (
+                <div className="col-span-3 text-center py-10 text-gray-500">Loading courses...</div>
+              )}
+            </div>
+          )}
+          {courses.length === 0 && !isLoadingCourses && (
+            <div className="text-center py-10 text-gray-500">No courses available yet.</div>
+          )}
+        </div>
+      </section>
+
+      {/* Learning Paths */}
+      <section className="py-16 px-4 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Individual Video Library
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Browse our collection of individual expert videos by topic and difficulty level
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {learningPaths.map((path, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className={`w-12 h-12 rounded-lg ${path.color} flex items-center justify-center mb-4`}>
+              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
+                <CardContent className="p-8">
+                  <div className={`w-16 h-16 rounded-2xl ${path.color} flex items-center justify-center mb-6`}>
                     {path.icon}
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">{path.title}</h3>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">{path.title}</h3>
                   <p className="text-gray-600 mb-4">{path.description}</p>
-                  <div className="flex items-center text-sm text-gray-500">
-                    <Play className="h-4 w-4 mr-1" />
-                    {path.videos} videos available
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500">{path.videos} videos</span>
+                    <Button variant="outline" size="sm">
+                      Browse Videos
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -168,7 +272,7 @@ export default function PropertyEducation() {
                 className="pl-10"
               />
             </div>
-            
+
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
               <SelectTrigger className="w-full md:w-48">
                 <SelectValue placeholder="All Categories" />
@@ -180,7 +284,7 @@ export default function PropertyEducation() {
                 ))}
               </SelectContent>
             </Select>
-            
+
             <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
               <SelectTrigger className="w-full md:w-48">
                 <SelectValue placeholder="All Levels" />
@@ -207,7 +311,7 @@ export default function PropertyEducation() {
               {searchTerm && `Search results for "${searchTerm}"`}
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredVideos.map((video) => (
               <Card key={video.id} className="overflow-hidden hover:shadow-xl transition-shadow group">
@@ -227,7 +331,7 @@ export default function PropertyEducation() {
                     {video.duration}
                   </div>
                 </div>
-                
+
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-3">
                     <Badge className={getDifficultyColor(video.difficulty)}>
@@ -238,15 +342,15 @@ export default function PropertyEducation() {
                       {video.viewCount}
                     </div>
                   </div>
-                  
+
                   <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
                     {video.title}
                   </h3>
-                  
+
                   <p className="text-gray-600 text-sm mb-4 line-clamp-3">
                     {video.description}
                   </p>
-                  
+
                   <div className="flex justify-between items-center">
                     <Badge variant="outline" className="text-xs">
                       {video.category}
@@ -272,7 +376,7 @@ export default function PropertyEducation() {
           <DialogHeader>
             <DialogTitle className="text-xl">{selectedVideo?.title}</DialogTitle>
           </DialogHeader>
-          
+
           {selectedVideo && (
             <div className="space-y-4">
               <div className="aspect-video w-full">
@@ -283,7 +387,7 @@ export default function PropertyEducation() {
                   title={selectedVideo.title}
                 />
               </div>
-              
+
               <div className="space-y-3">
                 <div className="flex items-center space-x-4 text-sm text-gray-600">
                   <Badge className={getDifficultyColor(selectedVideo.difficulty)}>
@@ -299,9 +403,9 @@ export default function PropertyEducation() {
                   </span>
                   <Badge variant="outline">{selectedVideo.category}</Badge>
                 </div>
-                
+
                 <p className="text-gray-700">{selectedVideo.description}</p>
-                
+
                 <div className="flex flex-wrap gap-2">
                   {selectedVideo.tags.map(tag => (
                     <Badge key={tag} variant="outline" className="text-xs">

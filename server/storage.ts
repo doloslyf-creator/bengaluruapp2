@@ -93,6 +93,9 @@ import {
   legalReportAssignments,
   propertyValuationReportAssignments,
   reraData,
+  videoCourses,
+  videoChapters,
+  courseEnrollments,
   InsertReraData,
   ReraData
 
