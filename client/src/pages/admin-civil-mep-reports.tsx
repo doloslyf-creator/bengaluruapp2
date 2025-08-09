@@ -9,8 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import AdminLayout from "@/components/layout/admin-layout";
-import { Plus, FileText, Search, Filter, Eye, Edit, Trash2, Download, TrendingUp, Calendar, CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { Plus, FileText, Search, Filter, Eye, Edit, Trash2, Download, TrendingUp, Calendar, CheckCircle, Clock, AlertCircle, Users, UserCheck, X } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import type { CivilMepReport } from "@shared/schema";
@@ -20,6 +22,9 @@ export function AdminCivilMepReports() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedReport, setSelectedReport] = useState<CivilMepReport | null>(null);
   const [showReportDialog, setShowReportDialog] = useState(false);
+  const [showAssignDialog, setShowAssignDialog] = useState(false);
+  const [selectedReportId, setSelectedReportId] = useState<string>("");
+  const [reportCustomers, setReportCustomers] = useState<Record<string, any[]>>({});
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -32,6 +37,38 @@ export function AdminCivilMepReports() {
   const { data: stats } = useQuery({
     queryKey: ["/api/civil-mep-reports-stats"],
   });
+
+  // Fetch customers for assignment
+  const { data: customers = [] } = useQuery<any[]>({
+    queryKey: ["/api/customers"],
+  });
+
+  // Fetch customer assignments for each report
+  useEffect(() => {
+    if (reports.length > 0) {
+      Promise.all(
+        reports.map(async (report) => {
+          try {
+            const response = await fetch(`/api/civil-mep-reports/${report.id}/assignments`);
+            if (response.ok) {
+              const assignments = await response.json();
+              return { reportId: report.id, assignments };
+            }
+            return { reportId: report.id, assignments: [] };
+          } catch (error) {
+            console.error(`Error fetching customers for report ${report.id}:`, error);
+            return { reportId: report.id, assignments: [] };
+          }
+        })
+      ).then((results) => {
+        const customersByReport: Record<string, any[]> = {};
+        results.forEach(({ reportId, assignments }) => {
+          customersByReport[reportId] = assignments;
+        });
+        setReportCustomers(customersByReport);
+      });
+    }
+  }, [reports]);
 
   // Delete report mutation
   const deleteReportMutation = useMutation({
@@ -233,8 +270,9 @@ export function AdminCivilMepReports() {
                       <TableHead className="min-w-[100px]">Status</TableHead>
                       <TableHead className="min-w-[80px]">Score</TableHead>
                       <TableHead className="min-w-[120px]">Recommendation</TableHead>
+                      <TableHead className="min-w-[100px]">Assigned Customers</TableHead>
                       <TableHead className="min-w-[100px]">Dates</TableHead>
-                      <TableHead className="text-right min-w-[120px]">Actions</TableHead>
+                      <TableHead className="text-right min-w-[140px]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -270,6 +308,19 @@ export function AdminCivilMepReports() {
                           {getRecommendationBadge(report.investmentRecommendation || 'conditional')}
                         </TableCell>
                         <TableCell>
+                          <div className="flex items-center gap-1">
+                            <UserCheck className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-sm font-medium">
+                              {reportCustomers[report.id]?.length || 0}
+                            </span>
+                            {reportCustomers[report.id]?.length > 0 && (
+                              <div className="text-xs text-muted-foreground">
+                                assigned
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
                           <div className="text-sm">
                             <div>Inspection: {new Date(report.inspectionDate).toLocaleDateString()}</div>
                             <div>Report: {new Date(report.reportDate).toLocaleDateString()}</div>
@@ -277,6 +328,18 @@ export function AdminCivilMepReports() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedReportId(report.id);
+                                setShowAssignDialog(true);
+                              }}
+                              title="Assign Customers"
+                              data-testid={`button-assign-${report.id}`}
+                            >
+                              <Users className="w-4 h-4" />
+                            </Button>
                             <Button
                               variant="ghost"
                               size="sm"
@@ -416,7 +479,326 @@ export function AdminCivilMepReports() {
             )}
           </DialogContent>
         </Dialog>
+
+        {/* Customer Assignment Dialog */}
+        <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Assign Customers to Civil+MEP Report</DialogTitle>
+              <DialogDescription>
+                Select customers to assign to this Civil+MEP report
+              </DialogDescription>
+            </DialogHeader>
+            <CivilMepCustomerAssignmentDialog
+              reportId={selectedReportId}
+              customers={customers}
+              onAssignmentChange={() => {
+                // Refresh the customer assignments
+                if (reports.length > 0) {
+                  Promise.all(
+                    reports.map(async (report) => {
+                      try {
+                        const response = await fetch(`/api/civil-mep-reports/${report.id}/assignments`);
+                        if (response.ok) {
+                          const assignments = await response.json();
+                          return { reportId: report.id, assignments };
+                        }
+                        return { reportId: report.id, assignments: [] };
+                      } catch (error) {
+                        console.error(`Error fetching customers for report ${report.id}:`, error);
+                        return { reportId: report.id, assignments: [] };
+                      }
+                    })
+                  ).then((results) => {
+                    const customersByReport: Record<string, any[]> = {};
+                    results.forEach(({ reportId, assignments }) => {
+                      customersByReport[reportId] = assignments;
+                    });
+                    setReportCustomers(customersByReport);
+                  });
+                }
+              }}
+              onClose={() => setShowAssignDialog(false)}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     </AdminLayout>
+  );
+}
+
+// Customer Assignment Dialog Component for Civil+MEP Reports
+function CivilMepCustomerAssignmentDialog({ 
+  reportId, 
+  customers, 
+  onAssignmentChange, 
+  onClose 
+}: {
+  reportId: string;
+  customers: any[];
+  onAssignmentChange: () => void;
+  onClose: () => void;
+}) {
+  const [selectedCustomers, setSelectedCustomers] = useState<string[]>([]);
+  const [assignedCustomers, setAssignedCustomers] = useState<any[]>([]);
+  const [isLoadingAssignments, setIsLoadingAssignments] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [accessLevel, setAccessLevel] = useState("view");
+  const [notes, setNotes] = useState("");
+  const { toast } = useToast();
+
+  // Fetch current assignments when dialog opens
+  useEffect(() => {
+    if (reportId) {
+      setIsLoadingAssignments(true);
+      fetch(`/api/civil-mep-reports/${reportId}/assignments`)
+        .then(response => response.json())
+        .then(assignments => {
+          setAssignedCustomers(assignments);
+          setIsLoadingAssignments(false);
+        })
+        .catch(error => {
+          console.error('Error fetching assignments:', error);
+          setIsLoadingAssignments(false);
+        });
+    }
+  }, [reportId]);
+
+  // Filter customers based on search term
+  const filteredCustomers = customers.filter(customer =>
+    customer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    customer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (customer.phone && customer.phone.includes(searchTerm))
+  );
+
+  // Get customers that are not yet assigned
+  const availableCustomers = filteredCustomers.filter(customer => 
+    !assignedCustomers.some(assignment => assignment.customerId === customer.id)
+  );
+
+  // Handle customer selection
+  const handleCustomerToggle = (customerId: string) => {
+    setSelectedCustomers(prev => 
+      prev.includes(customerId) 
+        ? prev.filter(id => id !== customerId)
+        : [...prev, customerId]
+    );
+  };
+
+  // Handle assignment submission
+  const handleAssign = async () => {
+    if (selectedCustomers.length === 0) {
+      toast({
+        title: "No customers selected",
+        description: "Please select at least one customer to assign.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const assignmentPromises = selectedCustomers.map(customerId =>
+        fetch(`/api/civil-mep-reports/${reportId}/assign-customer`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            customerId,
+            assignedBy: 'admin@ownit.com',
+            accessLevel,
+            notes
+          }),
+        })
+      );
+
+      const responses = await Promise.all(assignmentPromises);
+      const successCount = responses.filter(r => r.ok).length;
+      const failedCount = responses.length - successCount;
+
+      if (successCount > 0) {
+        toast({
+          title: "Success",
+          description: `Successfully assigned ${successCount} customer(s) to the report.${failedCount > 0 ? ` ${failedCount} assignment(s) failed.` : ''}`,
+        });
+        setSelectedCustomers([]);
+        setNotes("");
+        onAssignmentChange();
+        onClose();
+      } else {
+        throw new Error('All assignments failed');
+      }
+    } catch (error) {
+      console.error('Error assigning customers:', error);
+      toast({
+        title: "Error",
+        description: "Failed to assign customers to the report.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Handle assignment removal
+  const handleRemoveAssignment = async (customerId: string) => {
+    try {
+      const response = await fetch(`/api/civil-mep-reports/${reportId}/remove-customer/${customerId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Customer assignment removed successfully.",
+        });
+        setAssignedCustomers(prev => 
+          prev.filter(assignment => assignment.customerId !== customerId)
+        );
+        onAssignmentChange();
+      } else {
+        throw new Error('Failed to remove assignment');
+      }
+    } catch (error) {
+      console.error('Error removing assignment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove customer assignment.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Currently Assigned Customers */}
+      {isLoadingAssignments ? (
+        <div className="text-center py-4">Loading current assignments...</div>
+      ) : assignedCustomers.length > 0 ? (
+        <div>
+          <h4 className="font-semibold mb-3">Currently Assigned Customers ({assignedCustomers.length})</h4>
+          <div className="space-y-2 max-h-40 overflow-y-auto">
+            {assignedCustomers.map((assignment) => (
+              <div key={assignment.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex-1">
+                  <div className="font-medium">{assignment.customer?.name}</div>
+                  <div className="text-sm text-muted-foreground">{assignment.customer?.email}</div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Badge variant="outline" className="text-xs">
+                      {assignment.accessLevel}
+                    </Badge>
+                    {assignment.notes && (
+                      <span className="text-xs text-muted-foreground">
+                        {assignment.notes.length > 30 ? `${assignment.notes.substring(0, 30)}...` : assignment.notes}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleRemoveAssignment(assignment.customerId)}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="text-center py-4 text-muted-foreground">
+          No customers currently assigned to this report
+        </div>
+      )}
+
+      {/* Assignment Form */}
+      <div className="border-t pt-6">
+        <h4 className="font-semibold mb-3">Assign New Customers</h4>
+        
+        {/* Search customers */}
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="customer-search">Search Customers</Label>
+            <Input
+              id="customer-search"
+              placeholder="Search by name, email, or phone..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          {/* Access Level & Notes */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="access-level">Access Level</Label>
+              <Select value={accessLevel} onValueChange={setAccessLevel}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="view">View Only</SelectItem>
+                  <SelectItem value="edit">View & Edit</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="assignment-notes">Notes (Optional)</Label>
+              <Input
+                id="assignment-notes"
+                placeholder="Assignment notes..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Customer Selection */}
+          <div>
+            <Label>Available Customers ({availableCustomers.length})</Label>
+            <div className="border rounded-lg max-h-60 overflow-y-auto mt-2">
+              {availableCustomers.length === 0 ? (
+                <div className="text-center py-4 text-muted-foreground">
+                  {searchTerm ? "No customers match your search" : "All customers are already assigned"}
+                </div>
+              ) : (
+                <div className="p-2 space-y-2">
+                  {availableCustomers.map((customer) => (
+                    <div
+                      key={customer.id}
+                      className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
+                      onClick={() => handleCustomerToggle(customer.id)}
+                    >
+                      <Checkbox
+                        checked={selectedCustomers.includes(customer.id)}
+                        onChange={() => handleCustomerToggle(customer.id)}
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium">{customer.name}</div>
+                        <div className="text-sm text-muted-foreground">{customer.email}</div>
+                        {customer.phone && (
+                          <div className="text-sm text-muted-foreground">{customer.phone}</div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-end gap-2 pt-4">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleAssign}
+              disabled={selectedCustomers.length === 0}
+            >
+              Assign {selectedCustomers.length > 0 && `(${selectedCustomers.length})`} Customer{selectedCustomers.length !== 1 ? 's' : ''}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
