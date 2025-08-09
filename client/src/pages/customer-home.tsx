@@ -177,10 +177,10 @@ export default function CustomerHome() {
 
                 <Button 
                   className="w-full bg-gradient-to-r from-primary to-blue-600 text-white py-3 rounded-xl font-semibold"
-                  onClick={() => navigate('/property-valuation')}
-                  data-testid="button-get-analysis"
+                  onClick={() => navigate('/property-education')}
+                  data-testid="button-learn-before-buy"
                 >
-                  Get My Property Analysis →
+                  Learn Before You Buy →
                 </Button>
               </CardContent>
             </Card>
