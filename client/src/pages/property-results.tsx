@@ -310,7 +310,15 @@ export default function PropertyResults() {
   };
 
   const handleViewProperty = (property: PropertyWithConfigurations) => {
-    navigate(`/property/${property.id}/${generatePropertySlug(property)}`);
+    // Route to intent-specific property detail pages
+    if (preferences.intent === 'investment') {
+      navigate(`/property/${property.id}/investment`);
+    } else if (preferences.intent === 'end-use') {
+      navigate(`/property/${property.id}/end-use`);
+    } else {
+      // Fallback to general property page
+      navigate(`/property/${property.id}/${generatePropertySlug(property)}`);
+    }
   };
 
   const getPriceRange = (configurations: PropertyConfiguration[]) => {
