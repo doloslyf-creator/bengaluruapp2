@@ -138,23 +138,36 @@ export default function PropertyDetailInvestment() {
   const investmentScore = getInvestmentScore();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center space-x-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-100">
+      {/* Enhanced Investment-Focused Header */}
+      <div className="relative bg-gradient-to-r from-white via-green-50 to-emerald-50 border-b shadow-lg overflow-hidden">
+        {/* Investment-themed Background Elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-1/4 left-1/6 w-24 h-24 bg-green-200 rounded-full opacity-20 animate-pulse"></div>
+          <div className="absolute top-2/3 right-1/4 w-20 h-20 bg-emerald-200 rounded-full opacity-15 animate-pulse delay-1000"></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-6 py-6 relative">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
             <Button 
               variant="outline" 
               size="sm"
               onClick={() => navigate("/find-property")}
               data-testid="button-back-to-search"
+              className="bg-white/80 backdrop-blur-sm hover:bg-white border-2 border-slate-200 hover:border-green-300 rounded-xl px-6 py-3 transform hover:scale-105 transition-all duration-300"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Find Properties
             </Button>
-            <div className="flex items-center space-x-2">
-              <TrendingUp className="h-5 w-5 text-green-600" />
-              <span className="font-semibold text-green-600">Investment Analysis</span>
+            
+            <div className="flex items-center space-x-3">
+              <Badge className="bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-2 border-green-200 px-4 py-2 rounded-full font-bold shadow-lg">
+                <TrendingUp className="h-5 w-5 mr-2" />
+                Investment Analysis
+              </Badge>
+              <div className="text-sm text-slate-600 font-medium bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-md">
+                📊 ROI Focused View
+              </div>
             </div>
           </div>
         </div>

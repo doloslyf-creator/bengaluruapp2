@@ -147,23 +147,37 @@ export default function PropertyDetailEndUse() {
   const lifestyleScore = getLifestyleScore();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center space-x-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-100">
+      {/* Enhanced Family-Focused Header */}
+      <div className="relative bg-gradient-to-r from-white via-purple-50 to-pink-50 border-b shadow-lg overflow-hidden">
+        {/* Family-themed Background Elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-1/4 left-1/6 w-24 h-24 bg-purple-200 rounded-full opacity-20 animate-pulse"></div>
+          <div className="absolute top-2/3 right-1/4 w-20 h-20 bg-pink-200 rounded-full opacity-15 animate-pulse delay-1000"></div>
+          <div className="absolute bottom-1/4 left-1/2 w-28 h-28 bg-indigo-200 rounded-full opacity-10 animate-pulse delay-2000"></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-6 py-6 relative">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
             <Button 
               variant="outline" 
               size="sm"
               onClick={() => navigate("/find-property")}
               data-testid="button-back-to-search"
+              className="bg-white/80 backdrop-blur-sm hover:bg-white border-2 border-slate-200 hover:border-purple-300 rounded-xl px-6 py-3 transform hover:scale-105 transition-all duration-300"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Find Properties
             </Button>
-            <div className="flex items-center space-x-2">
-              <Home className="h-5 w-5 text-purple-600" />
-              <span className="font-semibold text-purple-600">Home for Living</span>
+            
+            <div className="flex items-center space-x-3">
+              <Badge className="bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 border-2 border-purple-200 px-4 py-2 rounded-full font-bold shadow-lg">
+                <Home className="h-5 w-5 mr-2" />
+                Home for Living
+              </Badge>
+              <div className="text-sm text-slate-600 font-medium bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-md">
+                🏡 Lifestyle Focused View
+              </div>
             </div>
           </div>
         </div>

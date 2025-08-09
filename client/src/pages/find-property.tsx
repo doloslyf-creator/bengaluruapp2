@@ -16,7 +16,9 @@ import {
   Calculator,
   Users,
   Briefcase,
-  School
+  School,
+  CheckCircle,
+  Star
 } from "lucide-react";
 import { type Property } from "@shared/schema";
 import Header from "@/components/layout/header";
@@ -293,44 +295,89 @@ export default function FindProperty() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <Header />
       
-      {/* Integrated Header */}
-      <section className="bg-white py-8 border-b">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Find Your Perfect Property
+      {/* Enhanced Hero Header with Premium Design */}
+      <section className="relative bg-gradient-to-br from-white via-blue-50 to-indigo-50 py-16 border-b overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-1/4 left-1/6 w-32 h-32 bg-blue-200 rounded-full opacity-20 animate-pulse"></div>
+          <div className="absolute top-2/3 right-1/4 w-24 h-24 bg-indigo-200 rounded-full opacity-15 animate-pulse delay-1000"></div>
+          <div className="absolute bottom-1/3 left-1/2 w-40 h-40 bg-purple-200 rounded-full opacity-10 animate-pulse delay-2000"></div>
+        </div>
+        
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="text-center mb-16">
+            {/* Badge */}
+            <div className="animate-fade-in mb-8">
+              <div className="inline-flex items-center bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-200 rounded-full px-6 py-3 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                <MapPin className="w-4 h-4 mr-2 animate-bounce" />
+                <span className="font-semibold">AI-Powered Property Matching</span>
+              </div>
+            </div>
+
+            {/* Main Heading */}
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-8 leading-tight animate-slide-up delay-100">
+              <span className="bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 bg-clip-text text-transparent">
+                Find Your Perfect
+              </span>
+              <span className="block text-orange-600 mt-2">
+                Property Match
+              </span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Tell us your purpose and preferences - we'll match you with properties 
+            
+            <p className="text-xl md:text-2xl text-slate-600 max-w-4xl mx-auto leading-relaxed font-medium animate-slide-up delay-200 mb-12">
+              Tell us your purpose and preferences - our AI will match you with properties 
               that fit your specific needs and show relevant insights.
             </p>
-          </div>
 
-          {/* Quick Stats */}
-          <div className="grid grid-cols-3 gap-6 max-w-2xl mx-auto">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600">{properties.length}+</div>
-              <div className="text-sm text-gray-600 mt-1">Verified Properties</div>
+            {/* Enhanced Stats with Animations */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12">
+              {[
+                { number: `${properties.length}+`, label: "Verified Properties", color: "text-blue-600", bgColor: "bg-blue-50", icon: Building2 },
+                { number: "Zero", label: "Broker Fees", color: "text-green-600", bgColor: "bg-green-50", icon: Shield },
+                { number: "AI", label: "Intent-Based Matching", color: "text-purple-600", bgColor: "bg-purple-50", icon: Target }
+              ].map((stat, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 + index * 0.1 }}
+                  className={`${stat.bgColor} p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 group`}
+                >
+                  <div className="flex items-center justify-center mb-4">
+                    <stat.icon className={`w-8 h-8 ${stat.color} group-hover:scale-110 transition-transform duration-300`} />
+                  </div>
+                  <div className={`text-3xl md:text-4xl font-black ${stat.color} mb-2`}>
+                    {stat.number}
+                  </div>
+                  <div className="text-slate-600 font-medium">{stat.label}</div>
+                </motion.div>
+              ))}
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-green-600">Zero</div>
-              <div className="text-sm text-gray-600 mt-1">Broker Fees</div>
+            
+            {/* Enhanced Trust Indicators */}
+            <div className="flex flex-wrap justify-center items-center gap-4 text-sm text-slate-600 animate-slide-up delay-500">
+              {[
+                { icon: CheckCircle, text: "RERA Verified", color: "text-green-600" },
+                { icon: Shield, text: "Expert Analysis", color: "text-blue-600" },
+                { icon: Star, text: "4.9/5 Rating", color: "text-yellow-600" }
+              ].map((item, index) => (
+                <div key={index} className="flex items-center bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300">
+                  <item.icon className={`w-4 h-4 mr-2 ${item.color}`} />
+                  <span className="font-medium">{item.text}</span>
+                </div>
+              ))}
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600">AI</div>
-              <div className="text-sm text-gray-600 mt-1">Intent-Based Matching</div>
+            
+            {/* Enhanced Data Transparency Banner */}
+            <div className="mt-12 animate-slide-up delay-600">
+              <DataTransparencyIndicator 
+                variant="banner" 
+                sources={["RERA Database Verified", "Site Visit Verified", "Updated Daily"]}
+              />
             </div>
-          </div>
-          
-          {/* Data Transparency Trust Banner */}
-          <div className="mt-8">
-            <DataTransparencyIndicator 
-              variant="banner" 
-              sources={["RERA Database Verified", "Site Visit Verified", "Updated Daily"]}
-            />
           </div>
         </div>
       </section>

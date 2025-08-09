@@ -395,39 +395,49 @@ export default function PropertyResults() {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <header className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+        {/* Enhanced Modern Header */}
+        <header className="bg-white/95 backdrop-blur-md shadow-lg border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between space-y-4 lg:space-y-0">
+              <div className="flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-6">
                 <Button 
                   variant="ghost" 
                   onClick={() => navigate('/find-property')}
-                  className="flex items-center space-x-2 hover:bg-gray-100"
+                  className="self-start flex items-center space-x-2 hover:bg-blue-50 rounded-xl transition-all duration-300 transform hover:scale-105"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  <span>Back</span>
+                  <span>Back to Search</span>
                 </Button>
-                <div>
-                  <h1 className="text-xl font-bold text-gray-900">
-                    {preferences.intent === 'investment' ? 'Investment Properties' : 
-                     preferences.intent === 'end-use' ? 'Homes for You' : 
-                     'Property Results'}
-                  </h1>
-                  <p className="text-sm text-gray-600">
-                    {matchingProperties.length} {preferences.intent === 'investment' ? 'investment opportunities' : 
-                    preferences.intent === 'end-use' ? 'family homes' : 'properties'} found
+                
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-3">
+                    <h1 className="text-2xl md:text-3xl font-black text-slate-900">
+                      {preferences.intent === 'investment' ? 'Investment Properties' : 
+                       preferences.intent === 'end-use' ? 'Homes for You' : 
+                       'Property Results'}
+                    </h1>
                     {preferences.intent && (
-                      <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                        {preferences.intent === 'investment' ? '💰 Investment Focus' : '🏡 Family Focus'}
-                      </span>
+                      <Badge 
+                        className={`${
+                          preferences.intent === 'investment' 
+                            ? 'bg-green-100 text-green-700 border-green-200' 
+                            : 'bg-purple-100 text-purple-700 border-purple-200'
+                        } px-4 py-1.5 font-semibold rounded-full border-2`}
+                      >
+                        {preferences.intent === 'investment' ? '📈 Investment Focus' : '🏡 Family Focus'}
+                      </Badge>
                     )}
+                  </div>
+                  
+                  <p className="text-lg font-medium text-slate-600">
+                    <span className="text-3xl font-bold text-blue-600">{matchingProperties.length}</span> {preferences.intent === 'investment' ? 'investment opportunities' : 
+                    preferences.intent === 'end-use' ? 'family homes' : 'properties'} found matching your criteria
                   </p>
                 </div>
                 
-                {/* Data Transparency Indicator */}
-                <div className="ml-6">
+                {/* Enhanced Data Transparency Indicator */}
+                <div className="bg-white/80 rounded-xl p-3 shadow-md border border-blue-200">
                   <DataTransparencyIndicator 
                     variant="compact" 
                     sources={["RERA Database", "Site Verification"]}
@@ -551,21 +561,24 @@ export default function PropertyResults() {
                   const matchInfo = getMatchLabel(property.matchScore);
                   
                   return (
-                    <Card key={property.id} className="group hover:shadow-lg transition-all duration-200 cursor-pointer border border-gray-200 hover:border-primary/30 bg-white">
+                    <Card key={property.id} className="group hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer border-2 border-slate-200 hover:border-blue-300 bg-white rounded-2xl overflow-hidden card-hover-effect">
                       <div onClick={() => handleViewProperty(property)} className="relative">
-                        {/* Property Image */}
-                        <div className="aspect-[4/3] bg-gradient-to-br from-blue-50 to-indigo-100 rounded-t-lg flex items-center justify-center relative overflow-hidden">
-                          <div className="text-primary/60 text-center">
-                            <div className="text-3xl mb-1">🏢</div>
-                            <p className="text-xs font-medium text-gray-600">Property Image</p>
+                        {/* Enhanced Property Image */}
+                        <div className="aspect-[4/3] bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 relative overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
+                          <div className="text-slate-400 text-center absolute inset-0 flex items-center justify-center">
+                            <div>
+                              <div className="text-4xl mb-2 group-hover:scale-110 transition-transform duration-300">🏢</div>
+                              <p className="text-sm font-medium">Property Image</p>
+                            </div>
                           </div>
                           
-                          {/* Match Badge - Top Left */}
-                          <Badge className={`absolute top-3 left-3 ${matchInfo.color} text-xs font-semibold shadow-sm`}>
-                            {property.matchScore}% Match
+                          {/* Enhanced Match Badge - Top Left */}
+                          <Badge className={`absolute top-4 left-4 ${matchInfo.color} text-xs font-bold shadow-lg backdrop-blur-sm border border-white/20 px-3 py-1.5 rounded-full`}>
+                            ⭐ {property.matchScore}% Match
                           </Badge>
                           
-                          {/* Heart Button - Top Right */}
+                          {/* Enhanced Heart Button - Top Right */}
                           <Button
                             variant="ghost"
                             size="sm"
@@ -573,51 +586,68 @@ export default function PropertyResults() {
                               e.stopPropagation();
                               toggleFavorite(property.id);
                             }}
-                            className="absolute top-2 right-2 h-8 w-8 bg-white/80 hover:bg-white backdrop-blur-sm"
+                            className="absolute top-4 right-4 h-10 w-10 bg-white/90 hover:bg-white backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300"
                           >
                             <Heart 
-                              className={`h-4 w-4 ${
+                              className={`h-5 w-5 ${
                                 favorites.has(property.id) 
-                                  ? 'fill-red-500 text-red-500' 
-                                  : 'text-gray-400 hover:text-red-400'
+                                  ? 'fill-red-500 text-red-500 animate-pulse' 
+                                  : 'text-slate-400 hover:text-red-500'
                               }`} 
                             />
                           </Button>
+
+                          {/* Hover Overlay */}
+                          <div className="absolute inset-0 bg-blue-600/80 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+                            <div className="text-white text-center transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                              <Eye className="h-8 w-8 mx-auto mb-2" />
+                              <p className="font-semibold">View Details</p>
+                            </div>
+                          </div>
                         </div>
 
-                        {/* Card Content */}
-                        <div className="p-4">
+                        {/* Enhanced Card Content */}
+                        <div className="p-6 space-y-4">
                           {/* Property Title */}
-                          <h3 className="font-bold text-lg text-gray-900 group-hover:text-primary transition-colors line-clamp-1 mb-1">
+                          <h3 className="font-black text-xl text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-tight">
                             {property.name}
                           </h3>
                           
-                          {/* Location */}
-                          <div className="flex items-center text-sm text-gray-600 mb-2">
-                            <MapPin className="h-3 w-3 mr-1 text-gray-400" />
-                            <span className="line-clamp-1">{property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)}</span>
+                          {/* Location with Enhanced Styling */}
+                          <div className="flex items-center text-sm text-slate-600">
+                            <div className="flex items-center bg-slate-100 rounded-full px-3 py-1.5">
+                              <MapPin className="h-4 w-4 mr-2 text-blue-500" />
+                              <span className="font-medium">{property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)}</span>
+                            </div>
                           </div>
                           
-                          {/* Developer */}
-                          <p className="text-xs text-gray-500 mb-3">By {property.developer}</p>
-                          
-                          {/* Price */}
-                          <div className="text-lg font-bold text-primary mb-3">
-                            {getPriceRange(property.configurations)}
+                          {/* Developer with Enhanced Styling */}
+                          <div className="flex items-center">
+                            <Building className="h-4 w-4 mr-2 text-slate-400" />
+                            <p className="text-sm text-slate-600 font-medium">By {property.developer}</p>
                           </div>
                           
-                          {/* Configurations */}
+                          {/* Enhanced Price Display */}
+                          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-100">
+                            <div className="text-2xl font-black text-blue-700 mb-1">
+                              {getPriceRange(property.configurations)}
+                            </div>
+                            <div className="text-xs text-blue-600 font-medium uppercase tracking-wide">Starting Price</div>
+                          </div>
+                          
+                          {/* Enhanced Configurations */}
                           {property.configurations.length > 0 && (
-                            <div className="mb-3">
-                              <div className="flex flex-wrap gap-1">
+                            <div className="space-y-2">
+                              <div className="text-sm font-semibold text-slate-700">Available Configurations:</div>
+                              <div className="flex flex-wrap gap-2">
                                 {property.configurations.slice(0, 3).map((config, index) => (
-                                  <Badge key={index} variant="outline" className="text-xs px-2 py-0.5 bg-blue-50 border-blue-200 text-blue-700">
+                                  <Badge key={index} className="bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border-blue-200 px-3 py-1.5 rounded-full font-semibold hover:shadow-md transition-shadow duration-200">
                                     {config.configuration}
                                   </Badge>
                                 ))}
                                 {property.configurations.length > 3 && (
-                                  <Badge variant="outline" className="text-xs px-2 py-0.5 bg-gray-50 border-gray-200 text-gray-600">
-                                    +{property.configurations.length - 3}
+                                  <Badge className="bg-slate-100 text-slate-600 border-slate-200 px-3 py-1.5 rounded-full font-semibold">
+                                    +{property.configurations.length - 3} more
                                   </Badge>
                                 )}
                               </div>

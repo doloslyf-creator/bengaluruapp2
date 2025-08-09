@@ -77,23 +77,44 @@ export default function About() {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <Header />
       
-      {/* Hero Section */}
-      <section className="bg-white py-8 border-b">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <Badge className="mb-6 text-sm px-4 py-2 bg-blue-100 text-blue-700 border-blue-200">
+      {/* Enhanced Hero Section with Animations */}
+      <section className="relative bg-gradient-to-br from-white via-blue-50 to-indigo-50 py-16 border-b overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-1/4 left-1/6 w-32 h-32 bg-blue-200 rounded-full opacity-20 animate-pulse"></div>
+          <div className="absolute top-2/3 right-1/4 w-24 h-24 bg-indigo-200 rounded-full opacity-15 animate-pulse delay-1000"></div>
+          <div className="absolute bottom-1/3 left-1/2 w-28 h-28 bg-purple-200 rounded-full opacity-10 animate-pulse delay-2000"></div>
+        </div>
+        
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="text-center mb-16 animate-slide-up">
+            <Badge className="mb-6 text-sm px-6 py-3 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border-2 border-blue-200 rounded-full font-bold shadow-lg">
               About OwnItRight
             </Badge>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              We Help You Buy Right, Not Just Buy Fast
+            <h1 className="text-5xl md:text-6xl font-black text-slate-900 mb-8 leading-tight">
+              <span className="bg-gradient-to-r from-slate-900 via-blue-700 to-indigo-700 bg-clip-text text-transparent">
+                We Help You Buy Right,
+              </span>
+              <br />
+              <span className="text-blue-600">Not Just Buy Fast</span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              In a market full of sales-driven advice, we provide independent analysis to help you 
-              make the biggest financial decision of your life with confidence and clarity.
+            <p className="text-2xl text-slate-600 max-w-4xl mx-auto leading-relaxed font-medium">
+              In a market full of sales-driven advice, we provide <span className="text-blue-600 font-bold">independent analysis</span> to help you 
+              make the biggest financial decision of your life with <span className="text-indigo-600 font-bold">confidence and clarity</span>.
             </p>
+            
+            {/* Enhanced Trust Indicators */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12 max-w-4xl mx-auto">
+              {stats.map((stat, index) => (
+                <div key={index} className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg border-2 border-blue-100 transform hover:scale-105 transition-all duration-300">
+                  <div className="text-3xl font-black text-blue-600">{stat.number}</div>
+                  <div className="text-sm font-semibold text-slate-600">{stat.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
