@@ -545,6 +545,61 @@ export default function PropertyDetail() {
           </Card>
         </div>
 
+        {/* Amenities Section - Right after configurations */}
+        {property.amenities && property.amenities.length > 0 && (
+          <div className="max-w-7xl mx-auto px-6 mb-12">
+            <Card className="bg-white shadow-2xl rounded-2xl overflow-hidden">
+              <CardHeader className="text-center pb-6">
+                <CardTitle className="text-3xl font-bold mb-2">Premium Amenities</CardTitle>
+                <p className="text-gray-600">World-class facilities for modern living</p>
+              </CardHeader>
+              <CardContent className="p-8">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+                  {property.amenities.slice(0, 12).map((amenity, index) => {
+                    const IconComponent = amenityIcons[amenity as keyof typeof amenityIcons] || Home;
+                    return (
+                      <div key={index} className="relative">
+                        {/* Premium badge for special amenities */}
+                        {(amenity.toLowerCase().includes('premium') || amenity.toLowerCase().includes('club') || amenity.toLowerCase().includes('golf')) && (
+                          <div className="absolute -top-1 -right-1 z-10">
+                            <div className="w-4 h-6 bg-gradient-to-b from-yellow-400 to-yellow-600 transform rotate-12 flex items-center justify-center">
+                              <Star className="h-2 w-2 text-white" />
+                            </div>
+                          </div>
+                        )}
+                        
+                        <div className="bg-white border border-gray-200 rounded-xl p-6 text-center hover:shadow-lg transition-all duration-300 hover:border-blue-300 hover:-translate-y-1 group">
+                          <div className="w-16 h-16 mx-auto mb-4 p-3 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl group-hover:from-blue-50 group-hover:to-indigo-50 transition-colors">
+                            <IconComponent className="h-10 w-10 text-amber-600 group-hover:text-blue-600 transition-colors" />
+                          </div>
+                          <h3 className="text-sm font-medium text-gray-900 leading-tight">
+                            {amenity}
+                          </h3>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                
+                {property.amenities.length > 12 && (
+                  <div className="mt-8 text-center">
+                    <Button 
+                      variant="outline" 
+                      className="text-blue-600 border-blue-600 hover:bg-blue-50 px-6 py-2"
+                      onClick={() => {
+                        // You can implement a modal or expansion logic here
+                        console.log('Show all amenities');
+                      }}
+                    >
+                      View All Amenities ({property.amenities.length}) →
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Property Overview */}
         <div className="max-w-7xl mx-auto px-6 mb-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -560,59 +615,7 @@ export default function PropertyDetail() {
                     {property.description || `Discover luxury living at ${property.name}, located in the prestigious ${property.area} area of ${property.zone} zone. This premium development offers world-class amenities and modern architecture designed for the discerning homeowner.`}
                   </p>
                 </CardContent>
-              </Card>
-
-              {/* Amenities */}
-              {property.amenities && property.amenities.length > 0 && (
-                <Card className="shadow-xl rounded-2xl">
-                  <CardHeader>
-                    <CardTitle className="text-2xl">Premium Amenities</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-                      {property.amenities.slice(0, 10).map((amenity, index) => {
-                        const IconComponent = amenityIcons[amenity as keyof typeof amenityIcons] || Home;
-                        return (
-                          <div key={index} className="relative">
-                            {/* Premium badge for special amenities */}
-                            {(amenity.toLowerCase().includes('premium') || amenity.toLowerCase().includes('club') || amenity.toLowerCase().includes('golf')) && (
-                              <div className="absolute -top-1 -right-1 z-10">
-                                <div className="w-4 h-6 bg-gradient-to-b from-yellow-400 to-yellow-600 transform rotate-12 flex items-center justify-center">
-                                  <Star className="h-2 w-2 text-white" />
-                                </div>
-                              </div>
-                            )}
-                            
-                            <div className="bg-white border border-gray-200 rounded-lg p-4 text-center hover:shadow-md transition-all duration-200 hover:border-blue-300 group">
-                              <div className="w-12 h-12 mx-auto mb-3 p-2 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-lg group-hover:from-blue-50 group-hover:to-indigo-50 transition-colors">
-                                <IconComponent className="h-8 w-8 text-amber-600 group-hover:text-blue-600 transition-colors" />
-                              </div>
-                              <h3 className="text-sm font-medium text-gray-900 leading-tight">
-                                {amenity}
-                              </h3>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    
-                    {property.amenities.length > 10 && (
-                      <div className="mt-6 text-center">
-                        <Button 
-                          variant="outline" 
-                          className="text-red-600 border-red-600 hover:bg-red-50"
-                          onClick={() => {
-                            // You can implement a modal or expansion logic here
-                            console.log('Show all amenities');
-                          }}
-                        >
-                          View All Amenities ({property.amenities.length}) →
-                        </Button>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
+              </Card></old_str>
 
               {/* Location Details */}
               <Card className="shadow-xl rounded-2xl">
