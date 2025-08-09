@@ -55,7 +55,6 @@ export default function Header() {
     { name: "Home", href: "/", icon: Home },
     { name: "Find Property", href: "/find-property", icon: Search },
     { name: "Property Archive", href: "/property-archive", icon: Building2 },
-    { name: "Property Reports", href: "/property-reports", icon: FileText },
     { name: "About Us", href: "/about", icon: UserCircle },
   ];
 
