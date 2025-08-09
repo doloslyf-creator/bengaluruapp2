@@ -192,6 +192,57 @@ export function registerEnhancedLeadRoutes(app: Express) {
     }
   });
 
+  // Update enhanced lead
+  app.put("/api/leads/enhanced/:leadId", async (req, res) => {
+    try {
+      const leadData = {
+        ...req.body,
+        leadScore: calculateEnhancedLeadScore(req.body),
+        smartTags: generateSmartTags(req.body),
+      };
+
+      // Add required fields for validation if missing
+      const completeLeadData = {
+        ...leadData,
+        propertyName: leadData.propertyName || "General Inquiry",
+        interestedConfiguration: leadData.interestedConfiguration || leadData.bhkPreference || "any",  
+        budgetRange: leadData.budgetMin && leadData.budgetMax ? `${leadData.budgetMin}L-${leadData.budgetMax}L` : "TBD"
+      };
+      
+      const validatedData = insertLeadSchema.partial().parse(completeLeadData);
+      const lead = await storage.updateLead(req.params.leadId, validatedData);
+      
+      if (!lead) {
+        return res.status(404).json({ error: "Lead not found" });
+      }
+
+      // Add activity for the update
+      await storage.addLeadActivity({
+        leadId: lead.id,
+        activityType: "note",
+        subject: `Lead updated: ${lead.customerName}`,
+        description: `Enhanced lead details updated with persona: ${lead.buyerPersona}, urgency: ${lead.urgency}`,
+        outcome: "positive",
+        performedBy: req.body.updatedBy || "admin",
+        attendees: [],
+        attachments: [],
+        duration: null,
+        scheduledAt: null,
+        completedAt: null,
+        nextAction: null
+      });
+
+      console.log(`📝 Enhanced lead updated: ${lead.leadId} (${lead.buyerPersona})`);
+      res.json(lead);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Invalid lead data", details: error.errors });
+      }
+      console.error("Error updating enhanced lead:", error);
+      res.status(500).json({ error: "Failed to update enhanced lead" });
+    }
+  });
+
   // Upload lead document
   app.post("/api/leads/:leadId/documents", async (req, res) => {
     try {

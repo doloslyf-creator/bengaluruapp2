@@ -48,7 +48,8 @@ import {
   Tag,
   Pin,
   FileImage,
-  Clock as Timeline
+  Clock as Timeline,
+  Edit
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -67,6 +68,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import AdminLayout from "@/components/layout/admin-layout";
 import CreateLeadDialog from "./create-lead-dialog";
+import EditLeadDialog from "./edit-lead-dialog";
 import type { Lead, LeadWithDetails, LeadStats } from "@shared/schema";
 
 // Buyer persona configurations
@@ -115,6 +117,7 @@ export default function EnhancedLeads() {
   const [selectedLead, setSelectedLead] = useState<LeadWithDetails | null>(null);
   const [showLeadDialog, setShowLeadDialog] = useState(false);
   const [showCreateLeadDialog, setShowCreateLeadDialog] = useState(false);
+  const [showEditLeadDialog, setShowEditLeadDialog] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [newNote, setNewNote] = useState("");
   const [smartFilters, setSmartFilters] = useState<SmartFilters>({
@@ -520,17 +523,30 @@ export default function EnhancedLeads() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedLead(lead);
-                            setShowLeadDialog(true);
-                          }}
-                          data-testid={`button-view-lead-${lead.id}`}
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedLead(lead);
+                              setShowLeadDialog(true);
+                            }}
+                            data-testid={`button-view-lead-${lead.id}`}
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedLead(lead);
+                              setShowEditLeadDialog(true);
+                            }}
+                            data-testid={`button-edit-lead-${lead.id}`}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -545,6 +561,13 @@ export default function EnhancedLeads() {
         <CreateLeadDialog 
           open={showCreateLeadDialog} 
           onOpenChange={setShowCreateLeadDialog} 
+        />
+
+        {/* Edit Lead Dialog */}
+        <EditLeadDialog 
+          open={showEditLeadDialog} 
+          onOpenChange={setShowEditLeadDialog}
+          lead={selectedLead}
         />
 
         {/* Lead Details Dialog */}
