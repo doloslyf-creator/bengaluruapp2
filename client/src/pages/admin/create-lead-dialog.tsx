@@ -297,9 +297,10 @@ export default function CreateLeadDialog({ open, onOpenChange }: CreateLeadDialo
                   <SelectValue placeholder="Select property type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="apartment">Apartment</SelectItem>
                   <SelectItem value="villa">Villa</SelectItem>
+                  <SelectItem value="apartment">Apartment</SelectItem>
                   <SelectItem value="plot">Plot</SelectItem>
+                  <SelectItem value="duplex">Duplex</SelectItem>
                 </SelectContent>
               </Select>
             </div>
