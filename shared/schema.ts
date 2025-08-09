@@ -1778,7 +1778,7 @@ export interface ZoneWithCity extends Zone {
   city?: City;
 }
 
-export interface PropertyWithLocation extends Omit<Property, 'zone'> {
+export interface PropertyWithLocation extends Property {
   city?: City;
   zone?: Zone;
 }

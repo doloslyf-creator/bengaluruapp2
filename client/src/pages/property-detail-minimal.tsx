@@ -14,7 +14,7 @@ import { ExpertCredentials } from '@/components/expert-credentials';
 import { ExitIntentPopup } from '@/components/exit-intent-popup';
 import { PropertyGallery } from '@/components/property/property-gallery';
 import Header from '@/components/layout/header';
-// import { SmartRecommendations } from '@/components/smart-recommendations'; // Component not yet implemented
+import { SmartRecommendations } from '@/components/smart-recommendations'; // Assuming this component exists
 
 interface Property {
   id: string;
@@ -538,8 +538,8 @@ export default function PropertyDetailMinimal() {
     if (property.tags.includes('metro-connectivity')) intent.connectivity = 'metro';
     if (property.tags.includes('schools-nearby')) intent.education = 'near_schools';
     if (property.tags.includes('investment-friendly') || property.tags.includes('high-roi')) intent.investment = 'high_potential';
-    if ((property.locationScore || 0) >= 4) intent.location = 'prime';
-    if ((property.amenitiesScore || 0) >= 4) intent.amenities = 'premium';
+    if (property.locationScore >= 4) intent.location = 'prime';
+    if (property.amenitiesScore >= 4) intent.amenities = 'premium';
 
     // Add more nuanced intent detection based on configurations or other factors
     if (property.configurations.some(c => c.configuration.includes('4 BHK') || c.configuration.includes('5 BHK'))) {
@@ -696,7 +696,15 @@ export default function PropertyDetailMinimal() {
   return (
     <div className="min-h-screen bg-white">
       {/* Exit Intent Popup */}
-      <ExitIntentPopup />
+      <ExitIntentPopup
+        title="Wait! Don't Miss This Property!"
+        description="Get a FREE Property Valuation Report worth ₹1,499 before you leave"
+        ctaText="Get FREE Report"
+        onAction={() => {
+          setOrderFormType('valuation');
+          setShowOrderForm(true);
+        }}
+      />
 
       {/* Global Header */}
       <Header />
@@ -1930,13 +1938,17 @@ export default function PropertyDetailMinimal() {
           </CardContent>
         </Card>
 
-        {/* Smart AI Recommendations - Coming Soon */}
+        {/* Smart AI Recommendations */}
         <div className="mb-12">
-          {/* SmartRecommendations component will be implemented */}
-          <div className="text-center p-8 bg-gray-50 rounded-lg">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">AI-Powered Property Recommendations</h3>
-            <p className="text-gray-600">Smart property matching based on your preferences - Coming Soon!</p>
-          </div>
+          <SmartRecommendations
+            intent={getBuyerIntent()}
+            currentProperty={property}
+            userPreferences={{
+              budgetRange: property?.configurations?.[0] ?
+                [Math.floor(property.configurations[0].price * 0.8 * 100), Math.ceil(property.configurations[0].price * 1.2 * 100)] :
+                [50, 500]
+            }}
+          />
         </div>
 
         {/* Similar Properties */}
