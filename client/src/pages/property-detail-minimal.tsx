@@ -14,7 +14,6 @@ import { ExpertCredentials } from '@/components/expert-credentials';
 import { ExitIntentPopup } from '@/components/exit-intent-popup';
 import { PropertyGallery } from '@/components/property/property-gallery';
 import Header from '@/components/layout/header';
-import { SmartRecommendations } from '@/components/smart-recommendations'; // Assuming this component exists
 
 interface Property {
   id: string;
@@ -46,8 +45,6 @@ interface Property {
     availableUnits?: number;
     price: number;
   }[];
-  amenities?: string[]; // Added amenities
-  brochureUrl?: string; // Added brochureUrl
 }
 
 export default function PropertyDetailMinimal() {
@@ -55,7 +52,7 @@ export default function PropertyDetailMinimal() {
   const navigate = useLocation()[1];
   const { toast } = useToast();
   const { processPayment, isProcessing } = usePayment();
-
+  
   const [isFavorite, setIsFavorite] = useState(false);
   const [selectedConfig, setSelectedConfig] = useState<any>(null);
   const [showVideo, setShowVideo] = useState(false);
@@ -79,7 +76,7 @@ export default function PropertyDetailMinimal() {
     if (property?.configurations && property.configurations.length > 0) {
       setSelectedConfig(property.configurations[0]);
     }
-
+    
     // SEO optimization for property page
     if (property) {
       const propertyTitle = `${property.name} in ${property.area} - Property Details | OwnItRight`;
@@ -87,9 +84,9 @@ export default function PropertyDetailMinimal() {
       const keywords = `${property.name}, ${property.area} property, ${property.zone} real estate, ${property.type} in bangalore, property valuation, CIVIL MEP reports`;
       const ogImage = property.images?.[0] || undefined;
       const canonicalUrl = `${window.location.origin}/property/${params.id}/${generatePropertySlug(property)}`;
-
+      
       updateMetaTags(propertyTitle, propertyDescription, keywords, ogImage, canonicalUrl);
-
+      
       // Inject property schema
       injectSchema(generatePropertySchema(property), 'property-schema');
     }
@@ -102,7 +99,7 @@ export default function PropertyDetailMinimal() {
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight - windowHeight;
       const scrollTop = window.scrollY;
-
+      
       // Calculate overall progress
       const overallProgress = Math.min((scrollTop / documentHeight) * 100, 100);
       setScrollProgress(overallProgress);
@@ -113,7 +110,7 @@ export default function PropertyDetailMinimal() {
         if (element) {
           const rect = element.getBoundingClientRect();
           const isInView = rect.top <= windowHeight / 2 && rect.bottom >= windowHeight / 2;
-
+          
           if (isInView) {
             // Update progress based on current section
             const sectionProgress = ((index + 1) / sections.length) * 100;
@@ -131,7 +128,7 @@ export default function PropertyDetailMinimal() {
     // Handle different price storage formats
     // If price is a small number (< 1000), it's likely stored in lakhs already
     // If price is a large number (>= 100000), it's stored in actual rupees
-
+    
     if (price < 1000) {
       // Price is stored in lakhs format (e.g., 120 = 120 lakhs)
       if (price >= 100) {
@@ -171,7 +168,7 @@ export default function PropertyDetailMinimal() {
 
   const handleOrderSubmit = async (orderData: any) => {
     if (!property) return;
-
+    
     try {
       // First, create the order record in the database (regardless of payment outcome)
       const baseAmount = 249900; // ₹2,499 in paise
@@ -193,18 +190,18 @@ export default function PropertyDetailMinimal() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderRecord)
       });
-
+      
       if (!orderResponse.ok) {
         throw new Error('Failed to create order record');
       }
-
+      
       const order = await orderResponse.json();
       console.log('Order created:', order);
-
+    
       // Generate short receipt ID (max 40 chars for Razorpay)
       const shortId = Math.random().toString(36).substring(2, 8);
       const receipt = `${orderData.reportType === 'valuation' ? 'VR' : 'CM'}_${shortId}_${Date.now().toString().slice(-8)}`;
-
+      
       // Now attempt payment - processPayment will handle success/failure
       const paymentInitiated = await processPayment({
         amount: baseAmount,
@@ -235,7 +232,7 @@ export default function PropertyDetailMinimal() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: 'completed' })
           });
-
+          
           setShowOrderForm(false);
           toast({
             title: "Payment Successful",
@@ -269,8 +266,8 @@ export default function PropertyDetailMinimal() {
 
   const handleBookVisit = () => {
     // Pass property information to the booking page
-    navigate('/book-visit', {
-      state: {
+    navigate('/book-visit', { 
+      state: { 
         property: {
           id: property?.id,
           name: property?.name,
@@ -278,14 +275,14 @@ export default function PropertyDetailMinimal() {
           developer: property?.developer,
           selectedConfig: selectedConfig
         }
-      }
+      } 
     });
   };
 
   const handleConsult = () => {
     // Pass property information to the consultation page
-    navigate('/consultation', {
-      state: {
+    navigate('/consultation', { 
+      state: { 
         property: {
           id: property?.id,
           name: property?.name,
@@ -294,16 +291,16 @@ export default function PropertyDetailMinimal() {
           developer: property?.developer,
           selectedConfig: selectedConfig
         }
-      }
+      } 
     });
   };
 
   const handleShare = async () => {
     if (!property) return;
-
+    
     const propertyUrl = window.location.href;
     const shareText = `🏠 *${property.name}*\n📍 ${property.area}, ${property.zone} Bengaluru\n🏗️ By ${property.developer}\n💰 ${getPriceRange()}\n\nView details: ${propertyUrl}`;
-
+    
     const shareData = {
       title: `${property.name} - Property in ${property.area}, ${property.zone} Bengaluru`,
       text: shareText,
@@ -316,7 +313,7 @@ export default function PropertyDetailMinimal() {
         await navigator.share(shareData);
         return;
       }
-
+      
       // Fallback: Copy to clipboard
       await navigator.clipboard.writeText(propertyUrl);
       toast({
@@ -340,7 +337,7 @@ export default function PropertyDetailMinimal() {
 
   const handleWhatsAppShare = () => {
     if (!property) return;
-
+    
     const propertyUrl = window.location.href;
     const whatsappText = `🏠 *${property.name}*\n📍 ${property.area}, ${property.zone} Bengaluru\n🏗️ By ${property.developer}\n💰 ${getPriceRange()}\n\nView details: ${propertyUrl}`;
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`;
@@ -352,11 +349,11 @@ export default function PropertyDetailMinimal() {
       // Show default pricing if no configurations available
       return "₹45 L - ₹2.5 Cr";
     }
-
+    
     const prices = property.configurations.map(c => c.price);
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
-
+    
     if (minPrice === maxPrice) {
       return formatPriceDisplay(minPrice);
     }
@@ -378,21 +375,21 @@ export default function PropertyDetailMinimal() {
     if (!property) return [];
 
     const insights = [];
-
+    
     // Family-friendly check
-    const hasFamilyFeatures = property.tags.some(tag =>
+    const hasFamilyFeatures = property.tags.some(tag => 
       ['family-friendly', 'children-play-area', 'school-nearby', 'park'].includes(tag.toLowerCase())
     ) || property.configurations.some(c => c.configuration.includes('3 BHK') || c.configuration.includes('4 BHK'));
-
+    
     if (hasFamilyFeatures) {
       insights.push({ icon: '👨‍👩‍👧‍👦', text: 'Ideal for Families', positive: true });
     }
 
     // Investment check
-    const investmentFriendly = property.tags.some(tag =>
+    const investmentFriendly = property.tags.some(tag => 
       ['investment', 'rental-yield', 'appreciation', 'roi'].includes(tag.toLowerCase())
     ) || property.zone === 'east' || property.area.toLowerCase().includes('it');
-
+    
     if (investmentFriendly) {
       insights.push({ icon: '📈', text: 'Great Investment Potential', positive: true });
     } else {
@@ -416,67 +413,67 @@ export default function PropertyDetailMinimal() {
 
   const getPropertyPros = () => {
     if (!property) return [];
-
+    
     const pros = [];
-
+    
     if (property.reraApproved) {
       pros.push('RERA Approved Project');
     }
-
+    
     if (property.status === 'completed') {
       pros.push('Ready for Possession');
     }
-
+    
     if (property.tags.includes('metro-connectivity')) {
       pros.push('Metro Connectivity');
     }
-
+    
     if (property.tags.includes('premium-location')) {
       pros.push('Prime Location');
     }
-
+    
     if (property.locationScore && property.locationScore >= 4) {
       pros.push('Excellent Location Score');
     }
-
+    
     if (property.amenitiesScore && property.amenitiesScore >= 4) {
       pros.push('World-class Amenities');
     }
-
+    
     return pros;
   };
 
   const getPropertyCons = () => {
     if (!property) return [];
-
+    
     const cons = [];
-
+    
     if (property.status === 'under-construction') {
       cons.push('Under Construction');
     }
-
+    
     if (property.status === 'pre-launch') {
       cons.push('Pre-launch Stage');
     }
-
+    
     if (property.valueScore && property.valueScore < 4) {
       cons.push('Premium Pricing');
     }
-
+    
     // Add more dynamic cons based on property data
     const highPriceConfigs = property?.configurations.filter(c => Number(c.pricePerSqft) > 15000);
     if (highPriceConfigs && highPriceConfigs.length > 0) {
       cons.push('Higher Price per sq ft');
     }
-
+    
     return cons;
   };
 
   // Property filtering functions
   const getSimilarProperties = () => {
     if (!property || !properties.length) return [];
-
-    return properties.filter(p =>
+    
+    return properties.filter(p => 
       p.id !== property.id && (
         p.area === property.area ||
         p.zone === property.zone ||
@@ -488,14 +485,14 @@ export default function PropertyDetailMinimal() {
 
   const getRecommendedProperties = () => {
     if (!property || !properties.length || !selectedConfig) return [];
-
+    
     const currentPrice = selectedConfig.price;
     const priceRange = currentPrice * 0.3; // 30% price variance
-
+    
     return properties.filter(p => {
       if (p.id === property.id) return false;
       const configs = p.configurations || [];
-      return configs.some(config =>
+      return configs.some(config => 
         Math.abs(config.price - currentPrice) <= priceRange
       );
     }).slice(0, 6);
@@ -503,8 +500,8 @@ export default function PropertyDetailMinimal() {
 
   const getInvestmentProperties = () => {
     if (!properties.length) return [];
-
-    return properties.filter(p =>
+    
+    return properties.filter(p => 
       p.id !== property?.id &&
       (p.tags.includes('investment-friendly') ||
        p.tags.includes('high-roi') ||
@@ -519,62 +516,29 @@ export default function PropertyDetailMinimal() {
     ).slice(0, 6);
   };
 
-  // Property intent function for SmartRecommendations
-  const getBuyerIntent = () => {
-    if (!property) return {};
-
-    const intent: { [key: string]: string } = {};
-
-    // Primary intent based on property type and key features
-    if (property.type === 'apartment') {
-      intent.primary = 'family-living';
-    } else if (property.type === 'villa') {
-      intent.primary = 'luxury-living';
-    } else if (property.type === 'penthouse') {
-      intent.primary = 'premium-lifestyle';
-    }
-
-    // Secondary intents based on tags and scores
-    if (property.tags.includes('metro-connectivity')) intent.connectivity = 'metro';
-    if (property.tags.includes('schools-nearby')) intent.education = 'near_schools';
-    if (property.tags.includes('investment-friendly') || property.tags.includes('high-roi')) intent.investment = 'high_potential';
-    if (property.locationScore >= 4) intent.location = 'prime';
-    if (property.amenitiesScore >= 4) intent.amenities = 'premium';
-
-    // Add more nuanced intent detection based on configurations or other factors
-    if (property.configurations.some(c => c.configuration.includes('4 BHK') || c.configuration.includes('5 BHK'))) {
-      intent.familySize = 'large_family';
-    } else if (property.configurations.some(c => c.configuration.includes('3 BHK'))) {
-      intent.familySize = 'medium_family';
-    }
-
-    return intent;
-  };
-
-
   // Carousel navigation functions
   const navigateCarousel = (type: 'similar' | 'recommended' | 'investment', direction: 'prev' | 'next') => {
-    const properties = type === 'similar' ? getSimilarProperties() :
-                     type === 'recommended' ? getRecommendedProperties() :
+    const properties = type === 'similar' ? getSimilarProperties() : 
+                     type === 'recommended' ? getRecommendedProperties() : 
                      getInvestmentProperties();
-
+    
     const maxIndex = Math.max(0, properties.length - 3); // Show 3 cards at a time
-
+    
     if (type === 'similar') {
-      setSimilarCarouselIndex(prev =>
-        direction === 'next'
+      setSimilarCarouselIndex(prev => 
+        direction === 'next' 
           ? Math.min(prev + 1, maxIndex)
           : Math.max(prev - 1, 0)
       );
     } else if (type === 'recommended') {
-      setRecommendedCarouselIndex(prev =>
-        direction === 'next'
+      setRecommendedCarouselIndex(prev => 
+        direction === 'next' 
           ? Math.min(prev + 1, maxIndex)
           : Math.max(prev - 1, 0)
       );
     } else {
-      setInvestmentCarouselIndex(prev =>
-        direction === 'next'
+      setInvestmentCarouselIndex(prev => 
+        direction === 'next' 
           ? Math.min(prev + 1, maxIndex)
           : Math.max(prev - 1, 0)
       );
@@ -596,13 +560,13 @@ export default function PropertyDetailMinimal() {
 
     const getPriceRange = () => {
       if (!prop.configurations?.length) return "₹45 L - ₹2.5 Cr";
-
+      
       const prices = prop.configurations.map(c => c.price).filter(p => p && p > 0);
       if (!prices.length) return "₹45 L - ₹2.5 Cr";
-
+      
       const minPrice = Math.min(...prices);
       const maxPrice = Math.max(...prices);
-
+      
       if (minPrice === maxPrice) {
         return formatPrice(minPrice);
       }
@@ -614,8 +578,8 @@ export default function PropertyDetailMinimal() {
         <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 group-hover:scale-105">
           <div className="relative">
             {prop.images?.[0] ? (
-              <img
-                src={prop.images[0]}
+              <img 
+                src={prop.images[0]} 
                 alt={prop.name}
                 className="w-full h-48 object-cover"
               />
@@ -637,7 +601,7 @@ export default function PropertyDetailMinimal() {
               )}
             </div>
           </div>
-
+          
           <CardContent className="p-4">
             <div className="space-y-2">
               <h3 className="font-semibold text-lg line-clamp-1">{prop.name}</h3>
@@ -645,7 +609,7 @@ export default function PropertyDetailMinimal() {
                 <MapPin className="h-4 w-4 mr-1" />
                 <span className="line-clamp-1">{prop.area}, {prop.zone}</span>
               </div>
-
+              
               <div className="flex items-center justify-between">
                 <div className="text-lg font-bold text-blue-600">
                   {getPriceRange()}
@@ -696,7 +660,7 @@ export default function PropertyDetailMinimal() {
   return (
     <div className="min-h-screen bg-white">
       {/* Exit Intent Popup */}
-      <ExitIntentPopup
+      <ExitIntentPopup 
         title="Wait! Don't Miss This Property!"
         description="Get a FREE Property Valuation Report worth ₹1,499 before you leave"
         ctaText="Get FREE Report"
@@ -705,10 +669,10 @@ export default function PropertyDetailMinimal() {
           setShowOrderForm(true);
         }}
       />
-
+      
       {/* Global Header */}
       <Header />
-
+      
       {/* Property Actions Bar */}
       <div className="bg-white border-b sticky top-16 z-30 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -867,7 +831,7 @@ export default function PropertyDetailMinimal() {
             </CardHeader>
             <CardContent>
               <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
-                <iframe
+                <iframe 
                   src={`https://www.youtube.com/embed/${property.youtubeVideoUrl.split('v=')[1]?.split('&')[0]}`}
                   className="w-full h-full"
                   allowFullScreen
@@ -929,7 +893,7 @@ export default function PropertyDetailMinimal() {
                     "Amphitheatre": Users,
                     "Jogging and Strolling Track": Users,
                   };
-
+                  
                   const IconComponent = amenityIcons[amenity as keyof typeof amenityIcons] || Home;
                   return (
                     <div key={index} className="relative">
@@ -941,7 +905,7 @@ export default function PropertyDetailMinimal() {
                           </div>
                         </div>
                       )}
-
+                      
                       <div className="bg-white border border-gray-200 rounded-xl p-6 text-center hover:shadow-lg transition-all duration-300 hover:border-blue-300 hover:-translate-y-1 group">
                         <div className="w-16 h-16 mx-auto mb-4 p-3 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl group-hover:from-blue-50 group-hover:to-indigo-50 transition-colors">
                           <IconComponent className="h-10 w-10 text-amber-600 group-hover:text-blue-600 transition-colors" />
@@ -954,11 +918,11 @@ export default function PropertyDetailMinimal() {
                   );
                 })}
               </div>
-
+              
               {property.amenities.length > 12 && (
                 <div className="mt-8 text-center">
-                  <Button
-                    variant="outline"
+                  <Button 
+                    variant="outline" 
                     className="text-blue-600 border-blue-600 hover:bg-blue-50 px-6 py-2"
                     onClick={() => {
                       // You can implement a modal or expansion logic here
@@ -983,23 +947,23 @@ export default function PropertyDetailMinimal() {
             {/* Configuration Selection Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
               {property.configurations.map((config, index) => (
-                <div
-                  key={index}
+                <div 
+                  key={index} 
                   className={`p-4 rounded-lg border-2 transition-all cursor-pointer ${
-                    selectedConfig?.id === config.id
-                      ? 'border-blue-500 bg-blue-50'
+                    selectedConfig?.id === config.id 
+                      ? 'border-blue-500 bg-blue-50' 
                       : 'border-gray-200 hover:border-blue-300'
                   }`}
                   onClick={() => setSelectedConfig(config)}
                 >
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-semibold">{config.configuration}</h3>
-                    <Badge variant={config.availabilityStatus === 'available' ? 'default' :
+                    <Badge variant={config.availabilityStatus === 'available' ? 'default' : 
                                    config.availabilityStatus === 'limited' ? 'secondary' : 'destructive'}>
                       {config.availabilityStatus}
                     </Badge>
                   </div>
-
+                  
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Area</span>
@@ -1027,7 +991,7 @@ export default function PropertyDetailMinimal() {
                 <h3 className="text-xl font-bold text-blue-900 mb-4">
                   {selectedConfig.configuration} - Detailed Information
                 </h3>
-
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {/* Pricing Details */}
                   <div className="space-y-3">
@@ -1064,7 +1028,7 @@ export default function PropertyDetailMinimal() {
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-gray-700">Status</span>
-                        <Badge variant={selectedConfig.availabilityStatus === 'available' ? 'default' :
+                        <Badge variant={selectedConfig.availabilityStatus === 'available' ? 'default' : 
                                        selectedConfig.availabilityStatus === 'limited' ? 'secondary' : 'destructive'}>
                           {selectedConfig.availabilityStatus}
                         </Badge>
@@ -1123,8 +1087,8 @@ export default function PropertyDetailMinimal() {
                     <MessageCircle className="h-4 w-4 mr-2" />
                     Get Expert Advice
                   </Button>
-                  <Button
-                    variant="outline"
+                  <Button 
+                    variant="outline" 
                     className="flex-1 min-w-48"
                     onClick={() => property.brochureUrl ? window.open(property.brochureUrl, '_blank') : null}
                     disabled={!property.brochureUrl}
@@ -1164,7 +1128,7 @@ export default function PropertyDetailMinimal() {
                   </div>
                   <Badge className="bg-orange-100 text-orange-800">Essential</Badge>
                 </div>
-
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
@@ -1221,8 +1185,8 @@ export default function PropertyDetailMinimal() {
                   <ExpertCredentials reportType="civil-mep" compact={true} />
                 </div>
 
-                <Button
-                  className="w-full"
+                <Button 
+                  className="w-full" 
                   size="sm"
                   onClick={handleCivilMepReport}
                   disabled={isProcessing}
@@ -1246,12 +1210,12 @@ export default function PropertyDetailMinimal() {
                   </div>
                   <Badge className="bg-blue-100 text-blue-800">Critical</Badge>
                 </div>
-
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Market Value</span>
-                      <span className="font-semibold text-green-600">₹{selectedConfig ? ((Number(selectedConfig.pricePerSqft) * Number(selectedConfig.builtUpArea))).toLocaleString() : '1,02,00,000'}</span>
+                      <span className="font-semibold">₹{selectedConfig ? ((Number(selectedConfig.pricePerSqft) * Number(selectedConfig.builtUpArea))).toLocaleString() : '1,02,00,000'}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Location Premium</span>
@@ -1303,8 +1267,8 @@ export default function PropertyDetailMinimal() {
                   <ExpertCredentials reportType="valuation" compact={true} />
                 </div>
 
-                <Button
-                  className="w-full"
+                <Button 
+                  className="w-full" 
                   size="sm"
                   onClick={handleValuationReport}
                   disabled={isProcessing}
@@ -1328,7 +1292,7 @@ export default function PropertyDetailMinimal() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
+              
               {/* Property Highlights - Card Grid */}
               <div className="space-y-4">
                 <div className="flex items-center mb-4">
@@ -1337,7 +1301,7 @@ export default function PropertyDetailMinimal() {
                   </div>
                   <h4 className="font-semibold text-green-800 text-lg">Property Highlights</h4>
                 </div>
-
+                
                 <div className="grid grid-cols-1 gap-3">
                   <Card className="border-green-200 bg-green-50/50 hover:bg-green-50 transition-colors">
                     <CardContent className="p-4">
@@ -1400,14 +1364,14 @@ export default function PropertyDetailMinimal() {
                           <div>
                             <p className="font-medium text-gray-900">Construction Status</p>
                             <p className="text-sm text-gray-600">
-                              {property.status === 'completed' ? 'Immediate possession available' :
-                               property.status === 'under-construction' ? 'Construction in progress' :
+                              {property.status === 'completed' ? 'Immediate possession available' : 
+                               property.status === 'under-construction' ? 'Construction in progress' : 
                                'Launch phase planning'}
                             </p>
                           </div>
                         </div>
                         <Badge className="bg-blue-100 text-blue-800">
-                          {property.status === 'completed' ? 'Ready' :
+                          {property.status === 'completed' ? 'Ready' : 
                            property.status === 'under-construction' ? 'Ongoing' : 'Pre-launch'}
                         </Badge>
                       </div>
@@ -1448,7 +1412,7 @@ export default function PropertyDetailMinimal() {
                   </div>
                   <h4 className="font-semibold text-orange-800 text-lg">Key Considerations</h4>
                 </div>
-
+                
                 <div className="grid grid-cols-1 gap-3">
                   <Card className="border-orange-200 bg-orange-50/50 hover:bg-orange-50 transition-colors">
                     <CardContent className="p-4">
@@ -1462,10 +1426,10 @@ export default function PropertyDetailMinimal() {
                             </p>
                           </div>
                         </div>
-                        <Badge className={`${property.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                          property.status === 'under-construction' ? 'bg-yellow-100 text-yellow-800' :
+                        <Badge className={`${property.status === 'completed' ? 'bg-green-100 text-green-800' : 
+                                          property.status === 'under-construction' ? 'bg-yellow-100 text-yellow-800' : 
                                           'bg-red-100 text-red-800'}`}>
-                          {property.status === 'under-construction' ? 'Ongoing' :
+                          {property.status === 'under-construction' ? 'Ongoing' : 
                            property.status === 'pre-launch' ? 'Future' : 'Immediate'}
                         </Badge>
                       </div>
@@ -1614,8 +1578,8 @@ export default function PropertyDetailMinimal() {
                       <Badge className="bg-blue-100 text-blue-800">Reference</Badge>
                     </td>
                     <td className="px-4 py-3 text-sm">
-                      <Badge
-                        variant={property.status === 'completed' ? 'default' :
+                      <Badge 
+                        variant={property.status === 'completed' ? 'default' : 
                                 property.status === 'under-construction' ? 'secondary' : 'outline'}
                         className="capitalize"
                       >
@@ -1623,20 +1587,20 @@ export default function PropertyDetailMinimal() {
                       </Badge>
                     </td>
                   </tr>
-
+                  
                   {/* Similar Properties Rows - Same Location and Type Only */}
-                  {getSimilarProperties().filter(prop => prop.area === property.area && prop.type === property.type).length > 0 ?
+                  {getSimilarProperties().filter(prop => prop.area === property.area && prop.type === property.type).length > 0 ? 
                     getSimilarProperties().filter(prop => prop.area === property.area && prop.type === property.type).slice(0, 4).map((similarProp, index) => {
                     const currentPrice = property.configurations[0] ? property.configurations[0].price : 28500000;
-
+                    
                     // Use actual property data - no calculations needed
                     const similarPrice = similarProp.configurations?.[0] ? similarProp.configurations[0].price : 0;
-                    const pricePerSqft = similarProp.configurations?.[0] ?
+                    const pricePerSqft = similarProp.configurations?.[0] ? 
                                        Number(similarProp.configurations[0].pricePerSqft) : 0;
-
+                    
                     // Calculate price difference only if both prices exist
                     const priceDiff = (similarPrice && currentPrice) ? ((similarPrice - currentPrice) / currentPrice) * 100 : 0;
-
+                    
                     return (
                       <tr key={similarProp.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-4 py-3 text-sm">
@@ -1684,8 +1648,8 @@ export default function PropertyDetailMinimal() {
                           )}
                         </td>
                         <td className="px-4 py-3 text-sm">
-                          <Badge
-                            variant={similarProp.status === 'completed' ? 'default' :
+                          <Badge 
+                            variant={similarProp.status === 'completed' ? 'default' : 
                                     similarProp.status === 'under-construction' ? 'secondary' : 'outline'}
                             className="capitalize"
                           >
@@ -1694,7 +1658,7 @@ export default function PropertyDetailMinimal() {
                         </td>
                       </tr>
                     );
-                  }) :
+                  }) : 
                   (
                     <tr>
                       <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
@@ -1724,7 +1688,7 @@ export default function PropertyDetailMinimal() {
                     <div>
                       <div className="text-sm font-medium text-green-900">Price Advantage</div>
                       <div className="text-xs text-green-700">
-                        {getSimilarProperties().filter(prop => prop.area === property.area && prop.type === property.type).length > 0
+                        {getSimilarProperties().filter(prop => prop.area === property.area && prop.type === property.type).length > 0 
                           ? '8% below area average'
                           : 'Competitive pricing'}
                       </div>
@@ -1773,8 +1737,8 @@ export default function PropertyDetailMinimal() {
                 <div className="text-sm">
                   <div className="font-medium text-yellow-900">Price Analysis Insight</div>
                   <div className="text-yellow-800 mt-1">
-                    This analysis is based on properties specifically in {property.area}.
-                    Prices can vary based on specific amenities, floor level, facing, and possession timeline.
+                    This analysis is based on properties specifically in {property.area}. 
+                    Prices can vary based on specific amenities, floor level, facing, and possession timeline. 
                     Consider booking a consultation for personalized pricing insights.
                   </div>
                 </div>
@@ -1811,7 +1775,7 @@ export default function PropertyDetailMinimal() {
                   <h4 className="font-semibold text-green-800">Family Suitability</h4>
                   <Badge className="bg-green-100 text-green-800">Excellent Match</Badge>
                 </div>
-
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
@@ -1880,7 +1844,7 @@ export default function PropertyDetailMinimal() {
                     {property.tags.some(tag => tag.includes('investment') || tag.includes('roi')) ? 'Good Match' : 'Moderate'}
                   </Badge>
                 </div>
-
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
@@ -1938,26 +1902,83 @@ export default function PropertyDetailMinimal() {
           </CardContent>
         </Card>
 
-        {/* Smart AI Recommendations */}
-        <div className="mb-12">
-          <SmartRecommendations
-            intent={getBuyerIntent()}
-            currentProperty={property}
-            userPreferences={{
-              budgetRange: property?.configurations?.[0] ?
-                [Math.floor(property.configurations[0].price * 0.8 * 100), Math.ceil(property.configurations[0].price * 1.2 * 100)] :
-                [50, 500]
-            }}
-          />
-        </div>
 
+
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-32 space-y-6">
+
+              {/* Quick Navigation */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Quick Navigation</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start"
+                    onClick={() => document.getElementById('configurations')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    Configurations
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start"
+                    onClick={() => document.getElementById('reports')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    Reports
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start"
+                    onClick={() => document.getElementById('pros-cons')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    Pros & Cons
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start"
+                    onClick={() => document.getElementById('buyer-match')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    Buyer Match
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start"
+                    onClick={() => document.getElementById('property-score')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    Property Score
+                  </Button>
+                  <Separator className="my-3" />
+                  <Button onClick={handleBookVisit} className="w-full" size="sm">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Book Site Visit
+                  </Button>
+                  <Button onClick={handleConsult} variant="outline" className="w-full" size="sm">
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Expert Consultation
+                  </Button>
+                </CardContent>
+              </Card>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Sliding Property Carousels */}
+      <div className="max-w-6xl mx-auto px-4 space-y-12 py-12">
+        
         {/* Similar Properties */}
         {getSimilarProperties().length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">Similar Properties</h2>
-                <p className="text-gray-600">Properties in the same area or category</p>
+                <p className="text-gray-600">Based on your preferences and search history</p>
               </div>
               <div className="flex space-x-2">
                 <Button
@@ -1978,11 +1999,11 @@ export default function PropertyDetailMinimal() {
                 </Button>
               </div>
             </div>
-
+            
             <div className="overflow-hidden">
-              <div
+              <div 
                 className="flex transition-transform duration-300 ease-in-out"
-                style={{ transform: `translateX(-${similarCarouselIndex * (100 / 3)}%)` }}
+                style={{ transform: `translateX(-${similarCarouselIndex * (100/3)}%)` }}
               >
                 {getSimilarProperties().map((prop) => (
                   <div key={prop.id} className="w-1/3 flex-shrink-0 px-2">
@@ -2021,11 +2042,11 @@ export default function PropertyDetailMinimal() {
                 </Button>
               </div>
             </div>
-
+            
             <div className="overflow-hidden">
-              <div
+              <div 
                 className="flex transition-transform duration-300 ease-in-out"
-                style={{ transform: `translateX(-${recommendedCarouselIndex * (100 / 3)}%)` }}
+                style={{ transform: `translateX(-${recommendedCarouselIndex * (100/3)}%)` }}
               >
                 {getRecommendedProperties().map((prop) => (
                   <div key={prop.id} className="w-1/3 flex-shrink-0 px-2">
@@ -2064,11 +2085,11 @@ export default function PropertyDetailMinimal() {
                 </Button>
               </div>
             </div>
-
+            
             <div className="overflow-hidden">
-              <div
+              <div 
                 className="flex transition-transform duration-300 ease-in-out"
-                style={{ transform: `translateX(-${investmentCarouselIndex * (100 / 3)}%)` }}
+                style={{ transform: `translateX(-${investmentCarouselIndex * (100/3)}%)` }}
               >
                 {getInvestmentProperties().map((prop) => (
                   <div key={prop.id} className="w-1/3 flex-shrink-0 px-2">
