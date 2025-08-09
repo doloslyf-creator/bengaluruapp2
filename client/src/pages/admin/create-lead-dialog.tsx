@@ -338,7 +338,8 @@ export default function CreateLeadDialog({ open, onOpenChange }: CreateLeadDialo
                 <SelectContent>
                   <SelectItem value="own-funds">Own Funds</SelectItem>
                   <SelectItem value="bank-loan">Bank Loan</SelectItem>
-                  <SelectItem value="combination">Combination</SelectItem>
+                  <SelectItem value="inheritance">Inheritance</SelectItem>
+                  <SelectItem value="mixed">Mixed</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -353,10 +354,10 @@ export default function CreateLeadDialog({ open, onOpenChange }: CreateLeadDialo
                   <SelectValue placeholder="Select purpose" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="self-use">Self Use</SelectItem>
+                  <SelectItem value="self">Self</SelectItem>
+                  <SelectItem value="parents">Parents</SelectItem>
                   <SelectItem value="investment">Investment</SelectItem>
-                  <SelectItem value="family">Family</SelectItem>
-                  <SelectItem value="commercial">Commercial</SelectItem>
+                  <SelectItem value="resale-flip">Resale Flip</SelectItem>
                 </SelectContent>
               </Select>
             </div>
