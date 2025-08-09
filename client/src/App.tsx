@@ -85,6 +85,7 @@ import RefundPolicy from "@/pages/refund-policy";
 import PropertiesLocation from "@/pages/properties-location";
 import NotFound from "@/pages/not-found";
 import LeadNurturingPage from "@/pages/admin/lead-nurturing";
+import SystemTest from "./pages/system-test";
 
 // Protected Routes Component that shows auth form for admin routes when not authenticated
 function ProtectedRouter() {
@@ -134,7 +135,6 @@ function ProtectedRouter() {
 
 
       <Route path="/admin-panel/orders" component={Orders} />
-      <Route path="/admin/orders" component={Orders} />
       <Route path="/admin-panel/customers" component={Customers} />
       <Route path="/admin/customers" component={Customers} />
 
@@ -159,9 +159,7 @@ function ProtectedRouter() {
       <Route path="/admin-panel/settings" component={AdminSettings} />
       <Route path="/admin-panel/team-management" component={TeamManagement} />
       <Route path="/admin-panel/whatsapp-management" component={WhatsAppManagement} />
-      <Route path="/admin/whatsapp-management" component={WhatsAppManagement} />
       <Route path="/admin-panel/enhanced-leads" component={EnhancedLeads} />
-      <Route path="/admin/enhanced-leads" component={EnhancedLeads} />
       <Route path="/admin-panel/lead-nurturing" component={LeadNurturingPage} />
       <Route path="/admin-panel/supabase-migration" component={SupabaseMigration} />
       <Route path="/admin-panel/supabase-status" component={SupabaseStatus} />
@@ -202,6 +200,9 @@ function ProtectedRouter() {
       <Route path="/privacy-policy" component={PrivacyPolicy} />
       <Route path="/terms-of-use" component={TermsOfUse} />
       <Route path="/refund-policy" component={RefundPolicy} />
+
+      {/* System Test Route */}
+      <Route path="/system-test" component={SystemTest} />
 
       <Route component={NotFound} />
     </Switch>

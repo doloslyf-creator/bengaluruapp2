@@ -870,21 +870,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Add note to lead
-  app.post("/api/leads/:leadId/notes", async (req, res) => {
-    try {
-      const note = await storage.addLeadNote({
-        leadId: req.params.leadId,
-        ...req.body,
-        createdBy: req.body.createdBy || "admin",
-      });
-      res.status(201).json(note);
-    } catch (error) {
-      console.error("Error adding lead note:", error);
-      res.status(500).json({ error: "Failed to add note" });
-    }
-  });
-
   // Qualify/disqualify lead
   app.post("/api/leads/:leadId/qualify", async (req, res) => {
     try {
@@ -2268,6 +2253,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating valuation request:", error);
       res.status(500).json({ error: "Failed to update valuation request" });
+    }
+  });
+
+  // Database health check endpoint
+  app.get("/api/health", async (req, res) => {
+    try {
+      const healthCheck = {
+        database: 'unknown',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
+        port: process.env.PORT || '5000',
+        checks: {
+          properties: 0,
+          customers: 0,
+          orders: 0,
+          settings: false
+        }
+      };
+
+      // Test basic database operations
+      try {
+        const properties = await storage.getAllProperties();
+        healthCheck.checks.properties = properties.length;
+        healthCheck.database = 'connected';
+      } catch (error) {
+        healthCheck.database = 'disconnected';
+        return res.status(500).json(healthCheck);
+      }
+
+      // Test customer data
+      try {
+        const customers = await storage.getAllCustomersWithDetails();
+        healthCheck.checks.customers = customers.length;
+      } catch (error) {
+        console.error("Customer check failed:", error);
+      }
+
+      // Test orders
+      try {
+        const orders = await storage.getAllOrdersWithDetails();
+        healthCheck.checks.orders = orders.length;
+      } catch (error) {
+        console.error("Orders check failed:", error);
+      }
+
+      // Test settings
+      try {
+        const settings = await storage.getAppSettings();
+        healthCheck.checks.settings = !!settings;
+      } catch (error) {
+        console.error("Settings check failed:", error);
+      }
+
+      res.json(healthCheck);
+    } catch (error) {
+      console.error("Health check failed:", error);
+      res.status(500).json({
+        database: 'error',
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
     }
   });
 
