@@ -172,12 +172,12 @@ export default function Header() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 lg:h-18 items-center justify-between">
-            {/* Logo - Bigger house logo without building */}
+            {/* Logo */}
             <div className="flex-shrink-0">
               <Link href="/" className="flex items-center space-x-3 group">
-                <div className="hidden sm:block">
-                  <Logo size="md" showTagline={false} />
-                </div>
+                <h3 className="text-xl font-bold text-primary ownitwise-wordmark">
+                  <span className="text-blue-400">Ownit</span><span className="text-emerald-400">Wise</span>
+                </h3>
               </Link>
             </div>
 

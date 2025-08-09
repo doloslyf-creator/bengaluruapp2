@@ -1,5 +1,4 @@
 import { Link } from 'wouter';
-import Logo from "@/components/ui/logo";
 
 export default function Footer() {
   return (
@@ -9,7 +8,10 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           {/* Logo */}
           <div className="flex items-center">
-            <Logo variant="white" size="md" showTagline={true} />
+            <h3 className="text-xl font-bold text-primary ownitwise-wordmark">
+              <span className="text-blue-400">Ownit</span><span className="text-emerald-400">Wise</span>
+            </h3>
+            <span className="text-gray-400 text-sm ml-2">Own homes With Confidence</span>
           </div>
 
           {/* Navigation & Policy Links */}
