@@ -319,11 +319,11 @@ export default function PropertiesAdd() {
               </Button>
               <Button
                 onClick={form.handleSubmit(onSubmit)}
-                disabled={addPropertyMutation.isPending || isSubmitting}
+                disabled={createPropertyMutation.isPending || isSubmitting}
                 className="bg-primary text-white hover:bg-primary/90"
               >
                 <Save className="h-4 w-4 mr-2" />
-                {addPropertyMutation.isPending || isSubmitting ? "Saving..." : "Save Property"}
+                {createPropertyMutation.isPending || isSubmitting ? "Saving..." : "Save Property"}
               </Button>
             </div>
           </div>
