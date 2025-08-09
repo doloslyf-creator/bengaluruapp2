@@ -7,7 +7,7 @@ import { DataTransparencyIndicator } from "@/components/data-transparency-indica
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
@@ -16,6 +16,39 @@ import { formatPriceDisplay } from "@/lib/utils";
 import { generatePropertySlug } from "@/utils/seo";
 import { type Property, type PropertyConfiguration } from "@shared/schema";
 import { PropertyCardSkeleton } from "@/components/ui/skeleton";
+
+// Placeholder for the SmartRecommendations component.
+// This component would likely fetch and display personalized property recommendations.
+// It's assumed to be defined elsewhere and imported.
+const SmartRecommendations = ({ intent, userPreferences, className }: { intent: UserIntent; userPreferences: PropertyPreferences; className?: string }) => (
+  <div className={`bg-blue-50 border border-blue-200 rounded-lg p-6 ${className}`}>
+    <h2 className="text-2xl font-bold text-blue-800 mb-4">Smart Recommendations for You</h2>
+    <p className="text-blue-700 mb-4">
+      Based on your {intent === 'investment' ? 'investment goals' : 'lifestyle needs'}, here are some properties you might love:
+    </p>
+    {/* Placeholder for actual recommendation cards or list */}
+    <div className="flex flex-wrap gap-4">
+      <div className="flex items-center space-x-3 bg-white p-3 rounded-md shadow">
+        <div className="w-12 h-12 bg-gray-200 rounded animate-pulse"></div>
+        <div>
+          <div className="h-4 w-32 bg-gray-200 rounded animate-pulse mb-1"></div>
+          <div className="h-3 w-20 bg-gray-300 rounded animate-pulse"></div>
+        </div>
+      </div>
+      <div className="flex items-center space-x-3 bg-white p-3 rounded-md shadow">
+        <div className="w-12 h-12 bg-gray-200 rounded animate-pulse"></div>
+        <div>
+          <div className="h-4 w-32 bg-gray-200 rounded animate-pulse mb-1"></div>
+          <div className="h-3 w-20 bg-gray-300 rounded animate-pulse"></div>
+        </div>
+      </div>
+    </div>
+    <p className="text-sm text-blue-600 mt-4">
+      We're continuously learning to provide better suggestions.
+    </p>
+  </div>
+);
+
 
 type UserIntent = 'investment' | 'end-use' | '';
 
@@ -50,14 +83,14 @@ export default function PropertyResults() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [sortBy, setSortBy] = useState<'match' | 'price-low' | 'price-high' | 'name'>('match');
   const [showFilters, setShowFilters] = useState(false);
-  
+
   // Get preferences from navigation state or localStorage
   const getCachedPreferences = (): PropertyPreferences => {
     // First try to get from navigation state
     if (history.state?.preferences) {
       return history.state.preferences;
     }
-    
+
     // Then try localStorage
     const cached = localStorage.getItem('propertyPreferences');
     if (cached) {
@@ -80,7 +113,7 @@ export default function PropertyResults() {
         // If parsing fails, return defaults
       }
     }
-    
+
     // Default fallback
     return {
       intent: '',
@@ -122,7 +155,7 @@ export default function PropertyResults() {
   // Helper function to get intent-specific highlights for properties
   const getIntentHighlights = (property: PropertyWithConfigurations) => {
     const highlights: { label: string; value: string; icon: any; color: string }[] = [];
-    
+
     if (preferences.intent === 'investment') {
       // Investment-focused highlights
       highlights.push({
@@ -131,21 +164,21 @@ export default function PropertyResults() {
         icon: BarChart3,
         color: "text-green-600"
       });
-      
+
       highlights.push({
         label: "Appreciation",
         value: "12% CAGR", // This would come from property data
         icon: TrendingUp,
         color: "text-blue-600"
       });
-      
+
       highlights.push({
         label: "Exit Liquidity",
         value: "High", // Based on property location/type
         icon: Clock,
         color: "text-purple-600"
       });
-      
+
     } else if (preferences.intent === 'end-use') {
       // Lifestyle-focused highlights
       highlights.push({
@@ -154,14 +187,14 @@ export default function PropertyResults() {
         icon: Star,
         color: "text-purple-600"
       });
-      
+
       highlights.push({
         label: "School Proximity", 
         value: "< 2km", // Distance to good schools
         icon: Building,
         color: "text-blue-600"
       });
-      
+
       highlights.push({
         label: "Commute",
         value: "20-30 min", // To major IT hubs
@@ -169,7 +202,7 @@ export default function PropertyResults() {
         color: "text-green-600"
       });
     }
-    
+
     return highlights;
   };
 
@@ -191,37 +224,37 @@ export default function PropertyResults() {
   const filterAndScoreProperties = (): PropertyWithConfigurations[] => {
     console.log('Filtering properties:', allProperties.length, 'configurations:', allConfigurations.length);
     console.log('Preferences:', preferences);
-    
+
     return allProperties
       .filter(property => {
         // Basic filtering - only exclude if there's a clear mismatch
-        
+
         // Property type filter - only if specified
         if (preferences.propertyType && preferences.propertyType !== "" && preferences.propertyType !== property.type) {
           return false;
         }
-        
+
         // Zone filter - only if specified, check both zoneId and zone name
         if (preferences.zoneId && preferences.zoneId !== "" && preferences.zoneId !== property.zoneId) {
           if (preferences.zone && preferences.zone !== "" && preferences.zone !== property.zone) {
             return false;
           }
         }
-        
+
         return true;
       })
       .map(property => {
         const propertyConfigs = allConfigurations.filter(config => config.propertyId === property.id);
-        
+
         let score = 0;
-        
+
         // Property type match (30 points)
         if (preferences.propertyType && preferences.propertyType !== "" && preferences.propertyType === property.type) {
           score += 30;
         } else if (!preferences.propertyType || preferences.propertyType === "") {
           score += 20; // Default score when no type preference
         }
-        
+
         // Zone match (25 points)
         if (preferences.zoneId && preferences.zoneId !== "" && preferences.zoneId === property.zoneId) {
           score += 25;
@@ -230,7 +263,7 @@ export default function PropertyResults() {
         } else if (!preferences.zoneId && !preferences.zone) {
           score += 15; // Default score when no zone preference
         }
-        
+
         // Budget range match (25 points)
         if (propertyConfigs.length === 0) {
           score += 15; // Partial score when no price data available
@@ -242,13 +275,13 @@ export default function PropertyResults() {
               const builtUpArea = c.builtUpArea || 1000; // Default area if missing
               return pricePerSqft * builtUpArea;
             }).filter(price => price > 0);
-            
+
             if (prices.length > 0) {
               const minPrice = Math.min(...prices) / 1000000; // Convert to lakhs
               const maxPrice = Math.max(...prices) / 1000000;
               const budgetMin = preferences.budgetRange[0]; // Already in lakhs
               const budgetMax = preferences.budgetRange[1];
-              
+
               // Check if there's any overlap in price ranges
               if (minPrice <= budgetMax && maxPrice >= budgetMin) {
                 score += 25;
@@ -264,7 +297,7 @@ export default function PropertyResults() {
             score += 10; // Error in price calculation
           }
         }
-        
+
         // Intent-based scoring (20 points)
         if (preferences.intent === 'investment') {
           // For investment intent, prioritize properties with good ROI indicators
@@ -287,7 +320,7 @@ export default function PropertyResults() {
         } else {
           score += 10; // Default score when no intent specified
         }
-        
+
         // BHK match (5 points) - if no configurations or preferences, give default score
         if (preferences.bhkType.length === 0) {
           score += 3; // Default score when no BHK preferences
@@ -312,7 +345,7 @@ export default function PropertyResults() {
           configurations: propertyConfigs,
           matchScore: Math.round(Math.max(score, 20)) // Ensure minimum score of 20
         };
-        
+
         return finalProperty;
       })
       .filter(property => property.matchScore >= 15) // Lower threshold to show more results
@@ -327,7 +360,7 @@ export default function PropertyResults() {
           if (a.configurations.length === 0 && b.configurations.length === 0) return 0;
           if (a.configurations.length === 0) return 1; // Put at end
           if (b.configurations.length === 0) return -1; // Put at end
-          
+
           const lowPricesA = a.configurations.map(c => parseFloat(c.pricePerSqft.toString()) * c.builtUpArea);
           const lowPricesB = b.configurations.map(c => parseFloat(c.pricePerSqft.toString()) * c.builtUpArea);
           const minPriceA = Math.min(...lowPricesA);
@@ -338,7 +371,7 @@ export default function PropertyResults() {
           if (a.configurations.length === 0 && b.configurations.length === 0) return 0;
           if (a.configurations.length === 0) return 1; // Put at end
           if (b.configurations.length === 0) return -1; // Put at end
-          
+
           const highPricesA = a.configurations.map(c => parseFloat(c.pricePerSqft.toString()) * c.builtUpArea);
           const highPricesB = b.configurations.map(c => parseFloat(c.pricePerSqft.toString()) * c.builtUpArea);
           const maxPriceA = Math.max(...highPricesA);
@@ -383,7 +416,7 @@ export default function PropertyResults() {
       // Show default pricing if no configurations available
       return "Price on Request";
     }
-    
+
     try {
       // Calculate actual prices using pricePerSqft * builtUpArea
       const prices = configurations.map(c => {
@@ -391,14 +424,14 @@ export default function PropertyResults() {
         const builtUpArea = c.builtUpArea || 1000;
         return pricePerSqft * builtUpArea;
       }).filter(price => price > 0);
-      
+
       if (prices.length === 0) {
         return "Price on Request";
       }
-      
+
       const minPrice = Math.min(...prices);
       const maxPrice = Math.max(...prices);
-      
+
       if (minPrice === maxPrice) {
         return formatPriceDisplay(minPrice);
       }
@@ -443,7 +476,7 @@ export default function PropertyResults() {
               <div className="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
             </div>
           </div>
-          
+
           <div className={`${
             viewMode === 'grid' 
               ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' 
@@ -490,7 +523,7 @@ export default function PropertyResults() {
                     )}
                   </p>
                 </div>
-                
+
                 {/* Data Transparency Indicator */}
                 <div className="ml-6">
                   <DataTransparencyIndicator 
@@ -500,7 +533,7 @@ export default function PropertyResults() {
                   />
                 </div>
               </div>
-              
+
               <div className="flex items-center space-x-3">
                 <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
                   <SelectTrigger className="w-[180px]">
@@ -575,7 +608,7 @@ export default function PropertyResults() {
                 )}
                 {preferences.tags?.slice(0, 1).map(tag => (
                   <Badge key={tag} variant="outline" className="text-xs">
-                    {tag.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                    {tag.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                   </Badge>
                 ))}
                 {preferences.tags && preferences.tags.length > 1 && (
@@ -596,6 +629,17 @@ export default function PropertyResults() {
           </div>
         </div>
 
+        {/* Smart Recommendations Section */}
+        {preferences.intent && matchingProperties.length > 0 && (
+          <div className="mb-12">
+            <SmartRecommendations
+              intent={preferences.intent}
+              userPreferences={preferences}
+              className="mb-8"
+            />
+          </div>
+        )}
+
         {/* Results */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {matchingProperties.length === 0 ? (
@@ -614,7 +658,7 @@ export default function PropertyResults() {
               <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {matchingProperties.map(property => {
                   const matchInfo = getMatchLabel(property.matchScore);
-                  
+
                   return (
                     <Card key={property.id} className="group hover:shadow-lg transition-all duration-200 cursor-pointer border border-gray-200 hover:border-primary/30 bg-white">
                       <div onClick={() => handleViewProperty(property)} className="relative">
@@ -624,12 +668,12 @@ export default function PropertyResults() {
                             <div className="text-3xl mb-1">🏢</div>
                             <p className="text-xs font-medium text-gray-600">Property Image</p>
                           </div>
-                          
+
                           {/* Match Badge - Top Left */}
                           <Badge className={`absolute top-3 left-3 ${matchInfo.color} text-xs font-semibold shadow-sm`}>
                             {property.matchScore}% Match
                           </Badge>
-                          
+
                           {/* Heart Button - Top Right */}
                           <Button
                             variant="ghost"
@@ -656,21 +700,21 @@ export default function PropertyResults() {
                           <h3 className="font-bold text-lg text-gray-900 group-hover:text-primary transition-colors line-clamp-1 mb-1">
                             {property.name}
                           </h3>
-                          
+
                           {/* Location */}
                           <div className="flex items-center text-sm text-gray-600 mb-2">
                             <MapPin className="h-3 w-3 mr-1 text-gray-400" />
                             <span className="line-clamp-1">{property.area}, {property.zone ? property.zone.charAt(0).toUpperCase() + property.zone.slice(1) : 'Unknown Zone'}</span>
                           </div>
-                          
+
                           {/* Developer */}
                           <p className="text-xs text-gray-500 mb-3">By {property.developer}</p>
-                          
+
                           {/* Price */}
                           <div className="text-lg font-bold text-primary mb-3">
                             {getPriceRange(property.configurations)}
                           </div>
-                          
+
                           {/* Configurations */}
                           {property.configurations.length > 0 && (
                             <div className="mb-3">
@@ -688,7 +732,7 @@ export default function PropertyResults() {
                               </div>
                             </div>
                           )}
-                          
+
                           {/* Intent-Based Highlights */}
                           {preferences.intent && (
                             <div className="mb-3">
@@ -703,7 +747,7 @@ export default function PropertyResults() {
                               </div>
                             </div>
                           )}
-                          
+
                           {/* Key Features - Only show if no intent or as fallback */}
                           {(!preferences.intent || property.tags.length > 0) && (
                             <div className="flex flex-wrap gap-1">
@@ -729,7 +773,7 @@ export default function PropertyResults() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {matchingProperties.map(property => {
                   const matchInfo = getMatchLabel(property.matchScore);
-                  
+
                   return (
                     <Card key={property.id} className="group hover:shadow-md transition-all duration-200 cursor-pointer border border-gray-200 hover:border-primary/30 bg-white">
                       <div onClick={() => handleViewProperty(property)} className="flex p-6 gap-6">
@@ -740,7 +784,7 @@ export default function PropertyResults() {
                               <div className="text-4xl mb-1">🏢</div>
                               <p className="text-xs font-medium text-gray-600">Property</p>
                             </div>
-                            
+
                             {/* Heart Button - Overlay */}
                             <Button
                               variant="ghost"
@@ -770,25 +814,25 @@ export default function PropertyResults() {
                               <h3 className="font-bold text-lg text-gray-900 group-hover:text-primary transition-colors line-clamp-1 mb-1">
                                 {property.name}
                               </h3>
-                              
+
                               <div className="flex items-center text-sm text-gray-600 mb-1">
                                 <MapPin className="h-4 w-4 mr-1 text-gray-400 shrink-0" />
                                 <span className="line-clamp-1">{property.area}, {property.zone ? property.zone.charAt(0).toUpperCase() + property.zone.slice(1) : 'Unknown Zone'}</span>
                               </div>
-                              
+
                               <p className="text-sm text-gray-500">By {property.developer}</p>
                             </div>
-                            
+
                             <Badge className={`${matchInfo.color} text-sm font-semibold shrink-0`}>
                               {property.matchScore}% Match
                             </Badge>
                           </div>
-                          
+
                           {/* Price */}
                           <div className="text-xl font-bold text-primary">
                             {getPriceRange(property.configurations)}
                           </div>
-                          
+
                           {/* Configurations Row */}
                           {property.configurations.length > 0 && (
                             <div>
@@ -807,7 +851,7 @@ export default function PropertyResults() {
                               </div>
                             </div>
                           )}
-                          
+
                           {/* Intent-Based Highlights */}
                           {preferences.intent && (
                             <div>
@@ -825,7 +869,7 @@ export default function PropertyResults() {
                               </div>
                             </div>
                           )}
-                          
+
                           {/* Features Row - Show only if no intent or as additional info */}
                           {(!preferences.intent || property.tags.length > 0) && (
                             <div>
@@ -872,7 +916,7 @@ function PropertyFilters({ preferences, onUpdatePreferences, properties }: Prope
     value: type,
     label: type.charAt(0).toUpperCase() + type.slice(1)
   }));
-  
+
   const allTags = Array.from(new Set(properties.flatMap(p => p.tags || []))).sort();
   const tags = allTags.map(tag => ({
     value: tag,
@@ -896,7 +940,7 @@ function PropertyFilters({ preferences, onUpdatePreferences, properties }: Prope
     const newArray = currentArray.includes(value)
       ? currentArray.filter(item => item !== value)
       : [...currentArray, value];
-    
+
     handlePreferenceChange(key, newArray);
   };
 
