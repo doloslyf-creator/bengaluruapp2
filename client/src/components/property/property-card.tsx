@@ -55,17 +55,17 @@ export function PropertyCard({ property, onClick, onDelete }: PropertyCardProps)
       // Show default pricing if no configurations available
       return "₹45 L - ₹2.5 Cr";
     }
-    
+
     // Calculate actual prices using pricePerSqft * builtUpArea
     const prices = configurations.map(c => {
       const pricePerSqft = parseFloat(c.pricePerSqft.toString());
       const builtUpArea = c.builtUpArea;
       return pricePerSqft * builtUpArea;
     });
-    
+
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
-    
+
     if (minPrice === maxPrice) {
       return formatPriceDisplay(minPrice);
     }
@@ -80,8 +80,8 @@ export function PropertyCard({ property, onClick, onDelete }: PropertyCardProps)
       <div className="aspect-video bg-gradient-to-br from-muted to-muted/50 rounded-t-xl flex items-center justify-center relative overflow-hidden">
         {property.images && property.images.length > 0 ? (
           <>
-            <img 
-              src={property.images[0]} 
+            <img
+              src={property.images[0]}
               alt={property.name}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
@@ -105,7 +105,7 @@ export function PropertyCard({ property, onClick, onDelete }: PropertyCardProps)
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-stripe"></div>
       </div>
-      
+
       <div className="p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
@@ -119,7 +119,7 @@ export function PropertyCard({ property, onClick, onDelete }: PropertyCardProps)
             {property.status.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
           </Badge>
         </div>
-        
+
         <div className="flex flex-wrap gap-2 mb-6">
           {property.tags.slice(0, 3).map((tag) => (
             <Badge
@@ -136,7 +136,7 @@ export function PropertyCard({ property, onClick, onDelete }: PropertyCardProps)
             </Badge>
           )}
         </div>
-        
+
         <div className="grid grid-cols-2 gap-4 mb-6 text-body-small">
           <div className="space-y-2">
             <div>
@@ -161,7 +161,7 @@ export function PropertyCard({ property, onClick, onDelete }: PropertyCardProps)
             </div>
           </div>
         </div>
-        
+
         {/* Price Range Display */}
         <div className="flex items-center justify-between mb-6 p-4 bg-muted/50 rounded-xl border border-border/50">
           <div className="flex items-center">
@@ -174,7 +174,7 @@ export function PropertyCard({ property, onClick, onDelete }: PropertyCardProps)
             {getPriceRange()}
           </span>
         </div>
-        
+
         <div className="flex items-center justify-between pt-4 border-t border-border">
           <span className="text-sm text-gray-600">
             {property.reraApproved && (

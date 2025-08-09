@@ -37,7 +37,6 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem,
   CommandList,
 } from "@/components/ui/command";
 import {
@@ -121,6 +120,43 @@ export default function Header() {
     }
   };
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Debounced search suggestions
+  useEffect(() => {
+    if (searchQuery.trim().length > 2) {
+      setIsSearching(true);
+      const timer = setTimeout(() => {
+        // Mock suggestions - replace with actual API call
+        const suggestions = [
+          'Whitefield Properties',
+          'Sarjapur Road Apartments',
+          'Electronic City Villas',
+          'HSR Layout 2BHK',
+          'Koramangala 3BHK'
+        ].filter(s => s.toLowerCase().includes(searchQuery.toLowerCase()));
+        setSearchSuggestions(suggestions.slice(0, 5));
+        setIsSearching(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    } else {
+      setSearchSuggestions([]);
+    }
+  }, [searchQuery]);
+
+  const handleSearch = (query?: string) => {
+    const searchTerm = query || searchQuery;
+    if (searchTerm.trim()) {
+      navigate(`/find-property?search=${encodeURIComponent(searchTerm.trim())}`);
+      setIsSearchOpen(false);
+      setSearchQuery('');
+      setSearchSuggestions([]);
+    }
+  };
+
   return (
     <div className="relative">
       {/* Header with proper spacing for promotional banners */}
@@ -160,7 +196,7 @@ export default function Header() {
                   <Link href={item.href}>{item.name}</Link>
                 </Button>
               ))}
-              
+
               {/* Search Component */}
               <div className="ml-4">
                 <Popover open={searchOpen} onOpenChange={setSearchOpen}>
