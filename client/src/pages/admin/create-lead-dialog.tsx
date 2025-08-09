@@ -90,6 +90,15 @@ export default function CreateLeadDialog({ open, onOpenChange }: CreateLeadDialo
 
     const submitData = {
       ...formData,
+      // Convert empty strings to undefined for enum fields
+      buyerPersona: formData.buyerPersona || undefined,
+      urgency: formData.urgency || undefined,
+      financing: formData.financing || undefined,
+      propertyType: formData.propertyType || undefined,
+      bhkPreference: formData.bhkPreference || undefined,
+      buyingFor: formData.buyingFor || undefined,
+      preferredContactTime: formData.preferredContactTime || undefined,
+      
       budgetMin: formData.budgetMin ? parseInt(formData.budgetMin) : null,
       budgetMax: formData.budgetMax ? parseInt(formData.budgetMax) : null,
       source: "walk-in",
