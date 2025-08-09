@@ -170,10 +170,10 @@ function ProtectedRouter() {
       <Route path="/admin/enhanced-leads" component={EnhancedLeads} />
       <Route path="/admin-panel/lead-nurturing" component={LeadNurturingPage} />
       <Route path="/admin-panel/video-education" component={VideoEducationPage} />
-      <Route path="/admin-panel/video-courses" element={<VideoCoursesPage />} />
-      <Route path="/admin-panel/video-courses/:courseId/chapters" element={<VideoChaptersPage />} />
-      <Route path="/property-education" element={<PropertyEducation />} />
-      <Route path="/courses/:courseSlug" element={<VideoCourseViewer />} />
+      <Route path="/admin-panel/video-courses" component={VideoCoursesPage} />
+      <Route path="/admin-panel/video-courses/:courseId/chapters" component={VideoChaptersPage} />
+      <Route path="/property-education" component={PropertyEducation} />
+      <Route path="/courses/:courseSlug" component={VideoCourseViewer} />
       <Route path="/admin-panel/supabase-migration" component={SupabaseMigration} />
       <Route path="/admin-panel/supabase-status" component={SupabaseStatus} />
       <Route path="/admin-panel/supabase" component={SupabaseStatus} />
