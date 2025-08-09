@@ -69,15 +69,15 @@ export default function ModernHomePage() {
   }, []);
   
   // Fetch dynamic data from admin panel
-  const { data: propertiesStats } = useQuery({
+  const { data: propertiesStats = {} } = useQuery<{ totalProperties?: number; activeProjects?: number }>({
     queryKey: ["/api/properties/stats"],
   });
 
-  const { data: ordersData } = useQuery({
+  const { data: ordersData = [] } = useQuery<any[]>({
     queryKey: ["/api/orders"],
   });
 
-  const { data: properties = [] } = useQuery({
+  const { data: properties = [] } = useQuery<{ type?: string }[]>({
     queryKey: ["/api/properties"],
   });
 

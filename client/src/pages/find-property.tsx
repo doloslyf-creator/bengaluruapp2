@@ -133,9 +133,9 @@ export default function FindProperty() {
 
     // When zone changes, also store the zone name for filtering
     if (key === 'zoneId' && value) {
-      const selectedZone = zones.find(zone => zone.id === value);
+      const selectedZone = zones.find((zone: any) => zone.id === value);
       if (selectedZone) {
-        newPreferences.zone = selectedZone.name;
+        (newPreferences as any).zone = selectedZone.name;
       }
     }
 
