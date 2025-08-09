@@ -2828,6 +2828,350 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Server creation and return
+  // Customer Assignment System API Routes
+  // ==================================================
+  
+  // Customer CRUD Routes
+  app.get("/api/customers", async (req, res) => {
+    try {
+      const customers = await storage.getAllCustomers();
+      res.json(customers);
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+      res.status(500).json({ error: "Failed to fetch customers" });
+    }
+  });
+
+  app.get("/api/customers/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const customer = await storage.getCustomer(id);
+      
+      if (!customer) {
+        return res.status(404).json({ error: "Customer not found" });
+      }
+      
+      res.json(customer);
+    } catch (error) {
+      console.error("Error fetching customer:", error);
+      res.status(500).json({ error: "Failed to fetch customer" });
+    }
+  });
+
+  app.get("/api/customers/:id/reports", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const customerWithReports = await storage.getCustomerWithReports(id);
+      
+      if (!customerWithReports) {
+        return res.status(404).json({ error: "Customer not found" });
+      }
+      
+      res.json(customerWithReports);
+    } catch (error) {
+      console.error("Error fetching customer reports:", error);
+      res.status(500).json({ error: "Failed to fetch customer reports" });
+    }
+  });
+
+  app.post("/api/customers", async (req, res) => {
+    try {
+      const customerData = req.body;
+      const customer = await storage.createCustomer(customerData);
+      res.status(201).json(customer);
+    } catch (error) {
+      console.error("Error creating customer:", error);
+      res.status(500).json({ error: "Failed to create customer" });
+    }
+  });
+
+  app.put("/api/customers/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+      
+      const customer = await storage.updateCustomer(id, updates);
+      
+      if (!customer) {
+        return res.status(404).json({ error: "Customer not found" });
+      }
+      
+      res.json(customer);
+    } catch (error) {
+      console.error("Error updating customer:", error);
+      res.status(500).json({ error: "Failed to update customer" });
+    }
+  });
+
+  app.delete("/api/customers/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deleteCustomer(id);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Customer not found" });
+      }
+      
+      res.json({ success: true, message: "Customer deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting customer:", error);
+      res.status(500).json({ error: "Failed to delete customer" });
+    }
+  });
+
+  // Civil+MEP Report Assignment Routes
+  app.post("/api/civil-mep-reports/:reportId/assign-customer", async (req, res) => {
+    try {
+      const { reportId } = req.params;
+      const { customerId, assignedBy, accessLevel = "view", notes } = req.body;
+      
+      const assignment = await storage.assignCivilMepReportToCustomer({
+        reportId,
+        customerId,
+        assignedBy,
+        accessLevel,
+        notes,
+      });
+      
+      res.status(201).json(assignment);
+    } catch (error) {
+      console.error("Error assigning Civil+MEP report to customer:", error);
+      res.status(500).json({ error: "Failed to assign report to customer" });
+    }
+  });
+
+  app.delete("/api/civil-mep-reports/:reportId/remove-customer/:customerId", async (req, res) => {
+    try {
+      const { reportId, customerId } = req.params;
+      const success = await storage.removeCivilMepReportAssignment(reportId, customerId);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Assignment not found" });
+      }
+      
+      res.json({ success: true, message: "Customer assignment removed successfully" });
+    } catch (error) {
+      console.error("Error removing Civil+MEP report assignment:", error);
+      res.status(500).json({ error: "Failed to remove customer assignment" });
+    }
+  });
+
+  app.get("/api/civil-mep-reports/:reportId/assignments", async (req, res) => {
+    try {
+      const { reportId } = req.params;
+      const assignments = await storage.getCivilMepReportAssignments(reportId);
+      res.json(assignments);
+    } catch (error) {
+      console.error("Error fetching Civil+MEP report assignments:", error);
+      res.status(500).json({ error: "Failed to fetch report assignments" });
+    }
+  });
+
+  app.get("/api/civil-mep-reports/:reportId/with-assignments", async (req, res) => {
+    try {
+      const { reportId } = req.params;
+      const reportWithAssignments = await storage.getCivilMepReportWithAssignments(reportId);
+      
+      if (!reportWithAssignments) {
+        return res.status(404).json({ error: "Civil+MEP report not found" });
+      }
+      
+      res.json(reportWithAssignments);
+    } catch (error) {
+      console.error("Error fetching Civil+MEP report with assignments:", error);
+      res.status(500).json({ error: "Failed to fetch report with assignments" });
+    }
+  });
+
+  // Legal Audit Report Assignment Routes
+  app.post("/api/legal-audit-reports/:reportId/assign-customer", async (req, res) => {
+    try {
+      const { reportId } = req.params;
+      const { customerId, assignedBy, accessLevel = "view", notes } = req.body;
+      
+      const assignment = await storage.assignLegalReportToCustomer({
+        reportId,
+        customerId,
+        assignedBy,
+        accessLevel,
+        notes,
+      });
+      
+      res.status(201).json(assignment);
+    } catch (error) {
+      console.error("Error assigning Legal report to customer:", error);
+      res.status(500).json({ error: "Failed to assign report to customer" });
+    }
+  });
+
+  app.delete("/api/legal-audit-reports/:reportId/remove-customer/:customerId", async (req, res) => {
+    try {
+      const { reportId, customerId } = req.params;
+      const success = await storage.removeLegalReportAssignment(reportId, customerId);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Assignment not found" });
+      }
+      
+      res.json({ success: true, message: "Customer assignment removed successfully" });
+    } catch (error) {
+      console.error("Error removing Legal report assignment:", error);
+      res.status(500).json({ error: "Failed to remove customer assignment" });
+    }
+  });
+
+  app.get("/api/legal-audit-reports/:reportId/assignments", async (req, res) => {
+    try {
+      const { reportId } = req.params;
+      const assignments = await storage.getLegalReportAssignments(reportId);
+      res.json(assignments);
+    } catch (error) {
+      console.error("Error fetching Legal report assignments:", error);
+      res.status(500).json({ error: "Failed to fetch report assignments" });
+    }
+  });
+
+  app.get("/api/legal-audit-reports/:reportId/with-assignments", async (req, res) => {
+    try {
+      const { reportId } = req.params;
+      const reportWithAssignments = await storage.getLegalReportWithAssignments(reportId);
+      
+      if (!reportWithAssignments) {
+        return res.status(404).json({ error: "Legal report not found" });
+      }
+      
+      res.json(reportWithAssignments);
+    } catch (error) {
+      console.error("Error fetching Legal report with assignments:", error);
+      res.status(500).json({ error: "Failed to fetch report with assignments" });
+    }
+  });
+
+  // Property Valuation Report Assignment Routes
+  app.post("/api/property-valuation-reports/:reportId/assign-customer", async (req, res) => {
+    try {
+      const { reportId } = req.params;
+      const { customerId, assignedBy, accessLevel = "view", notes } = req.body;
+      
+      const assignment = await storage.assignValuationReportToCustomer({
+        reportId,
+        customerId,
+        assignedBy,
+        accessLevel,
+        notes,
+      });
+      
+      res.status(201).json(assignment);
+    } catch (error) {
+      console.error("Error assigning Valuation report to customer:", error);
+      res.status(500).json({ error: "Failed to assign report to customer" });
+    }
+  });
+
+  app.delete("/api/property-valuation-reports/:reportId/remove-customer/:customerId", async (req, res) => {
+    try {
+      const { reportId, customerId } = req.params;
+      const success = await storage.removeValuationReportAssignment(reportId, customerId);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Assignment not found" });
+      }
+      
+      res.json({ success: true, message: "Customer assignment removed successfully" });
+    } catch (error) {
+      console.error("Error removing Valuation report assignment:", error);
+      res.status(500).json({ error: "Failed to remove customer assignment" });
+    }
+  });
+
+  app.get("/api/property-valuation-reports/:reportId/assignments", async (req, res) => {
+    try {
+      const { reportId } = req.params;
+      const assignments = await storage.getValuationReportAssignments(reportId);
+      res.json(assignments);
+    } catch (error) {
+      console.error("Error fetching Valuation report assignments:", error);
+      res.status(500).json({ error: "Failed to fetch report assignments" });
+    }
+  });
+
+  app.get("/api/property-valuation-reports/:reportId/with-assignments", async (req, res) => {
+    try {
+      const { reportId } = req.params;
+      const reportWithAssignments = await storage.getValuationReportWithAssignments(reportId);
+      
+      if (!reportWithAssignments) {
+        return res.status(404).json({ error: "Valuation report not found" });
+      }
+      
+      res.json(reportWithAssignments);
+    } catch (error) {
+      console.error("Error fetching Valuation report with assignments:", error);
+      res.status(500).json({ error: "Failed to fetch report with assignments" });
+    }
+  });
+
+  // Access Control Routes
+  app.get("/api/customers/:customerId/check-access/:reportId/:reportType", async (req, res) => {
+    try {
+      const { customerId, reportId, reportType } = req.params;
+      
+      if (!["civil-mep", "legal", "valuation"].includes(reportType)) {
+        return res.status(400).json({ error: "Invalid report type" });
+      }
+      
+      const hasAccess = await storage.checkCustomerReportAccess(
+        customerId, 
+        reportId, 
+        reportType as "civil-mep" | "legal" | "valuation"
+      );
+      
+      res.json({ hasAccess });
+    } catch (error) {
+      console.error("Error checking customer report access:", error);
+      res.status(500).json({ error: "Failed to check customer access" });
+    }
+  });
+
+  app.post("/api/track-report-access", async (req, res) => {
+    try {
+      const { customerId, reportId, reportType } = req.body;
+      
+      if (!["civil-mep", "legal", "valuation"].includes(reportType)) {
+        return res.status(400).json({ error: "Invalid report type" });
+      }
+      
+      await storage.trackReportAccess(
+        customerId, 
+        reportId, 
+        reportType as "civil-mep" | "legal" | "valuation"
+      );
+      
+      res.json({ success: true, message: "Report access tracked successfully" });
+    } catch (error) {
+      console.error("Error tracking report access:", error);
+      res.status(500).json({ error: "Failed to track report access" });
+    }
+  });
+
+  app.put("/api/assignments/:assignmentId/access", async (req, res) => {
+    try {
+      const { assignmentId } = req.params;
+      const { accessGranted } = req.body;
+      
+      const success = await storage.updateReportAccess(assignmentId, accessGranted);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Assignment not found" });
+      }
+      
+      res.json({ success: true, message: "Access updated successfully" });
+    } catch (error) {
+      console.error("Error updating report access:", error);
+      res.status(500).json({ error: "Failed to update access" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

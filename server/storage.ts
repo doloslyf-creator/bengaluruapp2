@@ -52,6 +52,19 @@
   type InsertTeamMember,
   type Developer,
   type InsertDeveloper,
+  // Customer assignment system types
+  type Customer,
+  type InsertCustomer,
+  type CustomerWithReports,
+  type CivilMepReportAssignment,
+  type InsertCivilMepReportAssignment,
+  type LegalReportAssignment,
+  type InsertLegalReportAssignment,
+  type PropertyValuationReportAssignment,
+  type InsertPropertyValuationReportAssignment,
+  type CivilMepReportWithAssignments,
+  type LegalAuditReportWithAssignments,
+  type PropertyValuationReportWithAssignments,
   properties, 
   propertyConfigurations,
   propertyScores,
@@ -74,10 +87,15 @@
   appSettings,
   teamMembers,
   developers,
+  // Customer assignment tables
+  customers,
+  civilMepReportAssignments,
+  legalReportAssignments,
+  propertyValuationReportAssignments,
 
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, ilike, gte, lte, desc, sql } from "drizzle-orm";
+import { eq, and, ilike, gte, lte, desc, sql, count, sum, or, like, isNull, isNotNull } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -259,6 +277,43 @@ export interface IStorage {
   getAllReportPayments(): Promise<ReportPayment[]>;
   getReportPaymentsByProperty(propertyId: string): Promise<ReportPayment[]>;
   updateReportPaymentStatus(paymentId: string, status: string): Promise<ReportPayment | undefined>;
+
+  // Customer Assignment System operations
+  // Customer CRUD operations
+  createCustomer(customer: InsertCustomer): Promise<Customer>;
+  getCustomer(customerId: string): Promise<Customer | undefined>;
+  getCustomerByEmail(email: string): Promise<Customer | undefined>;
+  getAllCustomers(): Promise<Customer[]>;
+  updateCustomer(customerId: string, updates: Partial<InsertCustomer>): Promise<Customer | undefined>;
+  deleteCustomer(customerId: string): Promise<boolean>;
+  getCustomerWithReports(customerId: string): Promise<CustomerWithReports | undefined>;
+
+  // Report Assignment operations
+  // Civil+MEP Report assignments
+  assignCivilMepReportToCustomer(assignment: InsertCivilMepReportAssignment): Promise<CivilMepReportAssignment>;
+  removeCivilMepReportAssignment(reportId: string, customerId: string): Promise<boolean>;
+  getCivilMepReportAssignments(reportId: string): Promise<Array<CivilMepReportAssignment & { customer: Customer }>>;
+  getCustomerCivilMepReports(customerId: string): Promise<Array<CivilMepReportAssignment & { report: CivilMepReport }>>;
+  getCivilMepReportWithAssignments(reportId: string): Promise<CivilMepReportWithAssignments | undefined>;
+
+  // Legal Audit Report assignments
+  assignLegalReportToCustomer(assignment: InsertLegalReportAssignment): Promise<LegalReportAssignment>;
+  removeLegalReportAssignment(reportId: string, customerId: string): Promise<boolean>;
+  getLegalReportAssignments(reportId: string): Promise<Array<LegalReportAssignment & { customer: Customer }>>;
+  getCustomerLegalReports(customerId: string): Promise<Array<LegalReportAssignment & { report: LegalAuditReport }>>;
+  getLegalReportWithAssignments(reportId: string): Promise<LegalAuditReportWithAssignments | undefined>;
+
+  // Property Valuation Report assignments
+  assignValuationReportToCustomer(assignment: InsertPropertyValuationReportAssignment): Promise<PropertyValuationReportAssignment>;
+  removeValuationReportAssignment(reportId: string, customerId: string): Promise<boolean>;
+  getValuationReportAssignments(reportId: string): Promise<Array<PropertyValuationReportAssignment & { customer: Customer }>>;
+  getCustomerValuationReports(customerId: string): Promise<Array<PropertyValuationReportAssignment & { report: PropertyValuationReport }>>;
+  getValuationReportWithAssignments(reportId: string): Promise<PropertyValuationReportWithAssignments | undefined>;
+
+  // Access control operations
+  checkCustomerReportAccess(customerId: string, reportId: string, reportType: "civil-mep" | "legal" | "valuation"): Promise<boolean>;
+  updateReportAccess(assignmentId: string, accessGranted: boolean): Promise<boolean>;
+  trackReportAccess(customerId: string, reportId: string, reportType: "civil-mep" | "legal" | "valuation"): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -2767,6 +2822,373 @@ export class DatabaseStorage implements IStorage {
       totalProjects,
       avgRating: Number(avgRating.toFixed(2))
     };
+  }
+  // Customer Assignment System Operations
+  async createCustomer(customer: InsertCustomer): Promise<Customer> {
+    const [newCustomer] = await db.insert(customers)
+      .values(customer)
+      .returning();
+    return newCustomer;
+  }
+
+  async getCustomer(customerId: string): Promise<Customer | undefined> {
+    const [customer] = await db.select().from(customers)
+      .where(eq(customers.id, customerId));
+    return customer || undefined;
+  }
+
+  async getCustomerByEmail(email: string): Promise<Customer | undefined> {
+    const [customer] = await db.select().from(customers)
+      .where(eq(customers.email, email));
+    return customer || undefined;
+  }
+
+  async getAllCustomers(): Promise<Customer[]> {
+    return await db.select().from(customers)
+      .orderBy(desc(customers.createdAt));
+  }
+
+  async updateCustomer(customerId: string, updates: Partial<InsertCustomer>): Promise<Customer | undefined> {
+    const [customer] = await db.update(customers)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(customers.id, customerId))
+      .returning();
+    return customer || undefined;
+  }
+
+  async deleteCustomer(customerId: string): Promise<boolean> {
+    const result = await db.delete(customers)
+      .where(eq(customers.id, customerId));
+    return result.rowCount > 0;
+  }
+
+  async getCustomerWithReports(customerId: string): Promise<CustomerWithReports | undefined> {
+    const customer = await this.getCustomer(customerId);
+    if (!customer) return undefined;
+
+    // Get all report assignments for this customer
+    const civilMepReports = await this.getCustomerCivilMepReports(customerId);
+    const legalReports = await this.getCustomerLegalReports(customerId);
+    const valuationReports = await this.getCustomerValuationReports(customerId);
+
+    return {
+      ...customer,
+      civilMepReports,
+      legalReports,
+      valuationReports,
+    };
+  }
+
+  // Civil+MEP Report Assignment Operations
+  async assignCivilMepReportToCustomer(assignment: InsertCivilMepReportAssignment): Promise<CivilMepReportAssignment> {
+    const [newAssignment] = await db.insert(civilMepReportAssignments)
+      .values(assignment)
+      .returning();
+    return newAssignment;
+  }
+
+  async removeCivilMepReportAssignment(reportId: string, customerId: string): Promise<boolean> {
+    const result = await db.delete(civilMepReportAssignments)
+      .where(and(
+        eq(civilMepReportAssignments.reportId, reportId),
+        eq(civilMepReportAssignments.customerId, customerId)
+      ));
+    return result.rowCount > 0;
+  }
+
+  async getCivilMepReportAssignments(reportId: string): Promise<Array<CivilMepReportAssignment & { customer: Customer }>> {
+    return await db.select({
+      id: civilMepReportAssignments.id,
+      reportId: civilMepReportAssignments.reportId,
+      customerId: civilMepReportAssignments.customerId,
+      assignedBy: civilMepReportAssignments.assignedBy,
+      assignedAt: civilMepReportAssignments.assignedAt,
+      accessGranted: civilMepReportAssignments.accessGranted,
+      accessLevel: civilMepReportAssignments.accessLevel,
+      expiresAt: civilMepReportAssignments.expiresAt,
+      lastAccessedAt: civilMepReportAssignments.lastAccessedAt,
+      accessCount: civilMepReportAssignments.accessCount,
+      notes: civilMepReportAssignments.notes,
+      customer: customers,
+    })
+      .from(civilMepReportAssignments)
+      .leftJoin(customers, eq(civilMepReportAssignments.customerId, customers.id))
+      .where(eq(civilMepReportAssignments.reportId, reportId));
+  }
+
+  async getCustomerCivilMepReports(customerId: string): Promise<Array<CivilMepReportAssignment & { report: CivilMepReport }>> {
+    return await db.select({
+      id: civilMepReportAssignments.id,
+      reportId: civilMepReportAssignments.reportId,
+      customerId: civilMepReportAssignments.customerId,
+      assignedBy: civilMepReportAssignments.assignedBy,
+      assignedAt: civilMepReportAssignments.assignedAt,
+      accessGranted: civilMepReportAssignments.accessGranted,
+      accessLevel: civilMepReportAssignments.accessLevel,
+      expiresAt: civilMepReportAssignments.expiresAt,
+      lastAccessedAt: civilMepReportAssignments.lastAccessedAt,
+      accessCount: civilMepReportAssignments.accessCount,
+      notes: civilMepReportAssignments.notes,
+      report: civilMepReports,
+    })
+      .from(civilMepReportAssignments)
+      .leftJoin(civilMepReports, eq(civilMepReportAssignments.reportId, civilMepReports.id))
+      .where(and(
+        eq(civilMepReportAssignments.customerId, customerId),
+        eq(civilMepReportAssignments.accessGranted, true)
+      ));
+  }
+
+  async getCivilMepReportWithAssignments(reportId: string): Promise<CivilMepReportWithAssignments | undefined> {
+    const report = await this.getCivilMepReport(reportId);
+    if (!report) return undefined;
+
+    const assignments = await this.getCivilMepReportAssignments(reportId);
+    return {
+      ...report,
+      assignments,
+    };
+  }
+
+  // Legal Audit Report Assignment Operations
+  async assignLegalReportToCustomer(assignment: InsertLegalReportAssignment): Promise<LegalReportAssignment> {
+    const [newAssignment] = await db.insert(legalReportAssignments)
+      .values(assignment)
+      .returning();
+    return newAssignment;
+  }
+
+  async removeLegalReportAssignment(reportId: string, customerId: string): Promise<boolean> {
+    const result = await db.delete(legalReportAssignments)
+      .where(and(
+        eq(legalReportAssignments.reportId, reportId),
+        eq(legalReportAssignments.customerId, customerId)
+      ));
+    return result.rowCount > 0;
+  }
+
+  async getLegalReportAssignments(reportId: string): Promise<Array<LegalReportAssignment & { customer: Customer }>> {
+    return await db.select({
+      id: legalReportAssignments.id,
+      reportId: legalReportAssignments.reportId,
+      customerId: legalReportAssignments.customerId,
+      assignedBy: legalReportAssignments.assignedBy,
+      assignedAt: legalReportAssignments.assignedAt,
+      accessGranted: legalReportAssignments.accessGranted,
+      accessLevel: legalReportAssignments.accessLevel,
+      expiresAt: legalReportAssignments.expiresAt,
+      lastAccessedAt: legalReportAssignments.lastAccessedAt,
+      accessCount: legalReportAssignments.accessCount,
+      notes: legalReportAssignments.notes,
+      customer: customers,
+    })
+      .from(legalReportAssignments)
+      .leftJoin(customers, eq(legalReportAssignments.customerId, customers.id))
+      .where(eq(legalReportAssignments.reportId, reportId));
+  }
+
+  async getCustomerLegalReports(customerId: string): Promise<Array<LegalReportAssignment & { report: LegalAuditReport }>> {
+    return await db.select({
+      id: legalReportAssignments.id,
+      reportId: legalReportAssignments.reportId,
+      customerId: legalReportAssignments.customerId,
+      assignedBy: legalReportAssignments.assignedBy,
+      assignedAt: legalReportAssignments.assignedAt,
+      accessGranted: legalReportAssignments.accessGranted,
+      accessLevel: legalReportAssignments.accessLevel,
+      expiresAt: legalReportAssignments.expiresAt,
+      lastAccessedAt: legalReportAssignments.lastAccessedAt,
+      accessCount: legalReportAssignments.accessCount,
+      notes: legalReportAssignments.notes,
+      report: legalAuditReports,
+    })
+      .from(legalReportAssignments)
+      .leftJoin(legalAuditReports, eq(legalReportAssignments.reportId, legalAuditReports.id))
+      .where(and(
+        eq(legalReportAssignments.customerId, customerId),
+        eq(legalReportAssignments.accessGranted, true)
+      ));
+  }
+
+  async getLegalReportWithAssignments(reportId: string): Promise<LegalAuditReportWithAssignments | undefined> {
+    const report = await this.getLegalAuditReport(reportId);
+    if (!report) return undefined;
+
+    const assignments = await this.getLegalReportAssignments(reportId);
+    return {
+      ...report,
+      assignments,
+    };
+  }
+
+  // Property Valuation Report Assignment Operations
+  async assignValuationReportToCustomer(assignment: InsertPropertyValuationReportAssignment): Promise<PropertyValuationReportAssignment> {
+    const [newAssignment] = await db.insert(propertyValuationReportAssignments)
+      .values(assignment)
+      .returning();
+    return newAssignment;
+  }
+
+  async removeValuationReportAssignment(reportId: string, customerId: string): Promise<boolean> {
+    const result = await db.delete(propertyValuationReportAssignments)
+      .where(and(
+        eq(propertyValuationReportAssignments.reportId, reportId),
+        eq(propertyValuationReportAssignments.customerId, customerId)
+      ));
+    return result.rowCount > 0;
+  }
+
+  async getValuationReportAssignments(reportId: string): Promise<Array<PropertyValuationReportAssignment & { customer: Customer }>> {
+    return await db.select({
+      id: propertyValuationReportAssignments.id,
+      reportId: propertyValuationReportAssignments.reportId,
+      customerId: propertyValuationReportAssignments.customerId,
+      assignedBy: propertyValuationReportAssignments.assignedBy,
+      assignedAt: propertyValuationReportAssignments.assignedAt,
+      accessGranted: propertyValuationReportAssignments.accessGranted,
+      accessLevel: propertyValuationReportAssignments.accessLevel,
+      expiresAt: propertyValuationReportAssignments.expiresAt,
+      lastAccessedAt: propertyValuationReportAssignments.lastAccessedAt,
+      accessCount: propertyValuationReportAssignments.accessCount,
+      notes: propertyValuationReportAssignments.notes,
+      customer: customers,
+    })
+      .from(propertyValuationReportAssignments)
+      .leftJoin(customers, eq(propertyValuationReportAssignments.customerId, customers.id))
+      .where(eq(propertyValuationReportAssignments.reportId, reportId));
+  }
+
+  async getCustomerValuationReports(customerId: string): Promise<Array<PropertyValuationReportAssignment & { report: PropertyValuationReport }>> {
+    return await db.select({
+      id: propertyValuationReportAssignments.id,
+      reportId: propertyValuationReportAssignments.reportId,
+      customerId: propertyValuationReportAssignments.customerId,
+      assignedBy: propertyValuationReportAssignments.assignedBy,
+      assignedAt: propertyValuationReportAssignments.assignedAt,
+      accessGranted: propertyValuationReportAssignments.accessGranted,
+      accessLevel: propertyValuationReportAssignments.accessLevel,
+      expiresAt: propertyValuationReportAssignments.expiresAt,
+      lastAccessedAt: propertyValuationReportAssignments.lastAccessedAt,
+      accessCount: propertyValuationReportAssignments.accessCount,
+      notes: propertyValuationReportAssignments.notes,
+      report: propertyValuationReports,
+    })
+      .from(propertyValuationReportAssignments)
+      .leftJoin(propertyValuationReports, eq(propertyValuationReportAssignments.reportId, propertyValuationReports.id))
+      .where(and(
+        eq(propertyValuationReportAssignments.customerId, customerId),
+        eq(propertyValuationReportAssignments.accessGranted, true)
+      ));
+  }
+
+  async getValuationReportWithAssignments(reportId: string): Promise<PropertyValuationReportWithAssignments | undefined> {
+    const report = await this.getValuationReport(reportId);
+    if (!report) return undefined;
+
+    const assignments = await this.getValuationReportAssignments(reportId);
+    return {
+      ...report,
+      assignments,
+    };
+  }
+
+  // Access Control Operations
+  async checkCustomerReportAccess(customerId: string, reportId: string, reportType: "civil-mep" | "legal" | "valuation"): Promise<boolean> {
+    let hasAccess = false;
+
+    switch (reportType) {
+      case "civil-mep":
+        const [civilAssignment] = await db.select()
+          .from(civilMepReportAssignments)
+          .where(and(
+            eq(civilMepReportAssignments.customerId, customerId),
+            eq(civilMepReportAssignments.reportId, reportId),
+            eq(civilMepReportAssignments.accessGranted, true)
+          ))
+          .limit(1);
+        hasAccess = !!civilAssignment;
+        break;
+
+      case "legal":
+        const [legalAssignment] = await db.select()
+          .from(legalReportAssignments)
+          .where(and(
+            eq(legalReportAssignments.customerId, customerId),
+            eq(legalReportAssignments.reportId, reportId),
+            eq(legalReportAssignments.accessGranted, true)
+          ))
+          .limit(1);
+        hasAccess = !!legalAssignment;
+        break;
+
+      case "valuation":
+        const [valuationAssignment] = await db.select()
+          .from(propertyValuationReportAssignments)
+          .where(and(
+            eq(propertyValuationReportAssignments.customerId, customerId),
+            eq(propertyValuationReportAssignments.reportId, reportId),
+            eq(propertyValuationReportAssignments.accessGranted, true)
+          ))
+          .limit(1);
+        hasAccess = !!valuationAssignment;
+        break;
+    }
+
+    return hasAccess;
+  }
+
+  async updateReportAccess(assignmentId: string, accessGranted: boolean): Promise<boolean> {
+    // Try updating in all assignment tables since we don't know which type
+    const civilResult = await db.update(civilMepReportAssignments)
+      .set({ accessGranted })
+      .where(eq(civilMepReportAssignments.id, assignmentId));
+
+    const legalResult = await db.update(legalReportAssignments)
+      .set({ accessGranted })
+      .where(eq(legalReportAssignments.id, assignmentId));
+
+    const valuationResult = await db.update(propertyValuationReportAssignments)
+      .set({ accessGranted })
+      .where(eq(propertyValuationReportAssignments.id, assignmentId));
+
+    return civilResult.rowCount > 0 || legalResult.rowCount > 0 || valuationResult.rowCount > 0;
+  }
+
+  async trackReportAccess(customerId: string, reportId: string, reportType: "civil-mep" | "legal" | "valuation"): Promise<void> {
+    const now = new Date();
+    const accessUpdate = {
+      lastAccessedAt: now,
+      accessCount: sql`${sql.identifier('access_count')} + 1`,
+    };
+
+    switch (reportType) {
+      case "civil-mep":
+        await db.update(civilMepReportAssignments)
+          .set(accessUpdate)
+          .where(and(
+            eq(civilMepReportAssignments.customerId, customerId),
+            eq(civilMepReportAssignments.reportId, reportId)
+          ));
+        break;
+
+      case "legal":
+        await db.update(legalReportAssignments)
+          .set(accessUpdate)
+          .where(and(
+            eq(legalReportAssignments.customerId, customerId),
+            eq(legalReportAssignments.reportId, reportId)
+          ));
+        break;
+
+      case "valuation":
+        await db.update(propertyValuationReportAssignments)
+          .set(accessUpdate)
+          .where(and(
+            eq(propertyValuationReportAssignments.customerId, customerId),
+            eq(propertyValuationReportAssignments.reportId, reportId)
+          ));
+        break;
+    }
   }
 }
 

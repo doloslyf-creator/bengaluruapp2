@@ -1997,3 +1997,160 @@ export interface PropertyWithLocation extends Property {
   city?: City;
   zone?: Zone;
 }
+
+// Customer Assignment System for Reports
+// This system allows administrators to assign specific customers to reports
+// Only assigned customers can access reports through their account panels
+
+// Customer table for report assignments
+export const customers = pgTable("customers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  
+  // Customer Information
+  name: text("name").notNull(),
+  email: text("email").unique().notNull(),
+  phone: text("phone"),
+  
+  // Account Information
+  isActive: boolean("is_active").default(true),
+  accountType: varchar("account_type", { enum: ["individual", "corporate", "nri"] }).default("individual"),
+  
+  // Profile Details
+  address: text("address"),
+  city: text("city"),
+  state: text("state"),
+  pincode: text("pincode"),
+  
+  // Engagement
+  registrationSource: varchar("registration_source", { 
+    enum: ["website", "referral", "direct", "admin_created"] 
+  }).default("website"),
+  
+  // Metadata
+  notes: text("notes"),
+  createdBy: text("created_by"), // Admin who created the customer
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Junction table for Civil+MEP Report assignments
+export const civilMepReportAssignments = pgTable("civil_mep_report_assignments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  reportId: varchar("report_id").notNull().references(() => civilMepReports.id, { onDelete: "cascade" }),
+  customerId: varchar("customer_id").notNull().references(() => customers.id, { onDelete: "cascade" }),
+  
+  // Assignment details
+  assignedBy: text("assigned_by").notNull(), // Admin who made the assignment
+  assignedAt: timestamp("assigned_at").defaultNow(),
+  
+  // Access control
+  accessGranted: boolean("access_granted").default(true),
+  accessLevel: varchar("access_level", { enum: ["view", "download", "share"] }).default("view"),
+  expiresAt: timestamp("expires_at"), // Optional expiration date
+  
+  // Tracking
+  lastAccessedAt: timestamp("last_accessed_at"),
+  accessCount: integer("access_count").default(0),
+  
+  notes: text("notes"),
+});
+
+// Junction table for Legal Due Diligence Report assignments
+export const legalReportAssignments = pgTable("legal_report_assignments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  reportId: varchar("report_id").notNull().references(() => legalAuditReports.id, { onDelete: "cascade" }),
+  customerId: varchar("customer_id").notNull().references(() => customers.id, { onDelete: "cascade" }),
+  
+  // Assignment details
+  assignedBy: text("assigned_by").notNull(),
+  assignedAt: timestamp("assigned_at").defaultNow(),
+  
+  // Access control
+  accessGranted: boolean("access_granted").default(true),
+  accessLevel: varchar("access_level", { enum: ["view", "download", "share"] }).default("view"),
+  expiresAt: timestamp("expires_at"),
+  
+  // Tracking
+  lastAccessedAt: timestamp("last_accessed_at"),
+  accessCount: integer("access_count").default(0),
+  
+  notes: text("notes"),
+});
+
+// Junction table for Property Valuation Report assignments
+export const propertyValuationReportAssignments = pgTable("property_valuation_report_assignments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  reportId: varchar("report_id").notNull().references(() => propertyValuationReports.id, { onDelete: "cascade" }),
+  customerId: varchar("customer_id").notNull().references(() => customers.id, { onDelete: "cascade" }),
+  
+  // Assignment details
+  assignedBy: text("assigned_by").notNull(),
+  assignedAt: timestamp("assigned_at").defaultNow(),
+  
+  // Access control
+  accessGranted: boolean("access_granted").default(true),
+  accessLevel: varchar("access_level", { enum: ["view", "download", "share"] }).default("view"),
+  expiresAt: timestamp("expires_at"),
+  
+  // Tracking
+  lastAccessedAt: timestamp("last_accessed_at"),
+  accessCount: integer("access_count").default(0),
+  
+  notes: text("notes"),
+});
+
+// Schema definitions for customer and assignment operations
+export const insertCustomerSchema = createInsertSchema(customers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertCivilMepReportAssignmentSchema = createInsertSchema(civilMepReportAssignments).omit({
+  id: true,
+  assignedAt: true,
+});
+
+export const insertLegalReportAssignmentSchema = createInsertSchema(legalReportAssignments).omit({
+  id: true,
+  assignedAt: true,
+});
+
+export const insertPropertyValuationReportAssignmentSchema = createInsertSchema(propertyValuationReportAssignments).omit({
+  id: true,
+  assignedAt: true,
+});
+
+// Type definitions
+export type Customer = typeof customers.$inferSelect;
+export type InsertCustomer = z.infer<typeof insertCustomerSchema>;
+
+export type CivilMepReportAssignment = typeof civilMepReportAssignments.$inferSelect;
+export type InsertCivilMepReportAssignment = z.infer<typeof insertCivilMepReportAssignmentSchema>;
+
+export type LegalReportAssignment = typeof legalReportAssignments.$inferSelect;
+export type InsertLegalReportAssignment = z.infer<typeof insertLegalReportAssignmentSchema>;
+
+export type PropertyValuationReportAssignment = typeof propertyValuationReportAssignments.$inferSelect;
+export type InsertPropertyValuationReportAssignment = z.infer<typeof insertPropertyValuationReportAssignmentSchema>;
+
+// Extended types with assignments
+export interface CivilMepReportWithAssignments extends CivilMepReport {
+  assignments?: Array<CivilMepReportAssignment & { customer: Customer }>;
+}
+
+export interface LegalAuditReportWithAssignments extends LegalAuditReport {
+  assignments?: Array<LegalReportAssignment & { customer: Customer }>;
+}
+
+export interface PropertyValuationReportWithAssignments extends PropertyValuationReport {
+  assignments?: Array<PropertyValuationReportAssignment & { customer: Customer }>;
+}
+
+// Customer with their accessible reports
+export interface CustomerWithReports extends Customer {
+  civilMepReports?: Array<CivilMepReportAssignment & { report: CivilMepReport }>;
+  legalReports?: Array<LegalReportAssignment & { report: LegalAuditReport }>;
+  valuationReports?: Array<PropertyValuationReportAssignment & { report: PropertyValuationReport }>;
+}
