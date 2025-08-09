@@ -96,7 +96,7 @@
 
 /* OwnItRight Premium Logo Styles */
 .logo-gradient {
-  background: linear-gradient(135deg, hsl(221, 83%, 53%) 0%, hsl(221, 83%, 25%) 30%, hsl(46, 69%, 65%) 70%, hsl(221, 83%, 53%) 100%);
+  background: linear-gradient(135deg, #006073 0%, #004d59 30%, hsl(46, 69%, 65%) 70%, #006073 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -115,40 +115,40 @@
 :root {
   /* OwnitWise Premium Brand Color System */
   --background: hsl(44, 13%, 96%); /* Warm Grey #F5F4F1 - Clean Background */
-  --foreground: hsl(210, 29%, 22%); /* Deep Navy #1E2A38 - Authority & Trust */
+  --foreground: hsl(190, 100%, 19%); /* Teal #006073 - Primary Brand Color */
   --muted: hsl(44, 13%, 91%);
-  --muted-foreground: hsl(210, 29%, 45%);
+  --muted-foreground: hsl(190, 100%, 35%);
   --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(210, 29%, 22%);
+  --popover-foreground: hsl(190, 100%, 19%);
   --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(210, 29%, 22%);
+  --card-foreground: hsl(190, 100%, 19%);
   --border: hsl(44, 13%, 88%);
   --input: hsl(44, 13%, 92%);
-  --primary: hsl(210, 29%, 22%); /* Deep Navy #1E2A38 */
+  --primary: hsl(190, 100%, 19%); /* Teal #006073 - Primary Brand Color */
   --primary-foreground: hsl(0, 0%, 100%);
   --secondary: hsl(45, 78%, 45%); /* Gold Accent #D4A017 */
-  --secondary-foreground: hsl(210, 29%, 22%);
+  --secondary-foreground: hsl(190, 100%, 19%);
   --accent: hsl(120, 13%, 67%); /* Soft Sage #A6BBA6 */
-  --accent-foreground: hsl(210, 29%, 22%);
+  --accent-foreground: hsl(190, 100%, 19%);
   --destructive: hsl(0, 84%, 60%);
   --destructive-foreground: hsl(0, 0%, 100%);
   --success: hsl(120, 13%, 67%); /* Soft Sage for success */
-  --success-foreground: hsl(210, 29%, 22%);
+  --success-foreground: hsl(190, 100%, 19%);
   --warning: hsl(45, 78%, 45%); /* Gold for warnings */
-  --warning-foreground: hsl(210, 29%, 22%);
-  --ring: hsl(45, 78%, 45%);
+  --warning-foreground: hsl(190, 100%, 19%);
+  --ring: hsl(190, 100%, 19%);
   --radius: 0.5rem;
   --neutral: hsl(44, 13%, 96%);
   
   /* OwnitWise Brand Colors */
-  --navy: hsl(210, 29%, 22%); /* Deep Navy #1E2A38 - Authority & Stability */
+  --navy: hsl(190, 100%, 19%); /* Teal #006073 - Primary Brand Color */
   --navy-foreground: hsl(0, 0%, 100%);
   --gold: hsl(45, 78%, 45%); /* Gold Accent #D4A017 - Premium & CTAs */
-  --gold-foreground: hsl(210, 29%, 22%);
+  --gold-foreground: hsl(190, 100%, 19%);
   --sage: hsl(120, 13%, 67%); /* Soft Sage #A6BBA6 - Calm & Balanced */
-  --sage-foreground: hsl(210, 29%, 22%);
+  --sage-foreground: hsl(190, 100%, 19%);
   --warm-grey: hsl(44, 13%, 96%); /* Warm Grey #F5F4F1 */
-  --warm-grey-foreground: hsl(210, 29%, 22%);
+  --warm-grey-foreground: hsl(190, 100%, 19%);
   
   /* Stripe spacing system */
   --spacing-xs: 0.25rem;
@@ -177,6 +177,11 @@
 .hover\:bg-gold\/90:hover { background-color: hsl(var(--gold) / 0.9); }
 .hover\:bg-navy:hover { background-color: hsl(var(--navy)); }
 .hover\:text-white:hover { color: white; }
+
+/* Primary color hover effects */
+.hover\:bg-primary:hover { background-color: #006073; }
+.hover\:border-primary:hover { border-color: #006073; }
+.hover\:text-primary:hover { color: #006073; }
 
 /* Gradient backgrounds */
 .bg-sage\/5 { background-color: hsl(var(--sage) / 0.05); }
@@ -266,6 +271,11 @@
   /* Premium UI enhancements */
   .btn-premium {
     @apply bg-gradient-to-r from-primary to-navy text-white px-8 py-4 rounded-lg font-semibold text-base tracking-wide shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5;
+    background: linear-gradient(135deg, #006073 0%, #004d59 100%);
+  }
+  
+  .btn-premium:hover {
+    background: #006073;
   }
   
   .btn-secondary-premium {
@@ -281,7 +291,7 @@
   }
   
   .text-gradient-premium {
-    background: linear-gradient(135deg, hsl(221, 83%, 53%) 0%, hsl(221, 83%, 25%) 50%, hsl(46, 69%, 65%) 100%);
+    background: linear-gradient(135deg, #006073 0%, #004d59 50%, hsl(46, 69%, 65%) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -323,7 +333,7 @@
   }
 
   .logo-gradient {
-    background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+    background: linear-gradient(135deg, #006073 0%, #004d59 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -421,7 +431,7 @@
     font-family: 'Playfair Display', serif;
     font-weight: 700;
     font-style: italic;
-    color: hsl(var(--navy));
+    color: #006073;
     letter-spacing: -0.02em;
   }
 
@@ -441,7 +451,7 @@
     justify-content: center;
     width: 32px;
     height: 32px;
-    background: linear-gradient(135deg, hsl(var(--navy)) 0%, hsl(var(--gold)) 100%);
+    background: linear-gradient(135deg, #006073 0%, hsl(var(--gold)) 100%);
     border-radius: 6px;
     margin-right: 8px;
     position: relative;
