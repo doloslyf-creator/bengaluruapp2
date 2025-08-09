@@ -1,5 +1,5 @@
 
-# OwnItRight - Property Advisory Platform Documentation
+# OwnitWise - Property Advisory Platform Documentation
 
 ## Table of Contents
 
@@ -18,7 +18,7 @@
 
 ## Overview
 
-OwnItRight is a comprehensive property advisory platform designed for the Indian real estate market, specifically focused on Bengaluru properties. The platform provides property valuation, engineering assessments, legal due diligence, and investment guidance services.
+OwnitWise is a comprehensive property advisory platform designed for the Indian real estate market, specifically focused on Bengaluru properties. The platform provides property valuation, engineering assessments, legal due diligence, and investment guidance services.
 
 ### Key Capabilities
 - **Property Discovery**: Advanced search and filtering for property listings

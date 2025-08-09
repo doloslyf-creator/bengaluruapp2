@@ -125,14 +125,14 @@ export default function TermsOfUse() {
             <section>
               <h2 className="text-2xl font-semibold mb-4">8. Limitation of Liability</h2>
               <p className="text-gray-700 mb-4">
-                OwnItRight shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, or business opportunities arising from your use of our services.
+                OwnitWise shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, or business opportunities arising from your use of our services.
               </p>
             </section>
 
             <section>
               <h2 className="text-2xl font-semibold mb-4">9. Indemnification</h2>
               <p className="text-gray-700 mb-4">
-                You agree to indemnify and hold harmless OwnItRight from any claims, damages, or expenses arising from your use of the platform or violation of these terms.
+                You agree to indemnify and hold harmless OwnitWise from any claims, damages, or expenses arising from your use of the platform or violation of these terms.
               </p>
             </section>
 

@@ -1,5 +1,5 @@
 
-# User Guide - OwnItRight Platform
+# User Guide - OwnitWise Platform
 
 ## Table of Contents
 1. [Getting Started](#getting-started)

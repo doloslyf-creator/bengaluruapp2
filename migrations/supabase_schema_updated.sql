@@ -1,5 +1,5 @@
 
--- Updated Supabase Schema for OwnItRight Platform
+-- Updated Supabase Schema for OwnitWise Platform
 -- This schema matches the current database structure
 
 -- Enable necessary extensions

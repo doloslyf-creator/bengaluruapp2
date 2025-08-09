@@ -475,4 +475,4 @@ VALUES ('admin', 'admin@ownitright.com', 'Admin', 'User')
 ON CONFLICT (id) DO NOTHING;
 
 -- Success message
-SELECT 'OwnItRight database schema created successfully!' as setup_status;
+SELECT 'OwnitWise database schema created successfully!' as setup_status;

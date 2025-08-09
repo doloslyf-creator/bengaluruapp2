@@ -94,7 +94,7 @@
   background: hsl(var(--primary) / 0.15);
 }
 
-/* OwnItRight Premium Logo Styles */
+/* OwnitWise Premium Logo Styles */
 .logo-gradient {
   background: linear-gradient(135deg, #006073 0%, #004d59 30%, hsl(46, 69%, 65%) 70%, #006073 100%);
   -webkit-background-clip: text;

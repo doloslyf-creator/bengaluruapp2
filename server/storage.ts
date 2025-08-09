@@ -1,4 +1,4 @@
- import { 
+import { 
   type Property, 
   type InsertProperty, 
   type PropertyStats, 
@@ -127,20 +127,20 @@ export interface IStorage {
   createProperty(property: InsertProperty): Promise<Property>;
   updateProperty(id: string, property: Partial<InsertProperty>): Promise<Property | undefined>;
   deleteProperty(id: string): Promise<boolean>;
-  
+
   // Property Scoring operations
   createPropertyScore(score: InsertPropertyScore): Promise<PropertyScore>;
   getPropertyScore(propertyId: string): Promise<PropertyScore | undefined>;
   updatePropertyScore(id: string, score: Partial<InsertPropertyScore>): Promise<PropertyScore | undefined>;
   deletePropertyScore(id: string): Promise<boolean>;
   getAllPropertyScores(): Promise<PropertyScore[]>;
-  
+
   // Property Configuration CRUD operations
   getPropertyConfigurations(propertyId: string): Promise<PropertyConfiguration[]>;
   createPropertyConfiguration(config: InsertPropertyConfiguration): Promise<PropertyConfiguration>;
   updatePropertyConfiguration(id: string, config: Partial<InsertPropertyConfiguration>): Promise<PropertyConfiguration | undefined>;
   deletePropertyConfiguration(id: string): Promise<boolean>;
-  
+
   // Search and filter operations
   searchProperties(query: string): Promise<Property[]>;
   filterProperties(filters: {
@@ -151,31 +151,31 @@ export interface IStorage {
     minPrice?: number;
     maxPrice?: number;
   }): Promise<Property[]>;
-  
+
   // Statistics
   getPropertyStats(): Promise<PropertyStats>;
-  
+
   // Booking operations
   createBooking(booking: InsertBooking): Promise<Booking>;
   getBooking(bookingId: string): Promise<Booking | undefined>;
   getAllBookings(): Promise<Booking[]>;
   updateBookingStatus(bookingId: string, status: string): Promise<Booking | undefined>;
-  
+
   // Lead management operations
   createLead(lead: InsertLead): Promise<Lead>;
   getLead(leadId: string): Promise<Lead | undefined>;
   getLeadWithDetails(leadId: string): Promise<LeadWithDetails | undefined>;
   getAllLeads(): Promise<Lead[]>;
   updateLead(leadId: string, updates: Partial<InsertLead>): Promise<Lead | undefined>;
-  
+
   // Lead activities
   addLeadActivity(activity: InsertLeadActivity): Promise<LeadActivity>;
   getLeadActivities(leadId: string): Promise<LeadActivity[]>;
-  
+
   // Lead notes
   addLeadNote(note: InsertLeadNote): Promise<LeadNote>;
   getLeadNotes(leadId: string): Promise<LeadNote[]>;
-  
+
   // Lead statistics and filtering
   getLeadStats(): Promise<LeadStats>;
   filterLeads(filters: {
@@ -187,7 +187,7 @@ export interface IStorage {
     dateFrom?: string;
     dateTo?: string;
   }): Promise<Lead[]>;
-  
+
   // Enhanced lead filtering
   getEnhancedLeads(filters: {
     persona?: string;
@@ -198,24 +198,24 @@ export interface IStorage {
     assignedTo?: string;
     dateRange?: string;
   }): Promise<LeadWithDetails[]>;
-  
+
   // Lead scoring and qualification
   updateLeadScore(leadId: string, score: number, notes?: string): Promise<Lead | undefined>;
   qualifyLead(leadId: string, qualified: boolean, notes: string): Promise<Lead | undefined>;
-  
+
   // Enhanced lead operations
   addLeadTimeline(timeline: InsertLeadTimeline): Promise<LeadTimeline>;
   getLeadTimeline(leadId: string): Promise<LeadTimeline[]>;
   addLeadDocument(document: InsertLeadDocument): Promise<LeadDocument>;
   getLeadDocuments(leadId: string): Promise<LeadDocument[]>;
-  
+
   // User operations (from original template)
   getUser(id: string): Promise<any>;
   getUserByUsername(username: string): Promise<any>;
   createUser(user: any): Promise<any>;
 
 
-  
+
   // Property Valuation Report operations
   createValuationReport(report: InsertPropertyValuationReport): Promise<PropertyValuationReport>;
   getValuationReport(reportId: string): Promise<PropertyValuationReport | undefined>;
@@ -261,7 +261,7 @@ export interface IStorage {
   updateLegalAuditReport(reportId: string, updates: Partial<InsertLegalAuditReport>): Promise<LegalAuditReport | undefined>;
   deleteLegalAuditReport(reportId: string): Promise<boolean>;
   getLegalAuditReportStats(): Promise<any>;
-  
+
   // Legal Audit Report operations
   createLegalAuditReport(report: InsertLegalAuditReport): Promise<LegalAuditReport>;
   getLegalAuditReport(reportId: string): Promise<LegalAuditReport | undefined>;
@@ -270,7 +270,7 @@ export interface IStorage {
   updateLegalAuditReport(reportId: string, updates: Partial<InsertLegalAuditReport>): Promise<LegalAuditReport | undefined>;
   deleteLegalAuditReport(reportId: string): Promise<boolean>;
   getLegalAuditReportStats(): Promise<any>;
-  
+
   // Report Payment operations
   createReportPayment(payment: InsertReportPayment): Promise<ReportPayment>;
   getReportPayment(paymentId: string): Promise<ReportPayment | undefined>;
@@ -335,10 +335,10 @@ export class MemStorage implements IStorage {
     this.leadNotes = new Map();
     this.users = new Map();
     this.appSettings = null;
-    
+
     // Initialize with some sample properties and configurations
     this.initializeSampleData();
-    
+
     // Initialize default app settings
     this.initializeDefaultAppSettings();
   }
@@ -435,7 +435,7 @@ export class MemStorage implements IStorage {
     ];
 
     const propertyIds: string[] = [];
-    
+
     sampleProperties.forEach(property => {
       const id = randomUUID();
       const fullProperty: Property = {
@@ -632,10 +632,10 @@ export class MemStorage implements IStorage {
   async getPropertyWithConfigurations(id: string): Promise<PropertyWithConfigurations | undefined> {
     const property = this.properties.get(id);
     if (!property) return undefined;
-    
+
     const configurations = Array.from(this.propertyConfigurations.values())
       .filter(config => config.propertyId === id);
-    
+
     return {
       ...property,
       configurations
@@ -663,9 +663,9 @@ export class MemStorage implements IStorage {
     const configsToDelete = Array.from(this.propertyConfigurations.entries())
       .filter(([, config]) => config.propertyId === id)
       .map(([configId]) => configId);
-    
+
     configsToDelete.forEach(configId => this.propertyConfigurations.delete(configId));
-    
+
     return this.properties.delete(id);
   }
 
@@ -744,7 +744,7 @@ export class MemStorage implements IStorage {
           return true;
         })
         .map(config => config.propertyId);
-      
+
       return properties.filter(property => filteredPropertyIds.includes(property.id));
     }
 
@@ -754,11 +754,11 @@ export class MemStorage implements IStorage {
   async getPropertyStats(): Promise<PropertyStats> {
     const properties = Array.from(this.properties.values());
     const configurations = Array.from(this.propertyConfigurations.values());
-    
+
     const totalProperties = properties.length;
     const activeProjects = properties.filter(p => p.status === "active" || p.status === "under-construction").length;
     const reraApproved = properties.filter(p => p.reraApproved).length;
-    
+
     // Calculate average price from configurations
     const avgPrice = configurations.length > 0 
       ? Math.round(configurations.reduce((sum, c) => sum + c.price, 0) / configurations.length * 10) / 10 
@@ -924,15 +924,15 @@ export class MemStorage implements IStorage {
   // Lead statistics and filtering
   async getLeadStats(): Promise<LeadStats> {
     const leads = Array.from(this.leads.values());
-    
+
     const totalLeads = leads.length;
     const newLeads = leads.filter(l => l.status === "new").length;
     const qualifiedLeads = leads.filter(l => l.status === "qualified").length;
     const hotLeads = leads.filter(l => l.leadType === "hot").length;
-    
+
     const closedWon = leads.filter(l => l.status === "closed-won").length;
     const conversionRate = totalLeads > 0 ? Math.round((closedWon / totalLeads) * 100) : 0;
-    
+
     const avgLeadScore = leads.length > 0 
       ? Math.round(leads.reduce((sum, l) => sum + (l.leadScore || 0), 0) / leads.length)
       : 0;
@@ -974,31 +974,28 @@ export class MemStorage implements IStorage {
       if (filters.priority && lead.priority !== filters.priority) return false;
       if (filters.assignedTo && lead.assignedTo !== filters.assignedTo) return false;
       if (filters.source && lead.source !== filters.source) return false;
-      
+
       if (filters.dateFrom) {
         const dateFrom = new Date(filters.dateFrom);
         if (lead.createdAt < dateFrom) return false;
       }
-      
+
       if (filters.dateTo) {
         const dateTo = new Date(filters.dateTo);
         if (lead.createdAt > dateTo) return false;
       }
-      
+
       return true;
     });
   }
 
   // Lead scoring and qualification
   async updateLeadScore(leadId: string, score: number, notes?: string): Promise<Lead | undefined> {
-    const lead = await this.getLead(leadId);
-    if (!lead) return undefined;
-
     const updated = await this.updateLead(leadId, { 
       leadScore: score,
       qualificationNotes: notes || lead.qualificationNotes 
     });
-    
+
     if (notes) {
       await this.addLeadNote({
         leadId: lead.id,
@@ -1007,7 +1004,7 @@ export class MemStorage implements IStorage {
         createdBy: "system",
       });
     }
-    
+
     return updated;
   }
 
@@ -1017,20 +1014,20 @@ export class MemStorage implements IStorage {
 
     const newStatus = qualified ? "qualified" : "new";
     const newLeadType = qualified ? "hot" : "cold";
-    
+
     const updated = await this.updateLead(leadId, { 
       status: newStatus,
       leadType: newLeadType,
       qualificationNotes: notes
     });
-    
+
     await this.addLeadNote({
       leadId: lead.id,
       content: `Lead ${qualified ? 'qualified' : 'disqualified'}: ${notes}`,
       noteType: "qualification",
       createdBy: "system",
     });
-    
+
     return updated;
   }
 
@@ -1050,21 +1047,21 @@ export class MemStorage implements IStorage {
     if (filters.persona && filters.persona !== "all") {
       filteredLeads = filteredLeads.filter(lead => lead.buyerPersona === filters.persona);
     }
-    
+
     if (filters.urgency && filters.urgency !== "all") {
       filteredLeads = filteredLeads.filter(lead => lead.urgency === filters.urgency);
     }
-    
+
     if (filters.status && filters.status !== "all") {
       filteredLeads = filteredLeads.filter(lead => lead.status === filters.status);
     }
-    
+
     if (filters.smartTags && filters.smartTags.length > 0) {
       filteredLeads = filteredLeads.filter(lead => 
         lead.smartTags && filters.smartTags!.some(tag => lead.smartTags!.includes(tag))
       );
     }
-    
+
     if (filters.assignedTo && filters.assignedTo !== "all") {
       filteredLeads = filteredLeads.filter(lead => lead.assignedTo === filters.assignedTo);
     }
@@ -1155,10 +1152,10 @@ export class MemStorage implements IStorage {
   private initializeDefaultAppSettings() {
     this.appSettings = {
       id: randomUUID(),
-      businessName: "OwnItRight – Curated Property Advisors",
+      businessName: "OwnitWise – Curated Property Advisors",
       logoUrl: null,
       faviconUrl: null,
-      contactEmail: "contact@ownitright.com",
+      contactEmail: "contact@ownitwise.com",
       phoneNumber: "+91 98765 43210",
       whatsappNumber: "+91 98765 43210",
       officeAddress: "Bengaluru, Karnataka, India",
@@ -1170,7 +1167,7 @@ export class MemStorage implements IStorage {
       maintenanceMessage: "We are currently performing maintenance. Please check back later.",
       primaryColor: "#2563eb",
       secondaryColor: "#64748b",
-      metaTitle: "OwnItRight - Property Discovery Platform",
+      metaTitle: "OwnitWise - Property Discovery Platform",
       metaDescription: "Discover your perfect property in Bengaluru with our advanced property discovery platform",
       enableBookings: true,
       enableConsultations: true,
@@ -1396,7 +1393,7 @@ export class MemStorage implements IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  
+
   // Enhanced lead filtering
   async getEnhancedLeads(filters: {
     persona?: string;
@@ -1411,19 +1408,19 @@ export class DatabaseStorage implements IStorage {
 
     // Build where conditions based on filters
     const conditions = [];
-    
+
     if (filters.persona && filters.persona !== "all") {
       conditions.push(eq(leads.buyerPersona, filters.persona));
     }
-    
+
     if (filters.urgency && filters.urgency !== "all") {
       conditions.push(eq(leads.urgency, filters.urgency));
     }
-    
+
     if (filters.status && filters.status !== "all") {
       conditions.push(eq(leads.status, filters.status));
     }
-    
+
     if (filters.assignedTo && filters.assignedTo !== "all") {
       conditions.push(eq(leads.assignedTo, filters.assignedTo));
     }
@@ -1517,7 +1514,7 @@ export class DatabaseStorage implements IStorage {
 
     const city = await this.getCity(zone.cityId);
     const zoneProperties = await this.getPropertiesByZone(id);
-    
+
     return { ...zone, city, properties: zoneProperties };
   }
 
@@ -1541,7 +1538,7 @@ export class DatabaseStorage implements IStorage {
     if (!zone) return undefined;
 
     const city = await this.getCity(zone.cityId);
-    
+
     return { ...zone, city };
   }
 
@@ -1576,10 +1573,10 @@ export class DatabaseStorage implements IStorage {
   async getPropertyWithConfigurations(id: string): Promise<PropertyWithConfigurations | undefined> {
     const property = await this.getProperty(id);
     if (!property) return undefined;
-    
+
     const configs = await db.select().from(propertyConfigurations)
       .where(eq(propertyConfigurations.propertyId, id));
-    
+
     return {
       ...property,
       configurations: configs
@@ -1604,23 +1601,23 @@ export class DatabaseStorage implements IStorage {
   async deleteProperty(id: string): Promise<boolean> {
     try {
       // Delete all related data that references this property to avoid foreign key constraint violations
-      
+
       // Delete property configurations
       await db.delete(propertyConfigurations).where(eq(propertyConfigurations.propertyId, id));
-      
+
       // Delete property scores 
       await db.delete(propertyScores).where(eq(propertyScores.propertyId, id));
-      
+
       // Delete report payments that reference this property
       await db.delete(reportPayments).where(eq(reportPayments.propertyId, id));
-      
+
       // Delete bookings that reference this property
       await db.delete(bookings).where(eq(bookings.propertyId, id));
-      
+
       // Finally delete the property itself
       const result = await db.delete(properties).where(eq(properties.id, id));
       return result.rowCount > 0;
-      
+
     } catch (error) {
       console.error("Error deleting property and related data:", error);
       throw error;
@@ -1634,29 +1631,29 @@ export class DatabaseStorage implements IStorage {
                          (insertScore.infrastructureDevelopment || 0) + 
                          (insertScore.socialInfrastructure || 0) + 
                          (insertScore.employmentHubs || 0);
-    
+
     const amenitiesTotal = (insertScore.basicAmenities || 0) + 
                           (insertScore.lifestyleAmenities || 0) + 
                           (insertScore.modernFeatures || 0);
-    
+
     const legalTotal = (insertScore.reraCompliance || 0) + 
                       (insertScore.titleClarity || 0) + 
                       (insertScore.approvals || 0);
-    
+
     const valueTotal = (insertScore.priceCompetitiveness || 0) + 
                       (insertScore.appreciationPotential || 0) + 
                       (insertScore.rentalYield || 0);
-    
+
     const developerTotal = (insertScore.trackRecord || 0) + 
                           (insertScore.financialStability || 0) + 
                           (insertScore.customerSatisfaction || 0);
-    
+
     const constructionTotal = (insertScore.structuralQuality || 0) + 
                              (insertScore.finishingStandards || 0) + 
                              (insertScore.maintenanceStandards || 0);
-                             
+
     const overallTotal = locationTotal + amenitiesTotal + legalTotal + valueTotal + developerTotal + constructionTotal;
-    
+
     // Calculate grade based on overall score
     let grade: "A+" | "A" | "B+" | "B" | "C+" | "C" | "D" = "D";
     if (overallTotal >= 90) grade = "A+";
@@ -1665,7 +1662,7 @@ export class DatabaseStorage implements IStorage {
     else if (overallTotal >= 60) grade = "B";
     else if (overallTotal >= 50) grade = "C+";
     else if (overallTotal >= 40) grade = "C";
-    
+
     const scoreWithTotals = {
       ...insertScore,
       locationScoreTotal: locationTotal,
@@ -1681,7 +1678,7 @@ export class DatabaseStorage implements IStorage {
     const [score] = await db.insert(propertyScores)
       .values(scoreWithTotals)
       .returning();
-      
+
     // Update property with the score reference and legacy scores
     await db.update(properties)
       .set({
@@ -1692,7 +1689,7 @@ export class DatabaseStorage implements IStorage {
         overallScore: (overallTotal / 20).toFixed(1) // Convert to 1-5 scale
       })
       .where(eq(properties.id, insertScore.propertyId));
-      
+
     return score;
   }
 
@@ -1706,37 +1703,37 @@ export class DatabaseStorage implements IStorage {
     // Get current score to calculate new totals
     const [currentScore] = await db.select().from(propertyScores).where(eq(propertyScores.id, id));
     if (!currentScore) return undefined;
-    
+
     const mergedScore = { ...currentScore, ...updates };
-    
+
     // Recalculate totals
     const locationTotal = (mergedScore.transportConnectivity || 0) + 
                          (mergedScore.infrastructureDevelopment || 0) + 
                          (mergedScore.socialInfrastructure || 0) + 
                          (mergedScore.employmentHubs || 0);
-    
+
     const amenitiesTotal = (mergedScore.basicAmenities || 0) + 
                           (mergedScore.lifestyleAmenities || 0) + 
                           (mergedScore.modernFeatures || 0);
-    
+
     const legalTotal = (mergedScore.reraCompliance || 0) + 
                       (mergedScore.titleClarity || 0) + 
                       (mergedScore.approvals || 0);
-    
+
     const valueTotal = (mergedScore.priceCompetitiveness || 0) + 
                       (mergedScore.appreciationPotential || 0) + 
                       (mergedScore.rentalYield || 0);
-    
+
     const developerTotal = (mergedScore.trackRecord || 0) + 
                           (mergedScore.financialStability || 0) + 
                           (mergedScore.customerSatisfaction || 0);
-    
+
     const constructionTotal = (mergedScore.structuralQuality || 0) + 
                              (mergedScore.finishingStandards || 0) + 
                              (mergedScore.maintenanceStandards || 0);
-                             
+
     const overallTotal = locationTotal + amenitiesTotal + legalTotal + valueTotal + developerTotal + constructionTotal;
-    
+
     // Calculate grade
     let grade: "A+" | "A" | "B+" | "B" | "C+" | "C" | "D" = "D";
     if (overallTotal >= 90) grade = "A+";
@@ -1745,7 +1742,7 @@ export class DatabaseStorage implements IStorage {
     else if (overallTotal >= 60) grade = "B";
     else if (overallTotal >= 50) grade = "C+";
     else if (overallTotal >= 40) grade = "C";
-    
+
     const updatesWithTotals = {
       ...updates,
       locationScoreTotal: locationTotal,
@@ -1763,7 +1760,7 @@ export class DatabaseStorage implements IStorage {
       .set(updatesWithTotals)
       .where(eq(propertyScores.id, id))
       .returning();
-      
+
     // Update legacy scores in properties table
     if (updatedScore) {
       await db.update(properties)
@@ -1775,7 +1772,7 @@ export class DatabaseStorage implements IStorage {
         })
         .where(eq(properties.id, updatedScore.propertyId));
     }
-      
+
     return updatedScore || undefined;
   }
 
@@ -1794,7 +1791,7 @@ export class DatabaseStorage implements IStorage {
         })
         .where(eq(properties.id, score.propertyId));
     }
-    
+
     const result = await db.delete(propertyScores).where(eq(propertyScores.id, id));
     return result.rowCount > 0;
   }
@@ -1955,7 +1952,7 @@ export class DatabaseStorage implements IStorage {
       completedAt: insertActivity.completedAt || null,
       nextAction: insertActivity.nextAction || null
     };
-    
+
     const [activity] = await db.insert(leadActivities)
       .values(activityData)
       .returning();
@@ -2076,7 +2073,7 @@ export class DatabaseStorage implements IStorage {
 
   async getReportPayments(reportId: string, reportType?: string): Promise<ReportPayment[]> {
     let query = db.select().from(reportPayments);
-    
+
     if (reportId && reportType) {
       query = query.where(and(eq(reportPayments.reportId, reportId), eq(reportPayments.reportType, reportType)));
     } else if (reportId) {
@@ -2084,7 +2081,7 @@ export class DatabaseStorage implements IStorage {
     } else if (reportType) {
       query = query.where(eq(reportPayments.reportType, reportType));
     }
-    
+
     return await query;
   }
 
@@ -2214,23 +2211,23 @@ export class DatabaseStorage implements IStorage {
   async getAllOrdersWithDetails(): Promise<any[]> {
     const payments = await db.select().from(reportPayments);
     const result = [];
-    
+
     for (const payment of payments) {
       let property = null;
       if (payment.propertyId) {
         [property] = await db.select().from(properties)
           .where(eq(properties.id, payment.propertyId));
       }
-      
+
       let reportTitle = "Report";
       let reportType = payment.reportType || "unknown";
       let reportDetails = null;
-      
+
       // Check if it's a CIVIL+MEP report
       if (payment.reportId) {
         const [civilMepReport] = await db.select().from(civilMepReports)
           .where(eq(civilMepReports.id, payment.reportId));
-        
+
         if (civilMepReport) {
           reportTitle = civilMepReport.reportTitle || "CIVIL+MEP Report";
           reportType = "civil-mep";
@@ -2239,7 +2236,7 @@ export class DatabaseStorage implements IStorage {
           // Check if it's a Valuation report
           const [valuationReport] = await db.select().from(propertyValuationReports)
             .where(eq(propertyValuationReports.id, payment.reportId));
-          
+
           if (valuationReport) {
             reportTitle = "Property Valuation Report";
             reportType = "property-valuation";
@@ -2256,7 +2253,7 @@ export class DatabaseStorage implements IStorage {
           reportType = "property-valuation";
         }
       }
-      
+
       result.push({
         ...payment,
         reportType,
@@ -2266,20 +2263,20 @@ export class DatabaseStorage implements IStorage {
         reportDetails
       });
     }
-    
+
     return result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
   async getOrderStats(): Promise<any> {
     const allPayments = await db.select().from(reportPayments);
     const now = new Date();
-    
+
     const overduePayments = allPayments.filter(p => 
       p.paymentStatus === 'pay-later-pending' && 
       p.payLaterDueDate && 
       new Date(p.payLaterDueDate) < now
     );
-    
+
     return {
       totalOrders: allPayments.length,
       pendingPayments: allPayments.filter(p => 
@@ -2299,9 +2296,9 @@ export class DatabaseStorage implements IStorage {
     const allLeads = await db.select().from(this.leads);
     const allBookings = await db.select().from(this.bookings);  
     const payments = await db.select().from(reportPayments);
-    
+
     const customerMap = new Map();
-    
+
     // Process leads
     for (const lead of allLeads) {
       const key = lead.email || lead.phone;
@@ -2325,7 +2322,7 @@ export class DatabaseStorage implements IStorage {
       }
       customerMap.get(key).leads.push(lead);
     }
-    
+
     // Process bookings
     for (const booking of allBookings) {
       const key = booking.email || booking.phone;
@@ -2352,7 +2349,7 @@ export class DatabaseStorage implements IStorage {
         customerMap.get(key).lastActivity = booking.updatedAt || booking.createdAt;
       }
     }
-    
+
     // Process orders/payments
     for (const payment of payments) {
       const key = payment.customerEmail || payment.customerPhone;
@@ -2384,7 +2381,7 @@ export class DatabaseStorage implements IStorage {
         customer.lastActivity = payment.updatedAt || payment.createdAt;
       }
     }
-    
+
     // Get notes for each customer
     const notes = await db.select().from(customerNotes);
     for (const note of notes) {
@@ -2392,7 +2389,7 @@ export class DatabaseStorage implements IStorage {
         customerMap.get(note.customerId).notes.push(note);
       }
     }
-    
+
     return Array.from(customerMap.values()).sort((a, b) => 
       new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime()
     );
@@ -2400,13 +2397,13 @@ export class DatabaseStorage implements IStorage {
 
   async getCustomerStats(): Promise<any> {
     const customers = await this.getAllCustomersWithDetails();
-    
+
     const totalCustomers = customers.length;
     const hotLeads = customers.filter(c => c.status === "hot").length;
     const convertedCustomers = customers.filter(c => c.status === "converted").length;
     const totalRevenue = customers.reduce((sum, c) => sum + c.totalSpent, 0);
     const avgOrderValue = convertedCustomers > 0 ? totalRevenue / convertedCustomers : 0;
-    
+
     return {
       totalCustomers,
       hotLeads,
@@ -2428,7 +2425,7 @@ export class DatabaseStorage implements IStorage {
     await db.update(leads)
       .set({ leadType: status as any, updatedAt: new Date() })
       .where(or(eq(leads.email, customerId), eq(leads.phone, customerId)));
-    
+
     return { success: true, customerId, status };
   }
 
@@ -2501,7 +2498,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateAppSettings(settingsData: Partial<InsertAppSettings>): Promise<AppSettings> {
     const existing = await this.getAppSettings();
-    
+
     if (existing) {
       const [updated] = await db.update(appSettings)
         .set({
@@ -2519,8 +2516,8 @@ export class DatabaseStorage implements IStorage {
   async initializeAppSettings(): Promise<AppSettings> {
     const [settings] = await db.insert(appSettings)
       .values({
-        businessName: "OwnItRight – Curated Property Advisors",
-        contactEmail: "contact@ownitright.com",
+        businessName: "OwnitWise – Curated Property Advisors",
+        contactEmail: "contact@ownitwise.com",
         phoneNumber: "+91 98765 43210",
         whatsappNumber: "+91 98765 43210",
         officeAddress: "Bengaluru, Karnataka, India",
@@ -2532,7 +2529,7 @@ export class DatabaseStorage implements IStorage {
         maintenanceMessage: "We are currently performing maintenance. Please check back later.",
         primaryColor: "#2563eb",
         secondaryColor: "#64748b",
-        metaTitle: "OwnItRight - Property Discovery Platform",
+        metaTitle: "OwnitWise - Property Discovery Platform",
         metaDescription: "Discover your perfect property in Bengaluru with our advanced property discovery platform",
         enableBookings: true,
         enableConsultations: true,
@@ -2676,17 +2673,17 @@ export class DatabaseStorage implements IStorage {
   async getCivilMepReportStats(): Promise<any> {
     try {
       const reports = await this.getAllCivilMepReports();
-      
+
       const totalReports = reports.length;
       const completedReports = reports.filter(r => r.status === "completed").length;
       const inProgressReports = reports.filter(r => r.status === "in-progress").length;
       const draftReports = reports.filter(r => r.status === "draft").length;
       const approvedReports = reports.filter(r => r.status === "approved").length;
-      
+
       const avgScore = reports.length > 0 
         ? reports.reduce((sum, r) => sum + (r.overallScore || 0), 0) / reports.length 
         : 0;
-      
+
       // Group by investment recommendation
       const byRecommendation = {
         "highly-recommended": reports.filter(r => r.investmentRecommendation === "highly-recommended").length,
@@ -2694,7 +2691,7 @@ export class DatabaseStorage implements IStorage {
         "conditional": reports.filter(r => r.investmentRecommendation === "conditional").length,
         "not-recommended": reports.filter(r => r.investmentRecommendation === "not-recommended").length,
       };
-      
+
       return {
         totalReports,
         completedReports,
@@ -2764,17 +2761,17 @@ export class DatabaseStorage implements IStorage {
 
   async getLegalAuditReportStats(): Promise<any> {
     const reports = await this.getAllLegalAuditReports();
-    
+
     const totalReports = reports.length;
     const completedReports = reports.filter(r => r.status === "completed").length;
     const inProgressReports = reports.filter(r => r.status === "in-progress").length;
     const draftReports = reports.filter(r => r.status === "draft").length;
     const approvedReports = reports.filter(r => r.status === "approved").length;
-    
+
     const avgScore = reports.length > 0 
       ? reports.reduce((sum, r) => sum + (r.overallScore || 0), 0) / reports.length 
       : 0;
-    
+
     // Group by risk level
     const byRiskLevel = {
       "low": reports.filter(r => r.riskLevel === "low").length,
@@ -2782,7 +2779,7 @@ export class DatabaseStorage implements IStorage {
       "high": reports.filter(r => r.riskLevel === "high").length,
       "critical": reports.filter(r => r.riskLevel === "critical").length,
     };
-    
+
     return {
       totalReports,
       completedReports,
