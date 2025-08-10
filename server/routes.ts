@@ -1534,16 +1534,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log("Received Civil+MEP report creation request:", req.body);
       
-      const validation = insertCivilMepReportSchema.safeParse(req.body);
-      if (!validation.success) {
-        console.log("Validation failed:", validation.error);
+      // Basic validation of required fields
+      const { propertyId, reportTitle, engineerName, engineerLicense, inspectionDate, reportDate } = req.body;
+      
+      if (!propertyId || !reportTitle || !engineerName || !engineerLicense || !inspectionDate || !reportDate) {
+        console.log("Missing required fields");
         return res.status(400).json({ 
-          error: "Invalid report data", 
-          details: validation.error.format() 
+          error: "Missing required fields",
+          details: "propertyId, reportTitle, engineerName, engineerLicense, inspectionDate, and reportDate are required"
         });
       }
 
-      const report = await storage.createCivilMepReport(validation.data);
+      // Prepare data with proper defaults
+      const reportData = {
+        propertyId,
+        reportTitle,
+        engineerName,
+        engineerLicense,
+        inspectionDate,
+        reportDate,
+        status: req.body.status || "draft",
+        overallScore: Number(req.body.overallScore) || 0,
+        executiveSummary: req.body.executiveSummary || "",
+        recommendations: req.body.recommendations || "",
+        conclusions: req.body.conclusions || "",
+        investmentRecommendation: req.body.investmentRecommendation || "conditional",
+        
+        // Ensure JSON fields are objects
+        siteInformation: req.body.siteInformation || {},
+        foundationDetails: req.body.foundationDetails || {},
+        superstructureDetails: req.body.superstructureDetails || {},
+        wallsFinishes: req.body.wallsFinishes || {},
+        roofingDetails: req.body.roofingDetails || {},
+        doorsWindows: req.body.doorsWindows || {},
+        flooringDetails: req.body.flooringDetails || {},
+        staircasesElevators: req.body.staircasesElevators || {},
+        externalWorks: req.body.externalWorks || {},
+        mechanicalSystems: req.body.mechanicalSystems || {},
+        electricalSystems: req.body.electricalSystems || {},
+        plumbingSystems: req.body.plumbingSystems || {},
+        fireSafetySystems: req.body.fireSafetySystems || {},
+        bmsAutomation: req.body.bmsAutomation || {},
+        greenSustainability: req.body.greenSustainability || {},
+        documentation: req.body.documentation || {}
+      };
+
+      const report = await storage.createCivilMepReport(reportData);
       console.log(`📋 Civil+MEP report created successfully: ${report.reportTitle || 'New Report'}`);
       res.status(201).json(report);
     } catch (error) {

@@ -214,7 +214,7 @@ export function AdminCivilMepReportsCreate() {
     console.log("Form submitted with data:", data);
     setShouldRedirect(redirect);
     
-    // Clean and prepare data for submission
+    // Clean and prepare data for submission according to database schema
     const submitData = {
       propertyId: data.propertyId,
       reportTitle: data.reportTitle,
@@ -228,26 +228,49 @@ export function AdminCivilMepReportsCreate() {
       recommendations: data.recommendations || "",
       conclusions: data.conclusions || "",
       investmentRecommendation: data.investmentRecommendation,
-      // Site and structural data as strings
-      siteLocation: data.siteLocation || "",
-      plotArea: data.plotArea || "",
-      builtUpArea: data.builtUpArea || "",
-      foundationType: data.foundationType || "",
-      structuralSystem: data.structuralSystem || "",
-      concreteGrade: data.concreteGrade || "",
-      steelGrade: data.steelGrade || "",
-      structuralCondition: data.structuralCondition || "",
-      wallMaterial: data.wallMaterial || "",
-      roofType: data.roofType || "",
-      electricalLoad: data.electricalLoad || "",
-      plumbingType: data.plumbingType || "",
-      hvacSystem: data.hvacSystem || "",
-      fireSafetyGrade: data.fireSafetyGrade || "",
-      // Notes sections
-      civilNotes: data.civilNotes || "",
-      mechanicalNotes: data.mechanicalNotes || "",
-      electricalNotes: data.electricalNotes || "",
-      plumbingNotes: data.plumbingNotes || "",
+      
+      // Site information as JSON object
+      siteInformation: {
+        siteLocation: data.siteLocation || "",
+        plotArea: data.plotArea || "",
+        builtUpArea: data.builtUpArea || "",
+        civilNotes: data.civilNotes || ""
+      },
+      
+      // Foundation details as JSON object
+      foundationDetails: {
+        foundationType: data.foundationType || "",
+        structuralSystem: data.structuralSystem || "",
+        concreteGrade: data.concreteGrade || "",
+        steelGrade: data.steelGrade || "",
+        structuralCondition: data.structuralCondition || ""
+      },
+      
+      // Walls and finishes as JSON object
+      wallsFinishes: {
+        wallMaterial: data.wallMaterial || "",
+        roofType: data.roofType || ""
+      },
+      
+      // MEP systems as JSON objects
+      mechanicalSystems: {
+        hvacSystem: data.hvacSystem || "",
+        notes: data.mechanicalNotes || ""
+      },
+      
+      electricalSystems: {
+        electricalLoad: data.electricalLoad || "",
+        notes: data.electricalNotes || ""
+      },
+      
+      plumbingSystems: {
+        plumbingType: data.plumbingType || "",
+        notes: data.plumbingNotes || ""
+      },
+      
+      fireSafetySystems: {
+        fireSafetyGrade: data.fireSafetyGrade || ""
+      }
     };
     
     console.log("Submitting cleaned data to API:", submitData);
