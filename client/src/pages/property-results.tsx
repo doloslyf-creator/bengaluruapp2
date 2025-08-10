@@ -196,8 +196,8 @@ export default function PropertyResults() {
       .filter(property => {
         // Basic filtering - only exclude if there's a clear mismatch
         
-        // Property type filter - only if specified
-        if (preferences.propertyType && preferences.propertyType !== "" && preferences.propertyType !== property.type) {
+        // Property type filter - only if specified and not "all"
+        if (preferences.propertyType && preferences.propertyType !== "" && preferences.propertyType !== "all" && preferences.propertyType !== property.type) {
           return false;
         }
         
@@ -216,10 +216,10 @@ export default function PropertyResults() {
         let score = 0;
         
         // Property type match (30 points)
-        if (preferences.propertyType && preferences.propertyType !== "" && preferences.propertyType === property.type) {
+        if (preferences.propertyType && preferences.propertyType !== "" && preferences.propertyType !== "all" && preferences.propertyType === property.type) {
           score += 30;
-        } else if (!preferences.propertyType || preferences.propertyType === "") {
-          score += 20; // Default score when no type preference
+        } else if (!preferences.propertyType || preferences.propertyType === "" || preferences.propertyType === "all") {
+          score += 20; // Default score when no type preference or "all" selected
         }
         
         // Zone match (25 points)
@@ -838,7 +838,7 @@ export default function PropertyResults() {
               <SelectValue placeholder="Select property type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Types</SelectItem>
+              <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="apartment">Apartment</SelectItem>
               <SelectItem value="villa">Villa</SelectItem>
               <SelectItem value="plot">Plot</SelectItem>
