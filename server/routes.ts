@@ -1643,6 +1643,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/civil-mep-reports/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log("Received Civil+MEP report update request:", req.body);
+
+      // Basic validation of required fields
+      const { propertyId, reportTitle, engineerName, engineerLicense, inspectionDate, reportDate } = req.body;
+
+      if (!propertyId || !reportTitle || !engineerName || !engineerLicense || !inspectionDate || !reportDate) {
+        console.log("Missing required fields for update");
+        return res.status(400).json({ 
+          error: "Missing required fields",
+          details: "propertyId, reportTitle, engineerName, engineerLicense, inspectionDate, and reportDate are required"
+        });
+      }
+
+      const updateData = {
+        ...req.body,
+        overallScore: Number(req.body.overallScore) || 0,
+        siteInformation: req.body.siteInformation || {},
+        foundationDetails: req.body.foundationDetails || {},
+        superstructureDetails: req.body.superstructureDetails || {},
+        wallsFinishes: req.body.wallsFinishes || {},
+        roofingDetails: req.body.roofingDetails || {},
+        doorsWindows: req.body.doorsWindows || {},
+        flooringDetails: req.body.flooringDetails || {},
+        staircasesElevators: req.body.staircasesElevators || {},
+        externalWorks: req.body.externalWorks || {},
+        mechanicalSystems: req.body.mechanicalSystems || {},
+        electricalSystems: req.body.electricalSystems || {},
+        plumbingSystems: req.body.plumbingSystems || {},
+        fireSafetySystems: req.body.fireSafetySystems || {},
+        bmsAutomation: req.body.bmsAutomation || {},
+        greenSustainability: req.body.greenSustainability || {},
+        documentation: req.body.documentation || {}
+      };
+
+      const report = await storage.updateCivilMepReport(id, updateData);
+
+      if (!report) {
+        return res.status(404).json({ error: "Civil+MEP report not found" });
+      }
+
+      console.log(`📋 Civil+MEP report updated successfully: ${report.reportTitle || 'Updated Report'}`);
+      res.json(report);
+    } catch (error) {
+      console.error("Error updating Civil+MEP report:", error);
+      res.status(500).json({ 
+        error: "Failed to update Civil+MEP report",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
   app.delete("/api/civil-mep-reports/:id", async (req, res) => {
     try {
       const { id } = req.params;
