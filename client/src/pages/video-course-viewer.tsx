@@ -250,90 +250,110 @@ export default function VideoCourseViewer() {
   const canViewChapter = (chapter: VideoChapter) => chapter.isPreview || isEnrolled;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Header />
       
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-6">
-          <Button 
-            variant="outline" 
-            onClick={() => setLocation('/property-education')}
-            className="mb-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Education Center
-          </Button>
+      {/* Minimalist Course Header */}
+      <section className="py-16 px-4 border-b border-gray-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-8">
+            <button 
+              onClick={() => setLocation('/property-education')}
+              className="text-sm text-gray-400 hover:text-emerald-600 transition-colors"
+            >
+              ← Back to insights
+            </button>
+          </div>
           
-          <div className="flex flex-col lg:flex-row items-start gap-6 mb-6">
-            <div className="w-full lg:w-48 h-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              {course.thumbnailUrl ? (
-                <img
-                  src={course.thumbnailUrl}
-                  alt={course.title}
-                  className="w-full h-full object-cover rounded-lg"
-                />
-              ) : (
-                <BookOpen className="h-12 w-12 text-blue-600" />
-              )}
-            </div>
-            
-            <div className="flex-1 w-full">
-              <div className="flex flex-wrap items-center gap-2 mb-2">
-                <Badge 
-                  variant={course.level === 'beginner' ? 'default' : 
-                          course.level === 'intermediate' ? 'secondary' : 'destructive'}
-                >
-                  {course.level}
-                </Badge>
-                <Badge variant="outline">{course.category}</Badge>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-2">
+              <div className="mb-6">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className={`w-2 h-2 rounded-full ${
+                    course.level === 'beginner' ? 'bg-green-500' :
+                    course.level === 'intermediate' ? 'bg-yellow-500' : 'bg-red-500'
+                  }`}></div>
+                  <span className="text-xs tracking-wider text-gray-400 uppercase">{course.level}</span>
+                  <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                  <span className="text-xs text-gray-400">{course.category}</span>
+                </div>
+                
+                <h1 className="text-4xl font-light text-gray-900 mb-6 leading-tight">
+                  {course.title}
+                </h1>
+                
+                <p className="text-lg text-gray-500 leading-relaxed mb-8">
+                  {course.description}
+                </p>
+                
+                <div className="flex items-center space-x-8 text-xs text-gray-400">
+                  <span>{course.enrollmentCount} learning</span>
+                  <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                  <span>{chapters.length} chapters</span>
+                  {course.estimatedDuration && (
+                    <>
+                      <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                      <span>{course.estimatedDuration}</span>
+                    </>
+                  )}
+                </div>
               </div>
-              
-              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">{course.title}</h1>
-              <p className="text-gray-600 mb-4 leading-relaxed">{course.description}</p>
-              
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-4">
-                <span className="flex items-center">
-                  <Clock className="h-4 w-4 mr-1" />
-                  {course.estimatedDuration || 'Self-paced'}
-                </span>
-                <span className="flex items-center">
-                  <User className="h-4 w-4 mr-1" />
-                  {course.enrollmentCount} enrolled
-                </span>
-                <span className="flex items-center">
-                  <Play className="h-4 w-4 mr-1" />
-                  {chapters.length} chapters
-                </span>
-              </div>
-              
+
               {isEnrolled && enrollment && (
-                <div className="mb-4 max-w-md">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">Course Progress</span>
-                    <span className="text-sm text-gray-600">{enrollment.progressPercentage}%</span>
+                <div className="mb-8">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm text-gray-500">Progress</span>
+                    <span className="text-sm text-emerald-600 font-medium">{enrollment.progressPercentage}%</span>
                   </div>
-                  <Progress value={enrollment.progressPercentage} className="h-2" />
+                  <div className="w-full bg-gray-100 h-1 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-emerald-500 transition-all duration-500" 
+                      style={{ width: `${enrollment.progressPercentage}%` }}
+                    ></div>
+                  </div>
                 </div>
               )}
               
               {!isEnrolled && (
-                <Button 
-                  onClick={() => setIsEnrollmentDialogOpen(true)}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  Enroll in Course - Free
-                </Button>
+                <div className="mb-8">
+                  <button 
+                    onClick={() => setIsEnrollmentDialogOpen(true)}
+                    className="group inline-flex items-center space-x-2 text-emerald-600 hover:text-emerald-700 transition-colors"
+                  >
+                    <span className="text-sm font-medium">Start learning now</span>
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </div>
+              )}
+            </div>
+            
+            <div className="lg:col-span-1">
+              {course.thumbnailUrl ? (
+                <div className="aspect-square bg-gray-50 rounded-2xl overflow-hidden">
+                  <img
+                    src={course.thumbnailUrl}
+                    alt={course.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="aspect-square bg-gray-50 rounded-2xl flex items-center justify-center">
+                  <BookOpen className="h-12 w-12 text-gray-400" />
+                </div>
               )}
             </div>
           </div>
         </div>
+      </section>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
+      {/* Main Content Area */}
+      <div className="max-w-6xl mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           {/* Video Player */}
           <div className="xl:col-span-2">
             {selectedChapter && canViewChapter(selectedChapter) ? (
               <div className="w-full">
-                <div className="aspect-video bg-black rounded-lg overflow-hidden mb-4 max-w-full">
+                <div className="aspect-video bg-black rounded-2xl overflow-hidden mb-8 shadow-lg">
                   <iframe
                     src={`https://www.youtube.com/embed/${selectedChapter.youtubeUrl.split('v=')[1]?.split('&')[0]}`}
                     className="w-full h-full"
@@ -342,32 +362,34 @@ export default function VideoCourseViewer() {
                   />
                 </div>
                 
-                <div className="mb-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
-                    <h2 className="text-lg lg:text-xl font-semibold">
-                      Chapter {selectedChapter.chapterNumber}: {selectedChapter.title}
-                    </h2>
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <span>{selectedChapter.duration}</span>
-                      <span>•</span>
-                      <span>{selectedChapter.viewCount} views</span>
+                {/* Minimalist Chapter Info */}
+                <div className="mb-8">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <span className="text-xs tracking-wider text-gray-400 uppercase">
+                        Chapter {String(selectedChapter.chapterNumber).padStart(2, '0')}
+                      </span>
+                      <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                      <span className="text-xs text-gray-400">{selectedChapter.duration}</span>
                     </div>
+                    <span className="text-xs text-gray-400">{selectedChapter.viewCount} views</span>
                   </div>
                   
+                  <h2 className="text-2xl font-light text-gray-900 mb-4 leading-tight">
+                    {selectedChapter.title}
+                  </h2>
+                  
                   {selectedChapter.description && (
-                    <p className="text-gray-600 mb-4">{selectedChapter.description}</p>
+                    <p className="text-gray-500 leading-relaxed mb-6">{selectedChapter.description}</p>
                   )}
                   
                   {selectedChapter.learningObjectives.length > 0 && (
-                    <div className="mb-4">
-                      <h3 className="font-medium mb-2 flex items-center">
-                        <Target className="h-4 w-4 mr-2" />
-                        Learning Objectives
-                      </h3>
-                      <ul className="space-y-1">
+                    <div className="mb-6">
+                      <h3 className="text-sm font-medium text-gray-800 mb-3">What you'll learn</h3>
+                      <ul className="space-y-2">
                         {selectedChapter.learningObjectives.map((objective, index) => (
                           <li key={index} className="flex items-start text-sm text-gray-600">
-                            <ChevronRight className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0" />
+                            <div className="w-1 h-1 bg-emerald-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
                             {objective}
                           </li>
                         ))}
@@ -376,15 +398,12 @@ export default function VideoCourseViewer() {
                   )}
                   
                   {selectedChapter.keyTakeaways.length > 0 && (
-                    <div className="mb-4">
-                      <h3 className="font-medium mb-2 flex items-center">
-                        <BookOpen className="h-4 w-4 mr-2" />
-                        Key Takeaways
-                      </h3>
-                      <ul className="space-y-1">
+                    <div className="mb-8">
+                      <h3 className="text-sm font-medium text-gray-800 mb-3">Key insights</h3>
+                      <ul className="space-y-2">
                         {selectedChapter.keyTakeaways.map((takeaway, index) => (
                           <li key={index} className="flex items-start text-sm text-gray-600">
-                            <CheckCircle className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0 text-green-600" />
+                            <div className="w-1 h-1 bg-emerald-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
                             {takeaway}
                           </li>
                         ))}
@@ -393,64 +412,83 @@ export default function VideoCourseViewer() {
                   )}
                 </div>
                 
-                {/* Navigation */}
-                <div className="flex flex-col sm:flex-row justify-between gap-3">
-                  <Button
-                    variant="outline"
+                {/* Minimalist Navigation */}
+                <div className="flex justify-between items-center">
+                  <button
                     onClick={() => {
                       const prev = getPrevChapter();
                       if (prev) handleChapterSelect(prev);
                     }}
                     disabled={!getPrevChapter()}
-                    className="w-full sm:w-auto"
+                    className={`group inline-flex items-center space-x-2 text-sm transition-colors ${
+                      getPrevChapter() 
+                        ? 'text-gray-600 hover:text-emerald-600' 
+                        : 'text-gray-300 cursor-not-allowed'
+                    }`}
                   >
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    <span className="hidden sm:inline">Previous Chapter</span>
-                    <span className="sm:hidden">Previous</span>
-                  </Button>
+                    <ArrowLeft className={`h-4 w-4 transition-transform ${
+                      getPrevChapter() ? 'group-hover:-translate-x-1' : ''
+                    }`} />
+                    <span>Previous</span>
+                  </button>
                   
-                  <Button
+                  <button
                     onClick={() => {
                       const next = getNextChapter();
                       if (next) handleChapterSelect(next);
                     }}
                     disabled={!getNextChapter()}
-                    className="w-full sm:w-auto"
+                    className={`group inline-flex items-center space-x-2 text-sm transition-colors ${
+                      getNextChapter() 
+                        ? 'text-gray-600 hover:text-emerald-600' 
+                        : 'text-gray-300 cursor-not-allowed'
+                    }`}
                   >
-                    <span className="hidden sm:inline">Next Chapter</span>
-                    <span className="sm:hidden">Next</span>
-                    <ArrowRight className="h-4 w-4 ml-2" />
-                  </Button>
+                    <span>Next</span>
+                    <ArrowRight className={`h-4 w-4 transition-transform ${
+                      getNextChapter() ? 'group-hover:translate-x-1' : ''
+                    }`} />
+                  </button>
                 </div>
               </div>
             ) : (
-              <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
-                <div className="text-center">
-                  <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Chapter Locked</h3>
-                  <p className="text-gray-600 mb-4">Enroll in the course to access this chapter</p>
-                  <Button onClick={() => setIsEnrollmentDialogOpen(true)}>
-                    Enroll Now - Free
-                  </Button>
+              <div className="aspect-video bg-gray-50 rounded-2xl flex items-center justify-center">
+                <div className="text-center max-w-sm">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-6 mx-auto">
+                    <Lock className="h-6 w-6 text-gray-400" />
+                  </div>
+                  <h3 className="text-xl font-light text-gray-900 mb-3">Chapter Locked</h3>
+                  <p className="text-gray-500 leading-relaxed mb-6">
+                    Start your learning journey to unlock this content
+                  </p>
+                  <button 
+                    onClick={() => setIsEnrollmentDialogOpen(true)}
+                    className="group inline-flex items-center space-x-2 text-emerald-600 hover:text-emerald-700 transition-colors"
+                  >
+                    <span className="text-sm font-medium">Enroll now</span>
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </button>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Chapter List */}
+          {/* Minimalist Chapter List */}
           <div className="w-full">
-            <Card className="h-fit">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Course Chapters</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 max-h-[600px] overflow-y-auto">
-                {sortedChapters.map((chapter) => (
+            <div className="bg-gray-50 rounded-2xl p-6">
+              <div className="mb-6">
+                <h3 className="text-lg font-light text-gray-900 mb-2">Course Content</h3>
+                <div className="w-12 h-0.5 bg-emerald-500"></div>
+              </div>
+              
+              <div className="space-y-2 max-h-[600px] overflow-y-auto">
+                {sortedChapters.map((chapter, index) => (
                   <div
                     key={chapter.id}
-                    className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                    className={`group cursor-pointer p-4 rounded-xl transition-all duration-300 ${
                       selectedChapter?.id === chapter.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'bg-emerald-50 border border-emerald-200'
+                        : 'bg-white border border-gray-100 hover:border-emerald-200 hover:shadow-sm'
                     } ${!canViewChapter(chapter) ? 'opacity-60' : ''}`}
                     onClick={() => {
                       if (canViewChapter(chapter)) {
@@ -461,82 +499,98 @@ export default function VideoCourseViewer() {
                     }}
                   >
                     <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0 pr-2">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className="text-xs text-gray-500">Chapter {chapter.chapterNumber}</span>
-                          {chapter.isPreview && (
-                            <Badge variant="outline" className="text-xs">Free</Badge>
-                          )}
-                          {!canViewChapter(chapter) && (
-                            <Lock className="h-3 w-3 text-gray-400" />
-                          )}
-                          {enrollment?.completedChapters.includes(chapter.id) && (
-                            <CheckCircle className="h-3 w-3 text-green-600" />
-                          )}
+                      <div className="flex-1 min-w-0 pr-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs tracking-wider text-gray-400 uppercase">
+                            {String(chapter.chapterNumber).padStart(2, '0')}
+                          </span>
+                          <div className="flex items-center space-x-2">
+                            {chapter.isPreview && (
+                              <span className="text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Free</span>
+                            )}
+                            {!canViewChapter(chapter) && (
+                              <Lock className="h-3 w-3 text-gray-400" />
+                            )}
+                            {enrollment?.completedChapters.includes(chapter.id) && (
+                              <CheckCircle className="h-3 w-3 text-emerald-600" />
+                            )}
+                          </div>
                         </div>
-                        <h4 className="font-medium text-sm leading-tight mb-1">{chapter.title}</h4>
-                        <div className="flex items-center text-xs text-gray-500">
-                          <Clock className="h-3 w-3 mr-1" />
-                          {chapter.duration}
+                        
+                        <h4 className={`font-medium text-sm leading-tight mb-2 transition-colors ${
+                          selectedChapter?.id === chapter.id ? 'text-emerald-700' : 'text-gray-900 group-hover:text-emerald-700'
+                        }`}>
+                          {chapter.title}
+                        </h4>
+                        
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-400">{chapter.duration}</span>
+                          {canViewChapter(chapter) && (
+                            <div className={`opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                              selectedChapter?.id === chapter.id ? 'opacity-100' : ''
+                            }`}>
+                              <Play className="h-3 w-3 text-emerald-600" />
+                            </div>
+                          )}
                         </div>
                       </div>
-                      {canViewChapter(chapter) && (
-                        <Play className="h-4 w-4 text-blue-600 flex-shrink-0 mt-1" />
-                      )}
                     </div>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Enrollment Dialog */}
+      {/* Minimalist Enrollment Dialog */}
       {isEnrollmentDialogOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4">Enroll in Course</h3>
-            <p className="text-gray-600 mb-4">
-              Get free access to all course chapters by providing your details.
-            </p>
+        <div className="fixed inset-0 bg-black bg-opacity-20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl">
+            <div className="text-center mb-8">
+              <h3 className="text-2xl font-light text-gray-900 mb-3">Start Learning</h3>
+              <p className="text-gray-500 leading-relaxed">
+                Get instant access to all course content. No credit card required.
+              </p>
+            </div>
             
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium mb-1">Email Address</label>
-                <Input
+                <input
                   type="email"
                   value={enrollmentData.userEmail}
                   onChange={(e) => setEnrollmentData({ ...enrollmentData, userEmail: e.target.value })}
-                  placeholder="your@email.com"
+                  placeholder="Email address"
+                  className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 transition-all"
                   required
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-1">Full Name</label>
-                <Input
+                <input
                   value={enrollmentData.userName}
                   onChange={(e) => setEnrollmentData({ ...enrollmentData, userName: e.target.value })}
-                  placeholder="Your full name"
+                  placeholder="Full name"
+                  className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 transition-all"
                   required
                 />
               </div>
             </div>
             
-            <div className="flex justify-end space-x-3 mt-6">
-              <Button 
-                variant="outline" 
+            <div className="flex space-x-3 mt-8">
+              <button 
                 onClick={() => setIsEnrollmentDialogOpen(false)}
+                className="flex-1 py-3 text-gray-600 hover:text-gray-800 transition-colors"
               >
-                Cancel
-              </Button>
-              <Button 
+                Maybe later
+              </button>
+              <button 
                 onClick={handleEnrollment}
                 disabled={!enrollmentData.userEmail || !enrollmentData.userName || enrollMutation.isPending}
+                className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {enrollMutation.isPending ? 'Enrolling...' : 'Enroll Now'}
-              </Button>
+                {enrollMutation.isPending ? 'Starting...' : 'Start Learning'}
+              </button>
             </div>
           </div>
         </div>
