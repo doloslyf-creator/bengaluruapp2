@@ -1,11 +1,9 @@
-
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from "react";
+import { Filter, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Filter, X, SortAsc, SortDesc, RotateCcw } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useState } from "react";
 import { type Property } from "@shared/schema";
 
 interface PropertyFiltersProps {
@@ -25,9 +23,9 @@ interface PropertyFiltersProps {
   filteredCount?: number;
 }
 
-export function PropertyFilters({ 
-  filters, 
-  onFiltersChange, 
+export function PropertyFilters({
+  filters,
+  onFiltersChange,
   properties = [],
   totalCount = 0,
   filteredCount = 0
@@ -65,10 +63,9 @@ export function PropertyFilters({
   };
 
   // Get unique values from properties for dynamic options
-  const uniqueTypes = Array.from(new Set(properties.map(p => p.type))).filter(Boolean);
-  const uniqueStatuses = Array.from(new Set(properties.map(p => p.status))).filter(Boolean);
-  const uniqueZones = Array.from(new Set(properties.map(p => p.zone))).filter(Boolean);
-  const uniqueDevelopers = Array.from(new Set(properties.map(p => p.developer))).filter(Boolean);
+  const uniqueTypes = Array.from(new Set(properties.map(p => p.type).filter(Boolean)));
+  const uniqueStatuses = Array.from(new Set(properties.map(p => p.status).filter(Boolean)));
+  const uniqueZones = Array.from(new Set(properties.map(p => p.zone).filter(Boolean)));
 
   return (
     <div className="bg-white border-b border-border">
@@ -85,7 +82,7 @@ export function PropertyFilters({
                 </Badge>
               )}
             </div>
-            
+
             {totalCount > 0 && (
               <div className="text-sm text-gray-600">
                 Showing <span className="font-semibold">{filteredCount}</span> of{" "}
@@ -100,242 +97,138 @@ export function PropertyFilters({
                 variant="ghost"
                 size="sm"
                 onClick={clearFilters}
-                className="text-sm text-gray-600 hover:text-gray-900"
+                className="text-xs"
               >
-                <RotateCcw className="h-4 w-4 mr-1" />
+                <X className="h-3 w-3 mr-1" />
                 Clear All
               </Button>
             )}
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowAdvanced(!showAdvanced)}
-              className="text-sm"
-            >
-              <Filter className="h-4 w-4 mr-1" />
-              {showAdvanced ? "Hide Advanced" : "Advanced Filters"}
-            </Button>
+
+            <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-xs">
+                  Advanced Filters
+                  <ChevronDown className="h-3 w-3 ml-1" />
+                </Button>
+              </CollapsibleTrigger>
+            </Collapsible>
           </div>
         </div>
 
-        {/* Quick Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          <div className="flex flex-col space-y-1">
-            <label className="text-xs font-medium text-gray-700">Type</label>
-            <Select value={filters.type} onValueChange={(value) => updateFilter("type", value)}>
-              <SelectTrigger className="h-9">
-                <SelectValue placeholder="All Types" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                {uniqueTypes.map(type => (
-                  <SelectItem key={type} value={type}>
-                    {type.charAt(0).toUpperCase() + type.slice(1)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        {/* Quick Filters Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {/* Property Type */}
+          <Select value={filters.type} onValueChange={(value) => updateFilter("type", value)}>
+            <SelectTrigger className="h-9">
+              <SelectValue placeholder="Property Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              {uniqueTypes.map(type => (
+                <SelectItem key={type} value={type}>{type}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-          <div className="flex flex-col space-y-1">
-            <label className="text-xs font-medium text-gray-700">Status</label>
-            <Select value={filters.status} onValueChange={(value) => updateFilter("status", value)}>
-              <SelectTrigger className="h-9">
-                <SelectValue placeholder="All Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                {uniqueStatuses.map(status => (
-                  <SelectItem key={status} value={status}>
-                    {status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Status */}
+          <Select value={filters.status} onValueChange={(value) => updateFilter("status", value)}>
+            <SelectTrigger className="h-9">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              {uniqueStatuses.map(status => (
+                <SelectItem key={status} value={status}>{status}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-          <div className="flex flex-col space-y-1">
-            <label className="text-xs font-medium text-gray-700">Zone</label>
-            <Select value={filters.zone} onValueChange={(value) => updateFilter("zone", value)}>
-              <SelectTrigger className="h-9">
-                <SelectValue placeholder="All Zones" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Zones</SelectItem>
-                {uniqueZones.map(zone => (
-                  <SelectItem key={zone} value={zone}>
-                    {zone}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Zone */}
+          <Select value={filters.zone} onValueChange={(value) => updateFilter("zone", value)}>
+            <SelectTrigger className="h-9">
+              <SelectValue placeholder="Zone" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Zones</SelectItem>
+              {uniqueZones.map(zone => (
+                <SelectItem key={zone} value={zone}>{zone}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-          <div className="flex flex-col space-y-1">
-            <label className="text-xs font-medium text-gray-700">Price Range</label>
-            <Select value={filters.priceRange} onValueChange={(value) => updateFilter("priceRange", value)}>
-              <SelectTrigger className="h-9">
-                <SelectValue placeholder="All Prices" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Prices</SelectItem>
-                <SelectItem value="under-50">Under ₹50L</SelectItem>
-                <SelectItem value="50-100">₹50L - ₹1Cr</SelectItem>
-                <SelectItem value="100-200">₹1Cr - ₹2Cr</SelectItem>
-                <SelectItem value="200-500">₹2Cr - ₹5Cr</SelectItem>
-                <SelectItem value="above-500">Above ₹5Cr</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* RERA Status */}
+          <Select value={filters.reraApproved} onValueChange={(value) => updateFilter("reraApproved", value)}>
+            <SelectTrigger className="h-9">
+              <SelectValue placeholder="RERA" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All RERA</SelectItem>
+              <SelectItem value="true">RERA Approved</SelectItem>
+              <SelectItem value="false">Pending RERA</SelectItem>
+            </SelectContent>
+          </Select>
 
-          <div className="flex flex-col space-y-1">
-            <label className="text-xs font-medium text-gray-700">Sort By</label>
-            <Select value={filters.sortBy} onValueChange={(value) => updateFilter("sortBy", value)}>
-              <SelectTrigger className="h-9">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="name">Name</SelectItem>
-                <SelectItem value="price">Price</SelectItem>
-                <SelectItem value="developer">Developer</SelectItem>
-                <SelectItem value="possession">Possession</SelectItem>
-                <SelectItem value="status">Status</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Sort By */}
+          <Select value={filters.sortBy} onValueChange={(value) => updateFilter("sortBy", value)}>
+            <SelectTrigger className="h-9">
+              <SelectValue placeholder="Sort By" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="name">Name</SelectItem>
+              <SelectItem value="developer">Developer</SelectItem>
+              <SelectItem value="startingPrice">Price</SelectItem>
+              <SelectItem value="area">Area</SelectItem>
+              <SelectItem value="status">Status</SelectItem>
+            </SelectContent>
+          </Select>
 
-          <div className="flex flex-col space-y-1">
-            <label className="text-xs font-medium text-gray-700">Order</label>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => updateFilter("sortOrder", filters.sortOrder === "asc" ? "desc" : "asc")}
-              className="h-9 justify-start"
-            >
-              {filters.sortOrder === "asc" ? (
-                <>
-                  <SortAsc className="h-4 w-4 mr-1" />
-                  Ascending
-                </>
-              ) : (
-                <>
-                  <SortDesc className="h-4 w-4 mr-1" />
-                  Descending
-                </>
-              )}
-            </Button>
-          </div>
+          {/* Sort Order */}
+          <Select value={filters.sortOrder} onValueChange={(value) => updateFilter("sortOrder", value)}>
+            <SelectTrigger className="h-9">
+              <SelectValue placeholder="Order" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="asc">Ascending</SelectItem>
+              <SelectItem value="desc">Descending</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
+
+        {/* Advanced Filters */}
+        <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
+          <CollapsibleContent className="space-y-4 mt-4 pt-4 border-t">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {/* Price Range */}
+              <Select value={filters.priceRange} onValueChange={(value) => updateFilter("priceRange", value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Price Range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Prices</SelectItem>
+                  <SelectItem value="under-50l">Under ₹50L</SelectItem>
+                  <SelectItem value="50l-1cr">₹50L - ₹1Cr</SelectItem>
+                  <SelectItem value="1cr-2cr">₹1Cr - ₹2Cr</SelectItem>
+                  <SelectItem value="2cr-5cr">₹2Cr - ₹5Cr</SelectItem>
+                  <SelectItem value="above-5cr">Above ₹5Cr</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Possession Status */}
+              <Select value={filters.possessionStatus} onValueChange={(value) => updateFilter("possessionStatus", value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Possession" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Possession</SelectItem>
+                  <SelectItem value="ready">Ready to Move</SelectItem>
+                  <SelectItem value="under-construction">Under Construction</SelectItem>
+                  <SelectItem value="tbd">TBD</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
       </div>
-
-      {/* Advanced Filters */}
-      <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
-        <CollapsibleContent className="px-6 pb-4">
-          <Card className="bg-gray-50">
-            <CardContent className="pt-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="flex flex-col space-y-1">
-                  <label className="text-xs font-medium text-gray-700">RERA Approved</label>
-                  <Select value={filters.reraApproved} onValueChange={(value) => updateFilter("reraApproved", value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Properties" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Properties</SelectItem>
-                      <SelectItem value="yes">RERA Approved Only</SelectItem>
-                      <SelectItem value="no">Non-RERA Properties</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="flex flex-col space-y-1">
-                  <label className="text-xs font-medium text-gray-700">Possession Status</label>
-                  <Select value={filters.possessionStatus} onValueChange={(value) => updateFilter("possessionStatus", value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="ready">Ready to Move</SelectItem>
-                      <SelectItem value="under-construction">Under Construction</SelectItem>
-                      <SelectItem value="upcoming">Future Projects</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="flex flex-col space-y-1">
-                  <label className="text-xs font-medium text-gray-700">Quick Actions</label>
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        onFiltersChange({
-                          ...filters,
-                          reraApproved: "yes",
-                          status: "active"
-                        });
-                      }}
-                      className="text-xs"
-                    >
-                      Active & RERA
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        onFiltersChange({
-                          ...filters,
-                          possessionStatus: "ready",
-                          status: "active"
-                        });
-                      }}
-                      className="text-xs"
-                    >
-                      Ready to Move
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              {hasActiveFilters && (
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-600">
-                      Active Filters:
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {Object.entries(filters).map(([key, value]) => {
-                        const defaultValues = {
-                          type: "all", status: "all", zone: "all", 
-                          reraApproved: "all", priceRange: "all", possessionStatus: "all",
-                          sortBy: "name", sortOrder: "asc"
-                        };
-                        
-                        if (value !== (defaultValues as any)[key]) {
-                          return (
-                            <Badge
-                              key={key}
-                              variant="secondary"
-                              className="text-xs cursor-pointer hover:bg-gray-300"
-                              onClick={() => updateFilter(key, (defaultValues as any)[key])}
-                            >
-                              {key}: {value}
-                              <X className="h-3 w-3 ml-1" />
-                            </Badge>
-                          );
-                        }
-                        return null;
-                      })}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </CollapsibleContent>
-      </Collapsible>
     </div>
   );
 }

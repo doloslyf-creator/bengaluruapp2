@@ -401,7 +401,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all properties
   app.get("/api/properties", async (req, res) => {
     try {
+      console.log("Fetching all properties...");
       const properties = await storage.getAllProperties();
+      console.log(`Found ${properties.length} properties`);
       res.json(properties);
     } catch (error) {
       console.error("Error fetching properties:", error);
