@@ -3529,10 +3529,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { reportId } = req.params;
       const { customerId, assignedBy, accessLevel = "view", notes } = req.body;
 
+      // Validate that customer exists
+      const customer = await storage.getCustomer(customerId);
+      if (!customer) {
+        return res.status(404).json({ 
+          error: "Customer not found",
+          details: `Customer with ID '${customerId}' does not exist`
+        });
+      }
+
+      // Validate that report exists
+      const report = await storage.getCivilMepReport(reportId);
+      if (!report) {
+        return res.status(404).json({ 
+          error: "Report not found",
+          details: `Civil+MEP report with ID '${reportId}' does not exist`
+        });
+      }
+
+      // Check if assignment already exists
+      const existingAssignments = await storage.getCivilMepReportAssignments(reportId);
+      const existingAssignment = existingAssignments.find(a => a.customerId === customerId);
+      
+      if (existingAssignment) {
+        return res.status(409).json({ 
+          error: "Assignment already exists",
+          details: `Customer '${customerId}' is already assigned to this report`
+        });
+      }
+
       const assignment = await storage.assignCivilMepReportToCustomer({
         reportId,
         customerId,
-        assignedBy,
+        assignedBy: assignedBy || "admin",
         accessLevel,
         notes,
       });
@@ -3540,23 +3569,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(assignment);
     } catch (error) {
       console.error("Error assigning Civil+MEP report to customer:", error);
-      res.status(500).json({ error: "Failed to assign report to customer" });
+      res.status(500).json({ 
+        error: "Failed to assign report to customer",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 
   app.delete("/api/civil-mep-reports/:reportId/remove-customer/:customerId", async (req, res) => {
     try {
       const { reportId, customerId } = req.params;
+      
+      // Check if assignment exists before trying to remove
+      const existingAssignments = await storage.getCivilMepReportAssignments(reportId);
+      const existingAssignment = existingAssignments.find(a => a.customerId === customerId);
+      
+      if (!existingAssignment) {
+        return res.status(404).json({ 
+          error: "Assignment not found",
+          details: `No assignment found for customer '${customerId}' on report '${reportId}'`
+        });
+      }
+
       const success = await storage.removeCivilMepReportAssignment(reportId, customerId);
 
       if (!success) {
-        return res.status(404).json({ error: "Assignment not found" });
+        return res.status(500).json({ 
+          error: "Failed to remove assignment",
+          details: "Assignment exists but could not be removed"
+        });
       }
 
+      console.log(`📋 Removed customer assignment: ${customerId} from Civil+MEP report ${reportId}`);
       res.json({ success: true, message: "Customer assignment removed successfully" });
     } catch (error) {
       console.error("Error removing Civil+MEP report assignment:", error);
-      res.status(500).json({ error: "Failed to remove customer assignment" });
+      res.status(500).json({ 
+        error: "Failed to remove customer assignment",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 
