@@ -936,131 +936,144 @@ export default function PropertyDetailMinimal() {
         </div>
       </div>
 
-      {/* Property Features & Amenities */}
-      <div className="max-w-6xl mx-auto px-4 py-12">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl font-light text-gray-900 mb-4">Premium Features & Amenities</h2>
-          <p className="text-gray-600 font-light">Designed for modern living with world-class facilities</p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {(property.features || property.tags || []).map((feature: string, index: number) => (
-            <div key={index} className="group bg-white rounded-xl border border-gray-100 p-6 hover:border-emerald-200 transition-colors">
-              <div className="w-12 h-12 bg-emerald-50 rounded-lg flex items-center justify-center mb-4 group-hover:bg-emerald-100 transition-colors">
-                <div className="w-6 h-6 bg-emerald-600 rounded-full"></div>
-              </div>
-              <h3 className="font-medium text-gray-900 mb-2">{feature}</h3>
-              <p className="text-sm text-gray-600 font-light">Premium quality amenity designed for your comfort</p>
-            </div>
-          ))}
+      {/* Property Overview */}
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2">
+            <Card className="border-gray-100">
+              <CardContent className="p-6">
+                <h2 className="text-lg font-medium text-gray-900 mb-4">About this Property</h2>
+                <p className="text-gray-600 leading-relaxed mb-6">
+                  Experience luxury living at {property.name}, a premium development in {property.area}. 
+                  This property offers world-class amenities and excellent connectivity to key areas of the city.
+                </p>
+                
+                {/* Tags */}
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {property.tags.map((tag, index) => (
+                    <Badge key={index} variant="secondary" className="bg-emerald-50 text-emerald-700 border-emerald-200">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+                
+                {/* Quick Info */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <div className="text-sm text-gray-500">Zone</div>
+                    <div className="font-medium text-gray-900">{property.zone}</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <div className="text-sm text-gray-500">Type</div>
+                    <div className="font-medium text-gray-900">{property.type}</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Quick Actions */}
+            <Card className="border-gray-100">
+              <CardContent className="p-6">
+                <h3 className="font-medium text-gray-900 mb-4">Get Expert Help</h3>
+                <div className="space-y-3">
+                  <Button 
+                    onClick={handleConsult}
+                    variant="outline" 
+                    className="w-full justify-start border-emerald-200 hover:bg-emerald-50"
+                  >
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Free Consultation
+                  </Button>
+                  <Button 
+                    onClick={handleBookVisit}
+                    className="w-full justify-start bg-emerald-600 hover:bg-emerald-700"
+                  >
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Schedule Site Visit
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Property Scores */}
+            {(property.overallScore || property.locationScore || property.amenitiesScore || property.valueScore) && (
+              <Card className="border-gray-100">
+                <CardContent className="p-6">
+                  <h3 className="font-medium text-gray-900 mb-4">Property Scores</h3>
+                  <div className="space-y-3">
+                    {property.overallScore && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Overall Score</span>
+                        <Badge className="bg-emerald-100 text-emerald-800">{property.overallScore}/10</Badge>
+                      </div>
+                    )}
+                    {property.locationScore && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Location</span>
+                        <Badge variant="secondary">{property.locationScore}/10</Badge>
+                      </div>
+                    )}
+                    {property.amenitiesScore && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Amenities</span>
+                        <Badge variant="secondary">{property.amenitiesScore}/10</Badge>
+                      </div>
+                    )}
+                    {property.valueScore && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Value</span>
+                        <Badge variant="secondary">{property.valueScore}/10</Badge>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Location & Connectivity */}
-      <div className="bg-gray-50 py-12">
+      {/* Property Details */}
+      <div className="bg-gray-50 py-8">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl font-light text-gray-900 mb-4">Prime Location & Connectivity</h2>
-            <p className="text-gray-600 font-light">Strategically located for easy access to key areas</p>
-          </div>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white rounded-xl p-6 text-center">
-              <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <MapPin className="h-6 w-6 text-blue-600" />
-              </div>
-              <h3 className="font-medium text-gray-900 mb-2">Metro Station</h3>
-              <p className="text-sm text-gray-600">2.5 km away</p>
-            </div>
+            <Card className="border-gray-100">
+              <CardContent className="p-4 text-center">
+                <Building className="h-8 w-8 text-emerald-600 mx-auto mb-2" />
+                <div className="text-sm text-gray-500">Developer</div>
+                <div className="font-medium text-gray-900">{property.developer || 'Premium Builder'}</div>
+              </CardContent>
+            </Card>
             
-            <div className="bg-white rounded-xl p-6 text-center">
-              <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Building className="h-6 w-6 text-green-600" />
-              </div>
-              <h3 className="font-medium text-gray-900 mb-2">IT Parks</h3>
-              <p className="text-sm text-gray-600">5-15 min drive</p>
-            </div>
+            <Card className="border-gray-100">
+              <CardContent className="p-4 text-center">
+                <Calendar className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                <div className="text-sm text-gray-500">Possession</div>
+                <div className="font-medium text-gray-900">{property.possessionDate || 'Q4 2025'}</div>
+              </CardContent>
+            </Card>
             
-            <div className="bg-white rounded-xl p-6 text-center">
-              <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <School className="h-6 w-6 text-purple-600" />
-              </div>
-              <h3 className="font-medium text-gray-900 mb-2">Schools</h3>
-              <p className="text-sm text-gray-600">Premium schools nearby</p>
-            </div>
+            <Card className="border-gray-100">
+              <CardContent className="p-4 text-center">
+                <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                <div className="text-sm text-gray-500">RERA Status</div>
+                <div className="font-medium text-gray-900">
+                  {property.reraApproved ? 'Approved' : 'Pending'}
+                </div>
+              </CardContent>
+            </Card>
             
-            <div className="bg-white rounded-xl p-6 text-center">
-              <div className="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <ShoppingBag className="h-6 w-6 text-orange-600" />
-              </div>
-              <h3 className="font-medium text-gray-900 mb-2">Shopping</h3>
-              <p className="text-sm text-gray-600">Malls & retail outlets</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Investment Analysis */}
-      <div className="max-w-6xl mx-auto px-4 py-12">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl font-light text-gray-900 mb-4">Investment Potential</h2>
-          <p className="text-gray-600 font-light">Strong fundamentals for long-term growth</p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-emerald-50 rounded-xl p-6 text-center">
-            <div className="text-2xl font-semibold text-emerald-700 mb-2">12-15%</div>
-            <h3 className="font-medium text-gray-900 mb-2">Expected Appreciation</h3>
-            <p className="text-sm text-gray-600 font-light">Per annum based on area growth</p>
-          </div>
-          
-          <div className="bg-blue-50 rounded-xl p-6 text-center">
-            <div className="text-2xl font-semibold text-blue-700 mb-2">₹45-55K</div>
-            <h3 className="font-medium text-gray-900 mb-2">Rental Yield</h3>
-            <p className="text-sm text-gray-600 font-light">Per month for 2-3 BHK units</p>
-          </div>
-          
-          <div className="bg-purple-50 rounded-xl p-6 text-center">
-            <div className="text-2xl font-semibold text-purple-700 mb-2">A+</div>
-            <h3 className="font-medium text-gray-900 mb-2">Investment Grade</h3>
-            <p className="text-sm text-gray-600 font-light">Based on location & builder reputation</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Similar Properties */}
-      <div className="bg-gray-50 py-12">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl font-light text-gray-900 mb-4">Similar Properties</h2>
-            <p className="text-gray-600 font-light">Other properties you might be interested in</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {(properties || [])
-              .filter((prop: any) => prop.id !== property.id && prop.area === property.area)
-              .slice(0, 3)
-              .map((similarProperty: any) => (
-                <Link
-                  key={similarProperty.id}
-                  to={`/property/${similarProperty.id}/${similarProperty.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`}
-                  className="group bg-white rounded-xl border border-gray-100 overflow-hidden hover:border-emerald-200 transition-colors"
-                >
-                  <div className="aspect-video bg-gradient-to-br from-emerald-50 to-emerald-100 p-6 flex items-center justify-center">
-                    <Building className="h-12 w-12 text-emerald-600" />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="font-medium text-gray-900 mb-2 group-hover:text-emerald-700 transition-colors">{similarProperty.name}</h3>
-                    <p className="text-sm text-gray-600 mb-3">{similarProperty.area}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-lg font-semibold text-emerald-700">
-                        ₹{(similarProperty.priceRange.min / 10000000).toFixed(1)}-{(similarProperty.priceRange.max / 10000000).toFixed(1)} Cr
-                      </span>
-                      <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-emerald-600 transition-colors" />
-                    </div>
-                  </div>
-                </Link>
-              ))}
+            <Card className="border-gray-100">
+              <CardContent className="p-4 text-center">
+                <MapPin className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+                <div className="text-sm text-gray-500">Location</div>
+                <div className="font-medium text-gray-900">{property.area}</div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
