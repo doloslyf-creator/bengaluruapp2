@@ -2725,9 +2725,47 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllCivilMepReports(): Promise<CivilMepReport[]> {
+    console.log("Fetching all Civil+MEP reports");
     try {
-      return await this.db.select().from(civilMepReports)
+      const reports = await this.db
+        .select({
+          id: civilMepReports.id,
+          propertyId: civilMepReports.propertyId,
+          reportTitle: civilMepReports.reportTitle,
+          engineerName: civilMepReports.engineerName,
+          engineerLicense: civilMepReports.engineerLicense,
+          inspectionDate: civilMepReports.inspectionDate,
+          reportDate: civilMepReports.reportDate,
+          status: civilMepReports.status,
+          overallScore: civilMepReports.overallScore,
+          executiveSummary: civilMepReports.executiveSummary,
+          recommendations: civilMepReports.recommendations,
+          conclusions: civilMepReports.conclusions,
+          investmentRecommendation: civilMepReports.investmentRecommendation,
+          siteInformation: civilMepReports.siteInformation,
+          foundationDetails: civilMepReports.foundationDetails,
+          superstructureDetails: civilMepReports.superstructureDetails,
+          wallsFinishes: civilMepReports.wallsFinishes,
+          roofingDetails: civilMepReports.roofingDetails,
+          doorsWindows: civilMepReports.doorsWindows,
+          flooringDetails: civilMepReports.flooringDetails,
+          staircasesElevators: civilMepReports.staircasesElevators,
+          externalWorks: civilMepReports.externalWorks,
+          mechanicalSystems: civilMepReports.mechanicalSystems,
+          electricalSystems: civilMepReports.electricalSystems,
+          plumbingSystems: civilMepReports.plumbingSystems,
+          fireSafetySystems: civilMepReports.fireSafetySystems,
+          bmsAutomation: civilMepReports.bmsAutomation,
+          greenSustainability: civilMepReports.greenSustainability,
+          documentation: civilMepReports.documentation,
+          createdAt: civilMepReports.createdAt,
+          updatedAt: civilMepReports.updatedAt,
+        })
+        .from(civilMepReports)
         .orderBy(desc(civilMepReports.createdAt));
+
+      console.log(`Retrieved ${reports.length} Civil+MEP reports`);
+      return reports;
     } catch (error) {
       console.error("Error in getAllCivilMepReports:", error);
       // Return empty array if table doesn't exist or has schema issues
