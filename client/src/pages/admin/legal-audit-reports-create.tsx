@@ -42,7 +42,7 @@ const formSchema = z.object({
   keyFindings: z.string(),
   recommendations: z.string(),
   legalConclusion: z.string(),
-  
+
   // Property Ownership & Title
   currentOwnership: z.object({
     ownerName: z.string(),
@@ -51,7 +51,7 @@ const formSchema = z.object({
     acquisitionMode: z.string(),
     previousOwners: z.array(z.string()),
   }),
-  
+
   titleVerification: z.object({
     titleDeedNumber: z.string(),
     registrationDate: z.string(),
@@ -60,7 +60,7 @@ const formSchema = z.object({
     encumbrances: z.array(z.string()),
     titleDefects: z.array(z.string()),
   }),
-  
+
   // Legal Documentation
   statutoryApprovals: z.object({
     reraRegistration: z.boolean(),
@@ -71,7 +71,7 @@ const formSchema = z.object({
     occupancyCertificate: z.boolean(),
     environmentClearance: z.boolean(),
   }),
-  
+
   taxCompliance: z.object({
     propertyTaxStatus: z.enum(["current", "arrears", "disputed"]),
     khataStatus: z.enum(["a-khata", "b-khata", "revenue-records", "disputed"]),
@@ -79,7 +79,7 @@ const formSchema = z.object({
     dcConversion: z.boolean(),
     landRevenuePaid: z.boolean(),
   }),
-  
+
   // Legal Risk Assessment
   litigationHistory: z.object({
     pendingCases: z.array(z.string()),
@@ -87,7 +87,7 @@ const formSchema = z.object({
     courtOrders: z.array(z.string()),
     legalNotices: z.array(z.string()),
   }),
-  
+
   complianceStatus: z.object({
     municipalCompliance: z.boolean(),
     fireNocStatus: z.boolean(),
@@ -104,7 +104,7 @@ export default function AdminLegalAuditReportsCreate() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("basic");
-  
+
   // Extract report ID from URL if in edit mode
   const currentPath = window.location.pathname;
   const editMatch = currentPath.match(/\/edit$/) && currentPath.includes('/legal-audit-reports/');
@@ -261,7 +261,7 @@ export default function AdminLegalAuditReportsCreate() {
     mutationFn: async (data: FormData) => {
       const url = isEditMode ? `/api/legal-audit-reports/${reportId}` : "/api/legal-audit-reports";
       const method = isEditMode ? "PUT" : "POST";
-      
+
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -315,7 +315,7 @@ export default function AdminLegalAuditReportsCreate() {
       litigationHistory: JSON.stringify(data.litigationHistory || {}),
       complianceStatus: JSON.stringify(data.complianceStatus || {}),
     };
-    
+
     console.log("Submitting Legal Audit report data:", submitData);
     saveReportMutation.mutate(submitData);
   };
@@ -1144,14 +1144,14 @@ export default function AdminLegalAuditReportsCreate() {
                     <div className="text-sm text-muted-foreground mb-4">
                       Document any pending legal cases, disputes, court orders, or legal notices related to the property.
                     </div>
-                    
+
                     <div className="grid grid-cols-1 gap-6">
                       <div>
                         <h3 className="text-base font-medium mb-2">Litigation History</h3>
                         <p className="text-sm text-muted-foreground mb-4">
                           Add each item on a new line. Leave blank if none.
                         </p>
-                        
+
                         <div className="space-y-4">
                           <div>
                             <label className="text-sm font-medium">Pending Cases</label>
@@ -1162,7 +1162,7 @@ export default function AdminLegalAuditReportsCreate() {
                               data-testid="textarea-pending-cases"
                             />
                           </div>
-                          
+
                           <div>
                             <label className="text-sm font-medium">Past Disputes</label>
                             <Textarea 
@@ -1172,7 +1172,7 @@ export default function AdminLegalAuditReportsCreate() {
                               data-testid="textarea-past-disputes"
                             />
                           </div>
-                          
+
                           <div>
                             <label className="text-sm font-medium">Court Orders</label>
                             <Textarea 
@@ -1182,7 +1182,7 @@ export default function AdminLegalAuditReportsCreate() {
                               data-testid="textarea-court-orders"
                             />
                           </div>
-                          
+
                           <div>
                             <label className="text-sm font-medium">Legal Notices</label>
                             <Textarea 

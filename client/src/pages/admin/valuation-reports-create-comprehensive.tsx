@@ -27,6 +27,8 @@ export default function ValuationReportsCreateComprehensive() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // Fetch properties for dropdown
   const { data: properties = [] } = useQuery<Property[]>({
     queryKey: ["/api/properties"],
@@ -100,107 +102,131 @@ export default function ValuationReportsCreateComprehensive() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
 
-    const reportData = {
-      // Basic Information
-      propertyId: formData.get("propertyId") as string,
-      reportTitle: formData.get("reportTitle") as string,
-      reportStatus: formData.get("reportStatus") as string || "draft",
-      assignedTo: formData.get("assignedTo") as string,
-      createdBy: "admin",
-      customerId: null, // Will be assigned later
+    try {
+      const formData = new FormData(e.currentTarget);
+      const data = Object.fromEntries(formData.entries());
 
-      // 1. Executive Summary
-      projectName: formData.get("projectName") as string,
-      towerUnit: formData.get("towerUnit") as string,
-      estimatedMarketValue: formData.get("estimatedMarketValue") as string,
-      ratePerSqftSbaUds: formData.get("ratePerSqftSbaUds") as string,
-      buyerFit: formData.get("buyerFit") as string,
-      valuationVerdict: formData.get("valuationVerdict") as string,
-      appreciationOutlook: formData.get("appreciationOutlook") as string,
-      riskScore: formData.get("riskScore") ? parseInt(formData.get("riskScore") as string) : 0,
-      recommendation: formData.get("recommendation") as string,
+      console.log("Form data:", data);
 
-      // 2. Property Profile
-      unitType: formData.get("unitType") as string,
-      configuration: formData.get("configuration") as string,
-      undividedLandShare: formData.get("undividedLandShare") as string,
-      facing: formData.get("facing") as string,
-      vastuCompliance: formData.get("vastuCompliance") === "on",
-      ocCcStatus: formData.get("ocCcStatus") as string,
-      possessionStatus: formData.get("possessionStatus") as string,
-      khataType: formData.get("khataType") as string,
-      landTitleStatus: formData.get("landTitleStatus") as string,
-      builderReputationScore: formData.get("builderReputationScore") as string,
+      // Validate required fields
+      if (!data.propertyId || !data.reportTitle || !data.valuerId || !data.reportDate) {
+        toast({
+          title: "Missing required fields",
+          description: "Please fill in Property ID, Report Title, Valuer ID, and Report Date",
+          variant: "destructive",
+        });
+        return;
+      }
 
-      // 3. Market Valuation Estimate
-      builderQuotedPrice: formData.get("builderQuotedPrice") as string,
-      totalEstimatedValue: formData.get("totalEstimatedValue") as string,
-      pricePerSqftAnalysis: formData.get("pricePerSqftAnalysis") as string,
-      landShareValue: formData.get("landShareValue") as string,
-      constructionValue: formData.get("constructionValue") as string,
-      guidanceValueZoneRate: formData.get("guidanceValueZoneRate") as string,
-      marketPremiumDiscount: formData.get("marketPremiumDiscount") as string,
+      setIsSubmitting(true);
 
-      // 4. Comparable Sales Analysis
-      comparableSales: parseJsonField(formData.get("comparableSales") as string),
-      benchmarkingSources: formData.get("benchmarkingSources") as string,
-      volatilityIndex: formData.get("volatilityIndex") as string,
-      averageDaysOnMarket: formData.get("averageDaysOnMarket") ? parseInt(formData.get("averageDaysOnMarket") as string) : null,
+      const reportData = {
+        propertyId: data.propertyId as string,
+        createdBy: data.valuerId as string,
+        reportTitle: data.reportTitle as string,
+        reportVersion: data.reportVersion as string || "1.0",
+        reportDate: new Date(data.reportDate as string).toISOString(),
+        marketAnalysis: {
+          currentMarketTrend: data.currentMarketTrend as string || "stable",
+          areaGrowthRate: parseFloat(data.areaGrowthRate as string) || 0,
+          demandSupplyRatio: data.demandSupplyRatio as string || "balanced",
+          marketSentiment: data.marketSentiment as string || "neutral",
+          competitorAnalysis: []
+        },
+        propertyAssessment: {
+          structuralCondition: data.structuralCondition as string || "good",
+          ageOfProperty: parseInt(data.ageOfProperty as string) || 0,
+          maintenanceLevel: data.maintenanceLevel as string || "average",
+          amenitiesRating: parseFloat(data.amenitiesRating as string) || 5,
+          locationAdvantages: [],
+          locationDisadvantages: [],
+          futureGrowthPotential: parseFloat(data.futureGrowthPotential as string) || 5
+        },
+        costBreakdown: {
+          landValue: parseFloat(data.landValue as string) || 0,
+          constructionCost: parseFloat(data.constructionCost as string) || 0,
+          developmentCharges: parseFloat(data.developmentCharges as string) || 0,
+          registrationStampDuty: parseFloat(data.registrationStampDuty as string) || 0,
+          gstOnConstruction: parseFloat(data.gstOnConstruction as string) || 0,
+          parkingCharges: parseFloat(data.parkingCharges as string) || 0,
+          clubhouseMaintenance: parseFloat(data.clubhouseMaintenance as string) || 0,
+          interiorFittings: parseFloat(data.interiorFittings as string) || 0,
+          movingCosts: parseFloat(data.movingCosts as string) || 0,
+          legalCharges: parseFloat(data.legalCharges as string) || 0,
+          totalEstimatedCost: parseFloat(data.totalEstimatedCost as string) || 0,
+          hiddenCosts: []
+        },
+        financialAnalysis: {
+          currentValuation: parseFloat(data.currentValuation as string) || 0,
+          appreciationProjection: [],
+          rentalYield: parseFloat(data.rentalYield as string) || 0,
+          monthlyRentalIncome: parseFloat(data.monthlyRentalIncome as string) || 0,
+          roiAnalysis: {
+            breakEvenPeriod: parseFloat(data.breakEvenPeriod as string) || 0,
+            totalRoi5Years: parseFloat(data.totalRoi5Years as string) || 0,
+            totalRoi10Years: parseFloat(data.totalRoi10Years as string) || 0
+          },
+          loanEligibility: {
+            maxLoanAmount: parseFloat(data.maxLoanAmount as string) || 0,
+            suggestedDownPayment: parseFloat(data.suggestedDownPayment as string) || 0,
+            emiEstimate: parseFloat(data.emiEstimate as string) || 0
+          }
+        },
+        investmentRecommendation: data.investmentRecommendation as "buy" | "hold" | "sell" || "hold",
+        riskAssessment: {
+          overallRisk: data.overallRisk as string || "medium",
+          riskFactors: [],
+          mitigationStrategies: []
+        },
+        executiveSummary: data.executiveSummary as string || "",
+        overallScore: data.overallScore as string || "0.0",
+        keyHighlights: [],
+        reportPdfUrl: null,
+        supportingDocuments: []
+      };
 
-      // 5. Location & Infrastructure Assessment
-      planningAuthority: formData.get("planningAuthority") as string,
-      zonalClassification: formData.get("zonalClassification") as string,
-      landUseStatus: formData.get("landUseStatus") as string,
-      connectivity: formData.get("connectivity") as string,
-      waterSupply: formData.get("waterSupply") as string,
-      drainage: formData.get("drainage") as string,
-      socialInfrastructure: formData.get("socialInfrastructure") as string,
-      futureInfrastructure: parseJsonField(formData.get("futureInfrastructure") as string),
+      console.log("Submitting report data:", reportData);
 
-      // 6. Legal & Compliance Snapshot
-      reraRegistration: formData.get("reraRegistration") as string,
-      khataVerification: formData.get("khataVerification") as string,
-      titleClearance: formData.get("titleClearance") as string,
-      dcConversion: formData.get("dcConversion") as string,
-      planApproval: formData.get("planApproval") as string,
-      loanApproval: parseJsonField(formData.get("loanApproval") as string),
-      titleClarityNotes: formData.get("titleClarityNotes") as string,
+      const response = await fetch("/api/valuation-reports", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(reportData),
+      });
 
-      // 7. Rental & Yield Potential
-      expectedMonthlyRent: formData.get("expectedMonthlyRent") as string,
-      grossRentalYield: formData.get("grossRentalYield") as string,
-      tenantDemand: formData.get("tenantDemand") as string,
-      exitLiquidity: formData.get("exitLiquidity") as string,
-      yieldScore: formData.get("yieldScore") as string,
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage = "Failed to create report";
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || errorData.details || errorMessage;
+        } catch {
+          errorMessage = errorText || errorMessage;
+        }
+        throw new Error(errorMessage);
+      }
 
-      // 8. Cost Sheet Breakdown
-      baseUnitCost: formData.get("baseUnitCost") as string,
-      amenitiesCharges: formData.get("amenitiesCharges") as string,
-      floorRiseCharges: formData.get("floorRiseCharges") as string,
-      gstAmount: formData.get("gstAmount") as string,
-      stampDutyRegistration: formData.get("stampDutyRegistration") as string,
-      totalAllInPrice: formData.get("totalAllInPrice") as string,
-      khataTransferCosts: formData.get("khataTransferCosts") as string,
+      const result = await response.json();
+      console.log("Report created successfully:", result);
 
-      // 9. Pros & Cons Summary
-      pros: parseArrayField(formData.get("pros") as string),
-      cons: parseArrayField(formData.get("cons") as string),
+      toast({
+        title: "Success",
+        description: "Property Valuation report created successfully",
+      });
 
-      // 10. Final Recommendation
-      buyerTypeFit: formData.get("buyerTypeFit") as string,
-      negotiationAdvice: formData.get("negotiationAdvice") as string,
-      riskSummary: formData.get("riskSummary") as string,
-      appreciationOutlook5yr: formData.get("appreciationOutlook5yr") as string,
-      exitPlan: formData.get("exitPlan") as string,
-      overallScore: formData.get("overallScore") as string,
-
-      // Additional
-      customNotes: formData.get("customNotes") as string,
-    };
-
-    createReportMutation.mutate(reportData);
+      navigate("/admin-panel/valuation-reports");
+    } catch (error) {
+      console.error("Error creating report:", error);
+      toast({
+        title: "Error creating report",
+        description: error instanceof Error ? error.message : "Failed to create Property Valuation report",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const getPropertyName = (propertyId: string) => {
@@ -1293,10 +1319,10 @@ export default function ValuationReportsCreateComprehensive() {
                   </Button>
                   <Button 
                     type="submit" 
-                    disabled={createReportMutation.isPending}
+                    disabled={isSubmitting}
                     className="min-w-[120px]"
                   >
-                    {createReportMutation.isPending ? (
+                    {isSubmitting ? (
                       <>
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                         Creating...

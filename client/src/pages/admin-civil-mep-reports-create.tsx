@@ -62,7 +62,7 @@ export function AdminCivilMepReportsCreate() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("basic");
-  
+
   // Extract report ID from URL if in edit mode
   const currentPath = window.location.pathname;
   const editMatch = currentPath.match(/\/edit$/) && currentPath.includes('/civil-mep-reports/');
@@ -168,7 +168,7 @@ export function AdminCivilMepReportsCreate() {
     mutationFn: async (data: FormData) => {
       const url = isEditMode ? `/api/civil-mep-reports/${reportId}` : "/api/civil-mep-reports";
       const method = isEditMode ? "PATCH" : "POST";
-      
+
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -191,7 +191,7 @@ export function AdminCivilMepReportsCreate() {
         title: `Civil+MEP Report ${isEditMode ? 'updated' : 'created'} successfully`,
         description: `Report "${response.reportTitle}" has been ${isEditMode ? 'updated' : 'created'}.`,
       });
-      
+
       // Only redirect if shouldRedirect is true (Save & Close)
       if (shouldRedirect || !isEditMode) {
         setLocation("/admin-panel/civil-mep-reports");
@@ -213,7 +213,7 @@ export function AdminCivilMepReportsCreate() {
   const onSubmit = (data: FormData, redirect: boolean = true) => {
     console.log("Form submitted with data:", data);
     setShouldRedirect(redirect);
-    
+
     // Clean and prepare data for submission according to database schema
     const submitData = {
       propertyId: data.propertyId,
@@ -228,7 +228,7 @@ export function AdminCivilMepReportsCreate() {
       recommendations: data.recommendations || "",
       conclusions: data.conclusions || "",
       investmentRecommendation: data.investmentRecommendation,
-      
+
       // Site information as JSON object
       siteInformation: {
         siteLocation: data.siteLocation || "",
@@ -236,7 +236,7 @@ export function AdminCivilMepReportsCreate() {
         builtUpArea: data.builtUpArea || "",
         civilNotes: data.civilNotes || ""
       },
-      
+
       // Foundation details as JSON object
       foundationDetails: {
         foundationType: data.foundationType || "",
@@ -245,34 +245,34 @@ export function AdminCivilMepReportsCreate() {
         steelGrade: data.steelGrade || "",
         structuralCondition: data.structuralCondition || ""
       },
-      
+
       // Walls and finishes as JSON object
       wallsFinishes: {
         wallMaterial: data.wallMaterial || "",
         roofType: data.roofType || ""
       },
-      
+
       // MEP systems as JSON objects
       mechanicalSystems: {
         hvacSystem: data.hvacSystem || "",
         notes: data.mechanicalNotes || ""
       },
-      
+
       electricalSystems: {
         electricalLoad: data.electricalLoad || "",
         notes: data.electricalNotes || ""
       },
-      
+
       plumbingSystems: {
         plumbingType: data.plumbingType || "",
         notes: data.plumbingNotes || ""
       },
-      
+
       fireSafetySystems: {
         fireSafetyGrade: data.fireSafetyGrade || ""
       }
     };
-    
+
     console.log("Submitting cleaned data to API:", submitData);
     saveReportMutation.mutate(submitData);
   };
@@ -306,9 +306,9 @@ export function AdminCivilMepReportsCreate() {
             Back to Civil+MEP Reports
           </Link>
         </div>
-        
+
         <Form {...form}>
-          <form onSubmit={form.handleSubmit((data) => onSubmit(data, true))} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* Header Section */}
           <Card>
             <CardHeader>
@@ -347,7 +347,7 @@ export function AdminCivilMepReportsCreate() {
                             </div>
                           </div>
                         </TabsTrigger>
-                        
+
                         <TabsTrigger 
                           value="civil" 
                           className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
@@ -360,7 +360,7 @@ export function AdminCivilMepReportsCreate() {
                             </div>
                           </div>
                         </TabsTrigger>
-                        
+
                         <TabsTrigger 
                           value="mep" 
                           className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
@@ -373,7 +373,7 @@ export function AdminCivilMepReportsCreate() {
                             </div>
                           </div>
                         </TabsTrigger>
-                        
+
                         <TabsTrigger 
                           value="summary" 
                           className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
@@ -407,7 +407,7 @@ export function AdminCivilMepReportsCreate() {
                         <FileText className="h-4 w-4" />
                         <span>Basic</span>
                       </TabsTrigger>
-                      
+
                       <TabsTrigger 
                         value="civil" 
                         className="flex flex-col items-center gap-1 p-3 text-xs bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all"
@@ -415,7 +415,7 @@ export function AdminCivilMepReportsCreate() {
                         <Building2 className="h-4 w-4" />
                         <span>Civil</span>
                       </TabsTrigger>
-                      
+
                       <TabsTrigger 
                         value="mep" 
                         className="flex flex-col items-center gap-1 p-3 text-xs bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all"
@@ -423,7 +423,7 @@ export function AdminCivilMepReportsCreate() {
                         <Zap className="h-4 w-4" />
                         <span>MEP</span>
                       </TabsTrigger>
-                      
+
                       <TabsTrigger 
                         value="summary" 
                         className="flex flex-col items-center gap-1 p-3 text-xs bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary rounded-lg transition-all"
@@ -1687,7 +1687,7 @@ export function AdminCivilMepReportsCreate() {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="recommendations"
@@ -1705,7 +1705,7 @@ export function AdminCivilMepReportsCreate() {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="conclusions"
@@ -1764,13 +1764,14 @@ export function AdminCivilMepReportsCreate() {
                 </div>
               )}
             </div>
-            
+
             <div className="flex items-center gap-3">
               <Button
                 type="button"
                 variant="outline"
                 onClick={(e) => {
                   e.preventDefault();
+                  // Pass false to onSubmit to indicate "Save Draft" and not redirect
                   form.handleSubmit((data) => onSubmit(data, false))();
                 }}
                 disabled={saveReportMutation.isPending}
@@ -1778,7 +1779,7 @@ export function AdminCivilMepReportsCreate() {
                 <Save className="w-4 h-4 mr-2" />
                 Save Draft
               </Button>
-              
+
               <Button
                 type="submit"
                 disabled={saveReportMutation.isPending}

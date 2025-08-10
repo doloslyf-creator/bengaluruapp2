@@ -2192,7 +2192,7 @@ export class DatabaseStorage implements IStorage {
   async assignReportToCustomer(reportId: string, customerId: string): Promise<PropertyValuationReport | undefined> {
     const [report] = await this.db.update(propertyValuationReports)
       .set({ customerId, assignedTo: customerId, updatedAt: new Date() })
-      .where(eq(propertyValuationReports.id, reportId))
+      .where(eq(reportId, reportId))
       .returning();
     return report || undefined;
   }
@@ -2657,49 +2657,57 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Civil+MEP Report operations
-  async createCivilMepReport(insertReport: InsertCivilMepReport): Promise<CivilMepReport> {
+  async createCivilMepReport(reportData: any) {
     try {
-      console.log("Creating Civil+MEP report with data:", insertReport);
+      console.log("Creating Civil+MEP report with data:", reportData);
 
-      // Remove fields that don't exist in database schema
-      const {
-        assignedCustomerIds,
-        customerAssignments,
-        ...reportData
-      } = insertReport as any;
+      // Validate required fields
+      if (!reportData.propertyId || !reportData.reportTitle || !reportData.engineerName || !reportData.engineerLicense) {
+        throw new Error("Missing required fields: propertyId, reportTitle, engineerName, engineerLicense are required");
+      }
 
-      // Ensure JSON fields are properly formatted and dates are converted
-      const processedData = {
-        ...reportData,
-        overallScore: Number(reportData.overallScore) || 0,
-        inspectionDate: reportData.inspectionDate ? new Date(reportData.inspectionDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-        reportDate: reportData.reportDate ? new Date(reportData.reportDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-        siteInformation: reportData.siteInformation || {},
-        foundationDetails: reportData.foundationDetails || {},
-        superstructureDetails: reportData.superstructureDetails || {},
-        wallsFinishes: reportData.wallsFinishes || {},
-        roofingDetails: reportData.roofingDetails || {},
-        doorsWindows: reportData.doorsWindows || {},
-        flooringDetails: reportData.flooringDetails || {},
-        staircasesElevators: reportData.staircasesElevators || {},
-        externalWorks: reportData.externalWorks || {},
-        mechanicalSystems: reportData.mechanicalSystems || {},
-        electricalSystems: reportData.electricalSystems || {},
-        plumbingSystems: reportData.plumbingSystems || {},
-        fireSafetySystems: reportData.fireSafetySystems || {},
-        bmsAutomation: reportData.bmsAutomation || {},
-        greenSustainability: reportData.greenSustainability || {},
-        documentation: reportData.documentation || {}
-      };
+      const reportId = reportData.id || crypto.randomUUID();
 
       const [report] = await this.db.insert(civilMepReports)
-        .values(processedData)
+        .values({
+          id: reportId,
+          propertyId: reportData.propertyId,
+          reportTitle: reportData.reportTitle,
+          engineerName: reportData.engineerName,
+          engineerLicense: reportData.engineerLicense,
+          inspectionDate: new Date(reportData.inspectionDate),
+          reportDate: new Date(reportData.reportDate),
+          overallScore: reportData.overallScore || 0,
+          status: reportData.status || "draft",
+          investmentRecommendation: reportData.investmentRecommendation || "conditional",
+          executiveSummary: reportData.executiveSummary || "",
+          recommendations: reportData.recommendations || "",
+          conclusions: reportData.conclusions || "",
+          siteInformation: reportData.siteInformation || {},
+          foundationDetails: reportData.foundationDetails || {},
+          superstructureDetails: reportData.superstructureDetails || {},
+          wallsFinishes: reportData.wallsFinishes || {},
+          roofingDetails: reportData.roofingDetails || {},
+          doorsWindows: reportData.doorsWindows || {},
+          flooringDetails: reportData.flooringDetails || {},
+          staircasesElevators: reportData.staircasesElevators || {},
+          externalWorks: reportData.externalWorks || {},
+          mechanicalSystems: reportData.mechanicalSystems || {},
+          electricalSystems: reportData.electricalSystems || {},
+          plumbingSystems: reportData.plumbingSystems || {},
+          fireSafetySystems: reportData.fireSafetySystems || {},
+          bmsAutomation: reportData.bmsAutomation || {},
+          greenSustainability: reportData.greenSustainability || {},
+          documentation: reportData.documentation || {},
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
         .returning();
 
-      console.log("Successfully created Civil+MEP report:", report);
+      console.log("Civil+MEP report created successfully:", report);
       return report;
     } catch (error) {
-      console.error("Error creating Civil+MEP report in storage:", error);
+      console.error("Error creating Civil+MEP report:", error);
       throw error;
     }
   }
