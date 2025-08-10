@@ -387,8 +387,9 @@ export default function CivilMepReportsEdit() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/civil-mep-reports"] });
       queryClient.invalidateQueries({ queryKey: [`/api/civil-mep-reports/${id}`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/civil-mep-reports-stats"] });
       toast({ title: "Civil+MEP report updated successfully" });
-      navigate("/admin-panel/reports");
+      navigate("/admin-panel/civil-mep-reports");
     },
     onError: (error: any) => {
       toast({
@@ -503,9 +504,9 @@ export default function CivilMepReportsEdit() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/admin-panel/reports")}>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/admin-panel/civil-mep-reports")}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Reports
+              Back to Civil+MEP Reports
             </Button>
             <div>
               <h1 className="text-2xl font-bold">Edit Civil+MEP Report</h1>
