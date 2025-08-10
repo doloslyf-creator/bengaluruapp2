@@ -12,7 +12,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { MapPin, Building, FileText, User, Mail, Phone, MessageCircle, CreditCard, Lock, BarChart3 } from 'lucide-react';
+import { MapPin, Building, FileText, User, Mail, Phone, MessageCircle, CreditCard, Lock } from 'lucide-react';
 
 const orderFormSchema = z.object({
   customerName: z.string().min(2, 'Name must be at least 2 characters'),
@@ -53,20 +53,6 @@ const reportTypeDetails = {
       'Quality Standards Verification',
       'Compliance Check',
       'Risk Assessment Report'
-    ],
-    sampleData: [
-      { label: 'Foundation Quality Score', value: '8.5/10', status: 'good' },
-      { label: 'Structural Integrity Rating', value: 'A-Grade', status: 'excellent' },
-      { label: 'Electrical Load Capacity', value: '45 KVA', status: 'adequate' },
-      { label: 'Water Pressure (Ground Floor)', value: '2.8 Bar', status: 'good' },
-      { label: 'Fire Safety Compliance', value: '95% Compliant', status: 'excellent' },
-      { label: 'Ventilation Efficiency', value: '7.2/10', status: 'good' },
-      { label: 'Plumbing Grade', value: 'Premium Grade', status: 'excellent' },
-      { label: 'Construction Quality Index', value: '82/100', status: 'good' },
-      { label: 'MEP Systems Integration', value: 'Fully Integrated', status: 'excellent' },
-      { label: 'Overall Engineering Score', value: '8.1/10', status: 'good' },
-      { label: 'Safety Standards Compliance', value: '98%', status: 'excellent' },
-      { label: 'Material Quality Rating', value: 'Grade A', status: 'excellent' }
     ]
   },
   'valuation': {
@@ -81,20 +67,6 @@ const reportTypeDetails = {
       'Rental Yield Calculation',
       'Appreciation Projection',
       'Risk Analysis Report'
-    ],
-    sampleData: [
-      { label: 'Current Market Value', value: '₹2.45 Cr', status: 'assessed' },
-      { label: 'Price Per Sq Ft', value: '₹12,250', status: 'competitive' },
-      { label: 'Expected Annual Appreciation', value: '8.5%', status: 'good' },
-      { label: 'Rental Yield Potential', value: '3.2%', status: 'good' },
-      { label: 'Investment Grade Rating', value: 'A-', status: 'excellent' },
-      { label: 'Market Liquidity Index', value: '7.8/10', status: 'good' },
-      { label: 'Capital Gains Forecast (5Y)', value: '45-52%', status: 'good' },
-      { label: 'Comparable Sales Price Range', value: '₹2.1-2.8 Cr', status: 'verified' },
-      { label: 'Location Premium Factor', value: '15%', status: 'premium' },
-      { label: 'Risk Assessment Score', value: 'Low Risk', status: 'excellent' },
-      { label: 'Market Demand Index', value: '8.3/10', status: 'good' },
-      { label: 'Investment Recommendation', value: 'Strong Buy', status: 'excellent' }
     ]
   }
 };
@@ -191,52 +163,6 @@ export default function OrderFormDialog({
                       <li key={index}>{feature}</li>
                     ))}
                   </ul>
-                </div>
-              </div>
-
-              <Separator className="my-4" />
-
-              {/* Sample Data Preview */}
-              <div className="mb-6">
-                <h4 className="font-semibold mb-3 flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4" />
-                  Sample Report Data
-                </h4>
-                <div className="text-xs text-gray-600 mb-3">
-                  Preview of actual data points you'll receive in your report
-                </div>
-                <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {report.sampleData.slice(0, 8).map((item, index) => (
-                    <div key={index} className="flex justify-between items-center py-1 text-sm">
-                      <span className="text-gray-600">{item.label}</span>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{item.value}</span>
-                        <Badge 
-                          variant={
-                            item.status === 'excellent' ? 'default' :
-                            item.status === 'good' ? 'secondary' :
-                            item.status === 'adequate' ? 'outline' :
-                            'secondary'
-                          }
-                          className={`text-xs h-5 ${
-                            item.status === 'excellent' ? 'bg-green-100 text-green-700' :
-                            item.status === 'good' ? 'bg-blue-100 text-blue-700' :
-                            item.status === 'adequate' ? 'bg-yellow-100 text-yellow-700' :
-                            'bg-gray-100 text-gray-700'
-                          }`}
-                        >
-                          {item.status}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                  {report.sampleData.length > 8 && (
-                    <div className="text-center py-2">
-                      <span className="text-xs text-gray-500">
-                        +{report.sampleData.length - 8} more data points in full report
-                      </span>
-                    </div>
-                  )}
                 </div>
               </div>
 
