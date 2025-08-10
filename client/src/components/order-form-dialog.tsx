@@ -28,7 +28,7 @@ interface OrderFormDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (orderData: OrderFormData) => void;
-  property: {
+  property?: {
     id: string;
     name: string;
     area: string;
@@ -36,8 +36,10 @@ interface OrderFormDialogProps {
     developer?: string;
     type: string;
   };
+  propertyName?: string;
+  propertyArea?: string;
   reportType: 'civil-mep' | 'valuation';
-  isProcessing?: boolean;
+  loading?: boolean;
 }
 
 const reportTypeDetails = {
@@ -78,8 +80,10 @@ export default function OrderFormDialog({
   onClose, 
   onSubmit, 
   property, 
+  propertyName,
+  propertyArea,
   reportType, 
-  isProcessing = false 
+  loading = false 
 }: OrderFormDialogProps) {
   const report = reportTypeDetails[reportType];
   const totalAmount = report.price;
@@ -121,16 +125,16 @@ export default function OrderFormDialog({
               <div className="space-y-3 mb-6">
                 <div>
                   <Label className="text-sm font-medium text-gray-600">Property Name</Label>
-                  <div className="font-semibold">{property.name}</div>
+                  <div className="font-semibold">{propertyName || property?.name || 'N/A'}</div>
                 </div>
                 <div>
                   <Label className="text-sm font-medium text-gray-600">Location</Label>
                   <div className="flex items-center gap-1">
                     <MapPin className="h-4 w-4 text-gray-500" />
-                    <span>{property.area}, {property.zone}</span>
+                    <span>{propertyArea || property?.area || 'N/A'}, {property?.zone || 'N/A'}</span>
                   </div>
                 </div>
-                {property.developer && (
+                {property?.developer && (
                   <div>
                     <Label className="text-sm font-medium text-gray-600">Developer</Label>
                     <div>{property.developer}</div>
@@ -138,7 +142,7 @@ export default function OrderFormDialog({
                 )}
                 <div>
                   <Label className="text-sm font-medium text-gray-600">Property Type</Label>
-                  <Badge variant="outline">{property.type}</Badge>
+                  <Badge variant="outline">{property?.type || 'N/A'}</Badge>
                 </div>
               </div>
 
@@ -272,10 +276,10 @@ export default function OrderFormDialog({
                   <Button 
                     type="submit" 
                     className="flex-1" 
-                    disabled={isProcessing}
+                    disabled={loading}
                   >
                     <CreditCard className="h-4 w-4 mr-2" />
-                    {isProcessing ? 'Processing...' : `Proceed to Payment - ₹${totalAmount.toLocaleString()}`}
+                    {loading ? 'Processing...' : `Proceed to Payment - ₹${totalAmount.toLocaleString()}`}
                   </Button>
                 </div>
               </form>
