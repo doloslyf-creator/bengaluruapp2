@@ -1,7 +1,7 @@
-import { 
-  type Property, 
-  type InsertProperty, 
-  type PropertyStats, 
+import {
+  type Property,
+  type InsertProperty,
+  type PropertyStats,
   type PropertyConfiguration,
   type InsertPropertyConfiguration,
   type PropertyWithConfigurations,
@@ -65,13 +65,13 @@ import {
   type CivilMepReportWithAssignments,
   type LegalAuditReportWithAssignments,
   type PropertyValuationReportWithAssignments,
-  properties, 
+  properties,
   propertyConfigurations,
   propertyScores,
   cities,
   zones,
-  leads, 
-  leadActivities, 
+  leads,
+  leadActivities,
   leadNotes,
   leadTimeline,
   leadDocuments,
@@ -766,8 +766,8 @@ export class MemStorage implements IStorage {
     const reraApproved = properties.filter(p => p.reraApproved).length;
 
     // Calculate average price from configurations
-    const avgPrice = configurations.length > 0 
-      ? Math.round(configurations.reduce((sum, c) => sum + c.price, 0) / configurations.length * 10) / 10 
+    const avgPrice = configurations.length > 0
+      ? Math.round(configurations.reduce((sum, c) => sum + c.price, 0) / configurations.length * 10) / 10
       : 156.2; // Default average for sample data
 
     return {
@@ -939,7 +939,7 @@ export class MemStorage implements IStorage {
     const closedWon = leads.filter(l => l.status === "closed-won").length;
     const conversionRate = totalLeads > 0 ? Math.round((closedWon / totalLeads) * 100) : 0;
 
-    const avgLeadScore = leads.length > 0 
+    const avgLeadScore = leads.length > 0
       ? Math.round(leads.reduce((sum, l) => sum + (l.leadScore || 0), 0) / leads.length)
       : 0;
 
@@ -997,9 +997,9 @@ export class MemStorage implements IStorage {
 
   // Lead scoring and qualification
   async updateLeadScore(leadId: string, score: number, notes?: string): Promise<Lead | undefined> {
-    const updated = await this.updateLead(leadId, { 
+    const updated = await this.updateLead(leadId, {
       leadScore: score,
-      qualificationNotes: notes || (await this.getLead(leadId))?.qualificationNotes 
+      qualificationNotes: notes || (await this.getLead(leadId))?.qualificationNotes
     });
 
     if (notes && updated) {
@@ -1021,7 +1021,7 @@ export class MemStorage implements IStorage {
     const newStatus = qualified ? "qualified" : "new";
     const newLeadType = qualified ? "hot" : "cold";
 
-    const updated = await this.updateLead(leadId, { 
+    const updated = await this.updateLead(leadId, {
       status: newStatus,
       leadType: newLeadType,
       qualificationNotes: notes
@@ -1065,7 +1065,7 @@ export class MemStorage implements IStorage {
     }
 
     if (filters.smartTags && filters.smartTags.length > 0) {
-      filteredLeads = filteredLeads.filter(lead => 
+      filteredLeads = filteredLeads.filter(lead =>
         lead.smartTags && filters.smartTags!.some(tag => lead.smartTags!.includes(tag))
       );
     }
@@ -1315,7 +1315,7 @@ export class MemStorage implements IStorage {
 
 
 
-  // Civil+MEP Report operations - MemStorage stub implementations  
+  // Civil+MEP Report operations - MemStorage stub implementations
   async createCivilMepReport(report: InsertCivilMepReport): Promise<CivilMepReport> {
     throw new Error("Civil+MEP reports not implemented in MemStorage");
   }
@@ -1357,7 +1357,7 @@ export class MemStorage implements IStorage {
     };
   }
 
-  // Legal Audit Report operations - MemStorage stub implementations  
+  // Legal Audit Report operations - MemStorage stub implementations
   async createLegalAuditReport(report: InsertLegalAuditReport): Promise<LegalAuditReport> {
     throw new Error("Legal Audit reports not implemented in MemStorage");
   }
@@ -1620,7 +1620,7 @@ export class DatabaseStorage implements IStorage {
       // Delete property configurations
       await this.db.delete(propertyConfigurations).where(eq(propertyConfigurations.propertyId, id));
 
-      // Delete property scores 
+      // Delete property scores
       await this.db.delete(propertyScores).where(eq(propertyScores.propertyId, id));
 
       // Delete report payments that reference this property
@@ -1642,29 +1642,29 @@ export class DatabaseStorage implements IStorage {
   // Property Scoring operations
   async createPropertyScore(insertScore: InsertPropertyScore): Promise<PropertyScore> {
     // Calculate totals
-    const locationTotal = (insertScore.transportConnectivity || 0) + 
-                         (insertScore.infrastructureDevelopment || 0) + 
-                         (insertScore.socialInfrastructure || 0) + 
+    const locationTotal = (insertScore.transportConnectivity || 0) +
+                         (insertScore.infrastructureDevelopment || 0) +
+                         (insertScore.socialInfrastructure || 0) +
                          (insertScore.employmentHubs || 0);
 
-    const amenitiesTotal = (insertScore.basicAmenities || 0) + 
-                          (insertScore.lifestyleAmenities || 0) + 
+    const amenitiesTotal = (insertScore.basicAmenities || 0) +
+                          (insertScore.lifestyleAmenities || 0) +
                           (insertScore.modernFeatures || 0);
 
-    const legalTotal = (insertScore.reraCompliance || 0) + 
-                      (insertScore.titleClarity || 0) + 
+    const legalTotal = (insertScore.reraCompliance || 0) +
+                      (insertScore.titleClarity || 0) +
                       (insertScore.approvals || 0);
 
-    const valueTotal = (insertScore.priceCompetitiveness || 0) + 
-                      (insertScore.appreciationPotential || 0) + 
+    const valueTotal = (insertScore.priceCompetitiveness || 0) +
+                      (insertScore.appreciationPotential || 0) +
                       (insertScore.rentalYield || 0);
 
-    const developerTotal = (insertScore.trackRecord || 0) + 
-                          (insertScore.financialStability || 0) + 
+    const developerTotal = (insertScore.trackRecord || 0) +
+                          (insertScore.financialStability || 0) +
                           (insertScore.customerSatisfaction || 0);
 
-    const constructionTotal = (insertScore.structuralQuality || 0) + 
-                             (insertScore.finishingStandards || 0) + 
+    const constructionTotal = (insertScore.structuralQuality || 0) +
+                             (insertScore.finishingStandards || 0) +
                              (insertScore.maintenanceStandards || 0);
 
     const overallTotal = locationTotal + amenitiesTotal + legalTotal + valueTotal + developerTotal + constructionTotal;
@@ -1722,29 +1722,29 @@ export class DatabaseStorage implements IStorage {
     const mergedScore = { ...currentScore, ...updates };
 
     // Recalculate totals
-    const locationTotal = (mergedScore.transportConnectivity || 0) + 
-                         (mergedScore.infrastructureDevelopment || 0) + 
-                         (mergedScore.socialInfrastructure || 0) + 
+    const locationTotal = (mergedScore.transportConnectivity || 0) +
+                         (mergedScore.infrastructureDevelopment || 0) +
+                         (mergedScore.socialInfrastructure || 0) +
                          (mergedScore.employmentHubs || 0);
 
-    const amenitiesTotal = (mergedScore.basicAmenities || 0) + 
-                          (mergedScore.lifestyleAmenities || 0) + 
+    const amenitiesTotal = (mergedScore.basicAmenities || 0) +
+                          (mergedScore.lifestyleAmenities || 0) +
                           (mergedScore.modernFeatures || 0);
 
-    const legalTotal = (mergedScore.reraCompliance || 0) + 
-                      (mergedScore.titleClarity || 0) + 
+    const legalTotal = (mergedScore.reraCompliance || 0) +
+                      (mergedScore.titleClarity || 0) +
                       (mergedScore.approvals || 0);
 
-    const valueTotal = (mergedScore.priceCompetitiveness || 0) + 
-                      (mergedScore.appreciationPotential || 0) + 
+    const valueTotal = (mergedScore.priceCompetitiveness || 0) +
+                      (mergedScore.appreciationPotential || 0) +
                       (mergedScore.rentalYield || 0);
 
-    const developerTotal = (mergedScore.trackRecord || 0) + 
-                          (mergedScore.financialStability || 0) + 
+    const developerTotal = (mergedScore.trackRecord || 0) +
+                          (mergedScore.financialStability || 0) +
                           (mergedScore.customerSatisfaction || 0);
 
-    const constructionTotal = (mergedScore.structuralQuality || 0) + 
-                             (mergedScore.finishingStandards || 0) + 
+    const constructionTotal = (mergedScore.structuralQuality || 0) +
+                             (mergedScore.finishingStandards || 0) +
                              (mergedScore.maintenanceStandards || 0);
 
     const overallTotal = locationTotal + amenitiesTotal + legalTotal + valueTotal + developerTotal + constructionTotal;
@@ -1845,9 +1845,9 @@ export class DatabaseStorage implements IStorage {
   async searchProperties(query: string): Promise<Property[]> {
     return await this.db.select().from(properties)
       .where(
-        sql`${properties.name} ILIKE ${`%${query}%`} OR 
-            ${properties.developer} ILIKE ${`%${query}%`} OR 
-            ${properties.area} ILIKE ${`%${query}%`} OR 
+        sql`${properties.name} ILIKE ${`%${query}%`} OR
+            ${properties.developer} ILIKE ${`%${query}%`} OR
+            ${properties.area} ILIKE ${`%${query}%`} OR
             ${properties.address} ILIKE ${`%${query}%`}`
       )
       .orderBy(desc(properties.createdAt));
@@ -2130,10 +2130,26 @@ export class DatabaseStorage implements IStorage {
 
   // Property Valuation Report operations
   async createValuationReport(report: InsertPropertyValuationReport): Promise<PropertyValuationReport> {
-    const [newReport] = await this.db.insert(propertyValuationReports)
-      .values(report)
-      .returning();
-    return newReport;
+    try {
+      console.log("Creating Property Valuation report with data:", report);
+
+      // Remove fields that don't exist in database schema
+      const {
+        assignedCustomerIds,
+        customerAssignments,
+        ...reportData
+      } = report as any;
+
+      const [newReport] = await this.db.insert(propertyValuationReports)
+        .values(reportData)
+        .returning();
+
+      console.log("Successfully created Property Valuation report:", newReport);
+      return newReport;
+    } catch (error) {
+      console.error("Error creating valuation report:", error);
+      throw error;
+    }
   }
 
   async getValuationReport(reportId: string): Promise<PropertyValuationReport | undefined> {
@@ -2204,7 +2220,7 @@ export class DatabaseStorage implements IStorage {
 
     // Calculate average estimated value
     const reportsWithValue = allReports.filter(r => r.estimatedMarketValue);
-    const averageValue = reportsWithValue.length > 0 
+    const averageValue = reportsWithValue.length > 0
       ? reportsWithValue.reduce((sum, r) => sum + Number(r.estimatedMarketValue || 0), 0) / reportsWithValue.length
       : 0;
 
@@ -2286,17 +2302,17 @@ export class DatabaseStorage implements IStorage {
     const allPayments = await this.db.select().from(reportPayments);
     const now = new Date();
 
-    const overduePayments = allPayments.filter(p => 
-      p.paymentStatus === 'pay-later-pending' && 
-      p.payLaterDueDate && 
+    const overduePayments = allPayments.filter(p =>
+      p.paymentStatus === 'pay-later-pending' &&
+      p.payLaterDueDate &&
       new Date(p.payLaterDueDate) < now
     );
 
     return {
       totalOrders: allPayments.length,
-      pendingPayments: allPayments.filter(p => 
-        p.paymentStatus === 'pending' || 
-        p.paymentStatus === 'processing' || 
+      pendingPayments: allPayments.filter(p =>
+        p.paymentStatus === 'pending' ||
+        p.paymentStatus === 'processing' ||
         p.paymentStatus === 'pay-later-pending'
       ).length,
       completedPayments: allPayments.filter(p => p.paymentStatus === 'completed').length,
@@ -2309,7 +2325,7 @@ export class DatabaseStorage implements IStorage {
   async getAllCustomersWithDetails(): Promise<any[]> {
     // Get unique customers from leads, bookings, and orders
     const allLeads = await this.db.select().from(leads);
-    const allBookings = await this.db.select().from(bookings);  
+    const allBookings = await this.db.select().from(bookings);
     const payments = await this.db.select().from(reportPayments);
 
     const customerMap = new Map();
@@ -2405,7 +2421,7 @@ export class DatabaseStorage implements IStorage {
       }
     }
 
-    return Array.from(customerMap.values()).sort((a, b) => 
+    return Array.from(customerMap.values()).sort((a, b) =>
       new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime()
     );
   }
@@ -2449,31 +2465,31 @@ export class DatabaseStorage implements IStorage {
 
     // Update leads
     await this.db.update(leads)
-      .set({ 
-        customerName: name, 
+      .set({
+        customerName: name,
         email: email,
         phone: phone || null,
-        updatedAt: new Date() 
+        updatedAt: new Date()
       })
       .where(or(eq(leads.email, customerId), eq(leads.phone, customerId)));
 
     // Update bookings
     await this.db.update(bookings)
-      .set({ 
-        customerName: name, 
+      .set({
+        customerName: name,
         customerEmail: email,
         customerPhone: phone || null,
-        updatedAt: new Date() 
+        updatedAt: new Date()
       })
       .where(or(eq(bookings.customerEmail, customerId), eq(bookings.customerPhone, customerId)));
 
     // Update report payments
     await this.db.update(reportPayments)
-      .set({ 
-        customerName: name, 
+      .set({
+        customerName: name,
         customerEmail: email,
         customerPhone: phone || null,
-        updatedAt: new Date() 
+        updatedAt: new Date()
       })
       .where(or(eq(reportPayments.customerEmail, customerId), eq(reportPayments.customerPhone, customerId)));
 
@@ -2641,11 +2657,27 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Civil+MEP Report operations
-  async createCivilMepReport(report: InsertCivilMepReport): Promise<CivilMepReport> {
-    const [newReport] = await this.db.insert(civilMepReports)
-      .values(report)
-      .returning();
-    return newReport;
+  async createCivilMepReport(insertReport: InsertCivilMepReport): Promise<CivilMepReport> {
+    try {
+      console.log("Creating Civil+MEP report with data:", insertReport);
+
+      // Remove fields that don't exist in database schema
+      const {
+        assignedCustomerIds,
+        customerAssignments,
+        ...reportData
+      } = insertReport as any;
+
+      const [report] = await this.db.insert(civilMepReports)
+        .values(reportData)
+        .returning();
+
+      console.log("Successfully created Civil+MEP report:", report);
+      return report;
+    } catch (error) {
+      console.error("Error creating Civil+MEP report in storage:", error);
+      throw error;
+    }
   }
 
   async getCivilMepReport(reportId: string): Promise<CivilMepReport | undefined> {
@@ -2695,8 +2727,8 @@ export class DatabaseStorage implements IStorage {
       const draftReports = reports.filter(r => r.status === "draft").length;
       const approvedReports = reports.filter(r => r.status === "approved").length;
 
-      const avgScore = reports.length > 0 
-        ? reports.reduce((sum, r) => sum + (r.overallScore || 0), 0) / reports.length 
+      const avgScore = reports.length > 0
+        ? reports.reduce((sum, r) => sum + (r.overallScore || 0), 0) / reports.length
         : 0;
 
       // Group by investment recommendation
@@ -2736,11 +2768,27 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Legal Audit Report operations
-  async createLegalAuditReport(report: InsertLegalAuditReport): Promise<LegalAuditReport> {
-    const [newReport] = await this.db.insert(legalAuditReports)
-      .values(report)
-      .returning();
-    return newReport;
+  async createLegalAuditReport(insertReport: InsertLegalAuditReport): Promise<LegalAuditReport> {
+    try {
+      console.log("Creating Legal Audit report with data:", insertReport);
+
+      // Remove fields that don't exist in database schema
+      const {
+        assignedCustomerIds,
+        customerAssignments,
+        ...reportData
+      } = insertReport as any;
+
+      const [report] = await this.db.insert(legalAuditReports)
+        .values(reportData)
+        .returning();
+
+      console.log("Successfully created Legal Audit report:", report);
+      return report;
+    } catch (error) {
+      console.error("Error creating Legal Audit report:", error);
+      throw error;
+    }
   }
 
   async getLegalAuditReport(reportId: string): Promise<LegalAuditReport | undefined> {
@@ -2783,8 +2831,8 @@ export class DatabaseStorage implements IStorage {
     const draftReports = reports.filter(r => r.status === "draft").length;
     const approvedReports = reports.filter(r => r.status === "approved").length;
 
-    const avgScore = reports.length > 0 
-      ? reports.reduce((sum, r) => sum + (r.overallScore || 0), 0) / reports.length 
+    const avgScore = reports.length > 0
+      ? reports.reduce((sum, r) => sum + (r.overallScore || 0), 0) / reports.length
       : 0;
 
     // Group by risk level
@@ -2848,8 +2896,8 @@ export class DatabaseStorage implements IStorage {
     const allDevelopers = await this.getAllDevelopers();
     const activeDevelopers = allDevelopers.filter(d => d.isActive).length;
     const totalProjects = allDevelopers.reduce((sum, d) => sum + (d.totalProjects || 0), 0);
-    const avgRating = allDevelopers.length > 0 
-      ? allDevelopers.reduce((sum, d) => sum + parseFloat(d.averageRating || "0"), 0) / allDevelopers.length 
+    const avgRating = allDevelopers.length > 0
+      ? allDevelopers.reduce((sum, d) => sum + parseFloat(d.averageRating || "0"), 0) / allDevelopers.length
       : 0;
 
     return {

@@ -1051,6 +1051,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
 
+  // Create Property Valuation Report
+  app.post("/api/valuation-reports", async (req, res) => {
+    try {
+      console.log("Received Property Valuation report creation request:", req.body);
+      
+      const validation = insertPropertyValuationReportSchema.safeParse(req.body);
+      if (!validation.success) {
+        console.log("Valuation report validation failed:", validation.error);
+        return res.status(400).json({ 
+          error: "Invalid report data", 
+          details: validation.error.format() 
+        });
+      }
+
+      const report = await storage.createValuationReport(validation.data);
+      console.log(`💰 Property Valuation report created successfully: ${report.reportTitle || 'New Report'}`);
+      res.status(201).json(report);
+    } catch (error) {
+      console.error("Error creating Property Valuation report:", error);
+      res.status(500).json({ 
+        error: "Failed to create Property Valuation report",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
   // Property Valuation Report pay later endpoint
   app.post("/api/valuation-reports/pay-later", async (req, res) => {
     try {
@@ -1506,8 +1532,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Civil+MEP Reports API - Complete CRUD operations
   app.post("/api/civil-mep-reports", async (req, res) => {
     try {
+      console.log("Received Civil+MEP report creation request:", req.body);
+      
       const validation = insertCivilMepReportSchema.safeParse(req.body);
       if (!validation.success) {
+        console.log("Validation failed:", validation.error);
         return res.status(400).json({ 
           error: "Invalid report data", 
           details: validation.error.format() 
@@ -1515,7 +1544,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const report = await storage.createCivilMepReport(validation.data);
-      console.log(`📋 Civil+MEP report created: ${report.reportTitle || 'New Report'}`);
+      console.log(`📋 Civil+MEP report created successfully: ${report.reportTitle || 'New Report'}`);
       res.status(201).json(report);
     } catch (error) {
       console.error("Error creating Civil+MEP report:", error);
@@ -1632,8 +1661,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Legal Audit Reports API - Complete CRUD operations
   app.post("/api/legal-audit-reports", async (req, res) => {
     try {
+      console.log("Received Legal Audit report creation request:", req.body);
+      
       const validation = insertLegalAuditReportSchema.safeParse(req.body);
       if (!validation.success) {
+        console.log("Legal Audit validation failed:", validation.error);
         return res.status(400).json({ 
           error: "Invalid report data", 
           details: validation.error.format() 
@@ -1641,10 +1673,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const report = await storage.createLegalAuditReport(validation.data);
+      console.log(`⚖️ Legal Audit report created successfully: ${report.reportTitle || 'New Report'}`);
       res.status(201).json(report);
     } catch (error) {
       console.error("Error creating Legal Audit report:", error);
-      res.status(500).json({ error: "Failed to create Legal Audit report" });
+      res.status(500).json({ 
+        error: "Failed to create Legal Audit report",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 

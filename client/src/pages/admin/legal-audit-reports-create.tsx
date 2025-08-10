@@ -292,18 +292,32 @@ export default function AdminLegalAuditReportsCreate() {
   });
 
   const onSubmit = (data: FormData) => {
+    // Clean and prepare data for submission
     const submitData = {
-      ...data,
-      // Ensure nested objects are properly structured
-      currentOwnership: JSON.stringify(data.currentOwnership),
-      titleVerification: JSON.stringify(data.titleVerification),
-      statutoryApprovals: JSON.stringify(data.statutoryApprovals),
-      taxCompliance: JSON.stringify(data.taxCompliance),
-      litigationHistory: JSON.stringify(data.litigationHistory),
-      complianceStatus: JSON.stringify(data.complianceStatus),
+      propertyId: data.propertyId,
+      reportTitle: data.reportTitle,
+      lawyerName: data.lawyerName,
+      lawyerBarNumber: data.lawyerBarNumber,
+      auditDate: data.auditDate,
+      reportDate: data.reportDate,
+      status: data.status,
+      overallScore: Number(data.overallScore) || 0,
+      riskLevel: data.riskLevel,
+      executiveSummary: data.executiveSummary || "",
+      keyFindings: data.keyFindings || "",
+      recommendations: data.recommendations || "",
+      legalConclusion: data.legalConclusion || "",
+      // Store complex objects as JSON strings
+      currentOwnership: JSON.stringify(data.currentOwnership || {}),
+      titleVerification: JSON.stringify(data.titleVerification || {}),
+      statutoryApprovals: JSON.stringify(data.statutoryApprovals || {}),
+      taxCompliance: JSON.stringify(data.taxCompliance || {}),
+      litigationHistory: JSON.stringify(data.litigationHistory || {}),
+      complianceStatus: JSON.stringify(data.complianceStatus || {}),
     };
     
-    saveReportMutation.mutate(submitData as any);
+    console.log("Submitting Legal Audit report data:", submitData);
+    saveReportMutation.mutate(submitData);
   };
 
   if (isLoadingReport || isLoadingProperties) {

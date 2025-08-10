@@ -214,7 +214,7 @@ export function AdminCivilMepReportsCreate() {
     console.log("Form submitted with data:", data);
     setShouldRedirect(redirect);
     
-    // Keep date strings as strings for submission
+    // Clean and prepare data for submission
     const submitData = {
       propertyId: data.propertyId,
       reportTitle: data.reportTitle,
@@ -223,32 +223,34 @@ export function AdminCivilMepReportsCreate() {
       inspectionDate: data.inspectionDate,
       reportDate: data.reportDate,
       status: data.status,
-      overallScore: data.overallScore,
-      executiveSummary: data.executiveSummary,
-      recommendations: data.recommendations,
-      conclusions: data.conclusions,
+      overallScore: Number(data.overallScore) || 0,
+      executiveSummary: data.executiveSummary || "",
+      recommendations: data.recommendations || "",
+      conclusions: data.conclusions || "",
       investmentRecommendation: data.investmentRecommendation,
-      siteLocation: data.siteLocation,
-      plotArea: data.plotArea,
-      builtUpArea: data.builtUpArea,
-      foundationType: data.foundationType,
-      structuralSystem: data.structuralSystem,
-      concreteGrade: data.concreteGrade,
-      steelGrade: data.steelGrade,
-      structuralCondition: data.structuralCondition,
-      wallMaterial: data.wallMaterial,
-      roofType: data.roofType,
-      electricalLoad: data.electricalLoad,
-      plumbingType: data.plumbingType,
-      hvacSystem: data.hvacSystem,
-      fireSafetyGrade: data.fireSafetyGrade,
-      civilNotes: data.civilNotes,
-      mechanicalNotes: data.mechanicalNotes,
-      electricalNotes: data.electricalNotes,
-      plumbingNotes: data.plumbingNotes,
+      // Site and structural data as strings
+      siteLocation: data.siteLocation || "",
+      plotArea: data.plotArea || "",
+      builtUpArea: data.builtUpArea || "",
+      foundationType: data.foundationType || "",
+      structuralSystem: data.structuralSystem || "",
+      concreteGrade: data.concreteGrade || "",
+      steelGrade: data.steelGrade || "",
+      structuralCondition: data.structuralCondition || "",
+      wallMaterial: data.wallMaterial || "",
+      roofType: data.roofType || "",
+      electricalLoad: data.electricalLoad || "",
+      plumbingType: data.plumbingType || "",
+      hvacSystem: data.hvacSystem || "",
+      fireSafetyGrade: data.fireSafetyGrade || "",
+      // Notes sections
+      civilNotes: data.civilNotes || "",
+      mechanicalNotes: data.mechanicalNotes || "",
+      electricalNotes: data.electricalNotes || "",
+      plumbingNotes: data.plumbingNotes || "",
     };
     
-    console.log("Submitting data to API:", submitData);
+    console.log("Submitting cleaned data to API:", submitData);
     saveReportMutation.mutate(submitData);
   };
 

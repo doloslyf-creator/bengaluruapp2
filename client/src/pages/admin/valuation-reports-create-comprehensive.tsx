@@ -34,22 +34,46 @@ export default function ValuationReportsCreateComprehensive() {
 
   // Create report mutation
   const createReportMutation = useMutation({
-    mutationFn: async (data: any) => {
-      return await apiRequest("POST", "/api/valuation-reports", data);
+    mutationFn: async (reportData: any) => {
+      console.log("Creating valuation report with data:", reportData);
+
+      // Clean up the data before sending
+      const cleanData = {
+        ...reportData,
+        // Ensure numeric fields are properly formatted
+        overallScore: reportData.overallScore ? String(reportData.overallScore) : "0.0",
+        // Ensure dates are strings
+        reportDate: reportData.reportDate || new Date().toISOString().split('T')[0],
+        // Remove any undefined or null values
+        ...Object.fromEntries(
+          Object.entries(reportData).filter(([_, v]) => v !== undefined && v !== null)
+        )
+      };
+
+      const response = await fetch("/api/valuation-reports", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(cleanData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("API error response:", error);
+        throw new Error(error.error || "Failed to create report");
+      }
+
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/valuation-reports"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/valuation-reports/stats"] });
-      toast({
-        title: "Success",
-        description: "Valuation report created successfully",
-      });
+      toast({ title: "Valuation report created successfully" });
       navigate("/admin-panel/valuation-reports");
     },
     onError: (error: any) => {
+      console.error("Error creating valuation report:", error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to create valuation report",
+        title: "Error creating valuation report",
+        description: error.message,
         variant: "destructive",
       });
     },
@@ -77,7 +101,7 @@ export default function ValuationReportsCreateComprehensive() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    
+
     const reportData = {
       // Basic Information
       propertyId: formData.get("propertyId") as string,
@@ -86,7 +110,7 @@ export default function ValuationReportsCreateComprehensive() {
       assignedTo: formData.get("assignedTo") as string,
       createdBy: "admin",
       customerId: null, // Will be assigned later
-      
+
       // 1. Executive Summary
       projectName: formData.get("projectName") as string,
       towerUnit: formData.get("towerUnit") as string,
@@ -97,7 +121,7 @@ export default function ValuationReportsCreateComprehensive() {
       appreciationOutlook: formData.get("appreciationOutlook") as string,
       riskScore: formData.get("riskScore") ? parseInt(formData.get("riskScore") as string) : 0,
       recommendation: formData.get("recommendation") as string,
-      
+
       // 2. Property Profile
       unitType: formData.get("unitType") as string,
       configuration: formData.get("configuration") as string,
@@ -109,7 +133,7 @@ export default function ValuationReportsCreateComprehensive() {
       khataType: formData.get("khataType") as string,
       landTitleStatus: formData.get("landTitleStatus") as string,
       builderReputationScore: formData.get("builderReputationScore") as string,
-      
+
       // 3. Market Valuation Estimate
       builderQuotedPrice: formData.get("builderQuotedPrice") as string,
       totalEstimatedValue: formData.get("totalEstimatedValue") as string,
@@ -118,13 +142,13 @@ export default function ValuationReportsCreateComprehensive() {
       constructionValue: formData.get("constructionValue") as string,
       guidanceValueZoneRate: formData.get("guidanceValueZoneRate") as string,
       marketPremiumDiscount: formData.get("marketPremiumDiscount") as string,
-      
+
       // 4. Comparable Sales Analysis
       comparableSales: parseJsonField(formData.get("comparableSales") as string),
       benchmarkingSources: formData.get("benchmarkingSources") as string,
       volatilityIndex: formData.get("volatilityIndex") as string,
       averageDaysOnMarket: formData.get("averageDaysOnMarket") ? parseInt(formData.get("averageDaysOnMarket") as string) : null,
-      
+
       // 5. Location & Infrastructure Assessment
       planningAuthority: formData.get("planningAuthority") as string,
       zonalClassification: formData.get("zonalClassification") as string,
@@ -134,7 +158,7 @@ export default function ValuationReportsCreateComprehensive() {
       drainage: formData.get("drainage") as string,
       socialInfrastructure: formData.get("socialInfrastructure") as string,
       futureInfrastructure: parseJsonField(formData.get("futureInfrastructure") as string),
-      
+
       // 6. Legal & Compliance Snapshot
       reraRegistration: formData.get("reraRegistration") as string,
       khataVerification: formData.get("khataVerification") as string,
@@ -143,14 +167,14 @@ export default function ValuationReportsCreateComprehensive() {
       planApproval: formData.get("planApproval") as string,
       loanApproval: parseJsonField(formData.get("loanApproval") as string),
       titleClarityNotes: formData.get("titleClarityNotes") as string,
-      
+
       // 7. Rental & Yield Potential
       expectedMonthlyRent: formData.get("expectedMonthlyRent") as string,
       grossRentalYield: formData.get("grossRentalYield") as string,
       tenantDemand: formData.get("tenantDemand") as string,
       exitLiquidity: formData.get("exitLiquidity") as string,
       yieldScore: formData.get("yieldScore") as string,
-      
+
       // 8. Cost Sheet Breakdown
       baseUnitCost: formData.get("baseUnitCost") as string,
       amenitiesCharges: formData.get("amenitiesCharges") as string,
@@ -159,11 +183,11 @@ export default function ValuationReportsCreateComprehensive() {
       stampDutyRegistration: formData.get("stampDutyRegistration") as string,
       totalAllInPrice: formData.get("totalAllInPrice") as string,
       khataTransferCosts: formData.get("khataTransferCosts") as string,
-      
+
       // 9. Pros & Cons Summary
       pros: parseArrayField(formData.get("pros") as string),
       cons: parseArrayField(formData.get("cons") as string),
-      
+
       // 10. Final Recommendation
       buyerTypeFit: formData.get("buyerTypeFit") as string,
       negotiationAdvice: formData.get("negotiationAdvice") as string,
@@ -171,7 +195,7 @@ export default function ValuationReportsCreateComprehensive() {
       appreciationOutlook5yr: formData.get("appreciationOutlook5yr") as string,
       exitPlan: formData.get("exitPlan") as string,
       overallScore: formData.get("overallScore") as string,
-      
+
       // Additional
       customNotes: formData.get("customNotes") as string,
     };
@@ -228,7 +252,7 @@ export default function ValuationReportsCreateComprehensive() {
                             </div>
                           </div>
                         </TabsTrigger>
-                        
+
                         <TabsTrigger 
                           value="property" 
                           className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
@@ -241,7 +265,7 @@ export default function ValuationReportsCreateComprehensive() {
                             </div>
                           </div>
                         </TabsTrigger>
-                        
+
                         <TabsTrigger 
                           value="market" 
                           className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
@@ -254,7 +278,7 @@ export default function ValuationReportsCreateComprehensive() {
                             </div>
                           </div>
                         </TabsTrigger>
-                        
+
                         <TabsTrigger 
                           value="location" 
                           className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
@@ -267,7 +291,7 @@ export default function ValuationReportsCreateComprehensive() {
                             </div>
                           </div>
                         </TabsTrigger>
-                        
+
                         <TabsTrigger 
                           value="legal" 
                           className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
@@ -280,7 +304,7 @@ export default function ValuationReportsCreateComprehensive() {
                             </div>
                           </div>
                         </TabsTrigger>
-                        
+
                         <TabsTrigger 
                           value="final" 
                           className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
@@ -1174,7 +1198,7 @@ export default function ValuationReportsCreateComprehensive() {
                       {/* Final Recommendation */}
                       <div>
                         <h3 className="text-md font-semibold mb-4">Final Investment Recommendation</h3>
-                        
+
                         <div>
                           <Label htmlFor="buyerTypeFit">Buyer Type Fit</Label>
                           <Select name="buyerTypeFit">
