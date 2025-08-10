@@ -7,12 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -110,10 +110,10 @@ export default function ValuationReportsCreateComprehensive() {
       console.log("Form data:", data);
 
       // Validate required fields
-      if (!data.propertyId || !data.reportTitle || !data.valuerId || !data.reportDate) {
+      if (!data.propertyId || !data.reportTitle || !data.createdBy || !data.reportDate) {
         toast({
           title: "Missing required fields",
-          description: "Please fill in Property ID, Report Title, Valuer ID, and Report Date",
+          description: "Please fill in Property ID, Report Title, Created By, and Report Date",
           variant: "destructive",
         });
         return;
@@ -122,25 +122,106 @@ export default function ValuationReportsCreateComprehensive() {
       setIsSubmitting(true);
 
       const reportData = {
+        // Basic Info
         propertyId: data.propertyId as string,
-        createdBy: data.valuerId as string,
         reportTitle: data.reportTitle as string,
-        reportVersion: data.reportVersion as string || "1.0",
-        reportDate: new Date(data.reportDate as string).toISOString(),
+        reportVersion: (data.reportVersion as string) || "1.0",
+        reportDate: data.reportDate ? new Date(data.reportDate as string) : new Date(),
+        createdBy: data.createdBy as string, // This is Valuer ID based on the prompt
+        assignedTo: data.assignedTo as string || null,
+        reportStatus: data.reportStatus as string || "draft",
+        projectName: data.projectName as string || null,
+        towerUnit: data.towerUnit as string || null,
+        estimatedMarketValue: data.estimatedMarketValue as string || null,
+        ratePerSqftSbaUds: data.ratePerSqftSbaUds as string || null,
+        buyerFit: data.buyerFit as string || null,
+        valuationVerdict: data.valuationVerdict as string || null,
+        appreciationOutlook: data.appreciationOutlook as string || null,
+        riskScore: data.riskScore as string || null,
+        recommendation: data.recommendation as string || null,
+
+        // Property Details
+        unitType: data.unitType as string || null,
+        configuration: data.configuration as string || null,
+        undividedLandShare: data.undividedLandShare as string || null,
+        facing: data.facing as string || null,
+        vastuCompliance: data.vastuCompliance as boolean || false,
+        ocCcStatus: data.ocCcStatus as string || null,
+        possessionStatus: data.possessionStatus as string || null,
+        khataType: data.khataType as string || null,
+        landTitleStatus: data.landTitleStatus as string || null,
+        builderReputationScore: data.builderReputationScore as string || null,
+
+        // Market Analysis
+        builderQuotedPrice: data.builderQuotedPrice as string || null,
+        totalEstimatedValue: data.totalEstimatedValue as string || null,
+        pricePerSqftAnalysis: data.pricePerSqftAnalysis as string || null,
+        landShareValue: data.landShareValue as string || null,
+        constructionValue: data.constructionValue as string || null,
+        guidanceValueZoneRate: data.guidanceValueZoneRate as string || null,
+        marketPremiumDiscount: data.marketPremiumDiscount as string || null,
+        comparableSales: parseJsonField(data.comparableSales as string) as any[] | null,
+        benchmarkingSources: data.benchmarkingSources as string || null,
+        volatilityIndex: data.volatilityIndex as string || null,
+        averageDaysOnMarket: data.averageDaysOnMarket ? parseInt(data.averageDaysOnMarket as string) : null,
+
+        // Location & Infrastructure
+        planningAuthority: data.planningAuthority as string || null,
+        zonalClassification: data.zonalClassification as string || null,
+        landUseStatus: data.landUseStatus as string || null,
+        connectivity: data.connectivity as string || null,
+        waterSupply: data.waterSupply as string || null,
+        drainage: data.drainage as string || null,
+        socialInfrastructure: data.socialInfrastructure as string || null,
+        futureInfrastructure: parseJsonField(data.futureInfrastructure as string) as any[] | null,
+
+        // Legal & Compliance
+        reraRegistration: data.reraRegistration as string || null,
+        khataVerification: data.khataVerification as string || null,
+        titleClearance: data.titleClearance as string || null,
+        dcConversion: data.dcConversion as string || null,
+        planApproval: data.planApproval as string || null,
+        loanApproval: parseJsonField(data.loanApproval as string) as string[] | null,
+        titleClarityNotes: data.titleClarityNotes as string || null,
+        expectedMonthlyRent: data.expectedMonthlyRent as string || null,
+        grossRentalYield: data.grossRentalYield as string || null,
+        tenantDemand: data.tenantDemand as string || null,
+        exitLiquidity: data.exitLiquidity as string || null,
+        yieldScore: data.yieldScore as string || null,
+
+        // Cost Breakdown & Final Recommendation
+        baseUnitCost: data.baseUnitCost as string || null,
+        amenitiesCharges: data.amenitiesCharges as string || null,
+        floorRiseCharges: data.floorRiseCharges as string || null,
+        gstAmount: data.gstAmount as string || null,
+        stampDutyRegistration: data.stampDutyRegistration as string || null,
+        khataTransferCosts: data.khataTransferCosts as string || null,
+        totalAllInPrice: data.totalAllInPrice as string || null,
+        pros: parseArrayField(data.pros as string),
+        cons: parseArrayField(data.cons as string),
+        buyerTypeFit: data.buyerTypeFit as string || null,
+        negotiationAdvice: data.negotiationAdvice as string || null,
+        riskSummary: data.riskSummary as string || null,
+        appreciationOutlook5yr: data.appreciationOutlook5yr as string || null,
+        exitPlan: data.exitPlan as string || null,
+        overallScore: data.overallScore as string || null,
+        customNotes: data.customNotes as string || null,
+
+        // Nested objects (ensure correct parsing or defaults)
         marketAnalysis: {
           currentMarketTrend: data.currentMarketTrend as string || "stable",
           areaGrowthRate: parseFloat(data.areaGrowthRate as string) || 0,
           demandSupplyRatio: data.demandSupplyRatio as string || "balanced",
           marketSentiment: data.marketSentiment as string || "neutral",
-          competitorAnalysis: []
+          competitorAnalysis: [] // Assuming empty if not provided
         },
         propertyAssessment: {
           structuralCondition: data.structuralCondition as string || "good",
           ageOfProperty: parseInt(data.ageOfProperty as string) || 0,
           maintenanceLevel: data.maintenanceLevel as string || "average",
           amenitiesRating: parseFloat(data.amenitiesRating as string) || 5,
-          locationAdvantages: [],
-          locationDisadvantages: [],
+          locationAdvantages: [], // Assuming empty if not provided
+          locationDisadvantages: [], // Assuming empty if not provided
           futureGrowthPotential: parseFloat(data.futureGrowthPotential as string) || 5
         },
         costBreakdown: {
@@ -155,11 +236,11 @@ export default function ValuationReportsCreateComprehensive() {
           movingCosts: parseFloat(data.movingCosts as string) || 0,
           legalCharges: parseFloat(data.legalCharges as string) || 0,
           totalEstimatedCost: parseFloat(data.totalEstimatedCost as string) || 0,
-          hiddenCosts: []
+          hiddenCosts: [] // Assuming empty if not provided
         },
         financialAnalysis: {
           currentValuation: parseFloat(data.currentValuation as string) || 0,
-          appreciationProjection: [],
+          appreciationProjection: [], // Assuming empty if not provided
           rentalYield: parseFloat(data.rentalYield as string) || 0,
           monthlyRentalIncome: parseFloat(data.monthlyRentalIncome as string) || 0,
           roiAnalysis: {
@@ -176,15 +257,16 @@ export default function ValuationReportsCreateComprehensive() {
         investmentRecommendation: data.investmentRecommendation as "buy" | "hold" | "sell" || "hold",
         riskAssessment: {
           overallRisk: data.overallRisk as string || "medium",
-          riskFactors: [],
-          mitigationStrategies: []
+          riskFactors: [], // Assuming empty if not provided
+          mitigationStrategies: [] // Assuming empty if not provided
         },
         executiveSummary: data.executiveSummary as string || "",
-        overallScore: data.overallScore as string || "0.0",
-        keyHighlights: [],
+        // overallScore is already mapped above
+        keyHighlights: [], // Assuming empty if not provided
         reportPdfUrl: null,
-        supportingDocuments: []
+        supportingDocuments: [] // Assuming empty if not provided
       };
+
 
       console.log("Submitting report data:", reportData);
 
@@ -266,8 +348,8 @@ export default function ValuationReportsCreateComprehensive() {
                     </CardHeader>
                     <CardContent className="p-0">
                       <TabsList className="flex flex-col h-auto p-1 bg-transparent space-y-1">
-                        <TabsTrigger 
-                          value="executive" 
+                        <TabsTrigger
+                          value="executive"
                           className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
                         >
                           <div className="flex items-center gap-3">
@@ -279,8 +361,8 @@ export default function ValuationReportsCreateComprehensive() {
                           </div>
                         </TabsTrigger>
 
-                        <TabsTrigger 
-                          value="property" 
+                        <TabsTrigger
+                          value="property"
                           className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
                         >
                           <div className="flex items-center gap-3">
@@ -292,8 +374,8 @@ export default function ValuationReportsCreateComprehensive() {
                           </div>
                         </TabsTrigger>
 
-                        <TabsTrigger 
-                          value="market" 
+                        <TabsTrigger
+                          value="market"
                           className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
                         >
                           <div className="flex items-center gap-3">
@@ -305,8 +387,8 @@ export default function ValuationReportsCreateComprehensive() {
                           </div>
                         </TabsTrigger>
 
-                        <TabsTrigger 
-                          value="location" 
+                        <TabsTrigger
+                          value="location"
                           className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
                         >
                           <div className="flex items-center gap-3">
@@ -318,8 +400,8 @@ export default function ValuationReportsCreateComprehensive() {
                           </div>
                         </TabsTrigger>
 
-                        <TabsTrigger 
-                          value="legal" 
+                        <TabsTrigger
+                          value="legal"
                           className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
                         >
                           <div className="flex items-center gap-3">
@@ -331,8 +413,8 @@ export default function ValuationReportsCreateComprehensive() {
                           </div>
                         </TabsTrigger>
 
-                        <TabsTrigger 
-                          value="final" 
+                        <TabsTrigger
+                          value="final"
                           className="w-full justify-start h-auto p-4 text-left bg-transparent border-none shadow-none hover:bg-muted data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-l-4 data-[state=active]:border-primary rounded-none transition-all"
                         >
                           <div className="flex items-center gap-3">
@@ -383,7 +465,7 @@ export default function ValuationReportsCreateComprehensive() {
                       {/* Basic Report Info */}
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div>
-                          <Label htmlFor="propertyId">Property *</Label>
+                          <Label htmlFor="propertyId">Property ID *</Label>
                           <Select name="propertyId" required>
                             <SelectTrigger>
                               <SelectValue placeholder="Select property" />
@@ -423,10 +505,11 @@ export default function ValuationReportsCreateComprehensive() {
                           </Select>
                         </div>
                         <div>
-                          <Label htmlFor="assignedTo">Assigned To</Label>
+                          <Label htmlFor="createdBy">Created By *</Label>
                           <Input
-                            name="assignedTo"
-                            placeholder="Analyst name"
+                            name="createdBy"
+                            placeholder="Enter creator name"
+                            required
                           />
                         </div>
                       </div>
@@ -993,7 +1076,7 @@ export default function ValuationReportsCreateComprehensive() {
                               <SelectItem value="clear">Clear</SelectItem>
                               <SelectItem value="minor-issues">Minor Issues</SelectItem>
                               <SelectItem value="major-issues">Major Issues</SelectItem>
-                              <SelectItem value="pending">Pending Verification</SelectItem>
+                              <SelectItem value="pending-verification">Pending Verification</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -1310,15 +1393,15 @@ export default function ValuationReportsCreateComprehensive() {
 
                 {/* Action Buttons */}
                 <div className="flex justify-end gap-4 mt-8 pt-6 border-t">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
+                  <Button
+                    type="button"
+                    variant="outline"
                     onClick={() => navigate("/admin-panel/valuation-reports")}
                   >
                     Cancel
                   </Button>
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     disabled={isSubmitting}
                     className="min-w-[120px]"
                   >
