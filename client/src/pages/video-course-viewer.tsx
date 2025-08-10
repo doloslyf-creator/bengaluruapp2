@@ -253,7 +253,7 @@ export default function VideoCourseViewer() {
     <div className="min-h-screen bg-gray-50">
       <Header />
       
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-6">
           <Button 
             variant="outline" 
@@ -264,8 +264,8 @@ export default function VideoCourseViewer() {
             Back to Education Center
           </Button>
           
-          <div className="flex items-start gap-6 mb-6">
-            <div className="w-48 h-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+          <div className="flex flex-col lg:flex-row items-start gap-6 mb-6">
+            <div className="w-full lg:w-48 h-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
               {course.thumbnailUrl ? (
                 <img
                   src={course.thumbnailUrl}
@@ -277,8 +277,8 @@ export default function VideoCourseViewer() {
               )}
             </div>
             
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
+            <div className="flex-1 w-full">
+              <div className="flex flex-wrap items-center gap-2 mb-2">
                 <Badge 
                   variant={course.level === 'beginner' ? 'default' : 
                           course.level === 'intermediate' ? 'secondary' : 'destructive'}
@@ -288,10 +288,10 @@ export default function VideoCourseViewer() {
                 <Badge variant="outline">{course.category}</Badge>
               </div>
               
-              <h1 className="text-3xl font-bold text-gray-900 mb-3">{course.title}</h1>
-              <p className="text-gray-600 mb-4">{course.description}</p>
+              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">{course.title}</h1>
+              <p className="text-gray-600 mb-4 leading-relaxed">{course.description}</p>
               
-              <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-4">
                 <span className="flex items-center">
                   <Clock className="h-4 w-4 mr-1" />
                   {course.estimatedDuration || 'Self-paced'}
@@ -307,7 +307,7 @@ export default function VideoCourseViewer() {
               </div>
               
               {isEnrolled && enrollment && (
-                <div className="mb-4">
+                <div className="mb-4 max-w-md">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium">Course Progress</span>
                     <span className="text-sm text-gray-600">{enrollment.progressPercentage}%</span>
@@ -328,12 +328,12 @@ export default function VideoCourseViewer() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
           {/* Video Player */}
-          <div className="lg:col-span-2">
+          <div className="xl:col-span-2">
             {selectedChapter && canViewChapter(selectedChapter) ? (
-              <div>
-                <div className="aspect-video bg-black rounded-lg overflow-hidden mb-4">
+              <div className="w-full">
+                <div className="aspect-video bg-black rounded-lg overflow-hidden mb-4 max-w-full">
                   <iframe
                     src={`https://www.youtube.com/embed/${selectedChapter.youtubeUrl.split('v=')[1]?.split('&')[0]}`}
                     className="w-full h-full"
@@ -343,13 +343,14 @@ export default function VideoCourseViewer() {
                 </div>
                 
                 <div className="mb-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <h2 className="text-xl font-semibold">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                    <h2 className="text-lg lg:text-xl font-semibold">
                       Chapter {selectedChapter.chapterNumber}: {selectedChapter.title}
                     </h2>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-500">{selectedChapter.duration}</span>
-                      <span className="text-sm text-gray-500">{selectedChapter.viewCount} views</span>
+                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                      <span>{selectedChapter.duration}</span>
+                      <span>•</span>
+                      <span>{selectedChapter.viewCount} views</span>
                     </div>
                   </div>
                   
@@ -393,7 +394,7 @@ export default function VideoCourseViewer() {
                 </div>
                 
                 {/* Navigation */}
-                <div className="flex justify-between">
+                <div className="flex flex-col sm:flex-row justify-between gap-3">
                   <Button
                     variant="outline"
                     onClick={() => {
@@ -401,9 +402,11 @@ export default function VideoCourseViewer() {
                       if (prev) handleChapterSelect(prev);
                     }}
                     disabled={!getPrevChapter()}
+                    className="w-full sm:w-auto"
                   >
                     <ArrowLeft className="h-4 w-4 mr-2" />
-                    Previous Chapter
+                    <span className="hidden sm:inline">Previous Chapter</span>
+                    <span className="sm:hidden">Previous</span>
                   </Button>
                   
                   <Button
@@ -412,8 +415,10 @@ export default function VideoCourseViewer() {
                       if (next) handleChapterSelect(next);
                     }}
                     disabled={!getNextChapter()}
+                    className="w-full sm:w-auto"
                   >
-                    Next Chapter
+                    <span className="hidden sm:inline">Next Chapter</span>
+                    <span className="sm:hidden">Next</span>
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 </div>
@@ -433,12 +438,12 @@ export default function VideoCourseViewer() {
           </div>
 
           {/* Chapter List */}
-          <div>
-            <Card>
-              <CardHeader>
+          <div className="w-full">
+            <Card className="h-fit">
+              <CardHeader className="pb-3">
                 <CardTitle className="text-lg">Course Chapters</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="space-y-2 max-h-[600px] overflow-y-auto">
                 {sortedChapters.map((chapter) => (
                   <div
                     key={chapter.id}
@@ -456,8 +461,8 @@ export default function VideoCourseViewer() {
                     }}
                   >
                     <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
+                      <div className="flex-1 min-w-0 pr-2">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <span className="text-xs text-gray-500">Chapter {chapter.chapterNumber}</span>
                           {chapter.isPreview && (
                             <Badge variant="outline" className="text-xs">Free</Badge>
@@ -469,14 +474,14 @@ export default function VideoCourseViewer() {
                             <CheckCircle className="h-3 w-3 text-green-600" />
                           )}
                         </div>
-                        <h4 className="font-medium text-sm line-clamp-2">{chapter.title}</h4>
-                        <div className="flex items-center text-xs text-gray-500 mt-1">
+                        <h4 className="font-medium text-sm leading-tight mb-1">{chapter.title}</h4>
+                        <div className="flex items-center text-xs text-gray-500">
                           <Clock className="h-3 w-3 mr-1" />
                           {chapter.duration}
                         </div>
                       </div>
                       {canViewChapter(chapter) && (
-                        <Play className="h-4 w-4 text-blue-600 ml-2 flex-shrink-0" />
+                        <Play className="h-4 w-4 text-blue-600 flex-shrink-0 mt-1" />
                       )}
                     </div>
                   </div>
