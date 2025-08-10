@@ -41,9 +41,8 @@ import Consultation from "@/pages/consultation";
 
 import EnhancedLeads from "@/pages/admin/enhanced-leads";
 
-import CustomerHome from "@/pages/customer-home";
 import CustomerAccount from "@/pages/customer-account";
-import Home from "@/pages/home-modern";
+import Home from "@/pages/home";
 import About from "@/pages/about";
 import LeadsPage from "@/pages/leads";
 import FAQ from "@/pages/faq";
@@ -122,7 +121,7 @@ function ProtectedRouter() {
 
   return (
     <Switch>
-      <Route path="/" component={CustomerHome} />
+      <Route path="/" component={Home} />
       <Route path="/admin" component={Home} />
       <Route path="/admin-panel" component={AdminDashboard} />
       <Route path="/admin-panel/properties" component={AdminProperties} />
