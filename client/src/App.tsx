@@ -60,7 +60,8 @@ import AdminBookings from "@/pages/admin/bookings";
 
 import BackupSystem from "@/pages/admin/backup-system";
 import { AdminCivilMepReports } from "@/pages/admin-civil-mep-reports";
-import { AdminCivilMepReportsCreate } from "@/pages/admin-civil-mep-reports-create";
+import CivilMepReportsCreate from "@/pages/admin/civil-mep-reports-create";
+import CivilMepReportsEdit from "@/pages/admin/civil-mep-reports-edit";
 import { CivilMepReportView } from "@/pages/civil-mep-report-view";
 import AdminLegalAuditReports from "@/pages/admin/legal-audit-reports";
 import AdminLegalAuditReportsCreate from "@/pages/admin/legal-audit-reports-create";
@@ -146,9 +147,9 @@ function ProtectedRouter() {
       <Route path="/admin/customers" component={Customers} />
 
       <Route path="/admin-panel/civil-mep-reports" component={AdminCivilMepReports} />
-      <Route path="/admin-panel/civil-mep-reports/create" component={AdminCivilMepReportsCreate} />
-      <Route path="/admin-panel/civil-mep-reports/:id/edit" component={AdminCivilMepReportsCreate} />
-      <Route path="/admin/civil-mep-reports/:id/edit" component={AdminCivilMepReportsCreate} />
+      <Route path="/admin-panel/civil-mep-reports/create" component={CivilMepReportsCreate} />
+      <Route path="/admin-panel/civil-mep-reports/:id/edit" component={CivilMepReportsEdit} />
+      <Route path="/admin/civil-mep-reports/:id/edit" component={CivilMepReportsEdit} />
       <Route path="/civil-mep-report/:id" component={CivilMepReportView} />
       <Route path="/admin-panel/legal-audit-reports" component={AdminLegalAuditReports} />
       <Route path="/admin-panel/legal-audit-reports/create" component={AdminLegalAuditReportsCreate} />
