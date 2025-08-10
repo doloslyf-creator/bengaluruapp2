@@ -259,6 +259,11 @@ export default function ValuationReportsPage() {
     removeAssignmentMutation.mutate({ reportId, customerId });
   };
 
+  const handleViewReport = (report: PropertyValuationReport) => {
+    setSelectedReport(report);
+    setShowViewDialog(true);
+  };
+
   const getStatusBadge = (status: string) => {
     const statusMap = {
       draft: { label: "Draft", className: "bg-gray-100 text-gray-800" },
@@ -455,7 +460,7 @@ export default function ValuationReportsPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => navigate(`/admin-panel/valuation-reports/view/${report.id}`)}
+                            onClick={() => handleViewReport(report)}
                             data-testid={`button-view-${report.id}`}
                           >
                             <Eye className="h-4 w-4" />
@@ -490,6 +495,254 @@ export default function ValuationReportsPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* View Report Dialog */}
+        <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Property Valuation Report Details</DialogTitle>
+              <DialogDescription>
+                Comprehensive property valuation report information
+              </DialogDescription>
+            </DialogHeader>
+            {selectedReport && (
+              <div className="space-y-6">
+                {/* Basic Information */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-semibold">Report Title</Label>
+                    <p className="text-sm text-muted-foreground">{selectedReport.reportTitle}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-semibold">Property</Label>
+                    <p className="text-sm text-muted-foreground">{getPropertyName(selectedReport.propertyId)}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-semibold">Status</Label>
+                    <div className="mt-1">{getStatusBadge(selectedReport.reportStatus || "draft")}</div>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-semibold">Created By</Label>
+                    <p className="text-sm text-muted-foreground">{selectedReport.createdBy}</p>
+                  </div>
+                </div>
+
+                {/* Property Profile */}
+                <div className="border-t pt-4">
+                  <h3 className="text-lg font-semibold mb-3">Property Profile</h3>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <Label className="text-sm font-semibold">Unit Type</Label>
+                      <p className="text-sm text-muted-foreground">{selectedReport.unitType || "Not specified"}</p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-semibold">Configuration</Label>
+                      <p className="text-sm text-muted-foreground">{selectedReport.configuration || "Not specified"}</p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-semibold">Buyer Fit</Label>
+                      <p className="text-sm text-muted-foreground">{selectedReport.buyerFit || "Not specified"}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Financial Analysis */}
+                <div className="border-t pt-4">
+                  <h3 className="text-lg font-semibold mb-3">Financial Analysis</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm font-semibold">Estimated Market Value</Label>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedReport.estimatedMarketValue ? 
+                          `₹${Number(selectedReport.estimatedMarketValue).toLocaleString()}` : 
+                          "Not specified"
+                        }
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-semibold">Rate per Sq.ft</Label>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedReport.ratePerSqft ? 
+                          `₹${Number(selectedReport.ratePerSqft).toLocaleString()}` : 
+                          "Not specified"
+                        }
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-semibold">Base Construction Cost</Label>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedReport.baseConstructionCost ? 
+                          `₹${Number(selectedReport.baseConstructionCost).toLocaleString()}` : 
+                          "Not specified"
+                        }
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-semibold">Finishing & Amenities Cost</Label>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedReport.finishingAmenitiesCost ? 
+                          `₹${Number(selectedReport.finishingAmenitiesCost).toLocaleString()}` : 
+                          "Not specified"
+                        }
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-semibold">Land Value</Label>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedReport.landValue ? 
+                          `₹${Number(selectedReport.landValue).toLocaleString()}` : 
+                          "Not specified"
+                        }
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-semibold">Overhead Costs</Label>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedReport.overheadCosts ? 
+                          `₹${Number(selectedReport.overheadCosts).toLocaleString()}` : 
+                          "Not specified"
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Location & Amenities */}
+                <div className="border-t pt-4">
+                  <h3 className="text-lg font-semibold mb-3">Location & Amenities</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm font-semibold">Location Advantage</Label>
+                      <p className="text-sm text-muted-foreground">{selectedReport.locationAdvantage || "Not provided"}</p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-semibold">Amenities</Label>
+                      <p className="text-sm text-muted-foreground">{selectedReport.amenities || "Not provided"}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Market Analysis */}
+                <div className="border-t pt-4">
+                  <h3 className="text-lg font-semibold mb-3">Market Analysis</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-sm font-semibold">Market Analysis</Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {selectedReport.marketAnalysis || "Not provided"}
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-semibold">Risk Assessment</Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {selectedReport.riskAssessment || "Not provided"}
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-semibold">Valuation Verdict</Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {selectedReport.valuationVerdict || "Not provided"}
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-semibold">Recommendation</Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {selectedReport.recommendation || "Not provided"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cost Breakdown */}
+                <div className="border-t pt-4">
+                  <h3 className="text-lg font-semibold mb-3">Detailed Cost Breakdown</h3>
+                  <div className="space-y-4">
+                    {selectedReport.costBreakdown && (
+                      <div>
+                        <Label className="text-sm font-semibold">Cost Breakdown</Label>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {selectedReport.costBreakdown}
+                        </p>
+                      </div>
+                    )}
+                    {selectedReport.comparativeAnalysis && (
+                      <div>
+                        <Label className="text-sm font-semibold">Comparative Analysis</Label>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {selectedReport.comparativeAnalysis}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Customer Assignments */}
+                {reportCustomers[selectedReport.id]?.length > 0 && (
+                  <div className="border-t pt-4">
+                    <h3 className="text-lg font-semibold mb-3">Customer Assignments</h3>
+                    <div className="space-y-2">
+                      {reportCustomers[selectedReport.id].map((assignment: any) => (
+                        <div key={assignment.customerId} className="flex items-center justify-between p-2 border rounded">
+                          <div className="flex items-center space-x-2">
+                            <Users className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm font-medium">
+                              {assignment.customer?.name || assignment.customerId}
+                            </span>
+                            <Badge variant="secondary" className="text-xs">
+                              {assignment.accessLevel || 'view'}
+                            </Badge>
+                          </div>
+                          <span className="text-xs text-muted-foreground">
+                            Assigned {new Date(assignment.assignedAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Timestamps */}
+                <div className="border-t pt-4">
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <Label className="text-sm font-semibold">Created</Label>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(selectedReport.createdAt!).toLocaleString()}
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-semibold">Last Updated</Label>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(selectedReport.updatedAt!).toLocaleString()}
+                      </p>
+                    </div>
+                    {selectedReport.deliveredAt && (
+                      <div>
+                        <Label className="text-sm font-semibold">Delivered</Label>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(selectedReport.deliveredAt).toLocaleString()}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+            <div className="flex justify-end space-x-2 pt-4 border-t">
+              <Button variant="outline" onClick={() => setShowViewDialog(false)}>
+                Close
+              </Button>
+              {selectedReport && (
+                <Button onClick={() => {
+                  setShowViewDialog(false);
+                  navigate(`/admin-panel/valuation-reports/edit/${selectedReport.id}`);
+                }}>
+                  Edit Report
+                </Button>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Customer Assignment Dialog */}
         <Dialog open={assignmentDialogOpen} onOpenChange={setAssignmentDialogOpen}>
