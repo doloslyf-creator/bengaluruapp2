@@ -126,10 +126,10 @@ export default function ValuationReportsCreateComprehensive() {
         propertyId: data.propertyId as string,
         reportTitle: data.reportTitle as string,
         reportVersion: (data.reportVersion as string) || "1.0",
-        reportDate: data.reportDate ? new Date(data.reportDate as string) : new Date(),
+        reportDate: data.reportDate ? new Date(data.reportDate as string).toISOString() : new Date().toISOString(),
         createdBy: data.createdBy as string, // This is Valuer ID based on the prompt
         assignedTo: data.assignedTo as string || null,
-        reportStatus: data.reportStatus as string || "draft",
+        reportStatus: (data.reportStatus as "draft" | "in_progress" | "completed" | "delivered") || "draft",
         projectName: data.projectName as string || null,
         towerUnit: data.towerUnit as string || null,
         estimatedMarketValue: data.estimatedMarketValue as string || null,
@@ -145,7 +145,7 @@ export default function ValuationReportsCreateComprehensive() {
         configuration: data.configuration as string || null,
         undividedLandShare: data.undividedLandShare as string || null,
         facing: data.facing as string || null,
-        vastuCompliance: data.vastuCompliance as boolean || false,
+        vastuCompliance: data.vastuCompliance === "on" || data.vastuCompliance === "true" || false,
         ocCcStatus: data.ocCcStatus as string || null,
         possessionStatus: data.possessionStatus as string || null,
         khataType: data.khataType as string || null,
@@ -498,7 +498,7 @@ export default function ValuationReportsCreateComprehensive() {
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="draft">Draft</SelectItem>
-                              <SelectItem value="in-progress">In Progress</SelectItem>
+                              <SelectItem value="in_progress">In Progress</SelectItem>
                               <SelectItem value="completed">Completed</SelectItem>
                               <SelectItem value="delivered">Delivered</SelectItem>
                             </SelectContent>
@@ -510,6 +510,26 @@ export default function ValuationReportsCreateComprehensive() {
                             name="createdBy"
                             placeholder="Enter creator name"
                             required
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="reportDate">Report Date *</Label>
+                          <Input
+                            type="date"
+                            name="reportDate"
+                            defaultValue={new Date().toISOString().split('T')[0]}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="reportVersion">Report Version</Label>
+                          <Input
+                            name="reportVersion"
+                            placeholder="1.0"
+                            defaultValue="1.0"
                           />
                         </div>
                       </div>
