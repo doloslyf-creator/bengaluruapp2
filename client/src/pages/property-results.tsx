@@ -592,7 +592,7 @@ export default function PropertyResults() {
         </div>
 
         {/* Results */}
-        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {matchingProperties.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-gray-300 text-4xl mb-4">🏠</div>
@@ -608,7 +608,8 @@ export default function PropertyResults() {
               </button>
             </div>
           ) : (
-            <div className="grid gap-6 grid-cols-1">
+            viewMode === 'grid' ? (
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {matchingProperties.map(property => {
                   const matchInfo = getMatchLabel(property.matchScore);
                   
@@ -719,7 +720,90 @@ export default function PropertyResults() {
                     </div>
                   );
                 })}
-            </div>
+              </div>
+            ) : (
+              <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
+                {matchingProperties.map(property => {
+                  const matchInfo = getMatchLabel(property.matchScore);
+                  
+                  return (
+                    <div key={property.id} className="group cursor-pointer bg-white border border-gray-100 rounded-xl hover:border-emerald-200 hover:shadow-sm transition-all duration-200">
+                      <div onClick={() => handleViewProperty(property)} className="flex p-4 gap-4">
+                        {/* Thumbnail */}
+                        <div className="flex-shrink-0">
+                          <div className="w-24 h-24 bg-gray-50 rounded-lg flex items-center justify-center relative overflow-hidden">
+                            <div className="text-gray-300 text-center">
+                              <div className="text-2xl mb-1">🏢</div>
+                            </div>
+                            
+                            {/* Heart Button - Overlay */}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleFavorite(property.id);
+                              }}
+                              className="absolute top-1 right-1 w-6 h-6 bg-white/90 hover:bg-white rounded-full flex items-center justify-center transition-colors"
+                            >
+                              <Heart 
+                                className={`h-3 w-3 ${
+                                  favorites.has(property.id) 
+                                    ? 'fill-red-500 text-red-500' 
+                                    : 'text-gray-400 hover:text-red-400'
+                                }`} 
+                              />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 space-y-2 min-w-0">
+                          {/* Header Row */}
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-medium text-gray-900 group-hover:text-emerald-600 transition-colors mb-1">
+                                {property.name}
+                              </h3>
+                              
+                              <div className="flex items-center text-sm text-gray-500 mb-1">
+                                <MapPin className="h-3 w-3 mr-1 text-gray-400 shrink-0" />
+                                <span className="truncate">{property.area}, {property.zone ? property.zone.charAt(0).toUpperCase() + property.zone.slice(1) : 'Unknown Zone'}</span>
+                              </div>
+                              
+                              <p className="text-xs text-gray-400">By {property.developer}</p>
+                            </div>
+                            
+                            <div className="bg-emerald-100 text-emerald-700 text-xs font-medium px-2 py-1 rounded-full shrink-0">
+                              {property.matchScore}% Match
+                            </div>
+                          </div>
+                          
+                          {/* Price */}
+                          <div className="text-lg font-medium text-emerald-600">
+                            {getPriceRange(property.configurations)}
+                          </div>
+                          
+                          {/* Configurations */}
+                          {property.configurations.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {property.configurations.slice(0, 3).map((config, index) => (
+                                <span key={index} className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-md">
+                                  {config.configuration}
+                                </span>
+                              ))}
+                              {property.configurations.length > 3 && (
+                                <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-md">
+                                  +{property.configurations.length - 3}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )
           )}
         </main>
       </div>
