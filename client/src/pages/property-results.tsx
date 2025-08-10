@@ -289,14 +289,14 @@ export default function PropertyResults() {
         }
         
         // BHK match (5 points) - if no configurations or preferences, give default score
-        if (preferences.bhkType.length === 0) {
+        if ((preferences.bhkType?.length || 0) === 0) {
           score += 3; // Default score when no BHK preferences
         } else if (propertyConfigs.length === 0) {
           score += 2; // Partial score when no configuration data
         } else {
           const hasMatchingBHK = propertyConfigs.some(config => {
             const configLower = config.configuration.toLowerCase();
-            return preferences.bhkType.some(bhk => {
+            return (preferences.bhkType || []).some(bhk => {
               const bhkLower = bhk.toLowerCase().replace(' ', '');
               // Check for various BHK formats: "2 BHK", "2BHK", "2-BHK", etc.
               return configLower.includes(bhkLower) || 
@@ -553,12 +553,12 @@ export default function PropertyResults() {
                     ₹{preferences.budgetRange[0]}L - ₹{preferences.budgetRange[1]}L
                   </Badge>
                 )}
-                {preferences.bhkType.slice(0, 2).map(bhk => (
+                {preferences.bhkType?.slice(0, 2).map(bhk => (
                   <Badge key={bhk} variant="outline" className="text-xs">{bhk}</Badge>
                 ))}
-                {preferences.bhkType.length > 2 && (
+                {(preferences.bhkType?.length || 0) > 2 && (
                   <Badge variant="outline" className="text-xs">
-                    +{preferences.bhkType.length - 2} BHK
+                    +{(preferences.bhkType?.length || 0) - 2} BHK
                   </Badge>
                 )}
                 {preferences.tags?.slice(0, 1).map(tag => (
@@ -856,15 +856,15 @@ export default function PropertyResults() {
               <div key={bhk} className="flex items-center space-x-2">
                 <Checkbox
                   id={bhk}
-                  checked={preferences.bhkType.includes(bhk)}
+                  checked={(preferences.bhkType || []).includes(bhk)}
                   onCheckedChange={(checked) => {
                     if (checked) {
                       onUpdatePreferences({ 
-                        bhkType: [...preferences.bhkType, bhk]
+                        bhkType: [...(preferences.bhkType || []), bhk]
                       });
                     } else {
                       onUpdatePreferences({
-                        bhkType: preferences.bhkType.filter(b => b !== bhk)
+                        bhkType: (preferences.bhkType || []).filter(b => b !== bhk)
                       });
                     }
                   }}

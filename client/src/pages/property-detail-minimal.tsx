@@ -63,6 +63,8 @@ export default function PropertyDetailMinimal() {
   const [showOrderForm, setShowOrderForm] = useState(false);
   const [orderFormType, setOrderFormType] = useState<'civil-mep' | 'valuation'>('civil-mep');
 
+
+
   const { data: property, isLoading, error } = useQuery<Property>({
     queryKey: [`/api/properties/${params.id}/with-configurations`],
     enabled: !!params.id,
@@ -937,13 +939,9 @@ export default function PropertyDetailMinimal() {
       <OrderFormDialog
         isOpen={showOrderForm}
         onClose={() => setShowOrderForm(false)}
+        onSubmit={handleOrderSubmit}
         reportType={orderFormType}
-        propertyDetails={{
-          name: property.name,
-          area: property.area,
-          zone: property.zone,
-          price: getPriceRange()
-        }}
+        property={property}
       />
     </div>
   );
