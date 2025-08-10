@@ -589,7 +589,7 @@ export default function PropertyDetailMinimal() {
               </div>
             )}
             <div className="absolute top-3 left-3">
-              <Badge className="bg-blue-600 text-white">
+              <Badge className="bg-emerald-600 text-white">
                 {prop.status === 'completed' ? 'Ready' : prop.status === 'under-construction' ? 'UC' : 'Pre-Launch'}
               </Badge>
             </div>
@@ -611,7 +611,7 @@ export default function PropertyDetailMinimal() {
               </div>
               
               <div className="flex items-center justify-between">
-                <div className="text-lg font-bold text-blue-600">
+                <div className="text-lg font-bold text-emerald-600">
                   {getPriceRange()}
                 </div>
                 <div className="text-sm text-gray-500">
@@ -635,7 +635,7 @@ export default function PropertyDetailMinimal() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <div className="animate-spin w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full mx-auto mb-4"></div>
           <p className="text-gray-600">Loading property details...</p>
         </div>
       </div>
@@ -676,16 +676,16 @@ export default function PropertyDetailMinimal() {
       {/* Property Actions Bar */}
       <div className="bg-white border-b sticky top-16 z-30 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Button variant="ghost" onClick={() => window.history.back()} className="text-gray-600">
+          <Button variant="ghost" onClick={() => window.history.back()} className="text-gray-700 hover:text-emerald-600">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Search
           </Button>
           <div className="flex items-center space-x-2">
             <Button variant="ghost" size="sm" onClick={toggleFavorite}>
-              <Heart className={`h-5 w-5 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
+              <Heart className={`h-5 w-5 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-700 hover:text-emerald-600'}`} />
             </Button>
             <Button variant="ghost" size="sm" onClick={handleShare}>
-              <Share2 className="h-5 w-5 text-gray-600" />
+              <Share2 className="h-5 w-5 text-gray-700 hover:text-emerald-600" />
             </Button>
           </div>
         </div>
@@ -724,7 +724,7 @@ export default function PropertyDetailMinimal() {
             {/* Price */}
             <div>
               <div className="text-sm text-gray-600 mb-1">Starting Price</div>
-              <div className="text-2xl font-bold text-blue-600">{getPriceRange()}</div>
+              <div className="text-2xl font-bold text-emerald-600">{getPriceRange()}</div>
             </div>
 
             {/* Key Details */}
@@ -739,7 +739,7 @@ export default function PropertyDetailMinimal() {
               </div>
               <div>
                 <div className="text-sm text-gray-600">RERA</div>
-                <div className="font-medium text-green-600">
+                <div className="font-medium text-emerald-600">
                   {property.reraApproved ? 'Approved' : 'Pending'}
                 </div>
               </div>
@@ -754,35 +754,35 @@ export default function PropertyDetailMinimal() {
               <div className="text-sm font-medium text-gray-900">Data Verification Status</div>
               <div className="grid grid-cols-2 gap-3">
                 {/* RERA Verification */}
-                <div className="flex items-center bg-green-50 border border-green-200 rounded-lg p-3">
-                  <div className="flex-shrink-0 h-8 w-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                    <FileCheck className="h-4 w-4 text-green-600" />
+                <div className="flex items-center bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+                  <div className="flex-shrink-0 h-8 w-8 bg-emerald-100 rounded-full flex items-center justify-center mr-3">
+                    <FileCheck className="h-4 w-4 text-emerald-600" />
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-green-900">RERA Verified</div>
-                    <div className="text-xs text-green-700">Government database</div>
+                    <div className="text-sm font-medium text-emerald-900">RERA Verified</div>
+                    <div className="text-xs text-emerald-700">Government database</div>
                   </div>
                 </div>
 
                 {/* Site Visit Verification */}
-                <div className="flex items-center bg-blue-50 border border-blue-200 rounded-lg p-3">
-                  <div className="flex-shrink-0 h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                    <MapPinVerified className="h-4 w-4 text-blue-600" />
+                <div className="flex items-center bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+                  <div className="flex-shrink-0 h-8 w-8 bg-emerald-100 rounded-full flex items-center justify-center mr-3">
+                    <MapPinVerified className="h-4 w-4 text-emerald-600" />
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-blue-900">Site Verified</div>
-                    <div className="text-xs text-blue-700">Expert site visit</div>
+                    <div className="text-sm font-medium text-emerald-900">Site Verified</div>
+                    <div className="text-xs text-emerald-700">Expert site visit</div>
                   </div>
                 </div>
 
                 {/* Price Verification */}
-                <div className="flex items-center bg-purple-50 border border-purple-200 rounded-lg p-3">
-                  <div className="flex-shrink-0 h-8 w-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
-                    <BarChart3 className="h-4 w-4 text-purple-600" />
+                <div className="flex items-center bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+                  <div className="flex-shrink-0 h-8 w-8 bg-emerald-100 rounded-full flex items-center justify-center mr-3">
+                    <BarChart3 className="h-4 w-4 text-emerald-600" />
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-purple-900">Price Verified</div>
-                    <div className="text-xs text-purple-700">Market analysis</div>
+                    <div className="text-sm font-medium text-emerald-900">Price Verified</div>
+                    <div className="text-xs text-emerald-700">Market analysis</div>
                   </div>
                 </div>
 
@@ -1198,17 +1198,17 @@ export default function PropertyDetailMinimal() {
             </Card>
 
             {/* Property Valuation Report Data */}
-            <Card className="border-blue-200">
+            <Card className="border-emerald-200">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center">
-                    <h4 className="font-semibold text-blue-800">Property Valuation Report</h4>
-                    <Badge className="ml-2 bg-purple-100 text-purple-800 border-purple-200 text-xs">
+                    <h4 className="font-semibold text-emerald-800">Property Valuation Report</h4>
+                    <Badge className="ml-2 bg-emerald-100 text-emerald-800 border-emerald-200 text-xs">
                       <BarChart3 className="h-3 w-3 mr-1" />
                       Market Verified
                     </Badge>
                   </div>
-                  <Badge className="bg-blue-100 text-blue-800">Critical</Badge>
+                  <Badge className="bg-emerald-100 text-emerald-800">Critical</Badge>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -1223,7 +1223,7 @@ export default function PropertyDetailMinimal() {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Investment Grade</span>
-                      <span className="font-semibold text-blue-600">A- Excellent</span>
+                      <span className="font-semibold text-emerald-600">A- Excellent</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Rental Yield</span>
@@ -1258,8 +1258,8 @@ export default function PropertyDetailMinimal() {
                   </div>
                 </div>
 
-                <div className="bg-blue-50 p-3 rounded mb-4">
-                  <p className="text-xs text-blue-800">Professional valuation prevents overpaying by 10-15% on average</p>
+                <div className="bg-emerald-50 p-3 rounded mb-4">
+                  <p className="text-xs text-emerald-800">Professional valuation prevents overpaying by 10-15% on average</p>
                 </div>
 
                 {/* Expert Credentials for Valuation */}
@@ -1285,7 +1285,7 @@ export default function PropertyDetailMinimal() {
         <Card className="mb-8" id="pros-cons">
           <CardHeader>
             <CardTitle className="flex items-center">
-              <CheckCircle className="h-5 w-5 mr-2 text-green-600" />
+              <CheckCircle className="h-5 w-5 mr-2 text-emerald-600" />
               Property Highlights & Considerations
             </CardTitle>
             <p className="text-gray-600">Key strengths and important factors to evaluate for this property</p>
@@ -1296,24 +1296,24 @@ export default function PropertyDetailMinimal() {
               {/* Property Highlights - Card Grid */}
               <div className="space-y-4">
                 <div className="flex items-center mb-4">
-                  <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                    <ThumbsUp className="h-4 w-4 text-green-600" />
+                  <div className="h-8 w-8 bg-emerald-100 rounded-full flex items-center justify-center mr-3">
+                    <ThumbsUp className="h-4 w-4 text-emerald-600" />
                   </div>
-                  <h4 className="font-semibold text-green-800 text-lg">Property Highlights</h4>
+                  <h4 className="font-semibold text-emerald-800 text-lg">Property Highlights</h4>
                 </div>
                 
                 <div className="grid grid-cols-1 gap-3">
-                  <Card className="border-green-200 bg-green-50/50 hover:bg-green-50 transition-colors">
+                  <Card className="border-emerald-200 bg-emerald-50/50 hover:bg-emerald-50 transition-colors">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
-                          <Shield className="h-5 w-5 text-green-600 mr-3" />
+                          <Shield className="h-5 w-5 text-emerald-600 mr-3" />
                           <div>
                             <p className="font-medium text-gray-900">RERA Compliance</p>
                             <p className="text-sm text-gray-600">Full regulatory compliance</p>
                           </div>
                         </div>
-                        <Badge className="bg-green-100 text-green-800">
+                        <Badge className="bg-emerald-100 text-emerald-800">
                           {property.reraApproved ? 'Approved' : 'Process'}
                         </Badge>
                       </div>
@@ -1394,10 +1394,10 @@ export default function PropertyDetailMinimal() {
                   </Card>
                 </div>
 
-                <div className="bg-green-100 p-4 rounded-lg">
+                <div className="bg-emerald-100 p-4 rounded-lg">
                   <div className="flex items-center">
-                    <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-                    <p className="text-sm font-medium text-green-800">
+                    <CheckCircle className="h-5 w-5 text-emerald-600 mr-2" />
+                    <p className="text-sm font-medium text-emerald-800">
                       This property meets {getPropertyPros().length} out of 10 key investment criteria
                     </p>
                   </div>
@@ -1679,15 +1679,15 @@ export default function PropertyDetailMinimal() {
 
             {/* Price Analysis Summary */}
             <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="border-green-200 bg-green-50">
+              <Card className="border-emerald-200 bg-emerald-50">
                 <CardContent className="p-4">
                   <div className="flex items-center">
-                    <div className="flex-shrink-0 h-8 w-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                      <TrendingDown className="h-4 w-4 text-green-600" />
+                    <div className="flex-shrink-0 h-8 w-8 bg-emerald-100 rounded-full flex items-center justify-center mr-3">
+                      <TrendingDown className="h-4 w-4 text-emerald-600" />
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-green-900">Price Advantage</div>
-                      <div className="text-xs text-green-700">
+                      <div className="text-sm font-medium text-emerald-900">Price Advantage</div>
+                      <div className="text-xs text-emerald-700">
                         {getSimilarProperties().filter(prop => prop.area === property.area && prop.type === property.type).length > 0 
                           ? '8% below area average'
                           : 'Competitive pricing'}
@@ -1697,15 +1697,15 @@ export default function PropertyDetailMinimal() {
                 </CardContent>
               </Card>
 
-              <Card className="border-blue-200 bg-blue-50">
+              <Card className="border-emerald-200 bg-emerald-50">
                 <CardContent className="p-4">
                   <div className="flex items-center">
-                    <div className="flex-shrink-0 h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                      <BarChart3 className="h-4 w-4 text-blue-600" />
+                    <div className="flex-shrink-0 h-8 w-8 bg-emerald-100 rounded-full flex items-center justify-center mr-3">
+                      <BarChart3 className="h-4 w-4 text-emerald-600" />
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-blue-900">Market Position</div>
-                      <div className="text-xs text-blue-700">
+                      <div className="text-sm font-medium text-emerald-900">Market Position</div>
+                      <div className="text-xs text-emerald-700">
                         {property.valueScore && property.valueScore >= 4 ? 'Premium segment' : 'Value segment'}
                       </div>
                     </div>
@@ -1713,15 +1713,15 @@ export default function PropertyDetailMinimal() {
                 </CardContent>
               </Card>
 
-              <Card className="border-purple-200 bg-purple-50">
+              <Card className="border-emerald-200 bg-emerald-50">
                 <CardContent className="p-4">
                   <div className="flex items-center">
-                    <div className="flex-shrink-0 h-8 w-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
-                      <Target className="h-4 w-4 text-purple-600" />
+                    <div className="flex-shrink-0 h-8 w-8 bg-emerald-100 rounded-full flex items-center justify-center mr-3">
+                      <Target className="h-4 w-4 text-emerald-600" />
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-purple-900">Investment Score</div>
-                      <div className="text-xs text-purple-700">
+                      <div className="text-sm font-medium text-emerald-900">Investment Score</div>
+                      <div className="text-xs text-emerald-700">
                         {property.overallScore && property.overallScore >= 4 ? 'High potential' : 'Moderate potential'}
                       </div>
                     </div>
