@@ -11,6 +11,8 @@ UI Design preferences: Clean, minimal design without unnecessary panels or borde
 Messaging preference: Personalized messaging that makes customers "feel us, our message" rather than sounding like an organization. Content should be human-centered and relatable.
 Admin Layout Consistency: ALL admin pages MUST maintain admin sidebar and topbar using AdminLayout component. This includes Supabase Migration and all future admin pages.
 Admin Sidebar Organization: Grouped menu structure with collapsible sections - Customer Relations (customers, developers, team management, enhanced leads), Reports (civil/MEP reports, valuation reports, legal tracker, property scoring, analytics), Property Management (properties, zones), with single items (dashboard, blog, orders, settings, database migration) remaining ungrouped.
+Color Theme: Updated property detail page to use emerald green color scheme for consistent branding (August 2025).
+Customer Panel: Deleted existing customer account functionality (customer-account.tsx, customer-home.tsx) to rebuild from scratch (August 2025).
 
 ## System Architecture
 
