@@ -246,8 +246,8 @@ export default function PropertyResults() {
             if (prices.length > 0) {
               const minPrice = Math.min(...prices) / 1000000; // Convert to lakhs
               const maxPrice = Math.max(...prices) / 1000000;
-              const budgetMin = preferences.budgetRange[0]; // Already in lakhs
-              const budgetMax = preferences.budgetRange[1];
+              const budgetMin = preferences.budgetRange?.[0] || 50; // Already in lakhs
+              const budgetMax = preferences.budgetRange?.[1] || 500;
               
               // Check if there's any overlap in price ranges
               if (minPrice <= budgetMax && maxPrice >= budgetMin) {
@@ -548,9 +548,11 @@ export default function PropertyResults() {
                 <span className="text-xs text-gray-500">Filters:</span>
                 {preferences.propertyType && <Badge variant="secondary" className="text-xs">{preferences.propertyType}</Badge>}
                 {preferences.zone && <Badge variant="secondary" className="text-xs">{preferences.zone}</Badge>}
-                <Badge variant="secondary" className="text-xs">
-                  ₹{preferences.budgetRange[0]}L - ₹{preferences.budgetRange[1]}L
-                </Badge>
+                {preferences.budgetRange && preferences.budgetRange.length === 2 && (
+                  <Badge variant="secondary" className="text-xs">
+                    ₹{preferences.budgetRange[0]}L - ₹{preferences.budgetRange[1]}L
+                  </Badge>
+                )}
                 {preferences.bhkType.slice(0, 2).map(bhk => (
                   <Badge key={bhk} variant="outline" className="text-xs">{bhk}</Badge>
                 ))}
@@ -817,7 +819,7 @@ export default function PropertyResults() {
         <div>
           <h4 className="font-medium mb-3">Budget Range (₹L)</h4>
           <Slider
-            value={preferences.budgetRange}
+            value={preferences.budgetRange || [50, 500]}
             onValueChange={(value) => onUpdatePreferences({ budgetRange: value as [number, number] })}
             min={50}
             max={1000}
@@ -825,8 +827,8 @@ export default function PropertyResults() {
             className="w-full"
           />
           <div className="flex justify-between text-sm text-gray-600 mt-2">
-            <span>₹{preferences.budgetRange[0]}L</span>
-            <span>₹{preferences.budgetRange[1]}L</span>
+            <span>₹{preferences.budgetRange?.[0] || 50}L</span>
+            <span>₹{preferences.budgetRange?.[1] || 500}L</span>
           </div>
         </div>
 
