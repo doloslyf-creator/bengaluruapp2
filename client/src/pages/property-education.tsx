@@ -110,263 +110,291 @@ export default function PropertyEducation() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-white">
       <Header />
 
-      {/* Hero Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="inline-flex items-center bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
-            <Play className="h-4 w-4 mr-2" />
-            Video Education Center
+      {/* Minimalist Hero Section */}
+      <section className="py-32 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="mb-8">
+            <span className="inline-block w-2 h-2 bg-emerald-500 rounded-full mr-3"></span>
+            <span className="text-sm tracking-wide text-gray-500 uppercase">Learn Property Investment</span>
+            <span className="inline-block w-2 h-2 bg-emerald-500 rounded-full ml-3"></span>
           </div>
 
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Master Property Investment
-            <span className="text-blue-600"> Through Expert Videos</span>
+          <h1 className="text-6xl font-light text-gray-900 mb-8 leading-tight">
+            What you don't know
+            <br />
+            <span className="font-medium text-emerald-600">could cost millions</span>
           </h1>
 
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Learn from RERA-certified experts with our comprehensive video library. 
-            From basic concepts to advanced strategies, we've got your property education covered.
+          <p className="text-lg text-gray-500 max-w-2xl mx-auto mb-12 leading-relaxed">
+            Discover the secrets that separate successful property investors from the rest. 
+            Expert knowledge, simplified.
           </p>
 
-          <div className="flex justify-center space-x-6 text-sm text-gray-600 mb-8">
-            <div className="flex items-center">
-              <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
-              {videos.length}+ Expert Videos
-            </div>
-            <div className="flex items-center">
-              <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
-              {categories.length} Learning Categories
-            </div>
-            <div className="flex items-center">
-              <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
-              RERA Certified Content
-            </div>
+          <div className="flex justify-center items-center space-x-8 text-xs text-gray-400 mb-16">
+            <span>{videos.length} insights</span>
+            <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+            <span>RERA certified</span>
+            <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+            <span>Expert curated</span>
           </div>
         </div>
       </section>
 
-      {/* Structured Courses */}
-      <section className="py-16 px-4 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Structured Video Courses
+      {/* Minimalist Course Grid */}
+      <section className="py-20 px-4 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-16">
+            <h2 className="text-3xl font-light text-gray-900 mb-3">
+              Complete Learning Journeys
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Follow step-by-step learning journeys designed by experts. From beginner basics to advanced strategies.
-            </p>
+            <div className="w-16 h-0.5 bg-emerald-500"></div>
           </div>
 
           {(isLoadingCourses || courses.length > 0) && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-              {!isLoadingCourses ? courses.map((course: Course) => (
-                <Card key={course.id} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-                  <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 rounded-t-lg flex items-center justify-center">
-                    {course.thumbnailUrl ? (
-                      <img
-                        src={course.thumbnailUrl}
-                        alt={course.title}
-                        className="w-full h-full object-cover rounded-t-lg"
-                      />
-                    ) : (
-                      <GraduationCap className="h-12 w-12 text-blue-600" />
-                    )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+              {!isLoadingCourses ? courses.map((course: Course, index) => (
+                <div 
+                  key={course.id} 
+                  className="group cursor-pointer"
+                  onClick={() => setLocation(`/courses/${course.slug}`)}
+                >
+                  <div className="relative overflow-hidden bg-white border border-gray-100 transition-all duration-500 group-hover:border-emerald-200 group-hover:shadow-lg">
+                    {/* Minimalist Header */}
+                    <div className="p-8 border-b border-gray-50">
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="text-xs tracking-wider text-gray-400 uppercase">
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <div className="flex items-center space-x-2">
+                          <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
+                          <span className="text-xs text-gray-400">{course.level}</span>
+                        </div>
+                      </div>
+                      
+                      <h3 className="text-xl font-medium text-gray-900 mb-3 leading-tight group-hover:text-emerald-700 transition-colors">
+                        {course.title}
+                      </h3>
+                      
+                      <p className="text-gray-500 text-sm leading-relaxed line-clamp-2">
+                        {course.description}
+                      </p>
+                    </div>
+
+                    {/* Minimalist Footer */}
+                    <div className="p-8">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4 text-xs text-gray-400">
+                          <span>{course.enrollmentCount} learning</span>
+                          {course.estimatedDuration && (
+                            <>
+                              <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                              <span>{course.estimatedDuration}</span>
+                            </>
+                          )}
+                        </div>
+                        
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <ArrowRight className="h-4 w-4 text-emerald-600" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Hover Effect Bar */}
+                    <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-emerald-500 transition-all duration-500 group-hover:w-full"></div>
                   </div>
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Badge 
-                        variant={course.level === 'beginner' ? 'default' : 
-                                course.level === 'intermediate' ? 'secondary' : 'destructive'}
-                        className="text-xs"
-                      >
-                        {course.level}
-                      </Badge>
-                      <Badge variant="outline" className="text-xs">{course.category}</Badge>
-                      {course.isFeatured && (
-                        <Badge className="bg-yellow-500 text-xs">Featured</Badge>
-                      )}
-                    </div>
-
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{course.title}</h3>
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">{course.description}</p>
-
-                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                      <span className="flex items-center">
-                        <Clock className="h-4 w-4 mr-1" />
-                        {course.estimatedDuration || 'Self-paced'}
-                      </span>
-                      <span className="flex items-center">
-                        <Users className="h-4 w-4 mr-1" />
-                        {course.enrollmentCount} enrolled
-                      </span>
-                    </div>
-
-                    <Button 
-                      className="w-full"
-                      onClick={() => setLocation(`/courses/${course.slug}`)}
-                    >
-                      Start Course
-                      <Play className="h-4 w-4 ml-2" />
-                    </Button>
-                  </CardContent>
-                </Card>
+                </div>
               )) : (
-                <div className="col-span-3 text-center py-10 text-gray-500">Loading courses...</div>
+                <div className="col-span-2 text-center py-20 text-gray-400">
+                  <div className="animate-pulse">Discovering learning paths...</div>
+                </div>
               )}
             </div>
           )}
-          {courses.length === 0 && !isLoadingCourses && (
-            <div className="text-center py-10 text-gray-500">No courses available yet.</div>
-          )}
         </div>
       </section>
 
-      {/* Learning Paths */}
-      <section className="py-16 px-4 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Individual Video Library
+      {/* Minimalist Learning Categories */}
+      <section className="py-20 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-16">
+            <h2 className="text-3xl font-light text-gray-900 mb-3">
+              Quick Expert Insights
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Browse our collection of individual expert videos by topic and difficulty level
-            </p>
+            <div className="w-16 h-0.5 bg-emerald-500"></div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {learningPaths.map((path, index) => (
-              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
-                <CardContent className="p-8">
-                  <div className={`w-16 h-16 rounded-2xl ${path.color} flex items-center justify-center mb-6`}>
-                    {path.icon}
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">{path.title}</h3>
-                  <p className="text-gray-600 mb-4">{path.description}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">{path.videos} videos</span>
-                    <Button variant="outline" size="sm">
-                      Browse Videos
-                      <ArrowRight className="h-4 w-4 ml-2" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Search and Filters */}
-      <section className="py-8 px-4 bg-white/50">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row gap-4 items-center">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Search videos..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full md:w-48">
-                <SelectValue placeholder="All Categories" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {categories.map(category => (
-                  <SelectItem key={category} value={category}>{category}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
-              <SelectTrigger className="w-full md:w-48">
-                <SelectValue placeholder="All Levels" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Levels</SelectItem>
-                <SelectItem value="beginner">Beginner</SelectItem>
-                <SelectItem value="intermediate">Intermediate</SelectItem>
-                <SelectItem value="advanced">Advanced</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </section>
-
-      {/* Video Grid */}
-      <section className="py-16 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold">
-              {filteredVideos.length} Video{filteredVideos.length !== 1 ? 's' : ''} Available
-            </h2>
-            <p className="text-gray-600">
-              {searchTerm && `Search results for "${searchTerm}"`}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredVideos.map((video) => (
-              <Card key={video.id} className="overflow-hidden hover:shadow-xl transition-shadow group">
-                <div className="aspect-video bg-muted relative cursor-pointer"
-                     onClick={() => setSelectedVideo(video)}>
-                  <img
-                    src={`https://img.youtube.com/vi/${video.youtubeUrl.split('v=')[1]?.split('&')[0]}/maxresdefault.jpg`}
-                    alt={video.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                    <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <Play className="h-6 w-6 text-blue-600 ml-1" />
-                    </div>
-                  </div>
-                  <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
-                    {video.duration}
+              <div 
+                key={index} 
+                className="group cursor-pointer p-8 border border-gray-100 transition-all duration-300 hover:border-emerald-200 hover:bg-gray-50"
+              >
+                <div className="mb-6">
+                  <span className="text-xs tracking-wider text-gray-400 uppercase">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                </div>
+                
+                <h3 className="text-lg font-medium text-gray-900 mb-3 group-hover:text-emerald-700 transition-colors">
+                  {path.title}
+                </h3>
+                
+                <p className="text-gray-500 text-sm mb-6 leading-relaxed">
+                  {path.description}
+                </p>
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-400">{path.videos} insights</span>
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <ArrowRight className="h-4 w-4 text-emerald-600" />
                   </div>
                 </div>
-
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-3">
-                    <Badge className={getDifficultyColor(video.difficulty)}>
-                      {video.difficulty}
-                    </Badge>
-                    <div className="flex items-center text-xs text-gray-500">
-                      <Eye className="h-3 w-3 mr-1" />
-                      {video.viewCount}
-                    </div>
-                  </div>
-
-                  <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                    {video.title}
-                  </h3>
-
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                    {video.description}
-                  </p>
-
-                  <div className="flex justify-between items-center">
-                    <Badge variant="outline" className="text-xs">
-                      {video.category}
-                    </Badge>
-                    <Button 
-                      size="sm" 
-                      onClick={() => setSelectedVideo(video)}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      Watch Now
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Minimalist Search */}
+      <section className="py-16 px-4 bg-gray-50">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="relative max-w-md mx-auto">
+              <input
+                type="text"
+                placeholder="What would you like to learn?"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full px-6 py-4 bg-white border border-gray-200 rounded-full text-center focus:outline-none focus:border-emerald-300 transition-colors"
+              />
+              <Search className="absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            </div>
+          </div>
+
+          <div className="flex justify-center space-x-8">
+            {['all', ...categories.slice(0, 3)].map((category, index) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`text-sm transition-colors ${
+                  selectedCategory === category 
+                    ? 'text-emerald-600 border-b border-emerald-600' 
+                    : 'text-gray-400 hover:text-gray-600'
+                }`}
+              >
+                {category === 'all' ? 'All Topics' : category}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Minimalist Video Grid */}
+      <section className="py-20 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          {filteredVideos.length > 0 && (
+            <>
+              <div className="mb-16">
+                <h2 className="text-3xl font-light text-gray-900 mb-3">
+                  {filteredVideos.length} expert insights available
+                </h2>
+                <div className="w-16 h-0.5 bg-emerald-500"></div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {filteredVideos.map((video, index) => (
+                  <div 
+                    key={video.id} 
+                    className="group cursor-pointer"
+                    onClick={() => setSelectedVideo(video)}
+                  >
+                    <div className="relative overflow-hidden bg-gray-50 border border-gray-100 transition-all duration-500 group-hover:border-emerald-200 group-hover:shadow-lg">
+                      {/* Video Thumbnail */}
+                      <div className="aspect-video relative overflow-hidden">
+                        <img
+                          src={`https://img.youtube.com/vi/${video.youtubeUrl.split('v=')[1]?.split('&')[0]}/maxresdefault.jpg`}
+                          alt={video.title}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                        
+                        {/* Minimalist Play Overlay */}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
+                          <div className="w-12 h-12 border border-white/80 rounded-full flex items-center justify-center backdrop-blur-sm opacity-80 group-hover:opacity-100 transition-all duration-300 group-hover:scale-110">
+                            <Play className="h-4 w-4 text-white ml-0.5" />
+                          </div>
+                        </div>
+
+                        {/* Duration Badge */}
+                        <div className="absolute top-4 right-4 bg-black/60 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
+                          {video.duration}
+                        </div>
+
+                        {/* Category Tag */}
+                        <div className="absolute top-4 left-4 bg-white/90 text-gray-800 text-xs px-2 py-1 rounded backdrop-blur-sm">
+                          {video.category}
+                        </div>
+                      </div>
+
+                      {/* Content */}
+                      <div className="p-8">
+                        <div className="flex items-center justify-between mb-4">
+                          <span className="text-xs tracking-wider text-gray-400 uppercase">
+                            {String(index + 1).padStart(2, '0')}
+                          </span>
+                          <div className="flex items-center space-x-2">
+                            <div className={`w-1.5 h-1.5 rounded-full ${
+                              video.difficulty === 'beginner' ? 'bg-green-500' :
+                              video.difficulty === 'intermediate' ? 'bg-yellow-500' : 'bg-red-500'
+                            }`}></div>
+                            <span className="text-xs text-gray-400">{video.difficulty}</span>
+                          </div>
+                        </div>
+                        
+                        <h3 className="text-xl font-medium text-gray-900 mb-3 leading-tight group-hover:text-emerald-700 transition-colors line-clamp-2">
+                          {video.title}
+                        </h3>
+                        
+                        <p className="text-gray-500 text-sm leading-relaxed line-clamp-2 mb-6">
+                          {video.description}
+                        </p>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3 text-xs text-gray-400">
+                            <span>{video.viewCount} views</span>
+                          </div>
+                          
+                          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <ArrowRight className="h-4 w-4 text-emerald-600" />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Hover Effect Bar */}
+                      <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-emerald-500 transition-all duration-500 group-hover:w-full"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {filteredVideos.length === 0 && (
+            <div className="text-center py-20">
+              <div className="text-gray-400 mb-4">No insights found for your search</div>
+              <button 
+                onClick={() => {
+                  setSearchTerm("");
+                  setSelectedCategory("all");
+                }}
+                className="text-emerald-600 text-sm hover:text-emerald-700 transition-colors"
+              >
+                Browse all insights
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
