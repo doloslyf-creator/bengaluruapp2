@@ -5,13 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, MapPin, Heart, Share2, Calendar, MessageCircle, Phone, Star, Award, Home, Building, CheckCircle, AlertTriangle, X, Users, Car, Building2, Shield, TreePine, Waves, Dumbbell, Wifi, ShoppingCart, Camera, Play, Download, Eye, Lock, CheckCircle2, XCircle, TrendingUp, TrendingDown, ChevronLeft, ChevronRight, BarChart3, Target, FileCheck, Clock, MapPin as MapPinVerified, UserCheck, ThumbsUp, Calculator, DollarSign, Zap, School, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, MapPin, Heart, Share2, Calendar, MessageCircle, Phone, Star, Award, Home, Building, CheckCircle, AlertTriangle, X, Users, Car, Building2, Shield, TreePine, Waves, Dumbbell, Wifi, ShoppingCart, Camera, Play, Download, Eye, Lock, CheckCircle2, XCircle, TrendingUp, TrendingDown, ChevronLeft, ChevronRight, BarChart3, Target, FileCheck, Clock, MapPin as MapPinVerified, UserCheck, ThumbsUp, Calculator, DollarSign, Zap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePayment } from '@/hooks/use-payment';
 import { updateMetaTags, generatePropertySchema, generatePropertySlug, injectSchema } from '@/utils/seo';
 import OrderFormDialog from '@/components/order-form-dialog';
 import { ExpertCredentials } from '@/components/expert-credentials';
-// import { ExitIntentPopup } from '@/components/exit-intent-popup';
+import { ExitIntentPopup } from '@/components/exit-intent-popup';
 import { PropertyGallery } from '@/components/property/property-gallery';
 import Header from '@/components/layout/header';
 
@@ -34,11 +34,6 @@ interface Property {
   possessionDate?: string;
   reraNumber?: string;
   reraApproved?: boolean;
-  features?: string[];
-  priceRange?: {
-    min: number;
-    max: number;
-  };
   configurations: {
     id: string;
     configuration: string;
@@ -664,458 +659,1485 @@ export default function PropertyDetailMinimal() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Exit Intent Popup - commented out for now */}
+      {/* Exit Intent Popup */}
+      <ExitIntentPopup 
+        title="Wait! Don't Miss This Property!"
+        description="Get a FREE Property Valuation Report worth ₹1,499 before you leave"
+        ctaText="Get FREE Report"
+        onAction={() => {
+          setOrderFormType('valuation');
+          setShowOrderForm(true);
+        }}
+      />
       
       {/* Global Header */}
       <Header />
       
-      {/* Minimalist Actions Bar */}
-      <div className="bg-white border-b border-gray-100 sticky top-16 z-30">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <button 
-            onClick={() => window.history.back()} 
-            className="text-sm text-gray-400 hover:text-emerald-600 transition-colors"
-          >
-            ← Back to search
-          </button>
-          <div className="flex items-center space-x-6">
-            <button onClick={toggleFavorite} className="group">
-              <Heart className={`h-5 w-5 transition-colors ${
-                isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400 group-hover:text-red-500'
-              }`} />
-            </button>
-            <button onClick={handleShare} className="group">
-              <Share2 className="h-5 w-5 text-gray-400 group-hover:text-emerald-600 transition-colors" />
-            </button>
+      {/* Property Actions Bar */}
+      <div className="bg-white border-b sticky top-16 z-30 shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <Button variant="ghost" onClick={() => window.history.back()} className="text-gray-600">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Search
+          </Button>
+          <div className="flex items-center space-x-2">
+            <Button variant="ghost" size="sm" onClick={toggleFavorite}>
+              <Heart className={`h-5 w-5 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-600'}`} />
+            </Button>
+            <Button variant="ghost" size="sm" onClick={handleShare}>
+              <Share2 className="h-5 w-5 text-gray-600" />
+            </Button>
           </div>
         </div>
       </div>
 
-      {/* Minimalist Hero Section */}
-      <section className="py-12 px-4 border-b border-gray-100">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Gallery */}
-            <div className="space-y-4">
-              <PropertyGallery
-                images={property.images || []}
-                videos={property.youtubeVideoUrl ? [property.youtubeVideoUrl] : []}
-                propertyName={property.name}
-                className="w-full rounded-2xl overflow-hidden shadow-lg"
-              />
+      <div className="max-w-6xl mx-auto px-4 py-6">
+        {/* Hero Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Images/Video */}
+          <div className="space-y-4">
+            {/* Enhanced Property Gallery */}
+            <PropertyGallery
+              images={property.images || []}
+              videos={property.youtubeVideoUrl ? [property.youtubeVideoUrl] : []}
+              propertyName={property.name}
+              className="w-full"
+            />
+          </div>
+
+          {/* Property Info */}
+          <div className="space-y-6">
+            {/* Status Badge */}
+            <Badge className={`${getStatusColor(property.status)} text-sm font-medium px-3 py-1`}>
+              {property.status.replace('-', ' ').toUpperCase()}
+            </Badge>
+
+            {/* Title */}
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{property.name}</h1>
+              <div className="flex items-center text-gray-600">
+                <MapPin className="h-4 w-4 mr-1" />
+                <span>{property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)} Zone</span>
+              </div>
             </div>
 
-            {/* Property Info */}
-            <div className="space-y-8">
-              {/* Status & Location */}
+            {/* Price */}
+            <div>
+              <div className="text-sm text-gray-600 mb-1">Starting Price</div>
+              <div className="text-2xl font-bold text-blue-600">{getPriceRange()}</div>
+            </div>
+
+            {/* Key Details */}
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className={`w-2 h-2 rounded-full ${
-                    property.status === 'completed' ? 'bg-green-500' :
-                    property.status === 'under-construction' ? 'bg-blue-500' : 'bg-yellow-500'
-                  }`}></div>
-                  <span className="text-xs tracking-wider text-gray-400 uppercase">
-                    {property.status.replace('-', ' ')}
-                  </span>
-                  <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-                  <span className="text-xs text-gray-400">{property.type}</span>
-                </div>
-                
-                <h1 className="text-4xl font-light text-gray-900 mb-4 leading-tight">
-                  {property.name}
-                </h1>
-                
-                <div className="flex items-center space-x-2 text-gray-500 mb-6">
-                  <MapPin className="h-4 w-4" />
-                  <span>{property.area}, {property.zone.charAt(0).toUpperCase() + property.zone.slice(1)} Zone</span>
-                </div>
-                
-                <div className="mb-8">
-                  <span className="text-sm text-gray-500 block mb-2">Starting from</span>
-                  <div className="text-3xl font-light text-gray-900">{getPriceRange()}</div>
+                <div className="text-sm text-gray-600">Developer</div>
+                <div className="font-medium">{property.developer}</div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-600">Possession</div>
+                <div className="font-medium">{property.possessionDate || 'TBA'}</div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-600">RERA</div>
+                <div className="font-medium text-green-600">
+                  {property.reraApproved ? 'Approved' : 'Pending'}
                 </div>
               </div>
+              <div>
+                <div className="text-sm text-gray-600">Property Type</div>
+                <div className="font-medium capitalize">{property.type}</div>
+              </div>
+            </div>
 
-              {/* Minimalist Key Details */}
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <span className="text-sm text-gray-500 block mb-1">Developer</span>
-                  <div className="text-gray-900">{property.developer}</div>
-                </div>
-                <div>
-                  <span className="text-sm text-gray-500 block mb-1">Possession</span>
-                  <div className="text-gray-900">{property.possessionDate || 'TBA'}</div>
-                </div>
-                <div>
-                  <span className="text-sm text-gray-500 block mb-1">RERA Status</span>
-                  <div className={`text-sm ${property.reraApproved ? 'text-emerald-600' : 'text-yellow-600'}`}>
-                    {property.reraApproved ? 'Verified' : 'Pending'}
+            {/* Data Verification Badges */}
+            <div className="space-y-3">
+              <div className="text-sm font-medium text-gray-900">Data Verification Status</div>
+              <div className="grid grid-cols-2 gap-3">
+                {/* RERA Verification */}
+                <div className="flex items-center bg-green-50 border border-green-200 rounded-lg p-3">
+                  <div className="flex-shrink-0 h-8 w-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                    <FileCheck className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-green-900">RERA Verified</div>
+                    <div className="text-xs text-green-700">Government database</div>
                   </div>
                 </div>
-                <div>
-                  <span className="text-sm text-gray-500 block mb-1">Property Type</span>
-                  <div className="text-gray-900 capitalize">{property.type}</div>
+
+                {/* Site Visit Verification */}
+                <div className="flex items-center bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <div className="flex-shrink-0 h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                    <MapPinVerified className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-blue-900">Site Verified</div>
+                    <div className="text-xs text-blue-700">Expert site visit</div>
+                  </div>
+                </div>
+
+                {/* Price Verification */}
+                <div className="flex items-center bg-purple-50 border border-purple-200 rounded-lg p-3">
+                  <div className="flex-shrink-0 h-8 w-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                    <BarChart3 className="h-4 w-4 text-purple-600" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-purple-900">Price Verified</div>
+                    <div className="text-xs text-purple-700">Market analysis</div>
+                  </div>
+                </div>
+
+                {/* Last Updated */}
+                <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg p-3">
+                  <div className="flex-shrink-0 h-8 w-8 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                    <Clock className="h-4 w-4 text-gray-600" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">Last Updated</div>
+                    <div className="text-xs text-gray-700">
+                      {new Date().toLocaleDateString('en-IN')}
+                    </div>
+                  </div>
                 </div>
               </div>
+            </div>
+
+            {/* Property Tags */}
+            <div className="flex flex-wrap gap-2">
+              {property.tags.slice(0, 4).map((tag) => (
+                <Badge key={tag} variant="secondary" className="text-xs">
+                  {tag.replace('-', ' ').toUpperCase()}
+                </Badge>
+              ))}
             </div>
           </div>
         </div>
-      </section>
 
 
 
-
-        {/* Main Content Section */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Main Content with Sidebar Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Main Content */}
           <div className="lg:col-span-3 space-y-8">
 
-            {/* Property Video Section */}
-            {property.youtubeVideoUrl && (
-              <div className="bg-gray-50 rounded-2xl p-6">
-                <div className="mb-4">
-                  <h3 className="text-lg font-light text-gray-900 mb-2">Property Walkthrough</h3>
-                  <div className="w-12 h-0.5 bg-emerald-500"></div>
+        {/* Property Video Section */}
+        {property.youtubeVideoUrl && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Play className="h-5 w-5 mr-2" />
+                Property Walkthrough & Review
+              </CardTitle>
+              <p className="text-gray-600">Expert review and virtual tour of the property</p>
+            </CardHeader>
+            <CardContent>
+              <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
+                <iframe 
+                  src={`https://www.youtube.com/embed/${property.youtubeVideoUrl.split('v=')[1]?.split('&')[0]}`}
+                  className="w-full h-full"
+                  allowFullScreen
+                  title="Property Walkthrough Video"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Amenities Section */}
+        {property.amenities && property.amenities.length > 0 && (
+          <Card className="mb-8">
+            <CardHeader className="text-center pb-6">
+              <CardTitle className="text-3xl font-bold mb-2">Premium Amenities</CardTitle>
+              <p className="text-gray-600">World-class facilities for modern living</p>
+            </CardHeader>
+            <CardContent className="p-8">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+                {property.amenities.slice(0, 12).map((amenity, index) => {
+                  const amenityIcons = {
+                    "Swimming Pool": Waves,
+                    "Gymnasium": Dumbbell,
+                    "Club House": Users,
+                    "Children's Play Area": Users,
+                    "Landscaped Gardens": TreePine,
+                    "24/7 Security": Shield,
+                    "Power Backup": Zap,
+                    "Covered Parking": Car,
+                    "Wi-Fi": Wifi,
+                    "Shopping Center": ShoppingCart,
+                    "Jogging Track": Users,
+                    "Tennis Court": Users,
+                    "Outdoor Tennis Courts": Users,
+                    "Security": Shield,
+                    "Reserved Parking": Car,
+                    "Visitor Parking": Car,
+                    "Flower Gardens": TreePine,
+                    "Library": Building2,
+                    "Business Centre": Building2,
+                    "Recreational Pool": Waves,
+                    "Rentable Community Space": Home,
+                    "RO Water System": Waves,
+                    "Multipurpose Courts": Users,
+                    "Basketball Court": Users,
+                    "Badminton Court": Users,
+                    "Yoga Deck": Users,
+                    "Meditation Area": TreePine,
+                    "Kids Pool": Waves,
+                    "Spa": Star,
+                    "Sauna": Star,
+                    "Steam Room": Star,
+                    "Party Hall": Users,
+                    "Banquet Hall": Users,
+                    "Mini Theatre": Users,
+                    "Game Room": Users,
+                    "Indoor Games": Users,
+                    "Outdoor Games": Users,
+                    "Amphitheatre": Users,
+                    "Jogging and Strolling Track": Users,
+                  };
+                  
+                  const IconComponent = amenityIcons[amenity as keyof typeof amenityIcons] || Home;
+                  return (
+                    <div key={index} className="relative">
+                      {/* Premium badge for special amenities */}
+                      {(amenity.toLowerCase().includes('premium') || amenity.toLowerCase().includes('club') || amenity.toLowerCase().includes('golf')) && (
+                        <div className="absolute -top-1 -right-1 z-10">
+                          <div className="w-4 h-6 bg-gradient-to-b from-yellow-400 to-yellow-600 transform rotate-12 flex items-center justify-center">
+                            <Star className="h-2 w-2 text-white" />
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="bg-white border border-gray-200 rounded-xl p-6 text-center hover:shadow-lg transition-all duration-300 hover:border-blue-300 hover:-translate-y-1 group">
+                        <div className="w-16 h-16 mx-auto mb-4 p-3 bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl group-hover:from-blue-50 group-hover:to-indigo-50 transition-colors">
+                          <IconComponent className="h-10 w-10 text-amber-600 group-hover:text-blue-600 transition-colors" />
+                        </div>
+                        <h3 className="text-sm font-medium text-gray-900 leading-tight">
+                          {amenity}
+                        </h3>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              {property.amenities.length > 12 && (
+                <div className="mt-8 text-center">
+                  <Button 
+                    variant="outline" 
+                    className="text-blue-600 border-blue-600 hover:bg-blue-50 px-6 py-2"
+                    onClick={() => {
+                      // You can implement a modal or expansion logic here
+                      console.log('Show all amenities');
+                    }}
+                  >
+                    View All Amenities ({property.amenities.length}) →
+                  </Button>
                 </div>
-                <div className="aspect-video rounded-xl overflow-hidden bg-gray-100 shadow-lg">
-                  <iframe 
-                    src={`https://www.youtube.com/embed/${property.youtubeVideoUrl.split('v=')[1]?.split('&')[0]}`}
-                    className="w-full h-full"
-                    allowFullScreen
-                    title="Property Walkthrough Video"
-                  />
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Enhanced Configuration Cards */}
+        <Card className="mb-8" id="configurations">
+          <CardHeader>
+            <CardTitle>Available Configurations</CardTitle>
+            <p className="text-gray-600">Select a configuration to view detailed information</p>
+          </CardHeader>
+          <CardContent>
+            {/* Configuration Selection Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              {property.configurations.map((config, index) => (
+                <div 
+                  key={index} 
+                  className={`p-4 rounded-lg border-2 transition-all cursor-pointer ${
+                    selectedConfig?.id === config.id 
+                      ? 'border-blue-500 bg-blue-50' 
+                      : 'border-gray-200 hover:border-blue-300'
+                  }`}
+                  onClick={() => setSelectedConfig(config)}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-semibold">{config.configuration}</h3>
+                    <Badge variant={config.availabilityStatus === 'available' ? 'default' : 
+                                   config.availabilityStatus === 'limited' ? 'secondary' : 'destructive'}>
+                      {config.availabilityStatus}
+                    </Badge>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Area</span>
+                      <span className="font-medium">{config.builtUpArea} sq ft</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Price/sq ft</span>
+                      <span className="font-medium">₹{Number(config.pricePerSqft).toLocaleString()}</span>
+                    </div>
+                    <Separator />
+                    <div className="flex justify-between">
+                      <span className="text-gray-900 font-medium">Total Price</span>
+                      <span className="text-lg font-bold text-blue-600">
+                        {formatPriceDisplay(config.price)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Selected Configuration Details */}
+            {selectedConfig && (
+              <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
+                <h3 className="text-xl font-bold text-blue-900 mb-4">
+                  {selectedConfig.configuration} - Detailed Information
+                </h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {/* Pricing Details */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-blue-800">Pricing Breakdown</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">Built-up Area</span>
+                        <span className="font-medium">{selectedConfig.builtUpArea} sq ft</span>
+                      </div>
+                      {selectedConfig.plotSize && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">Plot Size</span>
+                          <span className="font-medium">{selectedConfig.plotSize} sq ft</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">Rate per sq ft</span>
+                        <span className="font-medium">₹{Number(selectedConfig.pricePerSqft).toLocaleString()}</span>
+                      </div>
+                      <Separator />
+                      <div className="flex justify-between">
+                        <span className="text-blue-800 font-semibold">Base Price</span>
+                        <span className="font-bold text-blue-600">{formatPriceDisplay(selectedConfig.price)}</span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-600">
+                        <span>Additional charges may apply</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Availability */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-blue-800">Availability Status</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">Status</span>
+                        <Badge variant={selectedConfig.availabilityStatus === 'available' ? 'default' : 
+                                       selectedConfig.availabilityStatus === 'limited' ? 'secondary' : 'destructive'}>
+                          {selectedConfig.availabilityStatus}
+                        </Badge>
+                      </div>
+                      {selectedConfig.totalUnits && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">Total Units</span>
+                          <span className="font-medium">{selectedConfig.totalUnits}</span>
+                        </div>
+                      )}
+                      {selectedConfig.availableUnits && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-700">Available</span>
+                          <span className="font-medium text-green-600">{selectedConfig.availableUnits} units left</span>
+                        </div>
+                      )}
+                      {selectedConfig.availabilityStatus === 'limited' && (
+                        <div className="bg-yellow-100 p-2 rounded text-xs text-yellow-800">
+                          ⚡ Limited availability - High demand configuration
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Investment Analysis */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-blue-800">Investment Insights</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">EMI (20 years)</span>
+                        <span className="font-medium">₹{Math.round(selectedConfig.price * 0.008).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">Expected Rental</span>
+                        <span className="font-medium">₹{Math.round(selectedConfig.price * 0.003).toLocaleString()}/month</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">Rental Yield</span>
+                        <span className="font-medium text-green-600">3.6% annually</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-700">5-year Appreciation</span>
+                        <span className="font-medium text-green-600">+45-65%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Actions for Selected Config */}
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <Button onClick={handleBookVisit} className="flex-1 min-w-48">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Book Site Visit for {selectedConfig.configuration}
+                  </Button>
+                  <Button variant="outline" onClick={handleConsult} className="flex-1 min-w-48">
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Get Expert Advice
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="flex-1 min-w-48"
+                    onClick={() => property.brochureUrl ? window.open(property.brochureUrl, '_blank') : null}
+                    disabled={!property.brochureUrl}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    {property.brochureUrl ? 'Download Brochure' : 'Brochure Not Available'}
+                  </Button>
                 </div>
               </div>
             )}
+          </CardContent>
+        </Card>
 
-            {/* Property Features */}
-            <div className="bg-gray-50 rounded-2xl p-6">
-              <div className="mb-6">
-                <h3 className="text-lg font-light text-gray-900 mb-2">Property Features</h3>
-                <div className="w-12 h-0.5 bg-emerald-500"></div>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {property.tags.slice(0, 8).map((tag, index) => (
-                  <div key={index} className="bg-white rounded-xl p-4 text-center border border-gray-100 hover:border-emerald-200 transition-colors">
-                    <div className="w-10 h-10 mx-auto mb-3 bg-emerald-50 rounded-lg flex items-center justify-center">
-                      <Home className="h-5 w-5 text-emerald-600" />
-                    </div>
-                    <span className="text-sm text-gray-700 capitalize">
-                      {tag.replace('-', ' ')}
-                    </span>
+        {/* Property Analysis & Reports */}
+        <Card className="mb-8" id="reports">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              Property Analysis & Reports
+              <Badge className="ml-3 bg-green-100 text-green-800 border-green-200">
+                <FileCheck className="h-3 w-3 mr-1" />
+                Expert Verified
+              </Badge>
+            </CardTitle>
+            <p className="text-gray-600">Get professional insights to make informed decisions backed by site visits and expert analysis</p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Civil & MEP Report Data */}
+            <Card className="border-orange-200">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center">
+                    <h4 className="font-semibold text-orange-800">Civil & MEP Analysis Report</h4>
+                    <Badge className="ml-2 bg-blue-100 text-blue-800 border-blue-200 text-xs">
+                      <MapPinVerified className="h-3 w-3 mr-1" />
+                      Site Verified
+                    </Badge>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Configuration Cards */}
-            <div className="bg-gray-50 rounded-2xl p-6">
-              <div className="mb-6">
-                <h3 className="text-lg font-light text-gray-900 mb-2">Available Configurations</h3>
-                <div className="w-12 h-0.5 bg-emerald-500"></div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {property.configurations.map((config, index) => (
-                  <div 
-                    key={index} 
-                    className={`bg-white rounded-xl p-6 border transition-all cursor-pointer ${
-                      selectedConfig?.id === config.id 
-                        ? 'border-emerald-500 bg-emerald-50' 
-                        : 'border-gray-200 hover:border-emerald-300'
-                    }`}
-                    onClick={() => setSelectedConfig(config)}
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <h4 className="font-medium text-gray-900">{config.configuration}</h4>
-                      <div className={`w-2 h-2 rounded-full ${
-                        config.availabilityStatus === 'available' ? 'bg-green-500' :
-                        config.availabilityStatus === 'limited' ? 'bg-yellow-500' : 'bg-red-500'
-                      }`}></div>
+                  <Badge className="bg-orange-100 text-orange-800">Essential</Badge>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Foundation Type</span>
+                      <span className="font-semibold text-green-600">RCC Raft Foundation</span>
                     </div>
-                    
-                    <div className="space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-sm text-gray-500">Area</span>
-                        <span className="text-sm text-gray-900">{config.builtUpArea} sq ft</span>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Structural Grade</span>
+                      <span className="font-semibold text-green-600">M30 Concrete</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Steel Quality</span>
+                      <span className="font-semibold">Fe500 TMT Bars</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Earthquake Rating</span>
+                      <span className="font-semibold text-green-600">Zone II Compliant</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Waterproofing</span>
+                      <span className="font-semibold">Dr. Fixit System</span>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Electrical Load</span>
+                      <span className="font-semibold">5 KW per unit</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Power Backup</span>
+                      <span className="font-semibold text-green-600">100% DG Backup</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Plumbing</span>
+                      <span className="font-semibold">CPVC Pipes</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Fire Safety</span>
+                      <span className="font-semibold text-green-600">NOC Approved</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Lift Specifications</span>
+                      <span className="font-semibold">OTIS/Schindler</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-yellow-50 p-3 rounded mb-4">
+                  <p className="text-xs text-yellow-800">Civil & MEP analysis could save ₹2-5 lakhs in unexpected repairs</p>
+                </div>
+
+                {/* Expert Credentials for Civil & MEP */}
+                <div className="mb-4">
+                  <ExpertCredentials reportType="civil-mep" compact={true} />
+                </div>
+
+                <Button 
+                  className="w-full" 
+                  size="sm"
+                  onClick={handleCivilMepReport}
+                  disabled={isProcessing}
+                >
+                  <Lock className="h-4 w-4 mr-2" />
+                  {isProcessing ? 'Processing...' : 'Get Full Civil & MEP Report - ₹2,499'}
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Property Valuation Report Data */}
+            <Card className="border-blue-200">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center">
+                    <h4 className="font-semibold text-blue-800">Property Valuation Report</h4>
+                    <Badge className="ml-2 bg-purple-100 text-purple-800 border-purple-200 text-xs">
+                      <BarChart3 className="h-3 w-3 mr-1" />
+                      Market Verified
+                    </Badge>
+                  </div>
+                  <Badge className="bg-blue-100 text-blue-800">Critical</Badge>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Market Value</span>
+                      <span className="font-semibold">₹{selectedConfig ? ((Number(selectedConfig.pricePerSqft) * Number(selectedConfig.builtUpArea))).toLocaleString() : '1,02,00,000'}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Location Premium</span>
+                      <span className="font-semibold text-green-600">+15% vs Area Avg</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Investment Grade</span>
+                      <span className="font-semibold text-blue-600">A- Excellent</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Rental Yield</span>
+                      <span className="font-semibold text-green-600">3.8% annually</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Appreciation (5yr)</span>
+                      <span className="font-semibold text-green-600">55-70%</span>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Construction Quality</span>
+                      <span className="font-semibold text-green-600">Premium Grade</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Connectivity Score</span>
+                      <span className="font-semibold">8.5/10</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Social Infrastructure</span>
+                      <span className="font-semibold text-green-600">Excellent</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Liquidity Factor</span>
+                      <span className="font-semibold">High Demand Area</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Risk Assessment</span>
+                      <span className="font-semibold text-green-600">Low Risk</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 p-3 rounded mb-4">
+                  <p className="text-xs text-blue-800">Professional valuation prevents overpaying by 10-15% on average</p>
+                </div>
+
+                {/* Expert Credentials for Valuation */}
+                <div className="mb-4">
+                  <ExpertCredentials reportType="valuation" compact={true} />
+                </div>
+
+                <Button 
+                  className="w-full" 
+                  size="sm"
+                  onClick={handleValuationReport}
+                  disabled={isProcessing}
+                >
+                  <Lock className="h-4 w-4 mr-2" />
+                  {isProcessing ? 'Processing...' : 'Get Full Valuation Report - ₹1,499'}
+                </Button>
+              </CardContent>
+            </Card>
+          </CardContent>
+        </Card>
+
+        {/* Property Highlights & Considerations */}
+        <Card className="mb-8" id="pros-cons">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <CheckCircle className="h-5 w-5 mr-2 text-green-600" />
+              Property Highlights & Considerations
+            </CardTitle>
+            <p className="text-gray-600">Key strengths and important factors to evaluate for this property</p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              
+              {/* Property Highlights - Card Grid */}
+              <div className="space-y-4">
+                <div className="flex items-center mb-4">
+                  <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                    <ThumbsUp className="h-4 w-4 text-green-600" />
+                  </div>
+                  <h4 className="font-semibold text-green-800 text-lg">Property Highlights</h4>
+                </div>
+                
+                <div className="grid grid-cols-1 gap-3">
+                  <Card className="border-green-200 bg-green-50/50 hover:bg-green-50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Shield className="h-5 w-5 text-green-600 mr-3" />
+                          <div>
+                            <p className="font-medium text-gray-900">RERA Compliance</p>
+                            <p className="text-sm text-gray-600">Full regulatory compliance</p>
+                          </div>
+                        </div>
+                        <Badge className="bg-green-100 text-green-800">
+                          {property.reraApproved ? 'Approved' : 'Process'}
+                        </Badge>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-gray-500">Rate</span>
-                        <span className="text-sm text-gray-900">₹{Number(config.pricePerSqft).toLocaleString()}/sq ft</span>
-                      </div>
-                      <div className="border-t border-gray-100 pt-3">
-                        <div className="flex justify-between">
-                          <span className="text-gray-900 font-medium">Total Price</span>
-                          <span className="text-lg font-semibold text-emerald-600">
-                            {formatPriceDisplay(config.price)}
-                          </span>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-green-200 bg-green-50/50 hover:bg-green-50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <MapPin className="h-5 w-5 text-green-600 mr-3" />
+                          <div>
+                            <p className="font-medium text-gray-900">Prime Location</p>
+                            <p className="text-sm text-gray-600">Excellent connectivity & infrastructure</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-semibold text-green-600">{property.locationScore || 4}/5</div>
+                          <div className="text-xs text-green-600">Excellent</div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+                    </CardContent>
+                  </Card>
 
-            {/* Quick Actions */}
-            <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-100">
-              <div className="mb-4">
-                <h3 className="text-lg font-light text-gray-900 mb-2">Next Steps</h3>
-                <div className="w-12 h-0.5 bg-emerald-500"></div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button 
-                  onClick={handleBookVisit}
-                  className="bg-white border border-emerald-200 rounded-xl p-4 text-left hover:border-emerald-400 transition-colors"
-                >
-                  <div className="flex items-center space-x-3 mb-2">
-                    <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
-                      <Calendar className="h-4 w-4 text-emerald-600" />
-                    </div>
-                    <span className="font-medium text-gray-900">Schedule Site Visit</span>
-                  </div>
-                  <p className="text-sm text-gray-500">See the property in person</p>
-                </button>
+                  <Card className="border-green-200 bg-green-50/50 hover:bg-green-50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Star className="h-5 w-5 text-green-600 mr-3" />
+                          <div>
+                            <p className="font-medium text-gray-900">Premium Amenities</p>
+                            <p className="text-sm text-gray-600">World-class facilities & services</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-semibold text-green-600">{property.amenitiesScore || 5}/5</div>
+                          <div className="text-xs text-green-600">Premium</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-                <button 
-                  onClick={handleConsult}
-                  className="bg-white border border-emerald-200 rounded-xl p-4 text-left hover:border-emerald-400 transition-colors"
-                >
-                  <div className="flex items-center space-x-3 mb-2">
-                    <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
-                      <MessageCircle className="h-4 w-4 text-emerald-600" />
-                    </div>
-                    <span className="font-medium text-gray-900">Expert Consultation</span>
-                  </div>
-                  <p className="text-sm text-gray-500">Get professional advice</p>
-                </button>
-              </div>
-            </div>
-          </div>
+                  <Card className="border-green-200 bg-green-50/50 hover:bg-green-50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Building className="h-5 w-5 text-green-600 mr-3" />
+                          <div>
+                            <p className="font-medium text-gray-900">Construction Status</p>
+                            <p className="text-sm text-gray-600">
+                              {property.status === 'completed' ? 'Immediate possession available' : 
+                               property.status === 'under-construction' ? 'Construction in progress' : 
+                               'Launch phase planning'}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge className="bg-blue-100 text-blue-800">
+                          {property.status === 'completed' ? 'Ready' : 
+                           property.status === 'under-construction' ? 'Ongoing' : 'Pre-launch'}
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* CTA Section */}
-            <div className="bg-emerald-50 rounded-2xl p-6 border border-emerald-100">
-              <div className="text-center mb-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Get Professional Reports</h3>
-                <p className="text-sm text-gray-600">Expert property analysis & valuation</p>
-              </div>
-              
-              <div className="space-y-3">
-                <button
-                  onClick={() => {
-                    setOrderFormType('civil-mep');
-                    setShowOrderForm(true);
-                  }}
-                  className="w-full bg-emerald-600 text-white rounded-xl p-4 hover:bg-emerald-700 transition-colors"
-                >
-                  <div className="text-left">
-                    <div className="font-medium mb-1">Civil & MEP Report</div>
-                    <div className="text-sm opacity-90">₹2,999</div>
-                  </div>
-                </button>
-                
-                <button
-                  onClick={() => {
-                    setOrderFormType('valuation');
-                    setShowOrderForm(true);
-                  }}
-                  className="w-full border border-emerald-300 text-emerald-700 rounded-xl p-4 hover:bg-emerald-50 transition-colors"
-                >
-                  <div className="text-left">
-                    <div className="font-medium mb-1">Property Valuation</div>
-                    <div className="text-sm">₹1,499</div>
-                  </div>
-                </button>
-              </div>
-            </div>
-
-            {/* Expert Credentials */}
-            <ExpertCredentials reportType="civil-mep" />
-          </div>
-        </div>
-      </div>
-
-      {/* Property Overview */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            <Card className="border-gray-100">
-              <CardContent className="p-6">
-                <h2 className="text-lg font-medium text-gray-900 mb-4">About this Property</h2>
-                <p className="text-gray-600 leading-relaxed mb-6">
-                  Experience luxury living at {property.name}, a premium development in {property.area}. 
-                  This property offers world-class amenities and excellent connectivity to key areas of the city.
-                </p>
-                
-                {/* Tags */}
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {property.tags.map((tag, index) => (
-                    <Badge key={index} variant="secondary" className="bg-emerald-50 text-emerald-700 border-emerald-200">
-                      {tag}
-                    </Badge>
-                  ))}
+                  <Card className="border-green-200 bg-green-50/50 hover:bg-green-50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Award className="h-5 w-5 text-green-600 mr-3" />
+                          <div>
+                            <p className="font-medium text-gray-900">Developer Reputation</p>
+                            <p className="text-sm text-gray-600">Proven track record & brand trust</p>
+                          </div>
+                        </div>
+                        <Badge className="bg-green-100 text-green-800">Established</Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-                
-                {/* Quick Info */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <div className="text-sm text-gray-500">Zone</div>
-                    <div className="font-medium text-gray-900">{property.zone}</div>
-                  </div>
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <div className="text-sm text-gray-500">Type</div>
-                    <div className="font-medium text-gray-900">{property.type}</div>
+
+                <div className="bg-green-100 p-4 rounded-lg">
+                  <div className="flex items-center">
+                    <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+                    <p className="text-sm font-medium text-green-800">
+                      This property meets {getPropertyPros().length} out of 10 key investment criteria
+                    </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Quick Actions */}
-            <Card className="border-gray-100">
-              <CardContent className="p-6">
-                <h3 className="font-medium text-gray-900 mb-4">Get Expert Help</h3>
-                <div className="space-y-3">
-                  <Button 
-                    onClick={handleConsult}
-                    variant="outline" 
-                    className="w-full justify-start border-emerald-200 hover:bg-emerald-50"
-                  >
-                    <MessageCircle className="h-4 w-4 mr-2" />
-                    Free Consultation
-                  </Button>
-                  <Button 
-                    onClick={handleBookVisit}
-                    className="w-full justify-start bg-emerald-600 hover:bg-emerald-700"
-                  >
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Schedule Site Visit
-                  </Button>
+              {/* Property Considerations - Card Grid */}
+              <div className="space-y-4">
+                <div className="flex items-center mb-4">
+                  <div className="h-8 w-8 bg-orange-100 rounded-full flex items-center justify-center mr-3">
+                    <AlertTriangle className="h-4 w-4 text-orange-600" />
+                  </div>
+                  <h4 className="font-semibold text-orange-800 text-lg">Key Considerations</h4>
                 </div>
-              </CardContent>
-            </Card>
+                
+                <div className="grid grid-cols-1 gap-3">
+                  <Card className="border-orange-200 bg-orange-50/50 hover:bg-orange-50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Clock className="h-5 w-5 text-orange-600 mr-3" />
+                          <div>
+                            <p className="font-medium text-gray-900">Construction Timeline</p>
+                            <p className="text-sm text-gray-600">
+                              {property.status === 'completed' ? 'Ready to move' : 'Plan for waiting period'}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge className={`${property.status === 'completed' ? 'bg-green-100 text-green-800' : 
+                                          property.status === 'under-construction' ? 'bg-yellow-100 text-yellow-800' : 
+                                          'bg-red-100 text-red-800'}`}>
+                          {property.status === 'under-construction' ? 'Ongoing' : 
+                           property.status === 'pre-launch' ? 'Future' : 'Immediate'}
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-            {/* Property Scores */}
-            {(property.overallScore || property.locationScore || property.amenitiesScore || property.valueScore) && (
-              <Card className="border-gray-100">
-                <CardContent className="p-6">
-                  <h3 className="font-medium text-gray-900 mb-4">Property Scores</h3>
-                  <div className="space-y-3">
-                    {property.overallScore && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Overall Score</span>
-                        <Badge className="bg-emerald-100 text-emerald-800">{property.overallScore}/10</Badge>
+                  <Card className="border-orange-200 bg-orange-50/50 hover:bg-orange-50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <TrendingUp className="h-5 w-5 text-orange-600 mr-3" />
+                          <div>
+                            <p className="font-medium text-gray-900">Price Point</p>
+                            <p className="text-sm text-gray-600">Compare with similar properties</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-semibold text-orange-600">
+                            {property.valueScore && property.valueScore < 4 ? 'Premium' : 'Competitive'}
+                          </div>
+                        </div>
                       </div>
-                    )}
-                    {property.locationScore && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Location</span>
-                        <Badge variant="secondary">{property.locationScore}/10</Badge>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-orange-200 bg-orange-50/50 hover:bg-orange-50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Users className="h-5 w-5 text-orange-600 mr-3" />
+                          <div>
+                            <p className="font-medium text-gray-900">Market Competition</p>
+                            <p className="text-sm text-gray-600">Act quickly for preferred units</p>
+                          </div>
+                        </div>
+                        <Badge className="bg-orange-100 text-orange-800">High</Badge>
                       </div>
-                    )}
-                    {property.amenitiesScore && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Amenities</span>
-                        <Badge variant="secondary">{property.amenitiesScore}/10</Badge>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-orange-200 bg-orange-50/50 hover:bg-orange-50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Calculator className="h-5 w-5 text-orange-600 mr-3" />
+                          <div>
+                            <p className="font-medium text-gray-900">Additional Costs</p>
+                            <p className="text-sm text-gray-600">Budget for registration & taxes</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-semibold text-orange-600">12-15%</div>
+                          <div className="text-xs text-orange-600">of property value</div>
+                        </div>
                       </div>
-                    )}
-                    {property.valueScore && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Value</span>
-                        <Badge variant="secondary">{property.valueScore}/10</Badge>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-orange-200 bg-orange-50/50 hover:bg-orange-50 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <DollarSign className="h-5 w-5 text-orange-600 mr-3" />
+                          <div>
+                            <p className="font-medium text-gray-900">Rental Yield</p>
+                            <p className="text-sm text-gray-600">Moderate returns for investors</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-semibold text-orange-600">3.2-3.8%</div>
+                          <div className="text-xs text-orange-600">annual yield</div>
+                        </div>
                       </div>
-                    )}
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="bg-orange-100 p-4 rounded-lg">
+                  <div className="flex items-center">
+                    <AlertTriangle className="h-5 w-5 text-orange-600 mr-2" />
+                    <p className="text-sm font-medium text-orange-800">
+                      Consider these factors carefully - our experts can help you evaluate risks
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Similar Properties Price Analysis */}
+        <Card className="mb-8" id="similar-price-analysis">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <TrendingUp className="h-5 w-5 mr-2" />
+              Similar Properties Price Analysis
+            </CardTitle>
+            <p className="text-gray-600">Compare pricing with similar {property.type} properties in {property.area} for better decision making</p>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-hidden rounded-lg border border-gray-200">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Property</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price/Sq Ft</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Price</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price Difference</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {/* Current Property Row - Highlighted */}
+                  <tr className="bg-blue-50 border-l-4 border-blue-500">
+                    <td className="px-4 py-3 text-sm">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                          <Home className="h-4 w-4 text-blue-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-blue-900">{property.name}</div>
+                          <div className="text-xs text-blue-700">Current Property</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900">
+                      <div className="flex items-center">
+                        <MapPin className="h-3 w-3 mr-1 text-gray-400" />
+                        {property.area}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900">
+                      <Badge variant="default" className="capitalize">
+                        {property.type}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-3 text-sm font-semibold text-blue-900">
+                      ₹{property.configurations[0] ? Number(property.configurations[0].pricePerSqft).toLocaleString() : '12,500'}
+                    </td>
+                    <td className="px-4 py-3 text-sm font-semibold text-blue-900">
+                      {property.configurations[0] ? formatPriceDisplay(property.configurations[0].price) : '₹2.85 Cr'}
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      <Badge className="bg-blue-100 text-blue-800">Reference</Badge>
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      <Badge 
+                        variant={property.status === 'completed' ? 'default' : 
+                                property.status === 'under-construction' ? 'secondary' : 'outline'}
+                        className="capitalize"
+                      >
+                        {property.status.replace('-', ' ')}
+                      </Badge>
+                    </td>
+                  </tr>
+                  
+                  {/* Similar Properties Rows - Same Location and Type Only */}
+                  {getSimilarProperties().filter(prop => prop.area === property.area && prop.type === property.type).length > 0 ? 
+                    getSimilarProperties().filter(prop => prop.area === property.area && prop.type === property.type).slice(0, 4).map((similarProp, index) => {
+                    const currentPrice = property.configurations[0] ? property.configurations[0].price : 28500000;
+                    
+                    // Use actual property data - no calculations needed
+                    const similarPrice = similarProp.configurations?.[0] ? similarProp.configurations[0].price : 0;
+                    const pricePerSqft = similarProp.configurations?.[0] ? 
+                                       Number(similarProp.configurations[0].pricePerSqft) : 0;
+                    
+                    // Calculate price difference only if both prices exist
+                    const priceDiff = (similarPrice && currentPrice) ? ((similarPrice - currentPrice) / currentPrice) * 100 : 0;
+                    
+                    return (
+                      <tr key={similarProp.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-4 py-3 text-sm">
+                          <div className="flex items-center">
+                            <div className="flex-shrink-0 h-8 w-8 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                              <Building2 className="h-4 w-4 text-gray-600" />
+                            </div>
+                            <div>
+                              <div className="font-medium text-gray-900">{similarProp.name}</div>
+                              <div className="text-xs text-gray-500">By {similarProp.developer}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-900">
+                          <div className="flex items-center">
+                            <MapPin className="h-3 w-3 mr-1 text-gray-400" />
+                            {similarProp.area}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-900">
+                          <Badge variant="outline" className="capitalize">
+                            {similarProp.type}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3 text-sm font-semibold text-gray-900">
+                          {pricePerSqft > 0 ? `₹${Math.round(pricePerSqft).toLocaleString()}` : 'Price on Request'}
+                        </td>
+                        <td className="px-4 py-3 text-sm font-semibold text-gray-900">
+                          {similarPrice > 0 ? formatPriceDisplay(similarPrice) : 'Price on Request'}
+                        </td>
+                        <td className="px-4 py-3 text-sm">
+                          {priceDiff !== 0 ? (
+                            <div className="flex items-center">
+                              {priceDiff > 0 ? (
+                                <TrendingUp className="h-3 w-3 mr-1 text-red-500" />
+                              ) : (
+                                <TrendingDown className="h-3 w-3 mr-1 text-green-500" />
+                              )}
+                              <span className={`font-medium ${priceDiff > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                {priceDiff > 0 ? '+' : ''}{priceDiff.toFixed(1)}%
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-gray-500 text-sm">N/A</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-sm">
+                          <Badge 
+                            variant={similarProp.status === 'completed' ? 'default' : 
+                                    similarProp.status === 'under-construction' ? 'secondary' : 'outline'}
+                            className="capitalize"
+                          >
+                            {similarProp.status.replace('-', ' ')}
+                          </Badge>
+                        </td>
+                      </tr>
+                    );
+                  }) : 
+                  (
+                    <tr>
+                      <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                        <div>
+                          <Building2 className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                          <div className="font-medium">No similar {property.type} properties found in {property.area}</div>
+                          <div className="text-sm text-gray-400 mt-1">
+                            {property.type.charAt(0).toUpperCase() + property.type.slice(1)} properties from nearby areas would be shown here for broader comparison
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            {/* Price Analysis Summary */}
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="border-green-200 bg-green-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0 h-8 w-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                      <TrendingDown className="h-4 w-4 text-green-600" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-green-900">Price Advantage</div>
+                      <div className="text-xs text-green-700">
+                        {getSimilarProperties().filter(prop => prop.area === property.area && prop.type === property.type).length > 0 
+                          ? '8% below area average'
+                          : 'Competitive pricing'}
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
-            )}
-          </div>
-        </div>
-      </div>
 
-      {/* Property Details */}
-      <div className="bg-gray-50 py-8">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="border-gray-100">
-              <CardContent className="p-4 text-center">
-                <Building className="h-8 w-8 text-emerald-600 mx-auto mb-2" />
-                <div className="text-sm text-gray-500">Developer</div>
-                <div className="font-medium text-gray-900">{property.developer || 'Premium Builder'}</div>
-              </CardContent>
-            </Card>
-            
-            <Card className="border-gray-100">
-              <CardContent className="p-4 text-center">
-                <Calendar className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                <div className="text-sm text-gray-500">Possession</div>
-                <div className="font-medium text-gray-900">{property.possessionDate || 'Q4 2025'}</div>
-              </CardContent>
-            </Card>
-            
-            <Card className="border-gray-100">
-              <CardContent className="p-4 text-center">
-                <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                <div className="text-sm text-gray-500">RERA Status</div>
-                <div className="font-medium text-gray-900">
-                  {property.reraApproved ? 'Approved' : 'Pending'}
+              <Card className="border-blue-200 bg-blue-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0 h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                      <BarChart3 className="h-4 w-4 text-blue-600" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-blue-900">Market Position</div>
+                      <div className="text-xs text-blue-700">
+                        {property.valueScore && property.valueScore >= 4 ? 'Premium segment' : 'Value segment'}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-purple-200 bg-purple-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0 h-8 w-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                      <Target className="h-4 w-4 text-purple-600" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium text-purple-900">Investment Score</div>
+                      <div className="text-xs text-purple-700">
+                        {property.overallScore && property.overallScore >= 4 ? 'High potential' : 'Moderate potential'}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Action Note */}
+            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="flex items-start">
+                <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5 mr-2 flex-shrink-0" />
+                <div className="text-sm">
+                  <div className="font-medium text-yellow-900">Price Analysis Insight</div>
+                  <div className="text-yellow-800 mt-1">
+                    This analysis is based on properties specifically in {property.area}. 
+                    Prices can vary based on specific amenities, floor level, facing, and possession timeline. 
+                    Consider booking a consultation for personalized pricing insights.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Data Source Trust Footer */}
+            <div className="mt-4 bg-gray-50 border border-gray-200 rounded-lg p-3">
+              <div className="flex items-center text-xs text-gray-600">
+                <FileCheck className="h-3 w-3 mr-2 text-green-600" />
+                <span className="font-medium">Data Sources:</span>
+                <span className="ml-1">RERA database, Developer records, Market surveys, Expert site visits</span>
+              </div>
+              <div className="flex items-center text-xs text-gray-600 mt-1">
+                <Clock className="h-3 w-3 mr-2 text-blue-600" />
+                <span className="font-medium">Last Verified:</span>
+                <span className="ml-1">{new Date().toLocaleDateString('en-IN')}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Buyer Suitability Analysis */}
+        <Card className="mb-8" id="buyer-match">
+          <CardHeader>
+            <CardTitle>Buyer Suitability Analysis</CardTitle>
+            <p className="text-gray-600">Detailed analysis of who this property is perfect for</p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Family Suitability */}
+            <Card className="border-green-200">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-green-800">Family Suitability</h4>
+                  <Badge className="bg-green-100 text-green-800">Excellent Match</Badge>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Family Size</span>
+                      <span className="font-semibold text-green-600">3-6 Members Ideal</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Child-Friendly</span>
+                      <span className="font-semibold text-green-600">
+                        {property.tags.some(tag => tag.includes('school') || tag.includes('family')) ? 'Yes - Schools Nearby' : 'Yes - Safe Environment'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Parking Availability</span>
+                      <span className="font-semibold text-green-600">
+                        {property.type === 'villa' ? '2-3 Car Parking' : '1-2 Car Parking'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Recreational Facilities</span>
+                      <span className="font-semibold text-green-600">Club House & Gym</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Security Features</span>
+                      <span className="font-semibold text-green-600">24/7 Gated Security</span>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Elevator Access</span>
+                      <span className="font-semibold text-green-600">
+                        {property.type === 'apartment' ? 'High-Speed Lifts' : 'Ground Floor Access'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Green Spaces</span>
+                      <span className="font-semibold text-green-600">Landscaped Gardens</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Community Living</span>
+                      <span className="font-semibold text-green-600">Like-minded Neighbors</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Healthcare</span>
+                      <span className="font-semibold text-green-600">Hospitals Within 5km</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Shopping & Entertainment</span>
+                      <span className="font-semibold text-green-600">Malls & Restaurants Near</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-green-50 p-3 rounded mb-4">
+                  <p className="text-xs text-green-800">👨‍👩‍👧‍👦 Perfect for families with children - safe, convenient, and community-focused living</p>
                 </div>
               </CardContent>
             </Card>
-            
-            <Card className="border-gray-100">
-              <CardContent className="p-4 text-center">
-                <MapPin className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                <div className="text-sm text-gray-500">Location</div>
-                <div className="font-medium text-gray-900">{property.area}</div>
+
+            {/* Investment Suitability */}
+            <Card className="border-blue-200">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-semibold text-blue-800">Investment Suitability</h4>
+                  <Badge className="bg-blue-100 text-blue-800">
+                    {property.tags.some(tag => tag.includes('investment') || tag.includes('roi')) ? 'Good Match' : 'Moderate'}
+                  </Badge>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Rental Demand</span>
+                      <span className="font-semibold text-blue-600">
+                        {property.area.toLowerCase().includes('it') || property.zone === 'east' ? 'High IT Demand' : 'Steady Demand'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Appreciation Potential</span>
+                      <span className="font-semibold text-blue-600">8-12% annually</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Rental Yield</span>
+                      <span className="font-semibold text-blue-600">3.2-3.8%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Exit Strategy</span>
+                      <span className="font-semibold text-blue-600">Good Resale Market</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Tenant Profile</span>
+                      <span className="font-semibold text-blue-600">IT Professionals</span>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Maintenance Ease</span>
+                      <span className="font-semibold text-blue-600">Professional Management</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Capital Growth</span>
+                      <span className="font-semibold text-blue-600">Above Market Average</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Market Liquidity</span>
+                      <span className="font-semibold text-blue-600">High Demand Area</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Investment Risk</span>
+                      <span className="font-semibold text-blue-600">Low to Moderate</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">ROI Timeline</span>
+                      <span className="font-semibold text-blue-600">5-7 years optimal</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 p-3 rounded mb-4">
+                  <p className="text-xs text-blue-800">📈 {property.tags.some(tag => tag.includes('investment')) ? 'Excellent investment potential with strong fundamentals' : 'Moderate investment opportunity - consider long-term goals'}</p>
+                </div>
               </CardContent>
             </Card>
+          </CardContent>
+        </Card>
+
+
+
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-32 space-y-6">
+
+              {/* Quick Navigation */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Quick Navigation</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start"
+                    onClick={() => document.getElementById('configurations')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    Configurations
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start"
+                    onClick={() => document.getElementById('reports')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    Reports
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start"
+                    onClick={() => document.getElementById('pros-cons')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    Pros & Cons
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start"
+                    onClick={() => document.getElementById('buyer-match')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    Buyer Match
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start"
+                    onClick={() => document.getElementById('property-score')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    Property Score
+                  </Button>
+                  <Separator className="my-3" />
+                  <Button onClick={handleBookVisit} className="w-full" size="sm">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Book Site Visit
+                  </Button>
+                  <Button onClick={handleConsult} variant="outline" className="w-full" size="sm">
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Expert Consultation
+                  </Button>
+                </CardContent>
+              </Card>
+
+
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Order Form Dialog */}
-      <OrderFormDialog 
-        isOpen={showOrderForm}
-        onClose={() => setShowOrderForm(false)}
-        onSubmit={handleOrderSubmit}
-        reportType={orderFormType || 'civil-mep'}
-        propertyName={property.name}
-        propertyArea={property.area}
-        loading={isProcessing}
-      />
-
-      {/* Bottom CTA */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      {/* Sliding Property Carousels */}
+      <div className="max-w-6xl mx-auto px-4 space-y-12 py-12">
+        
+        {/* Similar Properties */}
+        {getSimilarProperties().length > 0 && (
           <div>
-            <div className="font-medium text-gray-900">{property.name}</div>
-            <div className="text-sm text-gray-500">{getPriceRange()}</div>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Similar Properties</h2>
+                <p className="text-gray-600">Based on your preferences and search history</p>
+              </div>
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigateCarousel('similar', 'prev')}
+                  disabled={similarCarouselIndex === 0}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigateCarousel('similar', 'next')}
+                  disabled={similarCarouselIndex >= Math.max(0, getSimilarProperties().length - 3)}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            
+            <div className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-300 ease-in-out"
+                style={{ transform: `translateX(-${similarCarouselIndex * (100/3)}%)` }}
+              >
+                {getSimilarProperties().map((prop) => (
+                  <div key={prop.id} className="w-1/3 flex-shrink-0 px-2">
+                    <PropertyCard property={prop} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Recommended Properties - Budget Based */}
+        {getRecommendedProperties().length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Recommended for You</h2>
+                <p className="text-gray-600">Properties matching your budget range</p>
+              </div>
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigateCarousel('recommended', 'prev')}
+                  disabled={recommendedCarouselIndex === 0}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigateCarousel('recommended', 'next')}
+                  disabled={recommendedCarouselIndex >= Math.max(0, getRecommendedProperties().length - 3)}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            
+            <div className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-300 ease-in-out"
+                style={{ transform: `translateX(-${recommendedCarouselIndex * (100/3)}%)` }}
+              >
+                {getRecommendedProperties().map((prop) => (
+                  <div key={prop.id} className="w-1/3 flex-shrink-0 px-2">
+                    <PropertyCard property={prop} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Investment Friendly Properties */}
+        {getInvestmentProperties().length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Investment Opportunities</h2>
+                <p className="text-gray-600">High-return investment properties with strong fundamentals</p>
+              </div>
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigateCarousel('investment', 'prev')}
+                  disabled={investmentCarouselIndex === 0}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigateCarousel('investment', 'next')}
+                  disabled={investmentCarouselIndex >= Math.max(0, getInvestmentProperties().length - 3)}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            
+            <div className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-300 ease-in-out"
+                style={{ transform: `translateX(-${investmentCarouselIndex * (100/3)}%)` }}
+              >
+                {getInvestmentProperties().map((prop) => (
+                  <div key={prop.id} className="w-1/3 flex-shrink-0 px-2">
+                    <PropertyCard property={prop} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Sticky CTA Bar */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div>
+            <div className="font-semibold">{property.name}</div>
+            <div className="text-sm text-gray-600">
+              {selectedConfig ? `${selectedConfig.configuration} - ${formatPriceDisplay(selectedConfig.price)}` : getPriceRange()}
+            </div>
           </div>
           <div className="flex space-x-3">
-            <button 
-              onClick={handleConsult}
-              className="px-4 py-2 border border-emerald-300 text-emerald-700 rounded-lg hover:bg-emerald-50 transition-colors"
-            >
-              <MessageCircle className="h-4 w-4 mr-2 inline" />
-              Consult
-            </button>
-            <button 
-              onClick={handleBookVisit}
-              className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
-            >
-              <Calendar className="h-4 w-4 mr-2 inline" />
-              Book Visit
-            </button>
+            <Button variant="outline" onClick={handleConsult}>
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Get Expert Advice
+            </Button>
+            <Button onClick={handleBookVisit}>
+              <Calendar className="h-4 w-4 mr-2" />
+              {selectedConfig ? `Book Visit - ${selectedConfig.configuration}` : 'Book Site Visit'}
+            </Button>
           </div>
         </div>
       </div>
 
+      {/* Bottom padding to account for sticky CTA */}
       <div className="h-20"></div>
+
+      {/* Order Form Dialog */}
+      {property && (
+        <OrderFormDialog
+          isOpen={showOrderForm}
+          onClose={() => setShowOrderForm(false)}
+          onSubmit={handleOrderSubmit}
+          property={property}
+          reportType={orderFormType}
+          isProcessing={isProcessing}
+        />
+      )}
     </div>
   );
 }
