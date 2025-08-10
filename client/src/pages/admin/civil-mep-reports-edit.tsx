@@ -304,6 +304,20 @@ export default function CivilMepReportsEdit() {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("basic");
   const [formData, setFormData] = useState<any>({});
+  const [basicFormData, setBasicFormData] = useState({
+    propertyId: "",
+    reportTitle: "",
+    engineerName: "",
+    engineerLicense: "",
+    inspectionDate: "",
+    reportDate: "",
+    status: "draft",
+    overallScore: 0,
+    executiveSummary: "",
+    recommendations: "",
+    conclusions: "",
+    investmentRecommendation: "conditional"
+  });
 
   // Fetch existing report
   const { data: report, isLoading } = useQuery<CivilMepReport>({
@@ -319,6 +333,22 @@ export default function CivilMepReportsEdit() {
   // Load existing data when report is fetched
   useEffect(() => {
     if (report) {
+      // Load basic form data
+      setBasicFormData({
+        propertyId: report.propertyId || "",
+        reportTitle: report.reportTitle || "",
+        engineerName: report.engineerName || "",
+        engineerLicense: report.engineerLicense || "",
+        inspectionDate: report.inspectionDate || "",
+        reportDate: report.reportDate || "",
+        status: report.status || "draft",
+        overallScore: report.overallScore || 0,
+        executiveSummary: report.executiveSummary || "",
+        recommendations: report.recommendations || "",
+        conclusions: report.conclusions || "",
+        investmentRecommendation: report.investmentRecommendation || "conditional"
+      });
+
       const sectionData: any = {};
       
       // Extract section data from report
@@ -379,29 +409,31 @@ export default function CivilMepReportsEdit() {
     }));
   };
 
+  const handleBasicFieldChange = (field: string, value: any) => {
+    setBasicFormData((prev) => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const form = new FormData(e.currentTarget);
     
-    // Get basic fields
-    const basicData = {
-      propertyId: form.get("propertyId") as string,
-      reportTitle: form.get("reportTitle") as string,
-      engineerName: form.get("engineerName") as string,
-      engineerLicense: form.get("engineerLicense") as string,
-      inspectionDate: form.get("inspectionDate") as string,
-      reportDate: form.get("reportDate") as string,
-      status: form.get("status") as string || "draft",
-      overallScore: parseFloat(form.get("overallScore") as string || "0"),
-      executiveSummary: form.get("executiveSummary") as string,
-      recommendations: form.get("recommendations") as string,
-      conclusions: form.get("conclusions") as string,
-      investmentRecommendation: form.get("investmentRecommendation") as string || "conditional",
-    };
+    // Validate required fields
+    if (!basicFormData.propertyId || !basicFormData.reportTitle || !basicFormData.engineerName || 
+        !basicFormData.engineerLicense || !basicFormData.inspectionDate || !basicFormData.reportDate) {
+      toast({
+        title: "Missing required fields",
+        description: "Please fill in all required fields in the Basic Info tab",
+        variant: "destructive",
+      });
+      setActiveTab("basic");
+      return;
+    }
 
     // Combine with section data
     const reportData = {
-      ...basicData,
+      ...basicFormData,
       ...formData
     };
 
@@ -505,7 +537,11 @@ export default function CivilMepReportsEdit() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="propertyId">Property *</Label>
-                      <Select name="propertyId" defaultValue={report.propertyId || ""} required>
+                      <Select 
+                        value={basicFormData.propertyId}
+                        onValueChange={(value) => handleBasicFieldChange("propertyId", value)}
+                        required
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select property" />
                         </SelectTrigger>
@@ -521,8 +557,8 @@ export default function CivilMepReportsEdit() {
                     <div>
                       <Label htmlFor="reportTitle">Report Title *</Label>
                       <Input
-                        name="reportTitle"
-                        defaultValue={report.reportTitle}
+                        value={basicFormData.reportTitle}
+                        onChange={(e) => handleBasicFieldChange("reportTitle", e.target.value)}
                         placeholder="Enter report title"
                         required
                       />
@@ -533,8 +569,8 @@ export default function CivilMepReportsEdit() {
                     <div>
                       <Label htmlFor="engineerName">Engineer Name *</Label>
                       <Input
-                        name="engineerName"
-                        defaultValue={report.engineerName}
+                        value={basicFormData.engineerName}
+                        onChange={(e) => handleBasicFieldChange("engineerName", e.target.value)}
                         placeholder="Enter engineer name"
                         required
                       />
@@ -542,8 +578,8 @@ export default function CivilMepReportsEdit() {
                     <div>
                       <Label htmlFor="engineerLicense">Engineer License *</Label>
                       <Input
-                        name="engineerLicense"
-                        defaultValue={report.engineerLicense}
+                        value={basicFormData.engineerLicense}
+                        onChange={(e) => handleBasicFieldChange("engineerLicense", e.target.value)}
                         placeholder="Enter license number"
                         required
                       />
@@ -555,8 +591,8 @@ export default function CivilMepReportsEdit() {
                       <Label htmlFor="inspectionDate">Inspection Date *</Label>
                       <Input
                         type="date"
-                        name="inspectionDate"
-                        defaultValue={report.inspectionDate}
+                        value={basicFormData.inspectionDate}
+                        onChange={(e) => handleBasicFieldChange("inspectionDate", e.target.value)}
                         required
                       />
                     </div>
@@ -564,8 +600,8 @@ export default function CivilMepReportsEdit() {
                       <Label htmlFor="reportDate">Report Date *</Label>
                       <Input
                         type="date"
-                        name="reportDate"
-                        defaultValue={report.reportDate}
+                        value={basicFormData.reportDate}
+                        onChange={(e) => handleBasicFieldChange("reportDate", e.target.value)}
                         required
                       />
                     </div>
@@ -574,7 +610,10 @@ export default function CivilMepReportsEdit() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="status">Status</Label>
-                      <Select name="status" defaultValue={report.status}>
+                      <Select 
+                        value={basicFormData.status}
+                        onValueChange={(value) => handleBasicFieldChange("status", value)}
+                      >
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
@@ -590,11 +629,11 @@ export default function CivilMepReportsEdit() {
                       <Label htmlFor="overallScore">Overall Score (0-10)</Label>
                       <Input
                         type="number"
-                        name="overallScore"
+                        value={basicFormData.overallScore}
+                        onChange={(e) => handleBasicFieldChange("overallScore", parseFloat(e.target.value) || 0)}
                         min="0"
                         max="10"
                         step="0.1"
-                        defaultValue={report.overallScore || 0}
                         placeholder="0.0"
                       />
                     </div>
@@ -652,8 +691,8 @@ export default function CivilMepReportsEdit() {
                   <div>
                     <Label htmlFor="executiveSummary">Executive Summary</Label>
                     <Textarea
-                      name="executiveSummary"
-                      defaultValue={report.executiveSummary || ""}
+                      value={basicFormData.executiveSummary}
+                      onChange={(e) => handleBasicFieldChange("executiveSummary", e.target.value)}
                       placeholder="Provide a comprehensive executive summary..."
                       rows={6}
                     />
@@ -662,8 +701,8 @@ export default function CivilMepReportsEdit() {
                   <div>
                     <Label htmlFor="recommendations">Recommendations</Label>
                     <Textarea
-                      name="recommendations"
-                      defaultValue={report.recommendations || ""}
+                      value={basicFormData.recommendations}
+                      onChange={(e) => handleBasicFieldChange("recommendations", e.target.value)}
                       placeholder="List key recommendations..."
                       rows={4}
                     />
@@ -672,8 +711,8 @@ export default function CivilMepReportsEdit() {
                   <div>
                     <Label htmlFor="conclusions">Conclusions</Label>
                     <Textarea
-                      name="conclusions"
-                      defaultValue={report.conclusions || ""}
+                      value={basicFormData.conclusions}
+                      onChange={(e) => handleBasicFieldChange("conclusions", e.target.value)}
                       placeholder="Provide final conclusions..."
                       rows={4}
                     />
@@ -681,7 +720,10 @@ export default function CivilMepReportsEdit() {
 
                   <div>
                     <Label htmlFor="investmentRecommendation">Investment Recommendation</Label>
-                    <Select name="investmentRecommendation" defaultValue={report.investmentRecommendation || "conditional"}>
+                    <Select 
+                      value={basicFormData.investmentRecommendation}
+                      onValueChange={(value) => handleBasicFieldChange("investmentRecommendation", value)}
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
