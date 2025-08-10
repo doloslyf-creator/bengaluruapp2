@@ -162,54 +162,44 @@ export default function Header() {
 
   return (
     <div className="relative">
-      {/* Header with proper spacing for promotional banners */}
-      <header className={`fixed top-0 z-50 w-full transition-all duration-300 ${
-        scrolled 
-          ? "bg-white/98 backdrop-blur-lg border-b border-gray-200 shadow-lg" 
-          : "bg-white/90 backdrop-blur-sm border-b border-gray-100"
-      }`}>
-
-
+      {/* Minimalist Header */}
+      <header className="fixed top-0 z-50 w-full bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 lg:h-18 items-center justify-between">
-            {/* Logo */}
+          <div className="flex h-16 items-center justify-between">
+            {/* Minimal Logo */}
             <div className="flex-shrink-0">
-              <Link href="/" className="flex items-center space-x-3 group">
-                <h3 className="text-xl font-bold text-primary ownitwise-wordmark">
-                  <span className="text-blue-400">Ownit</span><span className="text-emerald-400">Wise</span>
+              <Link href="/" className="group">
+                <h3 className="text-lg font-light text-gray-900">
+                  Ownit<span className="text-emerald-600">Wise</span>
                 </h3>
               </Link>
             </div>
 
-            {/* Desktop Navigation - centered */}
-            <nav className="hidden lg:flex items-center space-x-1 flex-1 justify-center">
+            {/* Minimal Navigation */}
+            <nav className="hidden lg:flex items-center space-x-8 flex-1 justify-center">
               {navigation.map((item) => (
-                <Button 
+                <Link 
                   key={item.name}
-                  asChild 
-                  variant="ghost" 
-                  className={`px-4 py-2 text-sm font-medium transition-colors hover:text-primary hover:bg-primary/5 ${
-                    isActive(item.href) ? "text-primary bg-primary/10" : "text-gray-700"
+                  href={item.href}
+                  className={`text-sm transition-colors ${
+                    isActive(item.href) 
+                      ? "text-emerald-600" 
+                      : "text-gray-600 hover:text-emerald-600"
                   }`}
                 >
-                  <Link href={item.href}>{item.name}</Link>
-                </Button>
+                  {item.name}
+                </Link>
               ))}
             </nav>
 
-            {/* Search Component - moved to right side */}
+            {/* Minimal Search */}
             <div className="hidden lg:flex items-center">
               <Popover open={searchOpen} onOpenChange={setSearchOpen}>
                 <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={searchOpen}
-                    className="w-64 justify-start text-gray-500"
-                  >
-                    <Search className="h-4 w-4 mr-2" />
-                    Search Properties...
-                  </Button>
+                  <button className="flex items-center space-x-2 text-sm text-gray-400 hover:text-emerald-600 transition-colors">
+                    <Search className="h-4 w-4" />
+                    <span>Search</span>
+                  </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-80 p-0" align="end">
                   <Command>
@@ -282,31 +272,29 @@ export default function Header() {
                 </Popover>
             </div>
 
-            {/* Right side buttons */}
-            <div className="flex items-center space-x-3">
-              {/* Customer Account */}
-              <Button asChild variant="ghost" size="sm" className="hidden md:flex">
-                <Link href="/my-account">
-                  <User className="h-4 w-4 mr-2" />
-                  My Account
-                </Link>
-              </Button>
+            {/* Minimal Right Side */}
+            <div className="flex items-center space-x-6">
+              {/* Account */}
+              <Link 
+                href="/my-account"
+                className="hidden md:flex text-sm text-gray-600 hover:text-emerald-600 transition-colors"
+              >
+                Account
+              </Link>
 
-
-              {/* Admin Panel for admins */}
+              {/* Admin for admins */}
               {isAdmin && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="hidden md:flex">
-                      <Settings className="h-4 w-4 mr-2" />
-                      Admin
-                      <ChevronDown className="h-3 w-3 ml-1" />
-                    </Button>
+                    <button className="hidden md:flex items-center space-x-1 text-sm text-gray-600 hover:text-emerald-600 transition-colors">
+                      <span>Admin</span>
+                      <ChevronDown className="h-3 w-3" />
+                    </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuContent align="end" className="w-56 border border-gray-100 shadow-lg rounded-xl">
                     {adminLinks.map((link) => (
                       <DropdownMenuItem key={link.name} asChild>
-                        <Link href={link.href} className="flex items-center">
+                        <Link href={link.href} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:text-emerald-600 hover:bg-gray-50">
                           <link.icon className="h-4 w-4 mr-3" />
                           {link.name}
                         </Link>
@@ -314,7 +302,7 @@ export default function Header() {
                     ))}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link href="/admin-panel/settings" className="flex items-center">
+                      <Link href="/admin-panel/settings" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:text-emerald-600 hover:bg-gray-50">
                         <Settings className="h-4 w-4 mr-3" />
                         Settings
                       </Link>
@@ -323,31 +311,35 @@ export default function Header() {
                 </DropdownMenu>
               )}
 
-
-
-              {/* Mobile Menu */}
+              {/* Minimal Mobile Menu */}
               <Sheet open={isOpen} onOpenChange={setIsOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="ghost" size="sm" className="lg:hidden">
+                  <button className="lg:hidden p-2 text-gray-600 hover:text-emerald-600 transition-colors">
                     <Menu className="h-5 w-5" />
-                    <span className="sr-only">Toggle menu</span>
-                  </Button>
+                    <span className="sr-only">Menu</span>
+                  </button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-[320px] sm:w-[400px] p-0">
+                <SheetContent side="right" className="w-[320px] sm:w-[400px] p-0 bg-white">
                   <div className="flex flex-col h-full">
-                    {/* Mobile Header */}
-                    <div className="flex items-center justify-between p-6 border-b">
-                      <Link href="/" className="flex items-center space-x-2" onClick={() => setIsOpen(false)}>
-                        <Building2 className="h-6 w-6 text-primary" />
-                        <Logo size="sm" showTagline={false} />
+                    {/* Minimal Mobile Header */}
+                    <div className="flex items-center justify-between p-6 border-b border-gray-100">
+                      <Link href="/" className="group" onClick={() => setIsOpen(false)}>
+                        <h3 className="text-lg font-light text-gray-900">
+                          Ownit<span className="text-emerald-600">Wise</span>
+                        </h3>
                       </Link>
+                      <button 
+                        onClick={() => setIsOpen(false)}
+                        className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                      >
+                        <X className="h-5 w-5" />
+                      </button>
                     </div>
 
-                    {/* Mobile Search */}
-                    <div className="px-6 py-4 border-b">
+                    {/* Minimal Mobile Search */}
+                    <div className="px-6 py-4 border-b border-gray-100">
                       <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                        <Input
+                        <input
                           placeholder="Search properties..."
                           value={searchValue}
                           onChange={(e) => setSearchValue(e.target.value)}
@@ -357,84 +349,71 @@ export default function Header() {
                               setIsOpen(false);
                             }
                           }}
-                          className="pl-10"
+                          className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-200 transition-all"
                         />
+                        <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                       </div>
                       {searchValue.trim() && filteredProperties.length > 0 && (
-                        <div className="mt-2 max-h-48 overflow-y-auto space-y-1">
-                          {filteredProperties.slice(0, 4).map((property: Property) => (
+                        <div className="mt-3 space-y-2">
+                          {filteredProperties.slice(0, 3).map((property: Property) => (
                             <button
                               key={property.id}
                               onClick={() => {
                                 handlePropertySelect(property.id, property.name);
                                 setIsOpen(false);
                               }}
-                              className="w-full text-left p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                              className="w-full text-left p-3 rounded-xl bg-white border border-gray-100 hover:border-emerald-200 transition-colors"
                             >
-                              <div className="flex items-center space-x-2">
-                                <Building2 className="h-4 w-4 text-gray-400" />
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium text-gray-900 truncate">
-                                    {property.name}
-                                  </p>
-                                  <p className="text-xs text-gray-500 truncate">
-                                    {property.developer} • {property.area}
-                                  </p>
-                                </div>
-                              </div>
+                              <p className="text-sm font-medium text-gray-900 truncate">
+                                {property.name}
+                              </p>
+                              <p className="text-xs text-gray-500 truncate">
+                                {property.developer} • {property.area}
+                              </p>
                             </button>
                           ))}
                         </div>
                       )}
                     </div>
 
-                    {/* Mobile Navigation */}
-                    <div className="flex-1 px-6 py-4 space-y-1">
-                      {navigation.map((item) => (
-                        <Link
-                          key={item.name}
-                          href={item.href}
-                          className={`flex items-center space-x-3 px-3 py-3 text-base font-medium rounded-lg transition-colors ${
-                            isActive(item.href)
-                              ? "text-primary bg-primary/10"
-                              : "text-gray-700 hover:text-primary hover:bg-gray-50"
-                          }`}
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <item.icon className="h-5 w-5" />
-                          <span>{item.name}</span>
-                        </Link>
-                      ))}
-                      <Link
-                        href="/property-education"
-                        className={`flex items-center space-x-3 px-3 py-3 text-base font-medium rounded-lg transition-colors ${
-                          isActive("/property-education")
-                            ? "text-primary bg-primary/10"
-                            : "text-gray-700 hover:text-primary hover:bg-gray-50"
-                        }`}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <FileText className="h-5 w-5" /> {/* Changed icon to FileText for example, could be a video icon */}
-                        <span>Learn</span>
-                      </Link>
+                    {/* Minimal Mobile Navigation */}
+                    <div className="flex-1 px-6 py-6">
+                      <nav className="space-y-1">
+                        {navigation.map((item) => (
+                          <Link
+                            key={item.name}
+                            href={item.href}
+                            className={`block py-3 text-base transition-colors ${
+                              isActive(item.href)
+                                ? "text-emerald-600"
+                                : "text-gray-600 hover:text-emerald-600"
+                            }`}
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {item.name}
+                          </Link>
+                        ))}
+                      </nav>
                     </div>
 
-                    {/* Mobile Footer Actions */}
-                    <div className="border-t p-6 space-y-3">
-                      <div className={`grid gap-3 ${isAdmin ? 'grid-cols-2' : 'grid-cols-1'}`}>
-                        <Button asChild variant="outline" size="sm" onClick={() => setIsOpen(false)}>
-                          <Link href="/my-account">
-                            <User className="h-4 w-4 mr-2" />
-                            My Account
-                          </Link>
-                        </Button>
+                    {/* Minimal Mobile Footer */}
+                    <div className="border-t border-gray-100 p-6">
+                      <div className="space-y-3">
+                        <Link
+                          href="/my-account"
+                          className="block py-2 text-sm text-gray-600 hover:text-emerald-600 transition-colors"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          My Account
+                        </Link>
                         {isAdmin && (
-                          <Button asChild variant="outline" size="sm" onClick={() => setIsOpen(false)}>
-                            <Link href="/admin-panel">
-                              <Settings className="h-4 w-4 mr-2" />
-                              Admin Panel
-                            </Link>
-                          </Button>
+                          <Link
+                            href="/admin-panel"
+                            className="block py-2 text-sm text-gray-600 hover:text-emerald-600 transition-colors"
+                            onClick={() => setIsOpen(false)}
+                          >
+                            Admin Panel
+                          </Link>
                         )}
                       </div>
                     </div>
@@ -447,7 +426,7 @@ export default function Header() {
       </header>
 
       {/* Content spacer to prevent overlap */}
-      <div className={`transition-all duration-300 ${scrolled ? 'h-16' : 'h-28'}`}></div>
+      <div className="h-16"></div>
     </div>
   );
 }
