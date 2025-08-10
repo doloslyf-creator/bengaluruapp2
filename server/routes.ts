@@ -1055,7 +1055,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/valuation-reports", async (req, res) => {
     try {
       console.log("Received Property Valuation report creation request:", req.body);
-      
+
       const validation = insertPropertyValuationReportSchema.safeParse(req.body);
       if (!validation.success) {
         console.log("Valuation report validation failed:", validation.error);
@@ -1533,10 +1533,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/civil-mep-reports", async (req, res) => {
     try {
       console.log("Received Civil+MEP report creation request:", req.body);
-      
+
       // Basic validation of required fields
       const { propertyId, reportTitle, engineerName, engineerLicense, inspectionDate, reportDate } = req.body;
-      
+
       if (!propertyId || !reportTitle || !engineerName || !engineerLicense || !inspectionDate || !reportDate) {
         console.log("Missing required fields");
         return res.status(400).json({ 
@@ -1545,22 +1545,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Prepare data with proper defaults
       const reportData = {
-        propertyId,
-        reportTitle,
-        engineerName,
-        engineerLicense,
-        inspectionDate,
-        reportDate,
-        status: req.body.status || "draft",
+        ...req.body,
         overallScore: Number(req.body.overallScore) || 0,
-        executiveSummary: req.body.executiveSummary || "",
-        recommendations: req.body.recommendations || "",
-        conclusions: req.body.conclusions || "",
-        investmentRecommendation: req.body.investmentRecommendation || "conditional",
-        
-        // Ensure JSON fields are objects
         siteInformation: req.body.siteInformation || {},
         foundationDetails: req.body.foundationDetails || {},
         superstructureDetails: req.body.superstructureDetails || {},
@@ -1698,7 +1685,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/legal-audit-reports", async (req, res) => {
     try {
       console.log("Received Legal Audit report creation request:", req.body);
-      
+
       const validation = insertLegalAuditReportSchema.safeParse(req.body);
       if (!validation.success) {
         console.log("Legal Audit validation failed:", validation.error);
@@ -3854,11 +3841,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const [course] = await db.select()
         .from(videoCourses)
         .where(eq(videoCourses.slug, slug));
-      
+
       if (!course) {
         return res.status(404).json({ error: "Course not found" });
       }
-      
+
       res.json(course);
     } catch (error) {
       console.error("Error fetching course by slug:", error);
@@ -3872,11 +3859,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const [course] = await db.select()
         .from(videoCourses)
         .where(eq(videoCourses.id, id));
-      
+
       if (!course) {
         return res.status(404).json({ error: "Course not found" });
       }
-      
+
       res.json(course);
     } catch (error) {
       console.error("Error fetching course:", error);
@@ -3908,7 +3895,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const updateData = insertVideoCourseSchema.partial().parse(req.body);
-      
+
       const [course] = await db.update(videoCourses)
         .set({ ...updateData, updatedAt: new Date() })
         .where(eq(videoCourses.id, id))
@@ -3928,17 +3915,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/video-courses/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      
+
       // Delete related chapters and enrollments first
       await db.delete(videoChapters).where(eq(videoChapters.courseId, id));
       await db.delete(courseEnrollments).where(eq(courseEnrollments.courseId, id));
-      
+
       const result = await db.delete(videoCourses).where(eq(videoCourses.id, id));
-      
+
       if (result.rowCount === 0) {
         return res.status(404).json({ error: "Course not found" });
       }
-      
+
       res.json({ success: true });
     } catch (error) {
       console.error("Error deleting video course:", error);
@@ -3981,12 +3968,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/video-courses/:courseId/chapters", async (req, res) => {
     try {
       const { courseId } = req.params;
-      
+
       console.log("Creating chapter with data:", req.body);
       console.log("Course ID from params:", courseId);
-      
+
       const chapterData = insertVideoChapterSchema.parse(req.body);
-      
+
       const newChapterData = {
         ...chapterData,
         id: crypto.randomUUID(),
@@ -4018,7 +4005,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { chapterId } = req.params;
       const updateData = insertVideoChapterSchema.partial().parse(req.body);
-      
+
       const [chapter] = await db.update(videoChapters)
         .set({ ...updateData, updatedAt: new Date() })
         .where(eq(videoChapters.id, chapterId))
@@ -4038,13 +4025,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/video-courses/:courseId/chapters/:chapterId", async (req, res) => {
     try {
       const { chapterId } = req.params;
-      
+
       const result = await db.delete(videoChapters).where(eq(videoChapters.id, chapterId));
-      
+
       if (result.rowCount === 0) {
         return res.status(404).json({ error: "Chapter not found" });
       }
-      
+
       res.json({ success: true });
     } catch (error) {
       console.error("Error deleting chapter:", error);
@@ -4057,7 +4044,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { courseId } = req.params;
       const { userEmail, userName } = req.body;
-      
+
       // Check if already enrolled
       const [existingEnrollment] = await db.select()
         .from(courseEnrollments)
@@ -4065,11 +4052,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           eq(courseEnrollments.courseId, courseId),
           eq(courseEnrollments.userEmail, userEmail)
         ));
-      
+
       if (existingEnrollment) {
         return res.status(400).json({ error: "Already enrolled in this course" });
       }
-      
+
       const enrollmentData = {
         id: crypto.randomUUID(),
         courseId,
@@ -4083,12 +4070,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       const [enrollment] = await db.insert(courseEnrollments).values(enrollmentData).returning();
-      
+
       // Update course enrollment count
       await db.update(videoCourses)
         .set({ enrollmentCount: sql`${videoCourses.enrollmentCount} + 1` })
         .where(eq(videoCourses.id, courseId));
-      
+
       res.status(201).json(enrollment);
     } catch (error) {
       console.error("Error enrolling in course:", error);
@@ -4099,18 +4086,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/video-courses/:courseId/enrollment/:userEmail", async (req, res) => {
     try {
       const { courseId, userEmail } = req.params;
-      
+
       const [enrollment] = await db.select()
         .from(courseEnrollments)
         .where(and(
           eq(courseEnrollments.courseId, courseId),
           eq(courseEnrollments.userEmail, userEmail)
         ));
-      
+
       if (!enrollment) {
         return res.status(404).json({ error: "Enrollment not found" });
       }
-      
+
       res.json(enrollment);
     } catch (error) {
       console.error("Error fetching enrollment:", error);

@@ -1769,7 +1769,10 @@ export function AdminCivilMepReportsCreate() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => form.handleSubmit((data) => onSubmit(data, false))()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  form.handleSubmit((data) => onSubmit(data, false))();
+                }}
                 disabled={saveReportMutation.isPending}
               >
                 <Save className="w-4 h-4 mr-2" />

@@ -2661,16 +2661,19 @@ export class DatabaseStorage implements IStorage {
     try {
       console.log("Creating Civil+MEP report with data:", insertReport);
 
-      // Remove fields that don't exist in database schema and prepare JSON fields
+      // Remove fields that don't exist in database schema
       const {
         assignedCustomerIds,
         customerAssignments,
         ...reportData
       } = insertReport as any;
 
-      // Ensure JSON fields are properly formatted
+      // Ensure JSON fields are properly formatted and dates are converted
       const processedData = {
         ...reportData,
+        overallScore: Number(reportData.overallScore) || 0,
+        inspectionDate: reportData.inspectionDate ? new Date(reportData.inspectionDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        reportDate: reportData.reportDate ? new Date(reportData.reportDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
         siteInformation: reportData.siteInformation || {},
         foundationDetails: reportData.foundationDetails || {},
         superstructureDetails: reportData.superstructureDetails || {},
