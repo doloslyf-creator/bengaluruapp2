@@ -1,9 +1,13 @@
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Plus, FileText, Shield, TrendingUp, AlertTriangle, Eye, Edit, Trash2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Plus, FileText, Shield, TrendingUp, AlertTriangle, Eye, Edit, Trash2, Users, UserPlus, UserMinus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import AdminLayout from "@/components/layout/admin-layout";
@@ -12,6 +16,9 @@ export default function AdminLegalAuditReports() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
+  const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
+  const [selectedCustomerId, setSelectedCustomerId] = useState("");
 
   // Fetch reports and stats
   const { data: reports = [], isLoading: isLoadingReports } = useQuery<any[]>({
@@ -20,6 +27,17 @@ export default function AdminLegalAuditReports() {
 
   const { data: stats } = useQuery<any>({
     queryKey: ["/api/legal-audit-reports-stats"],
+  });
+
+  // Fetch customers for assignment dropdown
+  const { data: customers = [] } = useQuery<any[]>({
+    queryKey: ["/api/customers"],
+  });
+
+  // Fetch assignments for selected report
+  const { data: assignments = [] } = useQuery<any[]>({
+    queryKey: ["/api/legal-audit-reports", selectedReportId, "assignments"],
+    enabled: !!selectedReportId,
   });
 
   // Delete report mutation
@@ -41,6 +59,88 @@ export default function AdminLegalAuditReports() {
       });
     },
   });
+
+  // Assign customer mutation
+  const assignCustomerMutation = useMutation({
+    mutationFn: async ({ reportId, customerId }: { reportId: string; customerId: string }) => {
+      const response = await fetch(`/api/legal-audit-reports/${reportId}/assign-customer`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerId,
+          assignedBy: "admin",
+          accessLevel: "view",
+          notes: "Assigned via admin panel"
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.details || error.error || "Failed to assign customer");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/legal-audit-reports", selectedReportId, "assignments"] });
+      toast({ title: "Customer assigned successfully" });
+      setSelectedCustomerId("");
+      setAssignmentDialogOpen(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error assigning customer",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Remove customer assignment mutation
+  const removeAssignmentMutation = useMutation({
+    mutationFn: async ({ reportId, customerId }: { reportId: string; customerId: string }) => {
+      const response = await fetch(`/api/legal-audit-reports/${reportId}/remove-customer/${customerId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.details || error.error || "Failed to remove assignment");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/legal-audit-reports", selectedReportId, "assignments"] });
+      toast({ title: "Customer assignment removed successfully" });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error removing assignment",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleAssignCustomer = () => {
+    if (!selectedReportId || !selectedCustomerId) {
+      toast({
+        title: "Please select a customer",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    assignCustomerMutation.mutate({
+      reportId: selectedReportId,
+      customerId: selectedCustomerId,
+    });
+  };
+
+  const handleRemoveAssignment = (reportId: string, customerId: string) => {
+    removeAssignmentMutation.mutate({ reportId, customerId });
+  };
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -185,6 +285,7 @@ export default function AdminLegalAuditReports() {
                       <th className="text-left p-4 font-medium">Risk Level</th>
                       <th className="text-left p-4 font-medium">Score</th>
                       <th className="text-left p-4 font-medium">Date</th>
+                      <th className="text-left p-4 font-medium">Customer Assignments</th>
                       <th className="text-left p-4 font-medium">Actions</th>
                     </tr>
                   </thead>
@@ -213,6 +314,9 @@ export default function AdminLegalAuditReports() {
                           <div className="text-sm">{formatDate(report.createdAt)}</div>
                         </td>
                         <td className="p-4">
+                          <CustomerAssignmentIndicator reportId={report.id} />
+                        </td>
+                        <td className="p-4">
                           <div className="flex items-center gap-2">
                             <Button
                               variant="ghost"
@@ -230,6 +334,75 @@ export default function AdminLegalAuditReports() {
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
+                            <Dialog open={assignmentDialogOpen && selectedReportId === report.id} onOpenChange={(open) => {
+                              setAssignmentDialogOpen(open);
+                              if (open) {
+                                setSelectedReportId(report.id);
+                              } else {
+                                setSelectedReportId(null);
+                                setSelectedCustomerId("");
+                              }
+                            }}>
+                              <DialogTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <Users className="h-4 w-4" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-2xl">
+                                <DialogHeader>
+                                  <DialogTitle>Manage Customer Assignments</DialogTitle>
+                                </DialogHeader>
+                                <div className="space-y-4">
+                                  <div className="flex gap-2">
+                                    <Select value={selectedCustomerId} onValueChange={setSelectedCustomerId}>
+                                      <SelectTrigger className="flex-1">
+                                        <SelectValue placeholder="Select customer to assign" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {customers.map((customer: any) => (
+                                          <SelectItem key={customer.id} value={customer.id}>
+                                            {customer.name} ({customer.email})
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                    <Button 
+                                      onClick={handleAssignCustomer}
+                                      disabled={assignCustomerMutation.isPending || !selectedCustomerId}
+                                    >
+                                      <UserPlus className="h-4 w-4 mr-2" />
+                                      Assign
+                                    </Button>
+                                  </div>
+                                  
+                                  <div className="border rounded-lg p-4">
+                                    <h4 className="font-medium mb-2">Current Assignments</h4>
+                                    {assignments.length === 0 ? (
+                                      <p className="text-sm text-muted-foreground">No customers assigned to this report.</p>
+                                    ) : (
+                                      <div className="space-y-2">
+                                        {assignments.map((assignment: any) => (
+                                          <div key={assignment.customerId} className="flex items-center justify-between p-2 bg-muted rounded">
+                                            <div>
+                                              <p className="font-medium">{assignment.customerName || assignment.customerId}</p>
+                                              <p className="text-sm text-muted-foreground">Access: {assignment.accessLevel}</p>
+                                            </div>
+                                            <Button
+                                              variant="ghost"
+                                              size="sm"
+                                              onClick={() => handleRemoveAssignment(report.id, assignment.customerId)}
+                                              disabled={removeAssignmentMutation.isPending}
+                                            >
+                                              <UserMinus className="h-4 w-4" />
+                                            </Button>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
                             <Button
                               variant="ghost"
                               size="sm"
@@ -251,5 +424,23 @@ export default function AdminLegalAuditReports() {
         </Card>
       </div>
     </AdminLayout>
+  );
+}
+
+// Component to show customer assignment indicator
+function CustomerAssignmentIndicator({ reportId }: { reportId: string }) {
+  const { data: assignments = [] } = useQuery<any[]>({
+    queryKey: ["/api/legal-audit-reports", reportId, "assignments"],
+  });
+
+  if (assignments.length === 0) {
+    return <span className="text-sm text-muted-foreground">No assignments</span>;
+  }
+
+  return (
+    <div className="flex items-center gap-1">
+      <Users className="h-4 w-4" />
+      <span className="text-sm">{assignments.length} assigned</span>
+    </div>
   );
 }

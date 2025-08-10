@@ -3644,6 +3644,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { reportId } = req.params;
       const { customerId, assignedBy, accessLevel = "view", notes } = req.body;
 
+      // Validate required fields
+      if (!reportId || !customerId) {
+        return res.status(400).json({ 
+          error: "Missing required fields",
+          details: "Both reportId and customerId are required"
+        });
+      }
+
+      // Check if report exists
+      const report = await storage.getLegalAuditReport(reportId);
+      if (!report) {
+        return res.status(404).json({ 
+          error: "Report not found",
+          details: `Legal audit report with ID '${reportId}' does not exist`
+        });
+      }
+
+      // Check if customer exists
+      const customer = await storage.getCustomer(customerId);
+      if (!customer) {
+        return res.status(404).json({ 
+          error: "Customer not found",
+          details: `Customer with ID '${customerId}' does not exist. Please create the customer first.`
+        });
+      }
+
+      // Check for existing assignment
+      const existingAssignments = await storage.getLegalReportAssignments(reportId);
+      const existingAssignment = existingAssignments.find(a => a.customerId === customerId);
+      
+      if (existingAssignment) {
+        return res.status(409).json({ 
+          error: "Assignment already exists",
+          details: `Customer '${customerId}' is already assigned to this legal audit report`
+        });
+      }
+
       const assignment = await storage.assignLegalReportToCustomer({
         reportId,
         customerId,
@@ -3652,26 +3689,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
         notes,
       });
 
+      console.log(`📋 Assigned customer: ${customerId} to Legal Audit report ${reportId}`);
       res.status(201).json(assignment);
     } catch (error) {
       console.error("Error assigning Legal report to customer:", error);
-      res.status(500).json({ error: "Failed to assign report to customer" });
+      res.status(500).json({ 
+        error: "Failed to assign report to customer",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 
   app.delete("/api/legal-audit-reports/:reportId/remove-customer/:customerId", async (req, res) => {
     try {
       const { reportId, customerId } = req.params;
+      
+      // Check if assignment exists before trying to remove
+      const existingAssignments = await storage.getLegalReportAssignments(reportId);
+      const existingAssignment = existingAssignments.find(a => a.customerId === customerId);
+      
+      if (!existingAssignment) {
+        return res.status(404).json({ 
+          error: "Assignment not found",
+          details: `No assignment found for customer '${customerId}' on legal audit report '${reportId}'`
+        });
+      }
+
       const success = await storage.removeLegalReportAssignment(reportId, customerId);
 
       if (!success) {
-        return res.status(404).json({ error: "Assignment not found" });
+        return res.status(500).json({ 
+          error: "Failed to remove assignment",
+          details: "Assignment exists but could not be removed"
+        });
       }
 
+      console.log(`📋 Removed customer assignment: ${customerId} from Legal Audit report ${reportId}`);
       res.json({ success: true, message: "Customer assignment removed successfully" });
     } catch (error) {
       console.error("Error removing Legal report assignment:", error);
-      res.status(500).json({ error: "Failed to remove customer assignment" });
+      res.status(500).json({ 
+        error: "Failed to remove customer assignment",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 
