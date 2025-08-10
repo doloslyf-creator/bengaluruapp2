@@ -3768,6 +3768,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { reportId } = req.params;
       const { customerId, assignedBy, accessLevel = "view", notes } = req.body;
 
+      // Validate required fields
+      if (!reportId || !customerId) {
+        return res.status(400).json({ 
+          error: "Missing required fields",
+          details: "Both reportId and customerId are required"
+        });
+      }
+
+      // Check if report exists
+      const report = await storage.getPropertyValuationReport(reportId);
+      if (!report) {
+        return res.status(404).json({ 
+          error: "Report not found",
+          details: `Property valuation report with ID '${reportId}' does not exist`
+        });
+      }
+
+      // Check if customer exists
+      const customer = await storage.getCustomer(customerId);
+      if (!customer) {
+        return res.status(404).json({ 
+          error: "Customer not found",
+          details: `Customer with ID '${customerId}' does not exist. Please create the customer first.`
+        });
+      }
+
+      // Check for existing assignment
+      const existingAssignments = await storage.getValuationReportAssignments(reportId);
+      const existingAssignment = existingAssignments.find(a => a.customerId === customerId);
+      
+      if (existingAssignment) {
+        return res.status(409).json({ 
+          error: "Assignment already exists",
+          details: `Customer '${customerId}' is already assigned to this valuation report`
+        });
+      }
+
       const assignment = await storage.assignValuationReportToCustomer({
         reportId,
         customerId,
@@ -3776,26 +3813,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
         notes,
       });
 
+      console.log(`📋 Assigned customer: ${customerId} to Property Valuation report ${reportId}`);
       res.status(201).json(assignment);
     } catch (error) {
       console.error("Error assigning Valuation report to customer:", error);
-      res.status(500).json({ error: "Failed to assign report to customer" });
+      res.status(500).json({ 
+        error: "Failed to assign report to customer",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 
   app.delete("/api/property-valuation-reports/:reportId/remove-customer/:customerId", async (req, res) => {
     try {
       const { reportId, customerId } = req.params;
+      
+      // Check if assignment exists before trying to remove
+      const existingAssignments = await storage.getValuationReportAssignments(reportId);
+      const existingAssignment = existingAssignments.find(a => a.customerId === customerId);
+      
+      if (!existingAssignment) {
+        return res.status(404).json({ 
+          error: "Assignment not found",
+          details: `No assignment found for customer '${customerId}' on valuation report '${reportId}'`
+        });
+      }
+
       const success = await storage.removeValuationReportAssignment(reportId, customerId);
 
       if (!success) {
-        return res.status(404).json({ error: "Assignment not found" });
+        return res.status(500).json({ 
+          error: "Failed to remove assignment",
+          details: "Assignment exists but could not be removed"
+        });
       }
 
+      console.log(`📋 Removed customer assignment: ${customerId} from Property Valuation report ${reportId}`);
       res.json({ success: true, message: "Customer assignment removed successfully" });
     } catch (error) {
       console.error("Error removing Valuation report assignment:", error);
-      res.status(500).json({ error: "Failed to remove customer assignment" });
+      res.status(500).json({ 
+        error: "Failed to remove customer assignment",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 
@@ -3806,7 +3866,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(assignments);
     } catch (error) {
       console.error("Error fetching Valuation report assignments:", error);
-      res.status(500).json({ error: "Failed to fetch report assignments" });
+      res.status(500).json({ 
+        error: "Failed to fetch report assignments",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 
@@ -3816,13 +3879,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const reportWithAssignments = await storage.getValuationReportWithAssignments(reportId);
 
       if (!reportWithAssignments) {
-        return res.status(404).json({ error: "Valuation report not found" });
+        return res.status(404).json({ 
+          error: "Valuation report not found",
+          details: `Property valuation report with ID '${reportId}' does not exist`
+        });
       }
 
       res.json(reportWithAssignments);
     } catch (error) {
       console.error("Error fetching Valuation report with assignments:", error);
-      res.status(500).json({ error: "Failed to fetch report with assignments" });
+      res.status(500).json({ 
+        error: "Failed to fetch report with assignments",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 

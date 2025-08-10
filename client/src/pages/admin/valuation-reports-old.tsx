@@ -39,6 +39,7 @@ import type { PropertyValuationReport, Property } from "@shared/schema";
 export default function ValuationReportsPage() {
   const [selectedReport, setSelectedReport] = useState<PropertyValuationReport | null>(null);
   const [showViewDialog, setShowViewDialog] = useState(false);
+  const [showAssignDialog, setShowAssignDialog] = useState(false);
   const [selectedReportId, setSelectedReportId] = useState<string>("");
   const [reportCustomers, setReportCustomers] = useState<Record<string, any[]>>({});
   const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
@@ -105,6 +106,10 @@ export default function ValuationReportsPage() {
   }>({
     queryKey: ["/api/valuation-reports/stats"],
   });
+
+
+
+
 
   // Delete report mutation
   const deleteReportMutation = useMutation({
@@ -258,6 +263,10 @@ export default function ValuationReportsPage() {
     setSelectedReportId(reportId);
     removeAssignmentMutation.mutate({ reportId, customerId });
   };
+
+
+
+
 
   const getStatusBadge = (status: string) => {
     const statusMap = {
@@ -491,6 +500,132 @@ export default function ValuationReportsPage() {
           </CardContent>
         </Card>
 
+
+
+        {/* View Dialog */}
+        <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Valuation Report Details</DialogTitle>
+              <DialogDescription>
+                Comprehensive property valuation report information
+              </DialogDescription>
+            </DialogHeader>
+            {selectedReport && (
+              <div className="space-y-6">
+                {/* Basic Information */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-semibold">Report Title</Label>
+                    <p className="text-sm text-muted-foreground">{selectedReport.reportTitle}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-semibold">Property</Label>
+                    <p className="text-sm text-muted-foreground">{getPropertyName(selectedReport.propertyId)}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-semibold">Status</Label>
+                    <div className="mt-1">{getStatusBadge(selectedReport.reportStatus || "draft")}</div>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-semibold">Created By</Label>
+                    <p className="text-sm text-muted-foreground">{selectedReport.createdBy}</p>
+                  </div>
+                </div>
+
+                {/* Financial Details */}
+                <div className="border-t pt-4">
+                  <h3 className="text-lg font-semibold mb-3">Financial Analysis</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm font-semibold">Estimated Market Value</Label>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedReport.estimatedMarketValue ? 
+                          `₹${Number(selectedReport.estimatedMarketValue).toLocaleString()}` : 
+                          "Not specified"
+                        }
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-semibold">Rate per Sq.ft</Label>
+                      <p className="text-sm text-muted-foreground">
+                        {selectedReport.ratePerSqft ? 
+                          `₹${Number(selectedReport.ratePerSqft).toLocaleString()}` : 
+                          "Not specified"
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Property Profile */}
+                <div className="border-t pt-4">
+                  <h3 className="text-lg font-semibold mb-3">Property Profile</h3>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <Label className="text-sm font-semibold">Unit Type</Label>
+                      <p className="text-sm text-muted-foreground">{selectedReport.unitType || "Not specified"}</p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-semibold">Configuration</Label>
+                      <p className="text-sm text-muted-foreground">{selectedReport.configuration || "Not specified"}</p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-semibold">Buyer Fit</Label>
+                      <p className="text-sm text-muted-foreground">{selectedReport.buyerFit || "Not specified"}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Analysis */}
+                <div className="border-t pt-4">
+                  <h3 className="text-lg font-semibold mb-3">Analysis & Recommendations</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-sm font-semibold">Valuation Verdict</Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {selectedReport.valuationVerdict || "Not provided"}
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-semibold">Recommendation</Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {selectedReport.recommendation || "Not provided"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Timestamps */}
+                <div className="border-t pt-4">
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <Label className="text-sm font-semibold">Created</Label>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(selectedReport.createdAt!).toLocaleString()}
+                      </p>
+                    </div>
+                    <div>
+                      <Label className="text-sm font-semibold">Last Updated</Label>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(selectedReport.updatedAt!).toLocaleString()}
+                      </p>
+                    </div>
+                    {selectedReport.deliveredAt && (
+                      <div>
+                        <Label className="text-sm font-semibold">Delivered</Label>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(selectedReport.deliveredAt).toLocaleString()}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
         {/* Customer Assignment Dialog */}
         <Dialog open={assignmentDialogOpen} onOpenChange={setAssignmentDialogOpen}>
           <DialogContent className="max-w-2xl">
@@ -569,5 +704,154 @@ export default function ValuationReportsPage() {
         </Dialog>
       </div>
     </AdminLayout>
+  );
+}
+    } catch (error) {
+      console.error('Error assigning customers:', error);
+      toast({
+        title: "Error",
+        description: "Failed to assign customers. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Handle customer removal
+  const handleRemoveCustomer = async (customerId: string) => {
+    try {
+      const response = await fetch(`/api/valuation-reports/${reportId}/customers`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customerIds: [customerId]
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Customer removed from report successfully.",
+        });
+        // Refresh assignments
+        const updatedResponse = await fetch(`/api/valuation-reports/${reportId}/customers`);
+        const updatedAssignments = await updatedResponse.json();
+        setAssignedCustomers(updatedAssignments);
+        onAssignmentChange();
+      } else {
+        throw new Error('Failed to remove customer');
+      }
+    } catch (error) {
+      console.error('Error removing customer:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove customer. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getCustomerName = (customerId: string) => {
+    const customer = customers.find(c => c.id === customerId);
+    return customer ? customer.name : customerId;
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Currently Assigned Customers */}
+      <div>
+        <h3 className="text-lg font-semibold mb-3">Currently Assigned Customers</h3>
+        {isLoadingAssignments ? (
+          <div className="text-center py-4">
+            <div className="text-muted-foreground">Loading assignments...</div>
+          </div>
+        ) : assignedCustomers.length === 0 ? (
+          <div className="text-center py-4">
+            <div className="text-muted-foreground">No customers assigned yet</div>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {assignedCustomers.map((assignment) => (
+              <div key={assignment.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div>
+                  <div className="font-medium">{getCustomerName(assignment.customerId)}</div>
+                  <div className="text-sm text-muted-foreground">
+                    Assigned by {assignment.assignedBy} on {new Date(assignment.assignedAt).toLocaleDateString()}
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleRemoveCustomer(assignment.customerId)}
+                >
+                  Remove
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Add New Customers */}
+      <div>
+        <h3 className="text-lg font-semibold mb-3">Add New Customers</h3>
+        
+        {/* Search */}
+        <div className="mb-4">
+          <Input
+            placeholder="Search customers by name, email, or phone..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        {/* Available Customers */}
+        {availableCustomers.length === 0 ? (
+          <div className="text-center py-4">
+            <div className="text-muted-foreground">
+              {searchTerm ? "No customers found matching your search" : "All customers are already assigned"}
+            </div>
+          </div>
+        ) : (
+          <div className="max-h-60 overflow-y-auto space-y-2">
+            {availableCustomers.map((customer) => (
+              <div
+                key={customer.id}
+                className={`flex items-center space-x-3 p-3 border rounded-lg cursor-pointer hover:bg-muted/50 ${
+                  selectedCustomers.includes(customer.id) ? 'bg-muted border-primary' : ''
+                }`}
+                onClick={() => handleCustomerToggle(customer.id)}
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedCustomers.includes(customer.id)}
+                  onChange={() => handleCustomerToggle(customer.id)}
+                  className="rounded"
+                />
+                <div className="flex-1">
+                  <div className="font-medium">{customer.name}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {customer.email} • {customer.phone}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        {selectedCustomers.length > 0 && (
+          <div className="flex justify-end space-x-3 mt-4">
+            <Button variant="outline" onClick={() => setSelectedCustomers([])}>
+              Clear Selection
+            </Button>
+            <Button onClick={handleAssign}>
+              Assign {selectedCustomers.length} Customer{selectedCustomers.length > 1 ? 's' : ''}
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
