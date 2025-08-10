@@ -417,17 +417,17 @@ export default function PropertyResults() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         <Header />
         {/* Header Skeleton */}
-        <header className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <header className="bg-white border-b border-gray-100">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="h-8 w-16 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-8 w-16 bg-gray-100 rounded animate-pulse"></div>
                 <div>
-                  <div className="h-6 w-32 bg-gray-200 rounded animate-pulse mb-1"></div>
-                  <div className="h-4 w-48 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-6 w-32 bg-gray-100 rounded animate-pulse mb-1"></div>
+                  <div className="h-4 w-48 bg-gray-100 rounded animate-pulse"></div>
                 </div>
               </div>
             </div>
@@ -435,20 +435,16 @@ export default function PropertyResults() {
         </header>
 
         {/* Results Skeleton */}
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center mb-6">
-            <div className="h-6 w-32 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-6 w-32 bg-gray-100 rounded animate-pulse"></div>
             <div className="flex space-x-2">
-              <div className="h-8 w-20 bg-gray-200 rounded animate-pulse"></div>
-              <div className="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-8 w-20 bg-gray-100 rounded animate-pulse"></div>
+              <div className="h-8 w-24 bg-gray-100 rounded animate-pulse"></div>
             </div>
           </div>
           
-          <div className={`${
-            viewMode === 'grid' 
-              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' 
-              : 'grid grid-cols-1 lg:grid-cols-2 gap-4'
-          }`}>
+          <div className="grid grid-cols-1 gap-4">
             {Array.from({ length: 8 }).map((_, i) => (
               <PropertyCardSkeleton key={i} />
             ))}
@@ -460,20 +456,19 @@ export default function PropertyResults() {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         {/* Header */}
-        <header className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+        <header className="bg-white border-b border-gray-100">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <Button 
-                  variant="ghost" 
+                <button 
                   onClick={() => navigate('/find-property')}
-                  className="flex items-center space-x-2 hover:bg-gray-100"
+                  className="flex items-center space-x-2 text-gray-600 hover:text-emerald-600 transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>Back</span>
-                </Button>
+                </button>
                 <div>
                   <h1 className="text-xl font-bold text-gray-900">
                     {preferences.intent === 'investment' ? 'Investment Properties' : 
@@ -597,48 +592,48 @@ export default function PropertyResults() {
         </div>
 
         {/* Results */}
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {matchingProperties.length === 0 ? (
             <div className="text-center py-12">
-              <div className="text-gray-400 text-6xl mb-4">🏠</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No matching properties found</h3>
+              <div className="text-gray-300 text-4xl mb-4">🏠</div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No matching properties found</h3>
               <p className="text-gray-600 mb-6">
                 Try adjusting your filters or budget range to see more options
               </p>
-              <Button onClick={() => navigate('/find-property')}>
+              <button 
+                onClick={() => navigate('/find-property')}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg transition-colors"
+              >
                 Refine Search
-              </Button>
+              </button>
             </div>
           ) : (
-            viewMode === 'grid' ? (
-              <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-6 grid-cols-1">
                 {matchingProperties.map(property => {
                   const matchInfo = getMatchLabel(property.matchScore);
                   
                   return (
-                    <Card key={property.id} className="group hover:shadow-lg transition-all duration-200 cursor-pointer border border-gray-200 hover:border-primary/30 bg-white">
+                    <div key={property.id} className="group cursor-pointer bg-white border border-gray-100 rounded-xl hover:border-emerald-200 hover:shadow-sm transition-all duration-200">
                       <div onClick={() => handleViewProperty(property)} className="relative">
                         {/* Property Image */}
-                        <div className="aspect-[4/3] bg-gradient-to-br from-blue-50 to-indigo-100 rounded-t-lg flex items-center justify-center relative overflow-hidden">
-                          <div className="text-primary/60 text-center">
-                            <div className="text-3xl mb-1">🏢</div>
-                            <p className="text-xs font-medium text-gray-600">Property Image</p>
+                        <div className="aspect-[4/3] bg-gray-50 rounded-t-xl flex items-center justify-center relative overflow-hidden">
+                          <div className="text-gray-300 text-center">
+                            <div className="text-2xl mb-1">🏢</div>
+                            <p className="text-xs text-gray-500">Property Image</p>
                           </div>
                           
                           {/* Match Badge - Top Left */}
-                          <Badge className={`absolute top-3 left-3 ${matchInfo.color} text-xs font-semibold shadow-sm`}>
+                          <div className="absolute top-3 left-3 bg-emerald-100 text-emerald-700 text-xs font-medium px-2 py-1 rounded-full">
                             {property.matchScore}% Match
-                          </Badge>
+                          </div>
                           
                           {/* Heart Button - Top Right */}
-                          <Button
-                            variant="ghost"
-                            size="sm"
+                          <button
                             onClick={(e) => {
                               e.stopPropagation();
                               toggleFavorite(property.id);
                             }}
-                            className="absolute top-2 right-2 h-8 w-8 bg-white/80 hover:bg-white backdrop-blur-sm"
+                            className="absolute top-3 right-3 w-7 h-7 bg-white/90 hover:bg-white rounded-full flex items-center justify-center transition-colors"
                           >
                             <Heart 
                               className={`h-4 w-4 ${
@@ -647,27 +642,27 @@ export default function PropertyResults() {
                                   : 'text-gray-400 hover:text-red-400'
                               }`} 
                             />
-                          </Button>
+                          </button>
                         </div>
 
                         {/* Card Content */}
                         <div className="p-4">
                           {/* Property Title */}
-                          <h3 className="font-bold text-lg text-gray-900 group-hover:text-primary transition-colors line-clamp-1 mb-1">
+                          <h3 className="font-medium text-gray-900 group-hover:text-emerald-600 transition-colors mb-1">
                             {property.name}
                           </h3>
                           
                           {/* Location */}
-                          <div className="flex items-center text-sm text-gray-600 mb-2">
+                          <div className="flex items-center text-sm text-gray-500 mb-2">
                             <MapPin className="h-3 w-3 mr-1 text-gray-400" />
-                            <span className="line-clamp-1">{property.area}, {property.zone ? property.zone.charAt(0).toUpperCase() + property.zone.slice(1) : 'Unknown Zone'}</span>
+                            <span>{property.area}, {property.zone ? property.zone.charAt(0).toUpperCase() + property.zone.slice(1) : 'Unknown Zone'}</span>
                           </div>
                           
                           {/* Developer */}
-                          <p className="text-xs text-gray-500 mb-3">By {property.developer}</p>
+                          <p className="text-xs text-gray-400 mb-3">By {property.developer}</p>
                           
                           {/* Price */}
-                          <div className="text-lg font-bold text-primary mb-3">
+                          <div className="text-lg font-medium text-emerald-600 mb-3">
                             {getPriceRange(property.configurations)}
                           </div>
                           
@@ -676,9 +671,9 @@ export default function PropertyResults() {
                             <div className="mb-3">
                               <div className="flex flex-wrap gap-1">
                                 {property.configurations.slice(0, 3).map((config, index) => (
-                                  <Badge key={index} variant="outline" className="text-xs px-2 py-0.5 bg-blue-50 border-blue-200 text-blue-700">
+                                  <span key={index} className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-md">
                                     {config.configuration}
-                                  </Badge>
+                                  </span>
                                 ))}
                                 {property.configurations.length > 3 && (
                                   <Badge variant="outline" className="text-xs px-2 py-0.5 bg-gray-50 border-gray-200 text-gray-600">
@@ -721,314 +716,88 @@ export default function PropertyResults() {
                           )}
                         </div>
                       </div>
-                    </Card>
+                    </div>
                   );
                 })}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {matchingProperties.map(property => {
-                  const matchInfo = getMatchLabel(property.matchScore);
-                  
-                  return (
-                    <Card key={property.id} className="group hover:shadow-md transition-all duration-200 cursor-pointer border border-gray-200 hover:border-primary/30 bg-white">
-                      <div onClick={() => handleViewProperty(property)} className="flex p-6 gap-6">
-                        {/* Thumbnail */}
-                        <div className="flex-shrink-0">
-                          <div className="w-32 h-32 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg flex items-center justify-center relative overflow-hidden">
-                            <div className="text-primary/60 text-center">
-                              <div className="text-4xl mb-1">🏢</div>
-                              <p className="text-xs font-medium text-gray-600">Property</p>
-                            </div>
-                            
-                            {/* Heart Button - Overlay */}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleFavorite(property.id);
-                              }}
-                              className="absolute top-2 right-2 h-8 w-8 bg-white/80 hover:bg-white backdrop-blur-sm p-0"
-                            >
-                              <Heart 
-                                className={`h-4 w-4 ${
-                                  favorites.has(property.id) 
-                                    ? 'fill-red-500 text-red-500' 
-                                    : 'text-gray-400 hover:text-red-400'
-                                }`} 
-                              />
-                            </Button>
-                          </div>
-                        </div>
-
-                        {/* Content */}
-                        <div className="flex-1 space-y-3 min-w-0">
-                          {/* Header Row */}
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-bold text-lg text-gray-900 group-hover:text-primary transition-colors line-clamp-1 mb-1">
-                                {property.name}
-                              </h3>
-                              
-                              <div className="flex items-center text-sm text-gray-600 mb-1">
-                                <MapPin className="h-4 w-4 mr-1 text-gray-400 shrink-0" />
-                                <span className="line-clamp-1">{property.area}, {property.zone ? property.zone.charAt(0).toUpperCase() + property.zone.slice(1) : 'Unknown Zone'}</span>
-                              </div>
-                              
-                              <p className="text-sm text-gray-500">By {property.developer}</p>
-                            </div>
-                            
-                            <Badge className={`${matchInfo.color} text-sm font-semibold shrink-0`}>
-                              {property.matchScore}% Match
-                            </Badge>
-                          </div>
-                          
-                          {/* Price */}
-                          <div className="text-xl font-bold text-primary">
-                            {getPriceRange(property.configurations)}
-                          </div>
-                          
-                          {/* Configurations Row */}
-                          {property.configurations.length > 0 && (
-                            <div>
-                              <p className="text-sm font-medium text-gray-700 mb-2">Available Configurations</p>
-                              <div className="flex flex-wrap gap-2">
-                                {property.configurations.slice(0, 4).map((config, index) => (
-                                  <Badge key={index} variant="outline" className="text-sm px-3 py-1 bg-blue-50 border-blue-200 text-blue-700">
-                                    {config.configuration}
-                                  </Badge>
-                                ))}
-                                {property.configurations.length > 4 && (
-                                  <Badge variant="outline" className="text-sm px-3 py-1 bg-gray-50 border-gray-200 text-gray-600">
-                                    +{property.configurations.length - 4} more
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                          
-                          {/* Intent-Based Highlights */}
-                          {preferences.intent && (
-                            <div>
-                              <p className="text-sm font-medium text-gray-700 mb-2">
-                                {preferences.intent === 'investment' ? 'Investment Metrics' : 'Lifestyle Highlights'}
-                              </p>
-                              <div className="flex flex-wrap gap-2">
-                                {getIntentHighlights(property).map((highlight, index) => (
-                                  <div key={index} className="flex items-center space-x-2 bg-gray-50 border border-gray-200 rounded-md px-3 py-2">
-                                    <highlight.icon className={`w-4 h-4 ${highlight.color}`} />
-                                    <span className="text-sm font-medium text-gray-700">{highlight.label}:</span>
-                                    <span className={`text-sm font-bold ${highlight.color}`}>{highlight.value}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                          
-                          {/* Features Row - Show only if no intent or as additional info */}
-                          {(!preferences.intent || property.tags.length > 0) && (
-                            <div>
-                              <p className="text-sm font-medium text-gray-700 mb-2">Key Features</p>
-                              <div className="flex flex-wrap gap-2">
-                                {property.tags.slice(0, preferences.intent ? 2 : 3).map(tag => (
-                                  <Badge key={tag} variant="secondary" className="text-sm px-3 py-1 bg-gray-100 text-gray-600">
-                                    {tag.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                  </Badge>
-                                ))}
-                                {property.tags.length > (preferences.intent ? 2 : 3) && (
-                                  <Badge variant="secondary" className="text-sm px-3 py-1 bg-gray-100 text-gray-600">
-                                    +{property.tags.length - (preferences.intent ? 2 : 3)} more
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </Card>
-                  );
-                })}
-              </div>
-            )
+            </div>
           )}
         </main>
       </div>
     </TooltipProvider>
   );
-}
 
-// Property Filters Component
-interface PropertyFiltersProps {
-  preferences: PropertyPreferences;
-  onUpdatePreferences: (preferences: PropertyPreferences) => void;
-  properties: Property[];
-}
-
-function PropertyFilters({ preferences, onUpdatePreferences, properties }: PropertyFiltersProps) {
-  // Extract real options from properties
-  const zones = Array.from(new Set(properties.map(p => p.zone))).sort();
-  const propertyTypes = Array.from(new Set(properties.map(p => p.type))).map(type => ({
-    value: type,
-    label: type.charAt(0).toUpperCase() + type.slice(1)
-  }));
-  
-  const allTags = Array.from(new Set(properties.flatMap(p => p.tags || []))).sort();
-  const tags = allTags.map(tag => ({
-    value: tag,
-    label: tag.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())
-  }));
-
-  const bhkOptions = ["1BHK", "2BHK", "3BHK", "4BHK", "5BHK+"];
-
-  const handlePreferenceChange = (key: keyof PropertyPreferences, value: any) => {
-    // Convert "any" back to empty string for internal use
-    const processedValue = value === "any" ? "" : value;
-    const newPreferences = {
-      ...preferences,
-      [key]: processedValue
-    };
-    onUpdatePreferences(newPreferences);
-  };
-
-  const handleArrayToggle = (key: keyof PropertyPreferences, value: string) => {
-    const currentArray = preferences[key] as string[];
-    const newArray = currentArray.includes(value)
-      ? currentArray.filter(item => item !== value)
-      : [...currentArray, value];
-    
-    handlePreferenceChange(key, newArray);
-  };
-
-  const formatBudget = (value: number) => {
-    if (value >= 100) {
-      return `₹${value / 100} Cr`;
-    }
-    return `₹${value} L`;
-  };
-
-  const clearAllFilters = () => {
-    const clearedPreferences: PropertyPreferences = {
-      intent: '',
-      propertyType: "",
-      cityId: "",
-      zoneId: "",
-      zone: "",
-      budgetRange: [50, 500],
-      bhkType: [],
-      amenities: [],
-      tags: []
-    };
-    onUpdatePreferences(clearedPreferences);
-  };
-
-  return (
-    <div className="space-y-6 py-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">Filters</h3>
-        <Button variant="ghost" size="sm" onClick={clearAllFilters}>
-          Clear All
-        </Button>
-      </div>
-
-      {/* Property Type */}
-      <div className="space-y-3">
-        <label className="text-sm font-medium text-gray-700">Property Type</label>
-        <Select 
-          value={preferences.propertyType || "any"} 
-          onValueChange={(value) => handlePreferenceChange('propertyType', value)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Any type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="any">Any Type</SelectItem>
-            {propertyTypes.map(type => (
-              <SelectItem key={type.value} value={type.value}>
-                {type.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Zone */}
-      <div className="space-y-3">
-        <label className="text-sm font-medium text-gray-700">Zone</label>
-        <Select 
-          value={preferences.zone || "any"} 
-          onValueChange={(value) => handlePreferenceChange('zone', value)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Any zone" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="any">Any Zone</SelectItem>
-            {zones.map(zone => zone ? (
-              <SelectItem key={zone} value={zone}>
-                {zone.charAt(0).toUpperCase() + zone.slice(1)} Bengaluru
-              </SelectItem>
-            ) : null)}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Budget Range */}
-      <div className="space-y-4">
-        <label className="text-sm font-medium text-gray-700">Budget Range</label>
-        <div className="px-2">
+  // Property Filters Component
+  function PropertyFilters({ 
+    preferences, 
+    onUpdatePreferences,
+    properties 
+  }: {
+    preferences: PropertyPreferences;
+    onUpdatePreferences: (updates: Partial<PropertyPreferences>) => void;
+    properties: Property[];
+  }) {
+    return (
+      <div className="space-y-6 mt-6">
+        {/* Budget Range */}
+        <div>
+          <h4 className="font-medium mb-3">Budget Range (₹L)</h4>
           <Slider
             value={preferences.budgetRange}
-            onValueChange={(value) => handlePreferenceChange('budgetRange', value as [number, number])}
-            max={500}
-            min={10}
-            step={10}
+            onValueChange={(value) => onUpdatePreferences({ budgetRange: value as [number, number] })}
+            min={50}
+            max={1000}
+            step={25}
             className="w-full"
           />
           <div className="flex justify-between text-sm text-gray-600 mt-2">
-            <span>{formatBudget(preferences.budgetRange[0])}</span>
-            <span>{formatBudget(preferences.budgetRange[1])}</span>
+            <span>₹{preferences.budgetRange[0]}L</span>
+            <span>₹{preferences.budgetRange[1]}L</span>
+          </div>
+        </div>
+
+        {/* Property Type */}
+        <div>
+          <h4 className="font-medium mb-3">Property Type</h4>
+          <Select value={preferences.propertyType} onValueChange={(value) => onUpdatePreferences({ propertyType: value })}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select property type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">All Types</SelectItem>
+              <SelectItem value="apartment">Apartment</SelectItem>
+              <SelectItem value="villa">Villa</SelectItem>
+              <SelectItem value="plot">Plot</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* BHK Type */}
+        <div>
+          <h4 className="font-medium mb-3">Configuration</h4>
+          <div className="grid grid-cols-2 gap-2">
+            {['1 BHK', '2 BHK', '3 BHK', '4 BHK', '5+ BHK'].map(bhk => (
+              <div key={bhk} className="flex items-center space-x-2">
+                <Checkbox
+                  id={bhk}
+                  checked={preferences.bhkType.includes(bhk)}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      onUpdatePreferences({ 
+                        bhkType: [...preferences.bhkType, bhk]
+                      });
+                    } else {
+                      onUpdatePreferences({
+                        bhkType: preferences.bhkType.filter(b => b !== bhk)
+                      });
+                    }
+                  }}
+                />
+                <label htmlFor={bhk} className="text-sm">{bhk}</label>
+              </div>
+            ))}
           </div>
         </div>
       </div>
-
-      {/* BHK Configuration */}
-      <div className="space-y-3">
-        <label className="text-sm font-medium text-gray-700">BHK Type</label>
-        <div className="grid grid-cols-2 gap-3">
-          {bhkOptions.map(bhk => (
-            <div key={bhk} className="flex items-center space-x-2">
-              <Checkbox 
-                id={`filter-${bhk}`}
-                checked={preferences.bhkType.includes(bhk)}
-                onCheckedChange={() => handleArrayToggle('bhkType', bhk)}
-              />
-              <label htmlFor={`filter-${bhk}`} className="text-sm text-gray-700 cursor-pointer">
-                {bhk}
-              </label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Tags */}
-      <div className="space-y-3">
-        <label className="text-sm font-medium text-gray-700">Features</label>
-        <div className="grid grid-cols-1 gap-3 max-h-48 overflow-y-auto">
-          {tags.slice(0, 10).map(tag => (
-            <div key={tag.value} className="flex items-center space-x-2">
-              <Checkbox 
-                id={`filter-${tag.value}`}
-                checked={preferences.tags?.includes(tag.value) || false}
-                onCheckedChange={() => handleArrayToggle('tags', tag.value)}
-              />
-              <label htmlFor={`filter-${tag.value}`} className="text-sm text-gray-700 cursor-pointer">
-                {tag.label}
-              </label>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+    );
+  }
 }
