@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { 
-  Search, Building, Edit2, Trash2, Eye, MapPin, Calendar, 
+import {
+  Search, Building, Edit2, Trash2, Eye, MapPin, Calendar,
   DollarSign, Tag, Users, Grid3X3, List, ChevronRight,
   AlertCircle, CheckCircle, Clock, Home
 } from "lucide-react";
@@ -17,7 +17,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { formatPriceDisplay } from "@/lib/utils";
 import AdminLayout from "@/components/layout/admin-layout";
 import { type Property, type PropertyStats } from "@shared/schema";
 
@@ -33,6 +32,10 @@ export default function PropertiesView() {
     type: "all",
     status: "all",
     zone: "all",
+    minPrice: 0,
+    maxPrice: 100000000, // Set a high default max price
+    reraApproved: "all", // 'all', 'true', 'false'
+    possessionDate: "all", // 'all', 'before-2023', '2023-2024', 'after-2024'
   });
 
   const { data: properties = [], isLoading } = useQuery<Property[]>({
@@ -43,19 +46,49 @@ export default function PropertiesView() {
     queryKey: ["/api/properties/stats"],
   });
 
-  const filteredProperties = properties.filter((property: Property) => {
-    const matchesSearch = 
+  const filteredAndSortedProperties = useMemo(() => {
+    let computedProperties = properties;
+
+    // Apply search query
+    computedProperties = computedProperties.filter((property: Property) =>
       property.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       property.developer.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      property.area.toLowerCase().includes(searchQuery.toLowerCase());
+      property.area.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
-    const matchesFilters = 
-      (filters.type === "all" || property.type === filters.type) &&
-      (filters.status === "all" || property.status === filters.status) &&
-      (filters.zone === "all" || property.zone === filters.zone);
+    // Apply filters
+    computedProperties = computedProperties.filter((property: Property) => {
+      const matchesFilters =
+        (filters.type === "all" || property.type === filters.type) &&
+        (filters.status === "all" || property.status === filters.status) &&
+        (filters.zone === "all" || property.zone === filters.zone) &&
+        (property.startingPrice !== undefined && property.startingPrice >= filters.minPrice) &&
+        (property.maxPrice !== undefined && property.maxPrice <= filters.maxPrice) &&
+        (filters.reraApproved === "all" || property.reraApproved === (filters.reraApproved === "true"));
 
-    return matchesSearch && matchesFilters;
-  });
+      // Possession date filtering logic
+      let possessionDateMatch = true;
+      if (filters.possessionDate !== "all") {
+        const propertyPossessionDate = new Date(property.possessionDate); // Assuming possessionDate is a valid date string
+
+        if (filters.possessionDate === "before-2023") {
+          possessionDateMatch = propertyPossessionDate.getFullYear() < 2023;
+        } else if (filters.possessionDate === "2023-2024") {
+          const year = propertyPossessionDate.getFullYear();
+          possessionDateMatch = year >= 2023 && year <= 2024;
+        } else if (filters.possessionDate === "after-2024") {
+          possessionDateMatch = propertyPossessionDate.getFullYear() > 2024;
+        }
+      }
+      return matchesFilters && possessionDateMatch;
+    });
+
+    // Sorting logic (example: by name)
+    computedProperties.sort((a, b) => a.name.localeCompare(b.name));
+
+    return computedProperties;
+  }, [properties, searchQuery, filters]);
+
 
   const deletePropertyMutation = useMutation({
     mutationFn: (id: string) => apiRequest("DELETE", `/api/properties/${id}`),
@@ -90,25 +123,14 @@ export default function PropertiesView() {
 
   const formatPriceDisplay = (startingPrice?: number, maxPrice?: number) => {
     if (!startingPrice && !maxPrice) return "Price on Request";
-    
+
     const formatPrice = (price: number): string => {
-      // Handle different price storage formats
-      if (price < 1000) {
-        // Price is stored in lakhs format (e.g., 120 = 120 lakhs)
-        if (price >= 100) {
-          return `₹${(price / 100).toFixed(2)} Cr`;
-        } else {
-          return `₹${price} L`;
-        }
+      if (price >= 10000000) { // 1 Cr and above
+        return `₹${(price / 10000000).toFixed(2)} Cr`;
+      } else if (price >= 100000) { // 1 Lakh and above (but below 1 Cr)
+        return `₹${(price / 100000).toFixed(2)} L`;
       } else {
-        // Price is stored in actual rupees
-        if (price >= 10000000) { // 1 Cr and above
-          return `₹${(price / 10000000).toFixed(2)} Cr`;
-        } else if (price >= 100000) { // 1 Lakh and above (but below 1 Cr)
-          return `₹${(price / 100000).toFixed(2)} L`;
-        } else {
-          return `₹${price.toLocaleString()}`;
-        }
+        return `₹${price.toLocaleString()}`;
       }
     };
 
@@ -119,7 +141,7 @@ export default function PropertiesView() {
     } else if (maxPrice) {
       return formatPrice(maxPrice);
     }
-    
+
     return "Price on Request";
   };
 
@@ -130,10 +152,10 @@ export default function PropertiesView() {
       "under-construction": { color: "bg-blue-100 text-blue-800", icon: Clock },
       "coming-soon": { color: "bg-yellow-100 text-yellow-800", icon: AlertCircle },
     };
-    
+
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.active;
     const IconComponent = config.icon;
-    
+
     return (
       <Badge className={`${config.color} flex items-center space-x-1`}>
         <IconComponent className="h-3 w-3" />
@@ -149,7 +171,7 @@ export default function PropertiesView() {
       plot: "bg-orange-50 text-orange-700",
       commercial: "bg-purple-50 text-purple-700",
     };
-    
+
     return (
       <Badge className={typeColors[type as keyof typeof typeColors] || "bg-gray-50 text-gray-700"}>
         {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -214,8 +236,8 @@ export default function PropertiesView() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  <span>Properties ({filteredProperties.length})</span>
-                  <Badge variant="outline">{filteredProperties.length} properties found</Badge>
+                  <span>Properties ({filteredAndSortedProperties.length})</span>
+                  <Badge variant="outline">{filteredAndSortedProperties.length} properties found</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -233,7 +255,7 @@ export default function PropertiesView() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredProperties.map((property) => (
+                      {filteredAndSortedProperties.map((property) => (
                         <TableRow key={property.id} className="hover:bg-gray-50">
                           <TableCell>
                             <div className="flex items-center space-x-3">
@@ -301,8 +323,8 @@ export default function PropertiesView() {
                     </TableBody>
                   </Table>
                 </div>
-                
-                {filteredProperties.length === 0 && (
+
+                {filteredAndSortedProperties.length === 0 && (
                   <div className="text-center py-12">
                     <Building className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">No properties found</h3>
@@ -314,7 +336,7 @@ export default function PropertiesView() {
           ) : (
             /* Card View */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProperties.map((property) => (
+              {filteredAndSortedProperties.map((property) => (
                 <Card key={property.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
@@ -343,7 +365,7 @@ export default function PropertiesView() {
                         <p className="font-medium">{property.zone}</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex space-x-2 pt-2">
                       <Button
                         variant="outline"
